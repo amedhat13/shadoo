@@ -1,25 +1,69 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Users,
   DollarSign,
   Camera,
-  FileText,
   Pause,
   Play,
   Archive,
   Edit,
-  HelpCircle,
+  CheckCircle2,
+  Clock,
+  Target,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MissionStatusBadge } from '@/components/missions/MissionStatusBadge';
 import { WalletCard } from '@/components/wallet/WalletCard';
+import { CompletedVisitsDialog, CompletedVisit } from '@/components/missions/CompletedVisitsDialog';
 import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/hooks/use-toast';
 import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
+
+// Mock completed visits data
+const mockCompletedVisits: CompletedVisit[] = [
+  {
+    id: 'visit-1',
+    agent_name: 'Mohamed Ali',
+    completed_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    purchase_amount: 150,
+    photos: ['photo1.jpg', 'photo2.jpg'],
+    answers: [
+      { question: 'Was the store clean?', type: 'yes_no', answer: true },
+      { question: 'Rate the staff friendliness', type: 'rating', answer: 4 },
+      { question: 'Any additional comments?', type: 'short_text', answer: 'Staff was very helpful and professional.' },
+    ],
+  },
+  {
+    id: 'visit-2',
+    agent_name: 'Sara Ahmed',
+    completed_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+    purchase_amount: 200,
+    photos: ['photo3.jpg', 'photo4.jpg', 'photo5.jpg'],
+    answers: [
+      { question: 'Was the store clean?', type: 'yes_no', answer: true },
+      { question: 'Rate the staff friendliness', type: 'rating', answer: 5 },
+      { question: 'Any additional comments?', type: 'short_text', answer: 'Excellent experience overall!' },
+    ],
+  },
+  {
+    id: 'visit-3',
+    agent_name: 'Omar Hassan',
+    completed_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    purchase_amount: 175,
+    photos: ['photo6.jpg', 'photo7.jpg'],
+    answers: [
+      { question: 'Was the store clean?', type: 'yes_no', answer: false },
+      { question: 'Rate the staff friendliness', type: 'rating', answer: 3 },
+      { question: 'Any additional comments?', type: 'short_text', answer: 'Store needs some cleaning, but staff was okay.' },
+    ],
+  },
+];
 
 export default function MissionDetailsPage() {
   const navigate = useNavigate();
@@ -27,6 +71,7 @@ export default function MissionDetailsPage() {
   const { toast } = useToast();
   const { getMission, updateMissionStatus } = useMissions();
   const { wallet } = useWallet();
+  const [showCompletedVisits, setShowCompletedVisits] = useState(false);
 
   const mission = id ? getMission(id) : null;
 
@@ -51,6 +96,7 @@ export default function MissionDetailsPage() {
   };
 
   const budgetRemaining = mission.total_purchase_budget - mission.budget_used;
+  const visitsRemaining = mission.number_of_visits - mission.visits_completed - mission.visits_pending;
 
   const handlePause = async () => {
     await updateMissionStatus(mission.id, 'paused');
@@ -76,6 +122,8 @@ export default function MissionDetailsPage() {
     });
     navigate('/missions');
   };
+
+  const isActiveMission = mission.status === 'published' || mission.status === 'paused' || mission.status === 'completed';
 
   return (
     <DashboardLayout>
@@ -139,6 +187,92 @@ export default function MissionDetailsPage() {
           </div>
         </div>
 
+        {/* Performance Stats Cards - TOP SECTION */}
+        {isActiveMission && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Completed - Clickable */}
+            <button
+              onClick={() => setShowCompletedVisits(true)}
+              className="text-left transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            >
+              <Card className="border-2 border-success/30 bg-success/5 hover:border-success/50 transition-colors h-full">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 text-success mb-1">
+                        <CheckCircle2 className="h-5 w-5" />
+                        <span className="text-xs uppercase tracking-wide font-bold">Completed</span>
+                      </div>
+                      <div className="text-4xl font-black text-success">
+                        {mission.visits_completed}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Click to view details →
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </button>
+
+            {/* Pending */}
+            <Card className="border border-primary/30 bg-primary/5">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <Clock className="h-5 w-5" />
+                  <span className="text-xs uppercase tracking-wide font-bold">Pending</span>
+                </div>
+                <div className="text-4xl font-black text-primary">
+                  {mission.visits_pending}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Awaiting agent submission
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Remaining */}
+            <Card className="border border-border bg-muted/30">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <Target className="h-5 w-5" />
+                  <span className="text-xs uppercase tracking-wide font-bold">Remaining</span>
+                </div>
+                <div className="text-4xl font-black">
+                  {visitsRemaining}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Available for agents
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Progress Bar */}
+        {isActiveMission && (
+          <Card className="border border-border">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-muted-foreground uppercase tracking-wide text-xs font-bold">
+                  Mission Progress
+                </span>
+                <span className="font-bold">
+                  {mission.visits_completed} / {mission.number_of_visits} visits completed
+                </span>
+              </div>
+              <div className="h-3 overflow-hidden bg-muted rounded-sm">
+                <div
+                  className="h-full bg-success transition-all duration-500"
+                  style={{
+                    width: `${(mission.visits_completed / mission.number_of_visits) * 100}%`,
+                  }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
@@ -198,61 +332,6 @@ export default function MissionDetailsPage() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Performance Stats */}
-            {(mission.status === 'published' || mission.status === 'paused' || mission.status === 'completed') && (
-              <Card className="border border-border">
-                <CardHeader>
-                  <CardTitle className="text-sm font-bold uppercase tracking-wide">Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="border border-success/30 bg-success/5 p-4 text-center">
-                      <div className="text-3xl font-black text-success">
-                        {mission.visits_completed}
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
-                        Completed
-                      </div>
-                    </div>
-                    <div className="border border-primary/30 bg-primary/5 p-4 text-center">
-                      <div className="text-3xl font-black text-primary">
-                        {mission.visits_pending}
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
-                        Pending
-                      </div>
-                    </div>
-                    <div className="border border-border bg-muted/30 p-4 text-center">
-                      <div className="text-3xl font-black">
-                        {mission.number_of_visits - mission.visits_completed - mission.visits_pending}
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
-                        Remaining
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="mt-6">
-                    <div className="mb-2 flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground uppercase tracking-wide text-xs">Completion</span>
-                      <span className="font-bold">
-                        {mission.visits_completed} / {mission.number_of_visits}
-                      </span>
-                    </div>
-                    <div className="h-2 overflow-hidden bg-muted">
-                      <div
-                        className="h-full bg-success transition-all duration-500"
-                        style={{
-                          width: `${(mission.visits_completed / mission.number_of_visits) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -318,6 +397,14 @@ export default function MissionDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Completed Visits Dialog */}
+      <CompletedVisitsDialog
+        open={showCompletedVisits}
+        onOpenChange={setShowCompletedVisits}
+        visits={mockCompletedVisits}
+        missionName={mission.name}
+      />
     </DashboardLayout>
   );
 }
