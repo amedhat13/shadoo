@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { MissionStatus } from '@/types/mission';
+import { MissionStatus } from '@/types';
 import { MISSION_STATUS_LABELS } from '@/lib/constants';
 
 interface MissionStatusBadgeProps {
@@ -7,13 +7,12 @@ interface MissionStatusBadgeProps {
   className?: string;
 }
 
-// Brand colors: Green = approved/completed, Orange = pending/action, Black/Gray = inactive
+// Brand colors: Green = active/completed, Orange = pending/action, Gray = inactive
 const statusStyles: Record<MissionStatus, string> = {
   draft: 'bg-muted text-muted-foreground border-border',
-  ready_for_funding: 'bg-primary/10 text-primary border-primary/30',
   published: 'bg-success/10 text-success border-success/30',
   paused: 'bg-primary/10 text-primary border-primary/30',
-  expired: 'bg-muted text-muted-foreground border-border',
+  completed: 'bg-foreground/10 text-foreground border-border',
   archived: 'bg-muted text-muted-foreground border-border',
 };
 

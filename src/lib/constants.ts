@@ -2,20 +2,25 @@
 
 export const MISSION_STATUS_LABELS: Record<string, string> = {
   draft: 'Draft',
-  ready_for_funding: 'Ready for Funding',
   published: 'Published',
   paused: 'Paused',
-  expired: 'Expired',
+  completed: 'Completed',
   archived: 'Archived',
 };
 
 export const MISSION_STATUS_DESCRIPTIONS: Record<string, string> = {
   draft: 'Mission is being created',
-  ready_for_funding: 'Mission is complete and awaiting funding',
-  published: 'Mission is live and accepting agents',
+  published: 'Mission is live and accepting visits',
   paused: 'Mission is temporarily paused',
-  expired: 'Mission has passed its end date',
+  completed: 'All visits have been completed',
   archived: 'Mission has been archived',
+};
+
+export const QUESTION_TYPE_LABELS: Record<string, string> = {
+  multiple_choice: 'Multiple Choice',
+  rating: 'Rating',
+  short_text: 'Short Text',
+  yes_no: 'Yes / No',
 };
 
 export const CURRENCY = {
@@ -26,12 +31,13 @@ export const CURRENCY = {
 
 export const FORM_STEPS = [
   { id: 'basics', title: 'Basics', description: 'Mission details' },
-  { id: 'requirements', title: 'Requirements', description: 'Agent requirements' },
-  { id: 'reward', title: 'Reward & Funding', description: 'Payment configuration' },
+  { id: 'questions', title: 'Questions & Photos', description: 'Build questionnaire' },
+  { id: 'funding', title: 'Visits & Funding', description: 'Budget configuration' },
   { id: 'review', title: 'Review', description: 'Review and publish' },
 ];
 
 export const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', href: '/', icon: 'LayoutDashboard' },
   { id: 'missions', label: 'Missions', href: '/missions', icon: 'ClipboardList' },
   { id: 'branches', label: 'Branches', href: '/branches', icon: 'Building2' },
   { id: 'wallet', label: 'Wallet', href: '/wallet', icon: 'Wallet' },
@@ -50,16 +56,26 @@ export const EMPTY_STATES = {
     description: 'Add your first branch to organize missions by location.',
     action: 'Add Branch',
   },
+  questions: {
+    title: 'No questions added',
+    description: 'Add questions that agents will answer during each visit.',
+    action: 'Add Question',
+  },
 };
 
 export const MESSAGES = {
   publish: {
-    confirmation: 'Publishing this mission will place a hold of {amount} on your wallet.',
+    confirmation: 'Publishing this mission will allocate {amount} EGP from your wallet to fund purchases across {visits} visits.',
     success: 'Mission published successfully!',
     error: 'Failed to publish mission. Please try again.',
   },
   funding: {
-    insufficient: 'Insufficient wallet balance. Please add funds to publish this mission.',
-    info: 'Funds will be placed on hold when you publish this mission.',
+    insufficient_balance: 'Insufficient wallet balance. Please add funds to publish this mission.',
+    insufficient_visits: "You've used all visits in your package this month. Upgrade your plan or wait until next month.",
+    info: 'Funds will be allocated from your wallet when you publish this mission.',
+  },
+  visits: {
+    consumption_warning: 'This mission will consume {count} visits from your monthly allowance.',
+    none_remaining: "You've used all visits in your package this month. Upgrade your plan or wait until next month.",
   },
 };

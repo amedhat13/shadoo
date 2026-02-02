@@ -1,17 +1,15 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { format } from 'date-fns';
 import {
   ArrowLeft,
-  Calendar,
   Users,
   DollarSign,
   Camera,
-  Receipt,
   FileText,
   Pause,
   Play,
   Archive,
   Edit,
+  HelpCircle,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -21,7 +19,7 @@ import { WalletCard } from '@/components/wallet/WalletCard';
 import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/hooks/use-toast';
-import { CURRENCY } from '@/lib/constants';
+import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 
 export default function MissionDetailsPage() {
   const navigate = useNavigate();
@@ -52,8 +50,7 @@ export default function MissionDetailsPage() {
     return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
   };
 
-  const usedAmount = (mission.completed_runs || 0) * mission.per_run_max_cost!;
-  const remainingHold = (mission.required_hold || 0) - usedAmount;
+  const budgetRemaining = mission.total_purchase_budget - mission.budget_used;
 
   const handlePause = async () => {
     await updateMissionStatus(mission.id, 'paused');
@@ -96,7 +93,7 @@ export default function MissionDetailsPage() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-black uppercase tracking-tight">
-                  {mission.title}
+                  {mission.name}
                 </h1>
                 <MissionStatusBadge status={mission.status} />
               </div>
@@ -145,59 +142,65 @@ export default function MissionDetailsPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Mission Summary */}
+            {/* Questions Summary */}
             <Card className="border border-border">
               <CardHeader>
-                <CardTitle className="text-sm font-bold uppercase tracking-wide">Mission Details</CardTitle>
+                <CardTitle className="text-sm font-bold uppercase tracking-wide">
+                  Questions ({mission.questions.length})
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">{mission.description}</p>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 border border-border p-3">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wide">Duration</div>
-                      <div className="text-sm font-semibold">
-                        {format(new Date(mission.start_date), 'MMM d')} -{' '}
-                        {format(new Date(mission.end_date), 'MMM d, yyyy')}
+              <CardContent className="space-y-3">
+                {mission.questions.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No questions configured.</p>
+                ) : (
+                  mission.questions.map((question, index) => (
+                    <div
+                      key={question.id}
+                      className="flex items-start gap-3 border border-border p-3"
+                    >
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{question.text}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {QUESTION_TYPE_LABELS[question.type]}
+                          {question.required && ' • Required'}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 border border-border p-3">
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wide">Quota</div>
-                      <div className="text-sm font-semibold">{mission.quota} runs</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="border-t border-border pt-4">
-                  <h4 className="text-xs font-bold uppercase tracking-wide mb-3">Requirements</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <div className="flex items-center gap-1.5 border border-border bg-muted/30 px-3 py-1 text-sm font-medium">
-                      <Camera className="h-3.5 w-3.5" />
-                      {mission.required_photos_count} photos
-                    </div>
-                    <div className="flex items-center gap-1.5 border border-border bg-muted/30 px-3 py-1 text-sm font-medium">
-                      <Receipt className="h-3.5 w-3.5" />
-                      Receipt required
-                    </div>
-                    {mission.quiz_id && (
-                      <div className="flex items-center gap-1.5 border border-border bg-muted/30 px-3 py-1 text-sm font-medium">
-                        <FileText className="h-3.5 w-3.5" />
-                        Quiz attached
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  ))
+                )}
               </CardContent>
             </Card>
 
-            {/* Stats */}
-            {(mission.status === 'published' || mission.status === 'paused') && (
+            {/* Photo Requirements */}
+            <Card className="border border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+                  <Camera className="h-4 w-4" />
+                  Photo Requirements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 border border-border px-3 py-2">
+                    <Camera className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-semibold">
+                      {mission.photo_requirements.required_count} photos required
+                    </span>
+                  </div>
+                </div>
+                {mission.photo_requirements.instructions && (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {mission.photo_requirements.instructions}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Performance Stats */}
+            {(mission.status === 'published' || mission.status === 'paused' || mission.status === 'completed') && (
               <Card className="border border-border">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold uppercase tracking-wide">Performance</CardTitle>
@@ -206,7 +209,7 @@ export default function MissionDetailsPage() {
                   <div className="grid grid-cols-3 gap-4">
                     <div className="border border-success/30 bg-success/5 p-4 text-center">
                       <div className="text-3xl font-black text-success">
-                        {mission.completed_runs || 0}
+                        {mission.visits_completed}
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
                         Completed
@@ -214,7 +217,7 @@ export default function MissionDetailsPage() {
                     </div>
                     <div className="border border-primary/30 bg-primary/5 p-4 text-center">
                       <div className="text-3xl font-black text-primary">
-                        {mission.pending_runs || 0}
+                        {mission.visits_pending}
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
                         Pending
@@ -222,10 +225,10 @@ export default function MissionDetailsPage() {
                     </div>
                     <div className="border border-border bg-muted/30 p-4 text-center">
                       <div className="text-3xl font-black">
-                        {mission.approval_rate || 0}%
+                        {mission.number_of_visits - mission.visits_completed - mission.visits_pending}
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wide">
-                        Approval Rate
+                        Remaining
                       </div>
                     </div>
                   </div>
@@ -235,14 +238,14 @@ export default function MissionDetailsPage() {
                     <div className="mb-2 flex items-center justify-between text-sm">
                       <span className="text-muted-foreground uppercase tracking-wide text-xs">Completion</span>
                       <span className="font-bold">
-                        {mission.completed_runs || 0} / {mission.quota}
+                        {mission.visits_completed} / {mission.number_of_visits}
                       </span>
                     </div>
                     <div className="h-2 overflow-hidden bg-muted">
                       <div
                         className="h-full bg-success transition-all duration-500"
                         style={{
-                          width: `${((mission.completed_runs || 0) / mission.quota) * 100}%`,
+                          width: `${(mission.visits_completed / mission.number_of_visits) * 100}%`,
                         }}
                       />
                     </div>
@@ -263,46 +266,44 @@ export default function MissionDetailsPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <DollarSign className="h-4 w-4" />
-                      Fixed Reward
+                      <Users className="h-4 w-4" />
+                      Number of Visits
                     </span>
-                    <span className="font-semibold">
-                      {formatCurrency(mission.fixed_reward)}
-                    </span>
+                    <span className="font-semibold">{mission.number_of_visits}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Receipt className="h-4 w-4" />
-                      Reimbursement Cap
+                      <DollarSign className="h-4 w-4" />
+                      Budget per Visit
                     </span>
                     <span className="font-semibold">
-                      {formatCurrency(mission.reimbursement_cap)}
+                      {formatCurrency(mission.purchase_budget_per_visit)}
                     </span>
                   </div>
                   <div className="border-t border-border pt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold uppercase tracking-wide">Per-run Max</span>
+                      <span className="text-sm font-bold uppercase tracking-wide">Total Budget</span>
                       <span className="font-black text-primary">
-                        {formatCurrency(mission.per_run_max_cost || 0)}
+                        {formatCurrency(mission.total_purchase_budget)}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Hold breakdown */}
+                {/* Budget breakdown for active missions */}
                 {(mission.status === 'published' || mission.status === 'paused') && (
                   <div className="border border-border p-3 space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Required Hold</span>
-                      <span>{formatCurrency(mission.required_hold || 0)}</span>
+                      <span className="text-muted-foreground">Total Allocated</span>
+                      <span>{formatCurrency(mission.total_purchase_budget)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Used Amount</span>
-                      <span className="text-success font-semibold">-{formatCurrency(usedAmount)}</span>
+                      <span className="text-muted-foreground">Used</span>
+                      <span className="text-destructive font-semibold">-{formatCurrency(mission.budget_used)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm font-bold border-t border-border pt-2">
                       <span className="uppercase tracking-wide">Remaining</span>
-                      <span>{formatCurrency(remainingHold)}</span>
+                      <span className="text-success">{formatCurrency(budgetRemaining)}</span>
                     </div>
                   </div>
                 )}
@@ -312,7 +313,7 @@ export default function MissionDetailsPage() {
             {/* Wallet Card */}
             <WalletCard
               availableBalance={wallet.available_balance}
-              onHoldBalance={wallet.on_hold_balance}
+              allocatedToMissions={wallet.allocated_to_missions}
             />
           </div>
         </div>

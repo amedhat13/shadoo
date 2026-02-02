@@ -6,27 +6,26 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { FORM_STEPS } from '@/lib/constants';
-import { MissionFormData } from '@/types/mission';
+import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
-import { StepRequirements } from '@/components/missions/form/StepRequirements';
-import { StepReward } from '@/components/missions/form/StepReward';
+import { StepQuestions } from '@/components/missions/form/StepQuestions';
+import { StepFunding } from '@/components/missions/form/StepFunding';
 import { StepReview } from '@/components/missions/form/StepReview';
 import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
+import { usePackage } from '@/hooks/usePackage';
 import { useToast } from '@/hooks/use-toast';
 
 const initialFormData: MissionFormData = {
-  title: '',
+  name: '',
   branch_id: '',
-  description: '',
-  start_date: undefined,
-  end_date: undefined,
-  quota: 10,
-  quiz_id: undefined,
-  form_id: undefined,
-  required_photos_count: 3,
-  fixed_reward: 100,
-  reimbursement_cap: 50,
+  questions: [],
+  photo_requirements: {
+    required_count: 3,
+    instructions: '',
+  },
+  number_of_visits: 10,
+  purchase_budget_per_visit: 100,
 };
 
 export default function MissionCreatePage() {
@@ -34,7 +33,8 @@ export default function MissionCreatePage() {
   const { id } = useParams();
   const { toast } = useToast();
   const { createMission, publishMission, getMission, branches } = useMissions();
-  const { wallet, placeHold } = useWallet();
+  const { wallet, allocateBudget } = useWallet();
+  const { visitsRemaining, consumeVisits, subscription } = usePackage();
 
   const isEditing = Boolean(id);
   const existingMission = id ? getMission(id) : null;
@@ -43,26 +43,21 @@ export default function MissionCreatePage() {
   const [formData, setFormData] = useState<MissionFormData>(() => {
     if (existingMission) {
       return {
-        title: existingMission.title,
+        name: existingMission.name,
         branch_id: existingMission.branch_id,
-        description: existingMission.description,
-        start_date: existingMission.start_date ? new Date(existingMission.start_date) : undefined,
-        end_date: existingMission.end_date ? new Date(existingMission.end_date) : undefined,
-        quota: existingMission.quota,
-        quiz_id: existingMission.quiz_id,
-        form_id: existingMission.form_id,
-        required_photos_count: existingMission.required_photos_count,
-        fixed_reward: existingMission.fixed_reward,
-        reimbursement_cap: existingMission.reimbursement_cap,
+        questions: existingMission.questions,
+        photo_requirements: existingMission.photo_requirements,
+        number_of_visits: existingMission.number_of_visits,
+        purchase_budget_per_visit: existingMission.purchase_budget_per_visit,
       };
     }
     return initialFormData;
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const perRunMaxCost = formData.fixed_reward + formData.reimbursement_cap;
-  const requiredHold = formData.quota * perRunMaxCost;
-  const canPublish = wallet.available_balance >= requiredHold;
+  const totalPurchaseBudget = formData.number_of_visits * formData.purchase_budget_per_visit;
+  
+  const { canPublish, reason } = canPublishMission(formData, subscription, wallet);
 
   const updateFormData = (updates: Partial<MissionFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -71,18 +66,11 @@ export default function MissionCreatePage() {
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0: // Basics
-        return Boolean(
-          formData.title &&
-          formData.branch_id &&
-          formData.description &&
-          formData.start_date &&
-          formData.end_date &&
-          formData.quota > 0
-        );
-      case 1: // Requirements
-        return formData.required_photos_count >= 0;
-      case 2: // Reward
-        return formData.fixed_reward > 0;
+        return Boolean(formData.name && formData.branch_id);
+      case 1: // Questions & Photos
+        return formData.questions.length > 0 && formData.questions.every(q => q.text.trim() !== '');
+      case 2: // Funding
+        return formData.number_of_visits > 0;
       case 3: // Review
         return isStepValid(0) && isStepValid(1) && isStepValid(2);
       default:
@@ -106,9 +94,12 @@ export default function MissionCreatePage() {
     setIsSubmitting(true);
     try {
       await createMission({
-        ...formData,
-        start_date: formData.start_date?.toISOString().split('T')[0],
-        end_date: formData.end_date?.toISOString().split('T')[0],
+        name: formData.name,
+        branch_id: formData.branch_id,
+        questions: formData.questions,
+        photo_requirements: formData.photo_requirements,
+        number_of_visits: formData.number_of_visits,
+        purchase_budget_per_visit: formData.purchase_budget_per_visit,
       });
       toast({
         title: 'Draft saved',
@@ -132,15 +123,21 @@ export default function MissionCreatePage() {
     setIsSubmitting(true);
     try {
       const mission = await createMission({
-        ...formData,
-        start_date: formData.start_date?.toISOString().split('T')[0],
-        end_date: formData.end_date?.toISOString().split('T')[0],
+        name: formData.name,
+        branch_id: formData.branch_id,
+        questions: formData.questions,
+        photo_requirements: formData.photo_requirements,
+        number_of_visits: formData.number_of_visits,
+        purchase_budget_per_visit: formData.purchase_budget_per_visit,
       });
+      
       await publishMission(mission.id);
-      await placeHold(requiredHold);
+      await allocateBudget(totalPurchaseBudget);
+      await consumeVisits(formData.number_of_visits);
+      
       toast({
         title: 'Mission published!',
-        description: `Your mission is now live. ${requiredHold.toLocaleString()} EGP has been placed on hold.`,
+        description: `Your mission is now live. ${totalPurchaseBudget.toLocaleString()} EGP has been allocated.`,
       });
       navigate('/missions');
     } catch (error) {
@@ -166,18 +163,18 @@ export default function MissionCreatePage() {
         );
       case 1:
         return (
-          <StepRequirements
+          <StepQuestions
             data={formData}
             onChange={updateFormData}
           />
         );
       case 2:
         return (
-          <StepReward
+          <StepFunding
             data={formData}
             onChange={updateFormData}
-            perRunMaxCost={perRunMaxCost}
-            requiredHold={requiredHold}
+            visitsRemaining={visitsRemaining}
+            walletBalance={wallet.available_balance}
           />
         );
       case 3:
@@ -186,9 +183,9 @@ export default function MissionCreatePage() {
             data={formData}
             branches={branches}
             wallet={wallet}
-            perRunMaxCost={perRunMaxCost}
-            requiredHold={requiredHold}
+            visitsRemaining={visitsRemaining}
             canPublish={canPublish}
+            publishBlockReason={reason}
             onPublish={handlePublish}
             onSaveDraft={handleSaveDraft}
             isSubmitting={isSubmitting}
