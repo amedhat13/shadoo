@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
+  LayoutDashboard,
   ClipboardList, 
   Building2, 
   Wallet, 
@@ -14,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import shadooLogo from '@/assets/shadoo-logo.png';
 
 const navItems = [
+  { id: 'dashboard', label: 'DASHBOARD', href: '/', icon: LayoutDashboard },
   { id: 'missions', label: 'MISSIONS', href: '/missions', icon: ClipboardList },
   { id: 'branches', label: 'BRANCHES', href: '/branches', icon: Building2 },
   { id: 'wallet', label: 'WALLET', href: '/wallet', icon: Wallet },
@@ -66,7 +68,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-2 py-4">
           {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.href);
+            const isActive = item.href === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.href);
             const Icon = item.icon;
             
             return (
