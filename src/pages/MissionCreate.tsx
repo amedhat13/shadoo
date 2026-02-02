@@ -220,7 +220,7 @@ export default function MissionCreatePage() {
         </div>
 
         {/* Progress Steps - Horizontal on desktop, compact on mobile */}
-        <div className="flex items-center justify-between overflow-x-auto pb-2">
+        <div className="flex items-center justify-between gap-1 pb-2">
           {FORM_STEPS.map((step, index) => (
             <div
               key={step.id}
@@ -230,14 +230,14 @@ export default function MissionCreatePage() {
                 onClick={() => index < currentStep && setCurrentStep(index)}
                 disabled={index > currentStep}
                 className={cn(
-                  'flex items-center gap-1 md:gap-2 transition-colors shrink-0',
+                  'flex items-center gap-1.5 lg:gap-2 transition-colors shrink-0',
                   index <= currentStep ? 'text-foreground' : 'text-muted-foreground',
                   index < currentStep && 'cursor-pointer hover:text-primary'
                 )}
               >
                 <div
                   className={cn(
-                    'flex h-7 w-7 md:h-8 md:w-8 items-center justify-center text-xs md:text-sm font-bold transition-all shrink-0',
+                    'flex h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 items-center justify-center text-xs font-bold transition-all shrink-0',
                     index < currentStep
                       ? 'bg-success text-success-foreground'
                       : index === currentStep
@@ -246,19 +246,19 @@ export default function MissionCreatePage() {
                   )}
                 >
                   {index < currentStep ? (
-                    <Check className="h-3 w-3 md:h-4 md:w-4" />
+                    <Check className="h-3 w-3" />
                   ) : (
                     index + 1
                   )}
                 </div>
-                <span className="hidden md:block text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
+                <span className="hidden lg:block text-xs xl:text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
                   {step.title}
                 </span>
               </button>
               {index < FORM_STEPS.length - 1 && (
                 <div
                   className={cn(
-                    'mx-2 md:mx-4 h-px flex-1 min-w-4',
+                    'mx-1 md:mx-2 lg:mx-3 h-px flex-1 min-w-2 md:min-w-4',
                     index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
