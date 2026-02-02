@@ -5,16 +5,16 @@ import {
   Wallet, 
   BarChart3, 
   Settings,
-  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import shadooLogo from '@/assets/shadoo-logo.png';
 
 const navItems = [
-  { id: 'missions', label: 'Missions', href: '/missions', icon: ClipboardList },
-  { id: 'branches', label: 'Branches', href: '/branches', icon: Building2 },
-  { id: 'wallet', label: 'Wallet', href: '/wallet', icon: Wallet },
-  { id: 'reports', label: 'Reports', href: '/reports', icon: BarChart3 },
-  { id: 'settings', label: 'Settings', href: '/settings', icon: Settings },
+  { id: 'missions', label: 'MISSIONS', href: '/missions', icon: ClipboardList },
+  { id: 'branches', label: 'BRANCHES', href: '/branches', icon: Building2 },
+  { id: 'wallet', label: 'WALLET', href: '/wallet', icon: Wallet },
+  { id: 'reports', label: 'REPORTS', href: '/reports', icon: BarChart3 },
+  { id: 'settings', label: 'SETTINGS', href: '/settings', icon: Settings },
 ];
 
 export function Sidebar() {
@@ -24,13 +24,12 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar">
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
-            <Zap className="h-5 w-5 text-sidebar-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold text-sidebar-accent-foreground">
-            Shadoo
-          </span>
+        <div className="flex h-20 items-center border-b border-sidebar-border px-6">
+          <img 
+            src={shadooLogo} 
+            alt="Shadoo" 
+            className="h-12 w-auto"
+          />
         </div>
 
         {/* Navigation */}
@@ -44,10 +43,10 @@ export function Sidebar() {
                 key={item.id}
                 to={item.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                  'flex items-center gap-3 px-3 py-2.5 text-sm font-semibold tracking-wide transition-colors',
                   isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-muted hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                    ? 'bg-sidebar-accent text-primary'
+                    : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground'
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -59,12 +58,12 @@ export function Sidebar() {
 
         {/* Wallet Quick View */}
         <div className="border-t border-sidebar-border p-4">
-          <div className="rounded-lg bg-sidebar-accent p-3">
-            <div className="flex items-center gap-2 text-xs text-sidebar-muted">
+          <div className="border border-sidebar-border p-3">
+            <div className="flex items-center gap-2 text-xs text-sidebar-muted uppercase tracking-wide">
               <Wallet className="h-3.5 w-3.5" />
               <span>Wallet Balance</span>
             </div>
-            <div className="mt-1 text-lg font-semibold text-sidebar-accent-foreground">
+            <div className="mt-1 text-xl font-black text-success">
               15,000 EGP
             </div>
             <div className="mt-0.5 text-xs text-sidebar-muted">
@@ -76,11 +75,11 @@ export function Sidebar() {
         {/* User */}
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-primary text-sm font-medium text-sidebar-primary-foreground">
+            <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground">
               AC
             </div>
             <div className="flex-1 min-w-0">
-              <div className="truncate text-sm font-medium text-sidebar-accent-foreground">
+              <div className="truncate text-sm font-semibold text-sidebar-foreground">
                 Acme Corp
               </div>
               <div className="truncate text-xs text-sidebar-muted">

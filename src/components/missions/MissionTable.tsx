@@ -36,28 +36,28 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card shadow-card">
+    <div className="border border-border bg-card">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[300px]">Mission</TableHead>
-            <TableHead>Branch</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Quota</TableHead>
-            <TableHead className="text-right">Reward</TableHead>
-            <TableHead>Published</TableHead>
+          <TableRow className="hover:bg-transparent border-b border-border">
+            <TableHead className="w-[300px] text-xs font-bold uppercase tracking-wide">Mission</TableHead>
+            <TableHead className="text-xs font-bold uppercase tracking-wide">Branch</TableHead>
+            <TableHead className="text-xs font-bold uppercase tracking-wide">Status</TableHead>
+            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Quota</TableHead>
+            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Reward</TableHead>
+            <TableHead className="text-xs font-bold uppercase tracking-wide">Published</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {missions.map((mission) => (
+          {missions.map((mission, index) => (
             <TableRow 
               key={mission.id}
-              className="cursor-pointer"
+              className={`cursor-pointer border-b border-border ${index % 2 === 1 ? 'bg-muted/30' : ''}`}
               onClick={() => navigate(`/missions/${mission.id}`)}
             >
               <TableCell>
-                <div className="font-medium text-foreground">
+                <div className="font-semibold text-foreground">
                   {mission.title}
                 </div>
                 <div className="text-sm text-muted-foreground line-clamp-1">
@@ -70,10 +70,11 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
               <TableCell>
                 <MissionStatusBadge status={mission.status} />
               </TableCell>
-              <TableCell className="text-right font-medium">
-                {mission.completed_runs || 0}/{mission.quota}
+              <TableCell className="text-right font-bold">
+                <span className="text-success">{mission.completed_runs || 0}</span>
+                <span className="text-muted-foreground">/{mission.quota}</span>
               </TableCell>
-              <TableCell className="text-right text-muted-foreground">
+              <TableCell className="text-right font-semibold">
                 {formatCurrency(mission.fixed_reward)}
               </TableCell>
               <TableCell className="text-muted-foreground">

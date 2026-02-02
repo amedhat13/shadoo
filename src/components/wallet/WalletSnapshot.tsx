@@ -1,4 +1,4 @@
-import { InfoIcon, AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { CURRENCY } from '@/lib/constants';
@@ -24,41 +24,41 @@ export function WalletSnapshot({
   const shortfall = requiredHold - availableBalance;
 
   return (
-    <Card className={cn('shadow-card', className)}>
+    <Card className={cn('border border-border', className)}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">Wallet Snapshot</CardTitle>
+        <CardTitle className="text-sm font-bold uppercase tracking-wide">Wallet Snapshot</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Available Balance</span>
-            <span className="font-medium">{formatCurrency(availableBalance)}</span>
+            <span className="font-bold text-success">{formatCurrency(availableBalance)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Currently On Hold</span>
-            <span className="font-medium text-warning">{formatCurrency(onHoldBalance)}</span>
+            <span className="font-bold">{formatCurrency(onHoldBalance)}</span>
           </div>
           <div className="border-t border-border my-2" />
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Required Hold for This Mission</span>
-            <span className="font-semibold text-primary">{formatCurrency(requiredHold)}</span>
+            <span className="text-sm font-semibold uppercase tracking-wide">Required Hold</span>
+            <span className="font-black text-primary">{formatCurrency(requiredHold)}</span>
           </div>
         </div>
 
         {/* Status Message */}
         <div 
           className={cn(
-            'rounded-lg p-3 flex items-start gap-2',
+            'border p-3 flex items-start gap-2',
             hasSufficientFunds 
-              ? 'bg-success/10 text-success' 
-              : 'bg-destructive/10 text-destructive'
+              ? 'border-success/30 bg-success/5 text-success' 
+              : 'border-destructive/30 bg-destructive/5 text-destructive'
           )}
         >
           {hasSufficientFunds ? (
             <>
               <CheckCircle className="h-5 w-5 shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium">Sufficient funds available</div>
+                <div className="font-bold uppercase text-sm">Sufficient Funds</div>
                 <div className="text-sm opacity-80">
                   You can publish this mission. {formatCurrency(requiredHold)} will be placed on hold.
                 </div>
@@ -68,7 +68,7 @@ export function WalletSnapshot({
             <>
               <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium">Insufficient funds</div>
+                <div className="font-bold uppercase text-sm">Insufficient Funds</div>
                 <div className="text-sm opacity-80">
                   You need {formatCurrency(shortfall)} more to publish this mission.
                 </div>

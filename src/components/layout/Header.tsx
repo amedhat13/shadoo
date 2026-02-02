@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background px-6">
       {/* Search */}
       <div className="relative w-full max-w-md">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
           placeholder="Search missions, branches..."
-          className="w-full pl-9 bg-secondary/50 border-transparent focus:border-border focus:bg-background"
+          className="w-full pl-9 border-border"
         />
       </div>
 
@@ -19,7 +19,7 @@ export function Header() {
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 bg-primary" />
         </Button>
       </div>
     </header>
