@@ -74,26 +74,28 @@ export default function BranchesPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <PageHeader
           title="Branches"
           description="Manage your locations. Branches must be verified by Shadoo admin before use in missions."
           actions={
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setBulkFormOpen(true)}>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setBulkFormOpen(true)} className="flex-1 sm:flex-none">
                 <Upload className="h-4 w-4 mr-2" />
-                Bulk Add
+                <span className="hidden sm:inline">Bulk Add</span>
+                <span className="sm:hidden">Bulk</span>
               </Button>
-              <Button onClick={() => { setEditingBranch(null); setFormOpen(true); }}>
+              <Button onClick={() => { setEditingBranch(null); setFormOpen(true); }} className="flex-1 sm:flex-none">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Branch
+                <span className="hidden sm:inline">Add Branch</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </div>
           }
         />
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Branches</CardTitle>

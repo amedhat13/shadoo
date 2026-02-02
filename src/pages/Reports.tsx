@@ -309,7 +309,7 @@ export default function ReportsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <PageHeader
           title="Reports & Analytics"
           description="Analyze visit outcomes, mission performance, and budget utilization."
@@ -317,21 +317,21 @@ export default function ReportsPage() {
 
         {/* Filters */}
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 p-4 md:p-6">
             <CardTitle className="text-base flex items-center gap-2">
               <Filter className="h-4 w-4" />
               Filters
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <div className="space-y-2">
+          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="space-y-2 flex-1 sm:flex-none">
                 <Label className="flex items-center gap-1 text-sm">
                   <Calendar className="h-3 w-3" />
                   Month
                 </Label>
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue placeholder="All Months" />
                   </SelectTrigger>
                   <SelectContent>
@@ -342,13 +342,13 @@ export default function ReportsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1 sm:flex-none">
                 <Label className="flex items-center gap-1 text-sm">
                   <MapPin className="h-3 w-3" />
                   Branch
                 </Label>
                 <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="All Branches" />
                   </SelectTrigger>
                   <SelectContent>
@@ -364,7 +364,7 @@ export default function ReportsPage() {
         </Card>
 
         {/* Key Metrics Row */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <Card className="border-l-4 border-l-orange-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Visit Completion</CardTitle>
