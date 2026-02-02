@@ -38,14 +38,14 @@ export function StepRequirements({ data, onChange }: StepRequirementsProps) {
           Attach Quiz (Optional)
         </Label>
         <Select
-          value={data.quiz_id || ''}
-          onValueChange={(value) => onChange({ quiz_id: value || undefined })}
+          value={data.quiz_id || 'none'}
+          onValueChange={(value) => onChange({ quiz_id: value === 'none' ? undefined : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a quiz" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No quiz</SelectItem>
+            <SelectItem value="none">No quiz</SelectItem>
             {mockQuizzes.map((quiz) => (
               <SelectItem key={quiz.id} value={quiz.id}>
                 {quiz.name}
@@ -65,14 +65,14 @@ export function StepRequirements({ data, onChange }: StepRequirementsProps) {
           Attach Form (Optional)
         </Label>
         <Select
-          value={data.form_id || ''}
-          onValueChange={(value) => onChange({ form_id: value || undefined })}
+          value={data.form_id || 'none'}
+          onValueChange={(value) => onChange({ form_id: value === 'none' ? undefined : value })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a form" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No form</SelectItem>
+            <SelectItem value="none">No form</SelectItem>
             {mockForms.map((form) => (
               <SelectItem key={form.id} value={form.id}>
                 {form.name}
