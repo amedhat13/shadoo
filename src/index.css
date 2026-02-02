@@ -56,16 +56,16 @@
 
     --radius: 0.25rem;
 
-    /* Sidebar - Black background per brand */
-    --sidebar-background: 0 0% 0%;
-    --sidebar-foreground: 0 0% 100%;
+    /* Sidebar - White background */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 20%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 90%;
     --sidebar-ring: 24 95% 53%;
-    --sidebar-muted: 0 0% 60%;
+    --sidebar-muted: 0 0% 45%;
   }
 
   .dark {
