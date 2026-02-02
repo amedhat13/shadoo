@@ -14,11 +14,11 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card p-12 text-center animate-fade-in">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+    <div className="flex flex-col items-center justify-center border border-dashed border-border bg-card p-12 text-center animate-fade-in">
+      <div className="flex h-14 w-14 items-center justify-center bg-muted">
         {icon || <FileQuestion className="h-7 w-7 text-muted-foreground" />}
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-foreground">
+      <h3 className="mt-4 text-lg font-bold uppercase tracking-wide text-foreground">
         {title}
       </h3>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">

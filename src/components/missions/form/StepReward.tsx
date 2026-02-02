@@ -25,7 +25,7 @@ export function StepReward({
     <div className="space-y-6">
       {/* Fixed Reward */}
       <div className="space-y-2">
-        <Label htmlFor="reward" className="flex items-center gap-2">
+        <Label htmlFor="reward" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <DollarSign className="h-4 w-4" />
           Fixed Reward per Run *
         </Label>
@@ -40,7 +40,7 @@ export function StepReward({
             }
             className="pr-16"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
             {CURRENCY.symbol}
           </span>
         </div>
@@ -51,7 +51,7 @@ export function StepReward({
 
       {/* Reimbursement Cap */}
       <div className="space-y-2">
-        <Label htmlFor="reimbursement" className="flex items-center gap-2">
+        <Label htmlFor="reimbursement" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <DollarSign className="h-4 w-4" />
           Reimbursement Cap per Run
         </Label>
@@ -66,7 +66,7 @@ export function StepReward({
             }
             className="pr-16"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
             {CURRENCY.symbol}
           </span>
         </div>
@@ -76,24 +76,24 @@ export function StepReward({
       </div>
 
       {/* Calculated Fields */}
-      <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Calculator className="h-4 w-4 text-primary" />
+      <div className="border border-border p-4 space-y-4">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+          <Calculator className="h-4 w-4" />
           Budget Calculation
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Fixed Reward</span>
-            <span>{formatCurrency(data.fixed_reward)}</span>
+            <span className="font-semibold">{formatCurrency(data.fixed_reward)}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">+ Reimbursement Cap</span>
-            <span>{formatCurrency(data.reimbursement_cap)}</span>
+            <span className="font-semibold">{formatCurrency(data.reimbursement_cap)}</span>
           </div>
           <div className="flex items-center justify-between border-t border-border pt-3">
-            <span className="font-medium">Per-run Max Cost</span>
-            <span className="font-semibold text-primary">
+            <span className="font-bold uppercase tracking-wide text-xs">Per-run Max Cost</span>
+            <span className="font-black text-primary">
               {formatCurrency(perRunMaxCost)}
             </span>
           </div>
@@ -102,11 +102,11 @@ export function StepReward({
         <div className="border-t border-border pt-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Quota</span>
-            <span>× {data.quota} runs</span>
+            <span className="font-semibold">× {data.quota} runs</span>
           </div>
           <div className="flex items-center justify-between mt-3">
-            <span className="font-medium">Required Hold</span>
-            <span className="text-lg font-bold text-primary">
+            <span className="font-bold uppercase tracking-wide text-xs">Required Hold</span>
+            <span className="text-xl font-black text-success">
               {formatCurrency(requiredHold)}
             </span>
           </div>
@@ -114,10 +114,10 @@ export function StepReward({
       </div>
 
       {/* Info Message */}
-      <div className="flex items-start gap-3 rounded-lg bg-primary/5 p-4">
+      <div className="flex items-start gap-3 border border-primary/30 bg-primary/5 p-4">
         <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
         <div>
-          <div className="font-medium text-sm">Funding Information</div>
+          <div className="font-bold text-xs uppercase tracking-wide">Funding Information</div>
           <p className="text-sm text-muted-foreground mt-1">
             {MESSAGES.funding.info}
           </p>

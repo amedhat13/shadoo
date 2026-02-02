@@ -30,7 +30,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="title">Mission Title *</Label>
+        <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wide">Mission Title *</Label>
         <Input
           id="title"
           placeholder="Enter a descriptive title for this mission"
@@ -40,7 +40,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="branch">Branch *</Label>
+        <Label htmlFor="branch" className="text-xs font-bold uppercase tracking-wide">Branch *</Label>
         <Select
           value={data.branch_id}
           onValueChange={(value) => onChange({ branch_id: value })}
@@ -59,7 +59,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description *</Label>
+        <Label htmlFor="description" className="text-xs font-bold uppercase tracking-wide">Description *</Label>
         <Textarea
           id="description"
           placeholder="Describe what agents need to do during this mission"
@@ -71,7 +71,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Start Date *</Label>
+          <Label className="text-xs font-bold uppercase tracking-wide">Start Date *</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -99,7 +99,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>End Date *</Label>
+          <Label className="text-xs font-bold uppercase tracking-wide">End Date *</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -131,7 +131,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="quota">Quota (Number of Runs) *</Label>
+        <Label htmlFor="quota" className="text-xs font-bold uppercase tracking-wide">Quota (Number of Runs) *</Label>
         <Input
           id="quota"
           type="number"

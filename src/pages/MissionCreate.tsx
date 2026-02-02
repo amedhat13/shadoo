@@ -212,7 +212,7 @@ export default function MissionCreatePage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-2xl font-black uppercase tracking-tight">
               {isEditing ? 'Edit Mission' : 'Create Mission'}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -239,11 +239,11 @@ export default function MissionCreatePage() {
               >
                 <div
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all',
+                    'flex h-8 w-8 items-center justify-center text-sm font-bold transition-all',
                     index < currentStep
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-success text-success-foreground'
                       : index === currentStep
-                      ? 'bg-primary text-primary-foreground ring-4 ring-primary/20'
+                      ? 'bg-primary text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
                   )}
                 >
@@ -253,7 +253,7 @@ export default function MissionCreatePage() {
                     index + 1
                   )}
                 </div>
-                <span className="hidden text-sm font-medium sm:block">
+                <span className="hidden text-sm font-semibold uppercase tracking-wide sm:block">
                   {step.title}
                 </span>
               </button>
@@ -261,7 +261,7 @@ export default function MissionCreatePage() {
                 <div
                   className={cn(
                     'mx-4 h-px flex-1',
-                    index < currentStep ? 'bg-primary' : 'bg-border'
+                    index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
               )}
@@ -270,7 +270,7 @@ export default function MissionCreatePage() {
         </div>
 
         {/* Form Content */}
-        <Card className="shadow-card">
+        <Card className="border border-border">
           <CardContent className="p-6">
             {renderStepContent()}
           </CardContent>
@@ -284,7 +284,7 @@ export default function MissionCreatePage() {
               onClick={handleBack}
               disabled={currentStep === 0}
             >
-              Back
+              BACK
             </Button>
             <div className="flex gap-3">
               <Button
@@ -292,13 +292,13 @@ export default function MissionCreatePage() {
                 onClick={handleSaveDraft}
                 disabled={!isStepValid(0) || isSubmitting}
               >
-                Save Draft
+                SAVE DRAFT
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!isStepValid(currentStep)}
               >
-                Continue
+                CONTINUE
               </Button>
             </div>
           </div>

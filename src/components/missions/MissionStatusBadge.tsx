@@ -7,20 +7,21 @@ interface MissionStatusBadgeProps {
   className?: string;
 }
 
+// Brand colors: Green = approved/completed, Orange = pending/action, Black/Gray = inactive
 const statusStyles: Record<MissionStatus, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  ready_for_funding: 'bg-warning/10 text-warning border-warning/20',
-  published: 'bg-success/10 text-success border-success/20',
-  paused: 'bg-warning/10 text-warning border-warning/20',
-  expired: 'bg-muted text-muted-foreground',
-  archived: 'bg-muted text-muted-foreground',
+  draft: 'bg-muted text-muted-foreground border-border',
+  ready_for_funding: 'bg-primary/10 text-primary border-primary/30',
+  published: 'bg-success/10 text-success border-success/30',
+  paused: 'bg-primary/10 text-primary border-primary/30',
+  expired: 'bg-muted text-muted-foreground border-border',
+  archived: 'bg-muted text-muted-foreground border-border',
 };
 
 export function MissionStatusBadge({ status, className }: MissionStatusBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors',
+        'inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
         statusStyles[status],
         className
       )}
