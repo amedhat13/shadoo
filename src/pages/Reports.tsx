@@ -434,42 +434,43 @@ export default function ReportsPage() {
 
         {/* Charts Tabs */}
         <Tabs defaultValue="visits" className="space-y-4">
-          <TabsList className="bg-muted/50">
-            <TabsTrigger value="visits" className="flex items-center gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              <BarChart3 className="h-4 w-4" />
-              Visits
+          <TabsList className="bg-muted/50 w-full flex-wrap h-auto gap-1 p-1">
+            <TabsTrigger value="visits" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+              <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Visits</span>
             </TabsTrigger>
-            <TabsTrigger value="budget" className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
-              <DollarSign className="h-4 w-4" />
-              Budget
+            <TabsTrigger value="budget" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-green-500 data-[state=active]:text-white">
+              <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Budget</span>
             </TabsTrigger>
-            <TabsTrigger value="performance" className="flex items-center gap-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white">
-              <TrendingUp className="h-4 w-4" />
-              Performance
+            <TabsTrigger value="performance" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline sm:hidden">Perf</span>
+              <span className="hidden sm:inline">Performance</span>
             </TabsTrigger>
-            <TabsTrigger value="responses" className="flex items-center gap-2 data-[state=active]:bg-sky-500 data-[state=active]:text-white">
-              <PieChartIcon className="h-4 w-4" />
-              Responses
+            <TabsTrigger value="responses" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-sky-500 data-[state=active]:text-white">
+              <PieChartIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Responses</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Visits Tab */}
           <TabsContent value="visits" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-orange-500" />
                     Visit Completion Over Time
                   </CardTitle>
-                  <CardDescription>Planned vs completed visits by month</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Planned vs completed visits by month</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
+                <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+                  <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
                     <BarChart data={visitsByMonth}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="month" className="text-xs" />
-                      <YAxis className="text-xs" />
+                      <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 10 }} />
+                      <YAxis className="text-xs" tick={{ fontSize: 10 }} width={30} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
                       <Bar 
@@ -490,22 +491,22 @@ export default function ReportsPage() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-green-500" />
                     Mission Status Distribution
                   </CardTitle>
-                  <CardDescription>Current status of all missions</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Current status of all missions</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
+                <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+                  <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
                     <PieChart>
                       <Pie
                         data={missionStatusData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
+                        innerRadius={40}
+                        outerRadius={70}
                         paddingAngle={4}
                         dataKey="value"
                         label={({ name, value }) => `${name}: ${value}`}
@@ -524,16 +525,16 @@ export default function ReportsPage() {
 
             {/* Branch comparison */}
             <Card>
-              <CardHeader>
-                <CardTitle>Visits by Branch</CardTitle>
-                <CardDescription>Comparison of planned vs completed visits across branches</CardDescription>
+              <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                <CardTitle className="text-sm sm:text-base">Visits by Branch</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Comparison of planned vs completed visits across branches</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[300px]">
+              <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+                <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full">
                   <BarChart data={visitsByBranch} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis type="number" className="text-xs" />
-                    <YAxis dataKey="name" type="category" width={130} className="text-xs" />
+                    <XAxis type="number" className="text-xs" tick={{ fontSize: 10 }} />
+                    <YAxis dataKey="name" type="category" width={80} className="text-xs" tick={{ fontSize: 9 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
                     <Bar dataKey="planned" fill={CHART_COLORS.orangeLight} radius={[0, 4, 4, 0]} name="Planned" />
@@ -547,15 +548,15 @@ export default function ReportsPage() {
           {/* Budget Tab */}
           <TabsContent value="budget" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                   <div className="h-3 w-3 rounded-full bg-amber-500" />
                   Budget Allocation vs Usage
                 </CardTitle>
-                <CardDescription>Track how your purchase budget is being utilized over time</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Track how your purchase budget is being utilized over time</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[350px]">
+              <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+                <ChartContainer config={chartConfig} className="h-[250px] sm:h-[350px] w-full">
                   <AreaChart data={budgetByMonth}>
                     <defs>
                       <linearGradient id="colorAllocated" x1="0" y1="0" x2="0" y2="1">
@@ -568,8 +569,8 @@ export default function ReportsPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="month" className="text-xs" />
-                    <YAxis className="text-xs" tickFormatter={(value) => `${value/1000}k`} />
+                    <XAxis dataKey="month" className="text-xs" tick={{ fontSize: 10 }} />
+                    <YAxis className="text-xs" tick={{ fontSize: 10 }} width={35} tickFormatter={(value) => `${value/1000}k`} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
                     <Area
@@ -595,31 +596,31 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-3">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-amber-700 dark:text-amber-300">Total Allocated</CardTitle>
+                <CardHeader className="pb-2 p-4">
+                  <CardTitle className="text-xs sm:text-sm text-amber-700 dark:text-amber-300">Total Allocated</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-amber-800 dark:text-amber-200">{totalBudgetAllocated.toLocaleString()} EGP</div>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-xl sm:text-2xl font-bold text-amber-800 dark:text-amber-200">{totalBudgetAllocated.toLocaleString()} EGP</div>
                   <p className="text-xs text-amber-600 dark:text-amber-400">Across all missions</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-green-700 dark:text-green-300">Total Used</CardTitle>
+                <CardHeader className="pb-2 p-4">
+                  <CardTitle className="text-xs sm:text-sm text-green-700 dark:text-green-300">Total Used</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-800 dark:text-green-200">{totalBudgetUsed.toLocaleString()} EGP</div>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-xl sm:text-2xl font-bold text-green-800 dark:text-green-200">{totalBudgetUsed.toLocaleString()} EGP</div>
                   <p className="text-xs text-green-600 dark:text-green-400">Spent on visits</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-sky-50 to-sky-100/50 dark:from-sky-950/20 dark:to-sky-900/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-sky-700 dark:text-sky-300">Available Balance</CardTitle>
+                <CardHeader className="pb-2 p-4">
+                  <CardTitle className="text-xs sm:text-sm text-sky-700 dark:text-sky-300">Available Balance</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-sky-800 dark:text-sky-200">{wallet.available_balance.toLocaleString()} EGP</div>
+                <CardContent className="p-4 pt-0">
+                  <div className="text-xl sm:text-2xl font-bold text-sky-800 dark:text-sky-200">{wallet.available_balance.toLocaleString()} EGP</div>
                   <p className="text-xs text-sky-600 dark:text-sky-400">In wallet</p>
                 </CardContent>
               </Card>
@@ -628,23 +629,23 @@ export default function ReportsPage() {
 
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-orange-500" />
                     Branch Ratings
                   </CardTitle>
-                  <CardDescription>Average customer satisfaction rating by branch</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">Average customer satisfaction rating by branch</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
+                <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full">
                     <RadialBarChart
                       cx="50%"
                       cy="50%"
                       innerRadius="30%"
-                      outerRadius="90%"
-                      barSize={20}
+                      outerRadius="80%"
+                      barSize={15}
                       data={branchRadialData}
                       startAngle={180}
                       endAngle={0}
@@ -653,19 +654,19 @@ export default function ReportsPage() {
                         background
                         dataKey="value"
                         cornerRadius={10}
-                        label={{ position: 'insideStart', fill: '#fff', fontWeight: 'bold' }}
+                        label={{ position: 'insideStart', fill: '#fff', fontWeight: 'bold', fontSize: 10 }}
                       />
                       <Legend
-                        iconSize={10}
-                        layout="vertical"
-                        verticalAlign="middle"
-                        align="right"
+                        iconSize={8}
+                        layout="horizontal"
+                        verticalAlign="bottom"
+                        align="center"
                         content={({ payload }) => (
-                          <ul className="space-y-2">
+                          <ul className="flex flex-wrap gap-2 justify-center mt-2">
                             {payload?.map((entry: any, index: number) => (
-                              <li key={`item-${index}`} className="flex items-center gap-2 text-sm">
-                                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                                <span>{entry.value}</span>
+                              <li key={`item-${index}`} className="flex items-center gap-1 text-xs">
+                                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                <span className="truncate max-w-[80px]">{entry.value}</span>
                                 <span className="font-bold">{branchRadialData[index]?.rating}/5</span>
                               </li>
                             ))}
@@ -678,27 +679,27 @@ export default function ReportsPage() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Branch Details</CardTitle>
-                  <CardDescription>Performance metrics by location</CardDescription>
+                <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+                  <CardTitle className="text-sm sm:text-base">Branch Details</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Performance metrics by location</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 md:p-6 pt-2 md:pt-2 space-y-3">
                   {visitsByBranch.map((branch, index) => {
                     const colors = [CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.amber];
                     const completion = branch.planned > 0 ? Math.round((branch.completed / branch.planned) * 100) : 0;
                     return (
-                      <div key={branch.name} className="p-4 rounded-lg border">
+                      <div key={branch.name} className="p-3 rounded-lg border">
                         <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
                             <div 
-                              className="h-3 w-3 rounded-full" 
+                              className="h-3 w-3 rounded-full flex-shrink-0" 
                               style={{ backgroundColor: colors[index] }}
                             />
-                            <span className="font-medium">{branch.name}</span>
+                            <span className="font-medium text-sm truncate">{branch.name}</span>
                           </div>
-                          <span className="text-lg font-bold">{branch.rating}/5.0</span>
+                          <span className="text-base font-bold flex-shrink-0">{branch.rating}/5.0</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                           <div>
                             <span className="text-muted-foreground">Visits</span>
                             <p className="font-medium">{branch.completed}/{branch.planned}</p>
@@ -729,18 +730,18 @@ export default function ReportsPage() {
           <TabsContent value="responses" className="space-y-4">
             {/* Mission Selector */}
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
+              <CardHeader className="pb-3 p-4 md:p-6">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <ClipboardList className="h-4 w-4" />
                   Select Mission
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Choose a mission to view response analytics for its specific questions
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                 <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
-                  <SelectTrigger className="w-full md:w-[400px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a mission..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -749,14 +750,14 @@ export default function ReportsPage() {
                     </SelectItem>
                     {missions.map(mission => (
                       <SelectItem key={mission.id} value={mission.id}>
-                        <div className="flex items-center gap-2">
-                          <span>{mission.name}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {mission.questions.length} questions
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                          <span className="truncate max-w-[150px] sm:max-w-none">{mission.name}</span>
+                          <Badge variant="outline" className="text-[10px] sm:text-xs">
+                            {mission.questions.length} q
                           </Badge>
                           <Badge 
                             variant={mission.status === 'published' ? 'default' : 'secondary'}
-                            className="text-xs"
+                            className="text-[10px] sm:text-xs"
                           >
                             {mission.status}
                           </Badge>
@@ -787,50 +788,50 @@ export default function ReportsPage() {
               <>
                 {/* Mission Summary Card */}
                 <Card className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{selectedMission.name}</CardTitle>
-                      <Badge variant="outline">
-                        {selectedMission.visits_completed} / {selectedMission.number_of_visits} visits completed
+                  <CardHeader className="pb-2 p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <CardTitle className="text-base sm:text-lg">{selectedMission.name}</CardTitle>
+                      <Badge variant="outline" className="w-fit text-xs">
+                        {selectedMission.visits_completed} / {selectedMission.number_of_visits} visits
                       </Badge>
                     </div>
-                    <CardDescription>
+                    <CardDescription className="text-xs sm:text-sm">
                       {selectedMission.branch?.name} • {selectedMission.questions.length} questions
                     </CardDescription>
                   </CardHeader>
                 </Card>
 
                 {/* Question Response Cards */}
-                <div className="grid gap-4">
+                <div className="grid gap-3 md:gap-4">
                   {missionResponses.map((response, index) => (
                     <Card key={response.questionId}>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-2">
+                      <CardHeader className="pb-2 p-4 md:p-6">
+                        <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:justify-between">
+                          <div className="flex items-start gap-2">
                             <div 
-                              className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                              className="h-5 w-5 sm:h-6 sm:w-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-white flex-shrink-0"
                               style={{ backgroundColor: [CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.amber, CHART_COLORS.sky][index % 4] }}
                             >
                               {index + 1}
                             </div>
-                            <CardTitle className="text-base">{response.question}</CardTitle>
+                            <CardTitle className="text-sm sm:text-base">{response.question}</CardTitle>
                           </div>
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-[10px] sm:text-xs w-fit">
                             {response.type.replace('_', ' ')}
                           </Badge>
                         </div>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                         {/* Yes/No Question */}
                         {response.type === 'yes_no' && (
                           <div className="space-y-3">
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                               <div className="flex-1">
-                                <div className="flex justify-between text-sm mb-1">
+                                <div className="flex justify-between text-xs sm:text-sm mb-1">
                                   <span className="text-green-600 font-medium">Yes</span>
                                   <span className="font-bold">{response.yes}%</span>
                                 </div>
-                                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
                                   <div 
                                     className="h-full bg-green-500 rounded-full transition-all"
                                     style={{ width: `${response.yes}%` }}
@@ -838,11 +839,11 @@ export default function ReportsPage() {
                                 </div>
                               </div>
                               <div className="flex-1">
-                                <div className="flex justify-between text-sm mb-1">
+                                <div className="flex justify-between text-xs sm:text-sm mb-1">
                                   <span className="text-red-600 font-medium">No</span>
                                   <span className="font-bold">{response.no}%</span>
                                 </div>
-                                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
                                   <div 
                                     className="h-full bg-red-500 rounded-full transition-all"
                                     style={{ width: `${response.no}%` }}

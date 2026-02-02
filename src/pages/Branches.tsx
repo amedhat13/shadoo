@@ -95,64 +95,64 @@ export default function BranchesPage() {
         />
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Branches</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{branches.length}</div>
+            <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{branches.length}</div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Verified</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Verified</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{verifiedCount}</div>
-              <p className="text-xs text-muted-foreground">Ready for missions</p>
+            <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{verifiedCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Ready for missions</p>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Pending</CardTitle>
               <Clock className="h-4 w-4 text-yellow-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
-              <p className="text-xs text-muted-foreground">Awaiting verification</p>
+            <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-yellow-600">{pendingCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Awaiting verification</p>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Rejected</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Rejected</CardTitle>
               <XCircle className="h-4 w-4 text-red-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
-              <p className="text-xs text-muted-foreground">Need attention</p>
+            <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
+              <div className="text-xl sm:text-2xl font-bold text-red-600">{rejectedCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Need attention</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="list" className="flex items-center gap-2">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="list" className="flex items-center gap-1.5 flex-1 sm:flex-none">
               <List className="h-4 w-4" />
-              List View
+              <span className="text-xs sm:text-sm">List</span>
             </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2">
+            <TabsTrigger value="map" className="flex items-center gap-1.5 flex-1 sm:flex-none">
               <MapPin className="h-4 w-4" />
-              Map View
+              <span className="text-xs sm:text-sm">Map</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="mt-4">
+          <TabsContent value="list" className="mt-3 sm:mt-4">
             <Card className="border border-border">
-              <CardContent className="pt-6">
+              <CardContent className="p-3 sm:p-4 md:pt-6">
                 <BranchTable
                   branches={branches}
                   onEdit={handleEdit}
