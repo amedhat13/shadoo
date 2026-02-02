@@ -1,11 +1,44 @@
 import { useState, useCallback } from 'react';
 import { Mission, MissionStatus, Branch, Question } from '@/types';
 
-// Mock branches
+// Mock branches (aligned with useBranches)
 const mockBranches: Branch[] = [
-  { id: 'branch-1', name: 'Cairo Downtown', address: '123 Tahrir Square, Cairo' },
-  { id: 'branch-2', name: 'Alexandria Mall', address: '456 Corniche, Alexandria' },
-  { id: 'branch-3', name: 'Giza Plaza', address: '789 Pyramids Road, Giza' },
+  {
+    id: 'branch-1',
+    name: 'Cairo Downtown',
+    address: '123 Tahrir Square',
+    city: 'Cairo',
+    google_maps_link: 'https://maps.google.com/?q=30.0444,31.2357',
+    latitude: 30.0444,
+    longitude: 31.2357,
+    status: 'verified',
+    created_at: '2025-01-01T10:00:00Z',
+    updated_at: '2025-01-01T10:00:00Z',
+  },
+  {
+    id: 'branch-2',
+    name: 'Alexandria Mall',
+    address: '456 Corniche Road',
+    city: 'Alexandria',
+    google_maps_link: 'https://maps.google.com/?q=31.2001,29.9187',
+    latitude: 31.2001,
+    longitude: 29.9187,
+    status: 'verified',
+    created_at: '2025-01-05T10:00:00Z',
+    updated_at: '2025-01-05T10:00:00Z',
+  },
+  {
+    id: 'branch-3',
+    name: 'Giza Plaza',
+    address: '789 Pyramids Road',
+    city: 'Giza',
+    google_maps_link: 'https://maps.google.com/?q=29.9773,31.1325',
+    latitude: 29.9773,
+    longitude: 31.1325,
+    status: 'pending_verification',
+    created_at: '2025-01-20T10:00:00Z',
+    updated_at: '2025-01-20T10:00:00Z',
+  },
 ];
 
 // Mock questions for demo

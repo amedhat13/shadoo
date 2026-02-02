@@ -18,10 +18,20 @@ export interface OrganizationSubscription {
 }
 
 // Branch
+export type BranchStatus = 'pending_verification' | 'verified' | 'rejected';
+
 export interface Branch {
   id: string;
   name: string;
-  address?: string;
+  address: string;
+  city: string;
+  google_maps_link: string;
+  latitude?: number;
+  longitude?: number;
+  status: BranchStatus;
+  rejection_reason?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Question Types
