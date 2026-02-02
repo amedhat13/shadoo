@@ -4,6 +4,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { FORM_STEPS } from '@/lib/constants';
 import { MissionFormData, canPublishMission } from '@/types';
@@ -219,46 +220,53 @@ export default function MissionCreatePage() {
           </div>
         </div>
 
-        {/* Progress Steps - Horizontal on desktop, compact on mobile */}
-        <div className="flex items-center justify-between gap-1 pb-2">
+        {/* Progress Steps */}
+        <div className="flex items-center gap-2 md:gap-0 pb-2">
           {FORM_STEPS.map((step, index) => (
             <div
               key={step.id}
-              className="flex flex-1 items-center min-w-0"
+              className="flex items-center"
             >
-              <button
-                onClick={() => index < currentStep && setCurrentStep(index)}
-                disabled={index > currentStep}
-                className={cn(
-                  'flex items-center gap-1.5 lg:gap-2 transition-colors shrink-0',
-                  index <= currentStep ? 'text-foreground' : 'text-muted-foreground',
-                  index < currentStep && 'cursor-pointer hover:text-primary'
-                )}
-              >
-                <div
-                  className={cn(
-                    'flex h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 items-center justify-center text-xs font-bold transition-all shrink-0',
-                    index < currentStep
-                      ? 'bg-success text-success-foreground'
-                      : index === currentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                >
-                  {index < currentStep ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-                <span className="hidden lg:block text-xs xl:text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
-                  {step.title}
-                </span>
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => index < currentStep && setCurrentStep(index)}
+                    disabled={index > currentStep}
+                    className={cn(
+                      'flex items-center gap-2 transition-colors',
+                      index <= currentStep ? 'text-foreground' : 'text-muted-foreground',
+                      index < currentStep && 'cursor-pointer hover:text-primary'
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'flex h-7 w-7 md:h-8 md:w-8 items-center justify-center text-xs font-bold transition-all shrink-0',
+                        index < currentStep
+                          ? 'bg-success text-success-foreground'
+                          : index === currentStep
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'
+                      )}
+                    >
+                      {index < currentStep ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    <span className="hidden xl:block text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
+                      {step.title}
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="xl:hidden">
+                  <p>{step.title}</p>
+                </TooltipContent>
+              </Tooltip>
               {index < FORM_STEPS.length - 1 && (
                 <div
                   className={cn(
-                    'mx-1 md:mx-2 lg:mx-3 h-px flex-1 min-w-2 md:min-w-4',
+                    'mx-3 md:mx-4 lg:mx-6 h-px w-6 md:w-10 lg:w-16 xl:w-20',
                     index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
