@@ -19,7 +19,9 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">Mission Name *</Label>
+        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">
+          Mission Name<span className="text-destructive">*</span>
+        </Label>
         <Input
           id="name"
           placeholder="Enter a descriptive name for this mission"
@@ -29,7 +31,9 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="branch" className="text-xs font-bold uppercase tracking-wide">Branch *</Label>
+        <Label htmlFor="branch" className="text-xs font-bold uppercase tracking-wide">
+          Branch<span className="text-destructive">*</span>
+        </Label>
         <Select
           value={data.branch_id}
           onValueChange={(value) => onChange({ branch_id: value })}
@@ -46,7 +50,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          Select the location where this mission will be executed
+          Select the location where this mission will be executed.
         </p>
       </div>
     </div>

@@ -94,7 +94,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Branch Name *</Label>
+            <Label htmlFor="name">Branch Name<span className="text-destructive">*</span></Label>
             <Input
               id="name"
               placeholder="e.g., Cairo Downtown"
@@ -105,7 +105,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address *</Label>
+            <Label htmlFor="address">Address<span className="text-destructive">*</span></Label>
             <Input
               id="address"
               placeholder="e.g., 123 Main Street"
@@ -116,7 +116,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">City *</Label>
+            <Label htmlFor="city">City<span className="text-destructive">*</span></Label>
             <Input
               id="city"
               placeholder="e.g., Cairo"
@@ -129,7 +129,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
           <div className="space-y-2">
             <Label htmlFor="google_maps_link" className="flex items-center gap-2">
               <LinkIcon className="h-3 w-3" />
-              Google Maps Link *
+              Google Maps Link<span className="text-destructive">*</span>
             </Label>
             <Input
               id="google_maps_link"
@@ -139,7 +139,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
             />
             {errors.google_maps_link && <p className="text-xs text-destructive">{errors.google_maps_link}</p>}
             <p className="text-xs text-muted-foreground">
-              Open Google Maps, find your location, and copy the share link
+              Open Google Maps, find your location, and copy the share link.
             </p>
           </div>
 

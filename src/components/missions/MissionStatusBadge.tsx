@@ -1,6 +1,11 @@
 import { cn } from '@/lib/utils';
 import { MissionStatus } from '@/types';
-import { MISSION_STATUS_LABELS } from '@/lib/constants';
+import { MISSION_STATUS_LABELS, MISSION_STATUS_DESCRIPTIONS } from '@/lib/constants';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface MissionStatusBadgeProps {
   status: MissionStatus;
@@ -18,14 +23,21 @@ const statusStyles: Record<MissionStatus, string> = {
 
 export function MissionStatusBadge({ status, className }: MissionStatusBadgeProps) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
-        statusStyles[status],
-        className
-      )}
-    >
-      {MISSION_STATUS_LABELS[status]}
-    </span>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className={cn(
+            'inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide cursor-help',
+            statusStyles[status],
+            className
+          )}
+        >
+          {MISSION_STATUS_LABELS[status]}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{MISSION_STATUS_DESCRIPTIONS[status]}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }

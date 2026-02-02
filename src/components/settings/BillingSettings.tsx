@@ -7,6 +7,11 @@ import { SubscriptionPlans } from './SubscriptionPlans';
 import { useSubscription } from '@/hooks/useSubscription';
 import { CURRENCY } from '@/lib/constants';
 import { toast } from 'sonner';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface Invoice {
   id: string;
@@ -22,9 +27,9 @@ const mockInvoices: Invoice[] = [
 ];
 
 const STATUS_CONFIG = {
-  paid: { label: 'Paid', variant: 'default' as const },
-  pending: { label: 'Pending', variant: 'secondary' as const },
-  failed: { label: 'Failed', variant: 'destructive' as const },
+  paid: { label: 'Paid', description: 'Payment completed successfully.', variant: 'default' as const },
+  pending: { label: 'Pending', description: 'Payment is being processed.', variant: 'secondary' as const },
+  failed: { label: 'Failed', description: 'Payment failed. Please retry.', variant: 'destructive' as const },
 };
 
 export function BillingSettings() {
@@ -59,7 +64,14 @@ export function BillingSettings() {
                   <div className="text-sm text-muted-foreground">Current Plan</div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold">{currentPlan.name}</span>
-                    <Badge>{currentPlan.visits_per_month} visits/month</Badge>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge className="cursor-help">{currentPlan.visits_per_month} visits/month</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Monthly visit allowance included in your plan.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </div>
@@ -149,7 +161,14 @@ export function BillingSettings() {
                     <span className="font-medium">
                       {invoice.amount.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
                     </span>
-                    <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant={statusConfig.variant} className="cursor-help">{statusConfig.label}</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{statusConfig.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <Download className="h-4 w-4" />
                     </Button>
