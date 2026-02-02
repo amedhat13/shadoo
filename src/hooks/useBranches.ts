@@ -8,6 +8,7 @@ const initialBranches: Branch[] = [
     name: 'Cairo Downtown',
     address: '123 Tahrir Square',
     city: 'Cairo',
+    district: 'Downtown',
     google_maps_link: 'https://maps.google.com/?q=30.0444,31.2357',
     latitude: 30.0444,
     longitude: 31.2357,
@@ -20,6 +21,7 @@ const initialBranches: Branch[] = [
     name: 'Alexandria Mall',
     address: '456 Corniche Road',
     city: 'Alexandria',
+    district: 'Smouha',
     google_maps_link: 'https://maps.google.com/?q=31.2001,29.9187',
     latitude: 31.2001,
     longitude: 29.9187,
@@ -32,6 +34,7 @@ const initialBranches: Branch[] = [
     name: 'Giza Plaza',
     address: '789 Pyramids Road',
     city: 'Giza',
+    district: '6th of October',
     google_maps_link: 'https://maps.google.com/?q=29.9773,31.1325',
     latitude: 29.9773,
     longitude: 31.1325,
@@ -44,11 +47,12 @@ const initialBranches: Branch[] = [
     name: 'Maadi Branch',
     address: 'Road 9, Maadi',
     city: 'Cairo',
+    district: 'Maadi',
     google_maps_link: 'https://maps.google.com/?q=29.9602,31.2569',
     latitude: 29.9602,
     longitude: 31.2569,
     status: 'rejected',
-    rejection_reason: 'Address verification failed - please provide correct location',
+    rejection_reason: 'Address verification failed - please provide correct location.',
     created_at: '2025-01-25T10:00:00Z',
     updated_at: '2025-01-26T10:00:00Z',
   },
@@ -58,6 +62,7 @@ export interface BranchFormData {
   name: string;
   address: string;
   city: string;
+  district?: string;
   google_maps_link: string;
 }
 
@@ -85,6 +90,7 @@ export function useBranches() {
       name: data.name,
       address: data.address,
       city: data.city,
+      district: data.district,
       google_maps_link: data.google_maps_link,
       latitude: coords?.lat,
       longitude: coords?.lng,
@@ -109,6 +115,7 @@ export function useBranches() {
         name: data.name,
         address: data.address,
         city: data.city,
+        district: data.district,
         google_maps_link: data.google_maps_link,
         latitude: coords?.lat,
         longitude: coords?.lng,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { BranchTable } from '@/components/branches/BranchTable';
 import { BranchForm } from '@/components/branches/BranchForm';
 import { BulkBranchForm } from '@/components/branches/BulkBranchForm';
 import { BranchMapView } from '@/components/branches/BranchMapView';
+import { BranchFiltersBar, BranchFilters } from '@/components/branches/BranchFiltersBar';
 import { useBranches, BranchFormData } from '@/hooks/useBranches';
 import { Branch } from '@/types';
 import { Plus, Upload, MapPin, List, CheckCircle, Clock, XCircle } from 'lucide-react';
@@ -22,11 +23,44 @@ export default function BranchesPage() {
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [selectedMapBranch, setSelectedMapBranch] = useState<Branch | null>(null);
   const [activeTab, setActiveTab] = useState('list');
+  const [filters, setFilters] = useState<BranchFilters>({
+    search: '',
+    city: '',
+    status: 'all',
+  });
 
   // Stats
   const verifiedCount = branches.filter(b => b.status === 'verified').length;
   const pendingCount = branches.filter(b => b.status === 'pending_verification').length;
   const rejectedCount = branches.filter(b => b.status === 'rejected').length;
+
+  // Filtered branches
+  const filteredBranches = useMemo(() => {
+    return branches.filter((branch) => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch = 
+          branch.name.toLowerCase().includes(searchLower) ||
+          branch.address.toLowerCase().includes(searchLower) ||
+          branch.city.toLowerCase().includes(searchLower) ||
+          (branch.district?.toLowerCase().includes(searchLower) || false);
+        if (!matchesSearch) return false;
+      }
+
+      // City filter
+      if (filters.city && branch.city !== filters.city) {
+        return false;
+      }
+
+      // Status filter
+      if (filters.status !== 'all' && branch.status !== filters.status) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [branches, filters]);
 
   const handleCreateBranch = async (data: BranchFormData) => {
     await createBranch(data);
@@ -150,15 +184,34 @@ export default function BranchesPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="mt-3 sm:mt-4">
+          <TabsContent value="list" className="mt-3 sm:mt-4 space-y-4">
+            <BranchFiltersBar filters={filters} onFiltersChange={setFilters} />
+            
             <Card className="border border-border">
               <CardContent className="p-3 sm:p-4 md:pt-6">
-                <BranchTable
-                  branches={branches}
-                  onEdit={handleEdit}
-                  onDelete={handleDeleteBranch}
-                  onViewOnMap={handleViewOnMap}
-                />
+                {filteredBranches.length === 0 && (filters.search || filters.city || filters.status !== 'all') ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium">No branches found</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Try adjusting your filters or search terms.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => setFilters({ search: '', city: '', status: 'all' })}
+                    >
+                      Clear Filters
+                    </Button>
+                  </div>
+                ) : (
+                  <BranchTable
+                    branches={filteredBranches}
+                    onEdit={handleEdit}
+                    onDelete={handleDeleteBranch}
+                    onViewOnMap={handleViewOnMap}
+                  />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
