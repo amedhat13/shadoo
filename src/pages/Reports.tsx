@@ -43,7 +43,11 @@ import {
   Filter,
   Calendar,
   MapPin,
+  ClipboardList,
+  Star,
+  MessageSquare,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 // Vibrant color palette for charts
 const CHART_COLORS = {
@@ -106,13 +110,74 @@ const allBudgetData = [
   { month: 'Feb', branch: 'Giza Plaza', allocated: 5000, used: 1700 },
 ];
 
-const questionResponseData = [
-  { question: 'Staff Friendly?', yes: 85, no: 15 },
-  { question: 'Clean Store?', yes: 78, no: 22 },
-  { question: 'Quick Service?', yes: 65, no: 35 },
-  { question: 'Good Value?', yes: 72, no: 28 },
-  { question: 'Would Return?', yes: 88, no: 12 },
-];
+// Generate mock response data per mission based on their actual questions
+const generateMockResponses = (missionId: string, questions: any[]) => {
+  // Seed random based on mission ID for consistent mock data
+  const seed = missionId.charCodeAt(missionId.length - 1);
+  
+  return questions.map((q, index) => {
+    const baseValue = 60 + ((seed + index) % 30);
+    
+    if (q.type === 'yes_no') {
+      return {
+        questionId: q.id,
+        question: q.text,
+        type: 'yes_no',
+        yes: baseValue,
+        no: 100 - baseValue,
+      };
+    } else if (q.type === 'rating') {
+      const avgRating = 3.5 + ((seed + index) % 15) / 10;
+      return {
+        questionId: q.id,
+        question: q.text,
+        type: 'rating',
+        avgRating: avgRating.toFixed(1),
+        maxRating: q.max_rating || 5,
+        distribution: [
+          { rating: 1, count: 5 + (index % 3) },
+          { rating: 2, count: 8 + (index % 5) },
+          { rating: 3, count: 15 + (index % 7) },
+          { rating: 4, count: 25 + (index % 10) },
+          { rating: 5, count: 20 + (index % 8) },
+        ],
+      };
+    } else if (q.type === 'multiple_choice' && q.options) {
+      const total = 100;
+      let remaining = total;
+      const optionResults = q.options.map((opt: any, optIndex: number) => {
+        const isLast = optIndex === q.options.length - 1;
+        const value = isLast ? remaining : Math.floor(remaining * (0.2 + ((seed + optIndex) % 40) / 100));
+        remaining -= value;
+        return {
+          option: opt.text,
+          count: value,
+          color: [CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.amber, CHART_COLORS.sky][optIndex % 4],
+        };
+      });
+      return {
+        questionId: q.id,
+        question: q.text,
+        type: 'multiple_choice',
+        options: optionResults,
+      };
+    } else {
+      // short_text - show sample responses
+      return {
+        questionId: q.id,
+        question: q.text,
+        type: 'short_text',
+        totalResponses: 25 + (seed % 20),
+        samples: [
+          'Great service overall!',
+          'Staff was helpful but slow',
+          'Clean and well organized',
+          'Could improve checkout speed',
+        ],
+      };
+    }
+  });
+};
 
 const MONTHS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
 const BRANCHES = ['Cairo Downtown', 'Alexandria Mall', 'Giza Plaza'];
@@ -138,6 +203,18 @@ export default function ReportsPage() {
   // Filters
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedBranch, setSelectedBranch] = useState<string>('all');
+  const [selectedMissionId, setSelectedMissionId] = useState<string>('all');
+
+  // Get selected mission and its responses
+  const selectedMission = useMemo(() => {
+    if (selectedMissionId === 'all') return null;
+    return missions.find(m => m.id === selectedMissionId);
+  }, [selectedMissionId, missions]);
+
+  const missionResponses = useMemo(() => {
+    if (!selectedMission) return null;
+    return generateMockResponses(selectedMission.id, selectedMission.questions);
+  }, [selectedMission]);
 
   // Filter data based on selections
   const filteredVisitData = useMemo(() => {
@@ -650,66 +727,244 @@ export default function ReportsPage() {
 
           {/* Responses Tab */}
           <TabsContent value="responses" className="space-y-4">
+            {/* Mission Selector */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-green-500" />
-                  Question Response Summary
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  Select Mission
                 </CardTitle>
-                <CardDescription>Yes/No question responses across all visits</CardDescription>
+                <CardDescription>
+                  Choose a mission to view response analytics for its specific questions
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={chartConfig} className="h-[350px]">
-                  <BarChart data={questionResponseData} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis type="number" domain={[0, 100]} className="text-xs" tickFormatter={(v) => `${v}%`} />
-                    <YAxis dataKey="question" type="category" width={120} className="text-xs" />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Bar dataKey="yes" stackId="a" fill={CHART_COLORS.green} name="Yes" />
-                    <Bar dataKey="no" stackId="a" fill={CHART_COLORS.red} radius={[0, 4, 4, 0]} name="No" />
-                  </BarChart>
-                </ChartContainer>
+                <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
+                  <SelectTrigger className="w-full md:w-[400px]">
+                    <SelectValue placeholder="Select a mission..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <span className="text-muted-foreground">Select a mission to view responses</span>
+                    </SelectItem>
+                    {missions.map(mission => (
+                      <SelectItem key={mission.id} value={mission.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{mission.name}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {mission.questions.length} questions
+                          </Badge>
+                          <Badge 
+                            variant={mission.status === 'published' ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {mission.status}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Insights</CardTitle>
-                <CardDescription>AI-generated observations from your data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-green-800 dark:text-green-200">High Customer Satisfaction</p>
-                      <p className="text-sm text-green-700 dark:text-green-300">
-                        85% of visits report friendly staff - above industry average of 75%
-                      </p>
+            {/* No mission selected state */}
+            {!selectedMission && (
+              <Card className="border-dashed">
+                <CardContent className="py-12 text-center">
+                  <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Select a Mission</h3>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    Choose a mission from the dropdown above to view detailed response analytics 
+                    for each question in that mission.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Mission responses */}
+            {selectedMission && missionResponses && (
+              <>
+                {/* Mission Summary Card */}
+                <Card className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{selectedMission.name}</CardTitle>
+                      <Badge variant="outline">
+                        {selectedMission.visits_completed} / {selectedMission.number_of_visits} visits completed
+                      </Badge>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800">
-                    <Clock className="h-5 w-5 text-amber-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-amber-800 dark:text-amber-200">Service Speed Opportunity</p>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        35% of visits report slow service - consider staffing adjustments during peak hours
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-orange-50 to-orange-100/50 dark:from-orange-950/20 dark:to-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
-                    <TrendingUp className="h-5 w-5 text-orange-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-orange-800 dark:text-orange-200">Cairo Downtown Leading</p>
-                      <p className="text-sm text-orange-700 dark:text-orange-300">
-                        Your Cairo Downtown branch has the highest rating ({visitsByBranch[0]?.rating || '4.5'}) and most visits
-                      </p>
-                    </div>
-                  </div>
+                    <CardDescription>
+                      {selectedMission.branch?.name} • {selectedMission.questions.length} questions
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                {/* Question Response Cards */}
+                <div className="grid gap-4">
+                  {missionResponses.map((response, index) => (
+                    <Card key={response.questionId}>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                              style={{ backgroundColor: [CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.amber, CHART_COLORS.sky][index % 4] }}
+                            >
+                              {index + 1}
+                            </div>
+                            <CardTitle className="text-base">{response.question}</CardTitle>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {response.type.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {/* Yes/No Question */}
+                        {response.type === 'yes_no' && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="text-green-600 font-medium">Yes</span>
+                                  <span className="font-bold">{response.yes}%</span>
+                                </div>
+                                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-green-500 rounded-full transition-all"
+                                    style={{ width: `${response.yes}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="text-red-600 font-medium">No</span>
+                                  <span className="font-bold">{response.no}%</span>
+                                </div>
+                                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-red-500 rounded-full transition-all"
+                                    style={{ width: `${response.no}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Rating Question */}
+                        {response.type === 'rating' && (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1">
+                                <Star className="h-8 w-8 fill-amber-400 text-amber-400" />
+                                <span className="text-3xl font-bold">{response.avgRating}</span>
+                                <span className="text-muted-foreground">/ {response.maxRating}</span>
+                              </div>
+                              <span className="text-sm text-muted-foreground">Average Rating</span>
+                            </div>
+                            <div className="space-y-2">
+                              {response.distribution?.map((d: any) => (
+                                <div key={d.rating} className="flex items-center gap-2">
+                                  <span className="w-8 text-sm text-right">{d.rating}★</span>
+                                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full bg-amber-400 rounded-full"
+                                      style={{ width: `${(d.count / 75) * 100}%` }}
+                                    />
+                                  </div>
+                                  <span className="w-8 text-xs text-muted-foreground">{d.count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Multiple Choice Question */}
+                        {response.type === 'multiple_choice' && (
+                          <div className="space-y-3">
+                            {response.options?.map((opt: any, optIndex: number) => (
+                              <div key={optIndex} className="flex items-center gap-3">
+                                <div className="flex-1">
+                                  <div className="flex justify-between text-sm mb-1">
+                                    <span>{opt.option}</span>
+                                    <span className="font-medium">{opt.count}%</span>
+                                  </div>
+                                  <div className="h-3 bg-muted rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full rounded-full transition-all"
+                                      style={{ 
+                                        width: `${opt.count}%`,
+                                        backgroundColor: opt.color,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Short Text Question */}
+                        {response.type === 'short_text' && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <MessageSquare className="h-4 w-4" />
+                              <span>{response.totalResponses} text responses collected</span>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-sm font-medium">Sample responses:</p>
+                              {response.samples?.map((sample: string, sampleIndex: number) => (
+                                <div 
+                                  key={sampleIndex}
+                                  className="p-2 bg-muted/50 rounded-md text-sm italic"
+                                >
+                                  "{sample}"
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Key Insights for this mission */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mission Insights</CardTitle>
+                    <CardDescription>AI-generated observations for {selectedMission.name}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
+                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-green-800 dark:text-green-200">Strong Performance</p>
+                          <p className="text-sm text-green-700 dark:text-green-300">
+                            This mission shows {selectedMission.visits_completed > selectedMission.number_of_visits / 2 ? 'good' : 'improving'} completion rates 
+                            with {selectedMission.visits_completed} visits completed out of {selectedMission.number_of_visits} planned.
+                          </p>
+                        </div>
+                      </div>
+                      {missionResponses.some(r => r.type === 'yes_no' && r.no > 30) && (
+                        <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800">
+                          <Clock className="h-5 w-5 text-amber-600 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-amber-800 dark:text-amber-200">Area for Improvement</p>
+                            <p className="text-sm text-amber-700 dark:text-amber-300">
+                              Some yes/no questions show over 30% negative responses - review these for potential improvements.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
