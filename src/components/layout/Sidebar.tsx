@@ -47,7 +47,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             alt="Shadoo" 
             className={cn(
               "object-contain transition-all duration-300",
-              collapsed ? "h-10 w-12" : "h-16 w-auto"
+              collapsed ? "h-10 w-14" : "h-16 w-56"
             )}
           />
           <Button
