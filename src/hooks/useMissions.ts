@@ -241,6 +241,36 @@ export function useMissions() {
     setIsLoading(false);
   }, []);
 
+  const duplicateMission = useCallback(async (id: string): Promise<Mission | undefined> => {
+    const original = missions.find((m) => m.id === id);
+    if (!original) return undefined;
+
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    const duplicatedMission: Mission = {
+      id: `mission-${Date.now()}`,
+      name: `${original.name} (Copy)`,
+      branch_id: original.branch_id,
+      branch: original.branch,
+      status: 'draft',
+      questions: original.questions.map(q => ({ ...q, id: `${q.id}-copy-${Date.now()}` })),
+      photo_requirements: { ...original.photo_requirements },
+      number_of_visits: original.number_of_visits,
+      purchase_budget_per_visit: original.purchase_budget_per_visit,
+      total_purchase_budget: original.total_purchase_budget,
+      visits_completed: 0,
+      visits_pending: 0,
+      budget_used: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    setMissions((prev) => [duplicatedMission, ...prev]);
+    setIsLoading(false);
+    return duplicatedMission;
+  }, [missions]);
+
   return {
     missions,
     isLoading,
@@ -249,6 +279,7 @@ export function useMissions() {
     publishMission,
     createMission,
     updateMission,
+    duplicateMission,
     branches: mockBranches,
   };
 }
