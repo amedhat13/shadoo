@@ -198,45 +198,46 @@ export default function MissionCreatePage() {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="mx-auto max-w-3xl space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/missions')}
+            className="shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-black uppercase tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight">
               {isEditing ? 'Edit Mission' : 'Create Mission'}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground truncate">
               {FORM_STEPS[currentStep].description}
             </p>
           </div>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-between">
+        {/* Progress Steps - Horizontal on desktop, compact on mobile */}
+        <div className="flex items-center justify-between overflow-x-auto pb-2">
           {FORM_STEPS.map((step, index) => (
             <div
               key={step.id}
-              className="flex flex-1 items-center"
+              className="flex flex-1 items-center min-w-0"
             >
               <button
                 onClick={() => index < currentStep && setCurrentStep(index)}
                 disabled={index > currentStep}
                 className={cn(
-                  'flex items-center gap-2 transition-colors',
+                  'flex items-center gap-1 md:gap-2 transition-colors shrink-0',
                   index <= currentStep ? 'text-foreground' : 'text-muted-foreground',
                   index < currentStep && 'cursor-pointer hover:text-primary'
                 )}
               >
                 <div
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center text-sm font-bold transition-all',
+                    'flex h-7 w-7 md:h-8 md:w-8 items-center justify-center text-xs md:text-sm font-bold transition-all shrink-0',
                     index < currentStep
                       ? 'bg-success text-success-foreground'
                       : index === currentStep
@@ -245,19 +246,19 @@ export default function MissionCreatePage() {
                   )}
                 >
                   {index < currentStep ? (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-3 w-3 md:h-4 md:w-4" />
                   ) : (
                     index + 1
                   )}
                 </div>
-                <span className="hidden text-sm font-semibold uppercase tracking-wide sm:block">
+                <span className="hidden md:block text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
                   {step.title}
                 </span>
               </button>
               {index < FORM_STEPS.length - 1 && (
                 <div
                   className={cn(
-                    'mx-4 h-px flex-1',
+                    'mx-2 md:mx-4 h-px flex-1 min-w-4',
                     index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
@@ -268,32 +269,35 @@ export default function MissionCreatePage() {
 
         {/* Form Content */}
         <Card className="border border-border">
-          <CardContent className="p-6">
+          <CardContent className="p-4 md:p-6">
             {renderStepContent()}
           </CardContent>
         </Card>
 
         {/* Navigation Buttons */}
         {currentStep < 3 && (
-          <div className="flex justify-between">
+          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0}
+              className="w-full sm:w-auto"
             >
               BACK
             </Button>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
                 variant="outline"
                 onClick={handleSaveDraft}
                 disabled={!isStepValid(0) || isSubmitting}
+                className="w-full sm:w-auto"
               >
                 SAVE DRAFT
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!isStepValid(currentStep)}
+                className="w-full sm:w-auto"
               >
                 CONTINUE
               </Button>

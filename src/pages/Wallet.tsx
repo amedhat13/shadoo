@@ -9,13 +9,13 @@ export default function WalletPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <PageHeader
           title="Wallet"
           description="Manage your balance and view funds allocated to missions."
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           <div className="lg:col-span-2">
             <WalletCard
               availableBalance={wallet.available_balance}
