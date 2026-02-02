@@ -1,11 +1,13 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { WalletCard } from '@/components/wallet/WalletCard';
+import { TopUpDialog } from '@/components/wallet/TopUpDialog';
+import { TransactionList } from '@/components/wallet/TransactionList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/hooks/useWallet';
 
 export default function WalletPage() {
-  const { wallet } = useWallet();
+  const { wallet, transactions, topUp } = useWallet();
 
   return (
     <DashboardLayout>
@@ -13,6 +15,7 @@ export default function WalletPage() {
         <PageHeader
           title="Wallet"
           description="Manage your balance and view funds allocated to missions."
+          actions={<TopUpDialog onTopUp={topUp} />}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
@@ -26,13 +29,11 @@ export default function WalletPage() {
           <Card className="border border-border">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-bold uppercase tracking-wide">
-                Wallet Activity
+                Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Transaction history will appear here.
-              </p>
+              <TransactionList transactions={transactions.slice(0, 5)} />
             </CardContent>
           </Card>
         </div>
