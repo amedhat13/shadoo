@@ -9,11 +9,11 @@ export const MISSION_STATUS_LABELS: Record<string, string> = {
 };
 
 export const MISSION_STATUS_DESCRIPTIONS: Record<string, string> = {
-  draft: 'Mission is being created',
-  published: 'Mission is live and accepting visits',
-  paused: 'Mission is temporarily paused',
-  completed: 'All visits have been completed',
-  archived: 'Mission has been archived',
+  draft: 'Mission is being created.',
+  published: 'Mission is live and accepting visits.',
+  paused: 'Mission is temporarily paused.',
+  completed: 'All visits have been completed.',
+  archived: 'Mission has been archived.',
 };
 
 export const QUESTION_TYPE_LABELS: Record<string, string> = {
@@ -30,10 +30,10 @@ export const CURRENCY = {
 };
 
 export const FORM_STEPS = [
-  { id: 'basics', title: 'Basics', description: 'Mission details' },
-  { id: 'questions', title: 'Questions & Photos', description: 'Build questionnaire' },
-  { id: 'funding', title: 'Visits & Funding', description: 'Budget configuration' },
-  { id: 'review', title: 'Review', description: 'Review and publish' },
+  { id: 'basics', title: 'Basics', description: 'Mission details.' },
+  { id: 'questions', title: 'Questions & Photos', description: 'Build questionnaire.' },
+  { id: 'funding', title: 'Visits & Funding', description: 'Budget configuration.' },
+  { id: 'review', title: 'Review', description: 'Review and publish.' },
 ];
 
 export const NAV_ITEMS = [

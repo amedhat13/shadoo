@@ -28,6 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 
 interface TeamMember {
@@ -67,9 +72,9 @@ const mockTeam: TeamMember[] = [
 ];
 
 const ROLE_CONFIG = {
-  admin: { label: 'Admin', variant: 'default' as const },
-  manager: { label: 'Manager', variant: 'secondary' as const },
-  viewer: { label: 'Viewer', variant: 'outline' as const },
+  admin: { label: 'Admin', description: 'Full access to all features and settings.', variant: 'default' as const },
+  manager: { label: 'Manager', description: 'Can create and manage missions.', variant: 'secondary' as const },
+  viewer: { label: 'Viewer', description: 'Read-only access to view data.', variant: 'outline' as const },
 };
 
 export function UsersSettings() {
@@ -197,7 +202,14 @@ export function UsersSettings() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{member.name}</span>
                         {member.status === 'pending' && (
-                          <Badge variant="outline" className="text-xs">Pending</Badge>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="outline" className="text-xs cursor-help">Pending</Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Invitation sent, awaiting acceptance.</p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -208,7 +220,14 @@ export function UsersSettings() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Badge variant={roleConfig.variant}>{roleConfig.label}</Badge>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant={roleConfig.variant} className="cursor-help">{roleConfig.label}</Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{roleConfig.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">

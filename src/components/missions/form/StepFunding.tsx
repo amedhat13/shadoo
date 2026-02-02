@@ -31,7 +31,7 @@ export function StepFunding({
       <div className="space-y-2">
         <Label htmlFor="visits" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Users className="h-4 w-4" />
-          Number of Visits *
+          Number of Visits<span className="text-destructive">*</span>
         </Label>
         <Input
           id="visits"
@@ -46,7 +46,7 @@ export function StepFunding({
         />
         <p className={`text-xs ${exceedsVisits ? 'text-destructive' : 'text-muted-foreground'}`}>
           {exceedsVisits
-            ? `Exceeds your remaining visits (${visitsRemaining} available)`
+            ? `Exceeds your remaining visits (${visitsRemaining} available).`
             : MESSAGES.visits.consumption_warning.replace('{count}', String(data.number_of_visits))}
         </p>
       </div>
@@ -73,7 +73,7 @@ export function StepFunding({
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          Budget allocated for agent purchases during each visit (e.g., restaurant meal, product purchase)
+          Budget allocated for agent purchases during each visit.
         </p>
       </div>
 
