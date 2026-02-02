@@ -145,6 +145,7 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap }: BranchT
               <TableHead>Name</TableHead>
               <TableHead>Address</TableHead>
               <TableHead>City</TableHead>
+              <TableHead>District</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Google Maps</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -156,6 +157,7 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap }: BranchT
                 <TableCell className="font-medium">{branch.name}</TableCell>
                 <TableCell className="text-muted-foreground">{branch.address}</TableCell>
                 <TableCell>{branch.city}</TableCell>
+                <TableCell className="text-muted-foreground">{branch.district || '-'}</TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
                     <BranchStatusBadge status={branch.status} />

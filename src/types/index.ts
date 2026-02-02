@@ -25,6 +25,7 @@ export interface Branch {
   name: string;
   address: string;
   city: string;
+  district?: string;
   google_maps_link: string;
   latitude?: number;
   longitude?: number;
