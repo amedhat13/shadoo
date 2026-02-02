@@ -199,7 +199,7 @@ export default function MissionCreatePage() {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto max-w-3xl space-y-4 md:space-y-6">
+      <div className="mx-auto w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl space-y-4 md:space-y-6 px-2 sm:px-4 lg:px-8">
         {/* Header */}
         <div className="flex items-center gap-3 md:gap-4">
           <Button
