@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, ChevronRight, Copy } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -27,9 +27,10 @@ interface MissionTableProps {
   onPause?: (mission: Mission) => void;
   onResume?: (mission: Mission) => void;
   onArchive?: (mission: Mission) => void;
+  onDuplicate?: (mission: Mission) => void;
 }
 
-export function MissionTable({ missions, onPause, onResume, onArchive }: MissionTableProps) {
+export function MissionTable({ missions, onPause, onResume, onArchive, onDuplicate }: MissionTableProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -78,6 +79,15 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
                         }}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
+                        </DropdownMenuItem>
+                      )}
+                      {onDuplicate && (
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          onDuplicate(mission);
+                        }}>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Duplicate
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -205,6 +215,15 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
                       }}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
+                      </DropdownMenuItem>
+                    )}
+                    {onDuplicate && (
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        onDuplicate(mission);
+                      }}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Duplicate
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />

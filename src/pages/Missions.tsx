@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 export default function MissionsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { missions, branches, updateMissionStatus } = useMissions();
+  const { missions, branches, updateMissionStatus, duplicateMission } = useMissions();
   const { visitsRemaining, visitsTotal } = usePackage();
 
   const [filters, setFilters] = useState<MissionFilters>({
@@ -73,6 +73,17 @@ export default function MissionsPage() {
       title: 'Mission archived',
       description: `"${mission.name}" has been archived.`,
     });
+  };
+
+  const handleDuplicate = async (mission: Mission) => {
+    const duplicated = await duplicateMission(mission.id);
+    if (duplicated) {
+      toast({
+        title: 'Mission duplicated',
+        description: `"${duplicated.name}" created as a draft. Review and publish when ready.`,
+      });
+      navigate(`/missions/${duplicated.id}/edit`);
+    }
   };
 
   const handleCreateClick = () => {
@@ -141,6 +152,7 @@ export default function MissionsPage() {
                 onPause={handlePause}
                 onResume={handleResume}
                 onArchive={handleArchive}
+                onDuplicate={handleDuplicate}
               />
             )}
           </>
