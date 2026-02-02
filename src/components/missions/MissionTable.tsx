@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Mission } from '@/types/mission';
+import { Mission } from '@/types';
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { CURRENCY } from '@/lib/constants';
 
@@ -40,12 +40,12 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border">
-            <TableHead className="w-[300px] text-xs font-bold uppercase tracking-wide">Mission</TableHead>
+            <TableHead className="w-[250px] text-xs font-bold uppercase tracking-wide">Mission</TableHead>
             <TableHead className="text-xs font-bold uppercase tracking-wide">Branch</TableHead>
             <TableHead className="text-xs font-bold uppercase tracking-wide">Status</TableHead>
-            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Quota</TableHead>
-            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Reward</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wide">Published</TableHead>
+            <TableHead className="text-center text-xs font-bold uppercase tracking-wide">Visits</TableHead>
+            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Budget/Visit</TableHead>
+            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Total Budget</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -58,10 +58,10 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
             >
               <TableCell>
                 <div className="font-semibold text-foreground">
-                  {mission.title}
+                  {mission.name}
                 </div>
-                <div className="text-sm text-muted-foreground line-clamp-1">
-                  {mission.description}
+                <div className="text-xs text-muted-foreground">
+                  {mission.questions.length} questions • {mission.photo_requirements.required_count} photos
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground">
@@ -70,17 +70,15 @@ export function MissionTable({ missions, onPause, onResume, onArchive }: Mission
               <TableCell>
                 <MissionStatusBadge status={mission.status} />
               </TableCell>
-              <TableCell className="text-right font-bold">
-                <span className="text-success">{mission.completed_runs || 0}</span>
-                <span className="text-muted-foreground">/{mission.quota}</span>
+              <TableCell className="text-center">
+                <span className="text-success font-bold">{mission.visits_completed}</span>
+                <span className="text-muted-foreground"> / {mission.number_of_visits}</span>
               </TableCell>
               <TableCell className="text-right font-semibold">
-                {formatCurrency(mission.fixed_reward)}
+                {formatCurrency(mission.purchase_budget_per_visit)}
               </TableCell>
-              <TableCell className="text-muted-foreground">
-                {mission.published_at
-                  ? format(new Date(mission.published_at), 'MMM d, yyyy')
-                  : '—'}
+              <TableCell className="text-right font-bold">
+                {formatCurrency(mission.total_purchase_budget)}
               </TableCell>
               <TableCell>
                 <DropdownMenu>

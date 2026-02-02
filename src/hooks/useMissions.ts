@@ -1,101 +1,120 @@
 import { useState, useCallback } from 'react';
-import { Mission, MissionStatus } from '@/types/mission';
+import { Mission, MissionStatus, Branch, Question } from '@/types';
 
-// Mock data for demonstration
-const mockBranches = [
+// Mock branches
+const mockBranches: Branch[] = [
   { id: 'branch-1', name: 'Cairo Downtown', address: '123 Tahrir Square, Cairo' },
   { id: 'branch-2', name: 'Alexandria Mall', address: '456 Corniche, Alexandria' },
   { id: 'branch-3', name: 'Giza Plaza', address: '789 Pyramids Road, Giza' },
 ];
 
+// Mock questions for demo
+const sampleQuestions: Question[] = [
+  {
+    id: 'q1',
+    type: 'yes_no',
+    text: 'Was the staff friendly and welcoming?',
+    required: true,
+  },
+  {
+    id: 'q2',
+    type: 'rating',
+    text: 'Rate the overall cleanliness of the store',
+    required: true,
+    max_rating: 5,
+  },
+  {
+    id: 'q3',
+    type: 'multiple_choice',
+    text: 'How long did you wait to be served?',
+    required: true,
+    options: [
+      { id: 'opt1', text: 'Less than 2 minutes' },
+      { id: 'opt2', text: '2-5 minutes' },
+      { id: 'opt3', text: '5-10 minutes' },
+      { id: 'opt4', text: 'More than 10 minutes' },
+    ],
+  },
+  {
+    id: 'q4',
+    type: 'short_text',
+    text: 'Any additional comments or observations?',
+    required: false,
+  },
+];
+
+// Mock missions
 const mockMissions: Mission[] = [
   {
     id: 'mission-1',
-    title: 'Store Visit - Customer Service Audit',
-    description: 'Evaluate customer service quality and staff responsiveness at retail locations.',
+    name: 'Customer Service Audit',
     branch_id: 'branch-1',
     branch: mockBranches[0],
     status: 'published',
-    start_date: '2025-02-01',
-    end_date: '2025-02-28',
-    quota: 20,
-    required_photos_count: 3,
-    receipt_required: true,
-    fixed_reward: 150,
-    reimbursement_cap: 100,
-    per_run_max_cost: 250,
-    required_hold: 5000,
-    completed_runs: 12,
-    pending_runs: 3,
-    approval_rate: 85,
+    questions: sampleQuestions,
+    photo_requirements: { required_count: 3, instructions: 'Take photos of store entrance, checkout area, and product displays' },
+    number_of_visits: 20,
+    purchase_budget_per_visit: 100,
+    total_purchase_budget: 2000,
+    visits_completed: 12,
+    visits_pending: 3,
+    budget_used: 1150,
     created_at: '2025-01-15T10:00:00Z',
     updated_at: '2025-01-20T14:30:00Z',
     published_at: '2025-02-01T09:00:00Z',
   },
   {
     id: 'mission-2',
-    title: 'Product Display Check',
-    description: 'Verify product placement and promotional material visibility in store.',
+    name: 'Product Display Check',
     branch_id: 'branch-2',
     branch: mockBranches[1],
     status: 'draft',
-    start_date: '2025-02-15',
-    end_date: '2025-03-15',
-    quota: 15,
-    required_photos_count: 5,
-    receipt_required: true,
-    fixed_reward: 200,
-    reimbursement_cap: 50,
-    per_run_max_cost: 250,
-    required_hold: 3750,
-    completed_runs: 0,
-    pending_runs: 0,
+    questions: sampleQuestions.slice(0, 2),
+    photo_requirements: { required_count: 5, instructions: 'Photograph each product category section' },
+    number_of_visits: 15,
+    purchase_budget_per_visit: 50,
+    total_purchase_budget: 750,
+    visits_completed: 0,
+    visits_pending: 0,
+    budget_used: 0,
     created_at: '2025-01-28T11:00:00Z',
     updated_at: '2025-01-28T11:00:00Z',
   },
   {
     id: 'mission-3',
-    title: 'Competitor Price Survey',
-    description: 'Collect competitor pricing data for key products in the electronics category.',
-    branch_id: 'branch-3',
-    branch: mockBranches[2],
+    name: 'Mystery Dining Experience',
+    branch_id: 'branch-1',
+    branch: mockBranches[0],
     status: 'paused',
-    start_date: '2025-01-20',
-    end_date: '2025-02-20',
-    quota: 30,
-    required_photos_count: 10,
-    receipt_required: true,
-    fixed_reward: 250,
-    reimbursement_cap: 0,
-    per_run_max_cost: 250,
-    required_hold: 7500,
-    completed_runs: 18,
-    pending_runs: 2,
-    approval_rate: 90,
+    questions: sampleQuestions,
+    photo_requirements: { required_count: 4, instructions: 'Photo of menu, food served, receipt, and restaurant ambiance' },
+    number_of_visits: 10,
+    purchase_budget_per_visit: 200,
+    total_purchase_budget: 2000,
+    visits_completed: 5,
+    visits_pending: 1,
+    budget_used: 980,
     created_at: '2025-01-10T09:00:00Z',
     updated_at: '2025-01-25T16:00:00Z',
     published_at: '2025-01-20T08:00:00Z',
   },
   {
     id: 'mission-4',
-    title: 'Mystery Dining Experience',
-    description: 'Evaluate food quality, service speed, and overall dining experience at restaurant locations.',
-    branch_id: 'branch-1',
-    branch: mockBranches[0],
-    status: 'ready_for_funding',
-    start_date: '2025-03-01',
-    end_date: '2025-03-31',
-    quota: 10,
-    required_photos_count: 4,
-    receipt_required: true,
-    fixed_reward: 300,
-    reimbursement_cap: 200,
-    per_run_max_cost: 500,
-    required_hold: 5000,
-    completed_runs: 0,
-    pending_runs: 0,
-    created_at: '2025-01-30T14:00:00Z',
-    updated_at: '2025-01-30T14:00:00Z',
+    name: 'Competitor Price Survey',
+    branch_id: 'branch-3',
+    branch: mockBranches[2],
+    status: 'completed',
+    questions: [sampleQuestions[2], sampleQuestions[3]],
+    photo_requirements: { required_count: 10, instructions: 'Photograph price tags for all listed products' },
+    number_of_visits: 8,
+    purchase_budget_per_visit: 0,
+    total_purchase_budget: 0,
+    visits_completed: 8,
+    visits_pending: 0,
+    budget_used: 0,
+    created_at: '2025-01-05T09:00:00Z',
+    updated_at: '2025-01-30T16:00:00Z',
+    published_at: '2025-01-06T08:00:00Z',
   },
 ];
 
@@ -109,7 +128,6 @@ export function useMissions() {
 
   const updateMissionStatus = useCallback(async (id: string, status: MissionStatus) => {
     setIsLoading(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500));
     setMissions((prev) =>
       prev.map((m) =>
@@ -123,56 +141,44 @@ export function useMissions() {
 
   const publishMission = useCallback(async (id: string) => {
     setIsLoading(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const mission = missions.find((m) => m.id === id);
-    if (mission) {
-      setMissions((prev) =>
-        prev.map((m) =>
-          m.id === id
-            ? {
-                ...m,
-                status: 'published' as MissionStatus,
-                published_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              }
-            : m
-        )
-      );
-    }
+    
+    setMissions((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? {
+              ...m,
+              status: 'published' as MissionStatus,
+              published_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+          : m
+      )
+    );
+    
     setIsLoading(false);
-    return {
-      status: 'published' as MissionStatus,
-      hold_amount: mission?.required_hold || 0,
-      hold_id: `hold-${Date.now()}`,
-    };
-  }, [missions]);
+  }, []);
 
   const createMission = useCallback(async (data: Partial<Mission>) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
     
-    const perRunMaxCost = (data.fixed_reward || 0) + (data.reimbursement_cap || 0);
-    const requiredHold = (data.quota || 0) * perRunMaxCost;
+    const totalBudget = (data.number_of_visits || 0) * (data.purchase_budget_per_visit || 0);
     
     const newMission: Mission = {
       id: `mission-${Date.now()}`,
-      title: data.title || '',
-      description: data.description || '',
+      name: data.name || '',
       branch_id: data.branch_id || '',
       branch: mockBranches.find((b) => b.id === data.branch_id),
       status: 'draft',
-      start_date: data.start_date || '',
-      end_date: data.end_date || '',
-      quota: data.quota || 0,
-      required_photos_count: data.required_photos_count || 0,
-      receipt_required: true,
-      fixed_reward: data.fixed_reward || 0,
-      reimbursement_cap: data.reimbursement_cap || 0,
-      per_run_max_cost: perRunMaxCost,
-      required_hold: requiredHold,
-      completed_runs: 0,
-      pending_runs: 0,
+      questions: data.questions || [],
+      photo_requirements: data.photo_requirements || { required_count: 0 },
+      number_of_visits: data.number_of_visits || 0,
+      purchase_budget_per_visit: data.purchase_budget_per_visit || 0,
+      total_purchase_budget: totalBudget,
+      visits_completed: 0,
+      visits_pending: 0,
+      budget_used: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -182,6 +188,26 @@ export function useMissions() {
     return newMission;
   }, []);
 
+  const updateMission = useCallback(async (id: string, data: Partial<Mission>) => {
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    setMissions((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? {
+              ...m,
+              ...data,
+              total_purchase_budget: (data.number_of_visits ?? m.number_of_visits) * (data.purchase_budget_per_visit ?? m.purchase_budget_per_visit),
+              updated_at: new Date().toISOString(),
+            }
+          : m
+      )
+    );
+    
+    setIsLoading(false);
+  }, []);
+
   return {
     missions,
     isLoading,
@@ -189,6 +215,7 @@ export function useMissions() {
     updateMissionStatus,
     publishMission,
     createMission,
+    updateMission,
     branches: mockBranches,
   };
 }

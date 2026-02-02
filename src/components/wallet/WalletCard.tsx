@@ -5,14 +5,14 @@ import { CURRENCY } from '@/lib/constants';
 
 interface WalletCardProps {
   availableBalance: number;
-  onHoldBalance: number;
+  allocatedToMissions: number;
   className?: string;
   compact?: boolean;
 }
 
 export function WalletCard({ 
   availableBalance, 
-  onHoldBalance, 
+  allocatedToMissions, 
   className,
   compact = false 
 }: WalletCardProps) {
@@ -20,7 +20,7 @@ export function WalletCard({
     return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
   };
 
-  const totalBalance = availableBalance + onHoldBalance;
+  const totalBalance = availableBalance + allocatedToMissions;
 
   if (compact) {
     return (
@@ -37,8 +37,8 @@ export function WalletCard({
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-muted-foreground uppercase tracking-wide">On Hold</div>
-              <div className="text-lg font-bold text-foreground">{formatCurrency(onHoldBalance)}</div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">Allocated</div>
+              <div className="text-lg font-bold text-foreground">{formatCurrency(allocatedToMissions)}</div>
             </div>
           </div>
         </CardContent>
@@ -73,9 +73,9 @@ export function WalletCard({
           <div className="border border-border bg-muted/30 p-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wide">
               <Lock className="h-3.5 w-3.5" />
-              On Hold
+              Allocated
             </div>
-            <div className="mt-1 text-lg font-bold">{formatCurrency(onHoldBalance)}</div>
+            <div className="mt-1 text-lg font-bold">{formatCurrency(allocatedToMissions)}</div>
           </div>
         </div>
       </CardContent>

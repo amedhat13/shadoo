@@ -6,33 +6,34 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { MissionTable } from '@/components/missions/MissionTable';
 import { MissionFiltersComponent, MissionFilters } from '@/components/missions/MissionFilters';
 import { EmptyState } from '@/components/common/EmptyState';
+import { VisitsRemainingWidget } from '@/components/package/VisitsRemainingWidget';
 import { Button } from '@/components/ui/button';
 import { useMissions } from '@/hooks/useMissions';
-import { Mission } from '@/types/mission';
-import { EMPTY_STATES } from '@/lib/constants';
+import { usePackage } from '@/hooks/usePackage';
+import { Mission } from '@/types';
+import { EMPTY_STATES, MESSAGES } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 
 export default function MissionsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { missions, branches, updateMissionStatus } = useMissions();
+  const { visitsRemaining, visitsTotal } = usePackage();
 
   const [filters, setFilters] = useState<MissionFilters>({
     search: '',
     status: 'all',
     branch: 'all',
-    dateRange: {},
   });
+
+  const canCreateMission = visitsRemaining > 0;
 
   // Filter missions
   const filteredMissions = missions.filter((mission) => {
     // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      if (
-        !mission.title.toLowerCase().includes(searchLower) &&
-        !mission.description.toLowerCase().includes(searchLower)
-      ) {
+      if (!mission.name.toLowerCase().includes(searchLower)) {
         return false;
       }
     }
@@ -47,16 +48,6 @@ export default function MissionsPage() {
       return false;
     }
 
-    // Date range filter
-    if (filters.dateRange.from) {
-      const missionDate = new Date(mission.created_at);
-      if (missionDate < filters.dateRange.from) return false;
-    }
-    if (filters.dateRange.to) {
-      const missionDate = new Date(mission.created_at);
-      if (missionDate > filters.dateRange.to) return false;
-    }
-
     return true;
   });
 
@@ -64,7 +55,7 @@ export default function MissionsPage() {
     await updateMissionStatus(mission.id, 'paused');
     toast({
       title: 'Mission paused',
-      description: `"${mission.title}" has been paused.`,
+      description: `"${mission.name}" has been paused.`,
     });
   };
 
@@ -72,7 +63,7 @@ export default function MissionsPage() {
     await updateMissionStatus(mission.id, 'published');
     toast({
       title: 'Mission resumed',
-      description: `"${mission.title}" is now live.`,
+      description: `"${mission.name}" is now live.`,
     });
   };
 
@@ -80,8 +71,20 @@ export default function MissionsPage() {
     await updateMissionStatus(mission.id, 'archived');
     toast({
       title: 'Mission archived',
-      description: `"${mission.title}" has been archived.`,
+      description: `"${mission.name}" has been archived.`,
     });
+  };
+
+  const handleCreateClick = () => {
+    if (!canCreateMission) {
+      toast({
+        title: 'No visits remaining',
+        description: MESSAGES.visits.none_remaining,
+        variant: 'destructive',
+      });
+      return;
+    }
+    navigate('/missions/create');
   };
 
   return (
@@ -91,11 +94,18 @@ export default function MissionsPage() {
           title="Missions"
           description="Create and manage mystery shopping missions for your organization."
           actions={
-            <Button onClick={() => navigate('/missions/create')} className="gap-2">
+            <Button onClick={handleCreateClick} className="gap-2" disabled={!canCreateMission}>
               <Plus className="h-4 w-4" />
               Create Mission
             </Button>
           }
+        />
+
+        {/* Visits remaining widget */}
+        <VisitsRemainingWidget
+          visitsRemaining={visitsRemaining}
+          visitsTotal={visitsTotal}
+          variant="card"
         />
 
         {missions.length === 0 ? (
@@ -103,10 +113,14 @@ export default function MissionsPage() {
             icon={<ClipboardList className="h-7 w-7 text-muted-foreground" />}
             title={EMPTY_STATES.missions.title}
             description={EMPTY_STATES.missions.description}
-            action={{
-              label: EMPTY_STATES.missions.action,
-              onClick: () => navigate('/missions/create'),
-            }}
+            action={
+              canCreateMission
+                ? {
+                    label: EMPTY_STATES.missions.action,
+                    onClick: () => navigate('/missions/create'),
+                  }
+                : undefined
+            }
           />
         ) : (
           <>
