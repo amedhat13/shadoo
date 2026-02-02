@@ -1,104 +1,67 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { SubscriptionPlans } from '@/components/settings/SubscriptionPlans';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { useSubscription } from '@/hooks/useSubscription';
-import { CreditCard, Bell, Shield } from 'lucide-react';
-import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AccountSettings } from '@/components/settings/AccountSettings';
+import { UsersSettings } from '@/components/settings/UsersSettings';
+import { NotificationSettings } from '@/components/settings/NotificationSettings';
+import { SecuritySettings } from '@/components/settings/SecuritySettings';
+import { BillingSettings } from '@/components/settings/BillingSettings';
+import { User, Users, Bell, Shield, CreditCard } from 'lucide-react';
+
+const SETTINGS_TABS = [
+  { id: 'account', label: 'Account', icon: User },
+  { id: 'users', label: 'Users', icon: Users },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'billing', label: 'Billing', icon: CreditCard },
+];
 
 export default function SettingsPage() {
-  const { plans, currentPlanId, currentPlan, isLoading, selectPlan } = useSubscription();
-
-  const handleSelectPlan = async (planId: string) => {
-    await selectPlan(planId);
-    const plan = plans.find((p) => p.id === planId);
-    toast.success(`Switched to ${plan?.name} plan`);
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <PageHeader
           title="Settings"
-          description="Configure your organization preferences and subscription."
+          description="Manage your account, team, and preferences."
         />
 
-        {/* Current Plan Summary */}
-        {currentPlan && (
-          <Card className="border border-primary/30 bg-primary/5">
-            <CardContent className="flex items-center justify-between py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-primary">
-                  <CreditCard className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Current Plan</div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold">{currentPlan.name}</span>
-                    <Badge variant="secondary">{currentPlan.visits_per_month} visits/month</Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <Tabs defaultValue="account" className="space-y-6">
+          <TabsList className="h-auto flex-wrap gap-1 bg-transparent p-0">
+            {SETTINGS_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="gap-2 border border-transparent data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                >
+                  <Icon className="h-4 w-4" />
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-        {/* Subscription Plans */}
-        <section>
-          <div className="mb-4">
-            <h2 className="text-lg font-bold">Subscription Plans</h2>
-            <p className="text-sm text-muted-foreground">
-              Choose the plan that best fits your business needs.
-            </p>
-          </div>
-          <SubscriptionPlans
-            plans={plans}
-            currentPlanId={currentPlanId}
-            onSelectPlan={handleSelectPlan}
-            isLoading={isLoading}
-          />
-        </section>
+          <TabsContent value="account" className="mt-6">
+            <AccountSettings />
+          </TabsContent>
 
-        <Separator />
+          <TabsContent value="users" className="mt-6">
+            <UsersSettings />
+          </TabsContent>
 
-        {/* Other Settings */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-                <Bell className="h-4 w-4" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Configure how you receive alerts and updates.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Notification settings coming soon.
-              </p>
-            </CardContent>
-          </Card>
+          <TabsContent value="notifications" className="mt-6">
+            <NotificationSettings />
+          </TabsContent>
 
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-                <Shield className="h-4 w-4" />
-                Security
-              </CardTitle>
-              <CardDescription>
-                Manage your account security and access.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Security settings coming soon.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+          <TabsContent value="security" className="mt-6">
+            <SecuritySettings />
+          </TabsContent>
+
+          <TabsContent value="billing" className="mt-6">
+            <BillingSettings />
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
