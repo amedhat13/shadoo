@@ -58,9 +58,9 @@ export function MissionFiltersComponent({
           value={filters.status}
           onValueChange={(value) => onFiltersChange({ ...filters, status: value as MissionStatus | 'all' })}
         >
-          <SelectTrigger className="flex-1 sm:flex-none sm:w-[140px] border-border">
+          <SelectTrigger className="flex-1 sm:flex-none sm:w-[180px] border-border">
             <Filter className="mr-2 h-4 w-4 shrink-0" />
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Status" className="truncate" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
