@@ -38,22 +38,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       <div className="flex h-full flex-col">
         {/* Logo & Toggle */}
-        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3">
-          {!collapsed && (
-            <img 
-              src={shadooLogo} 
-              alt="Shadoo" 
-              className="h-10 w-auto"
-            />
-          )}
+        <div className={cn(
+          "flex items-center border-b border-sidebar-border transition-all duration-300",
+          collapsed ? "h-20 flex-col justify-center gap-2 px-2" : "h-24 justify-between px-4"
+        )}>
+          <img 
+            src={shadooLogo} 
+            alt="Shadoo" 
+            className={cn(
+              "object-contain transition-all duration-300",
+              collapsed ? "h-10 w-12" : "h-16 w-auto"
+            )}
+          />
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className={cn(
-              "h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent",
-              collapsed && "mx-auto"
-            )}
+            className="h-7 w-7 text-sidebar-foreground hover:bg-sidebar-accent shrink-0"
           >
             {collapsed ? (
               <ChevronRight className="h-4 w-4" />
