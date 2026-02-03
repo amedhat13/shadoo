@@ -6,15 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, ArrowLeft, Loader2, AlertCircle, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import logo from '@/assets/shadoo-logo.png';
+import { generateDemoCredentials } from '@/lib/auth/demoAccount';
 
 export default function AdminAuthPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [creatingDemo, setCreatingDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -86,6 +88,56 @@ export default function AdminAuthPage() {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateDemoAccount = async () => {
+    setError(null);
+    setCreatingDemo(true);
+
+    try {
+      const { email, password, fullName } = generateDemoCredentials();
+      
+      // Sign up the demo user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: `${fullName} (Admin)` },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        setCreatingDemo(false);
+        return;
+      }
+
+      if (!signUpData.user) {
+        setError('Failed to create demo account');
+        setCreatingDemo(false);
+        return;
+      }
+
+      // Wait a moment for the profile to be created by trigger
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Assign super_admin role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({ user_id: signUpData.user.id, role: 'super_admin' });
+
+      if (roleError) {
+        console.error('Role assignment error:', roleError);
+        // Continue anyway - user can still access if session exists
+      }
+
+      toast.success('Demo admin account created!');
+      navigate('/admin');
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
+      setCreatingDemo(false);
     }
   };
 
@@ -169,7 +221,7 @@ export default function AdminAuthPage() {
               <Button 
                 type="submit" 
                 className="w-full bg-warning text-warning-foreground hover:bg-warning/90"
-                disabled={loading}
+                disabled={loading || creatingDemo}
               >
                 {loading ? (
                   <>
@@ -178,6 +230,35 @@ export default function AdminAuthPage() {
                   </>
                 ) : (
                   'Sign In'
+                )}
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">Or</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleCreateDemoAccount}
+                disabled={loading || creatingDemo}
+              >
+                {creatingDemo ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Creating demo account...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Create Demo Admin
+                  </>
                 )}
               </Button>
             </form>
