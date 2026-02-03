@@ -11,7 +11,7 @@ import { useWallet } from '@/hooks/useWallet';
 import { MESSAGES } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 
-const Index = () => {
+const ClientDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { missions } = useMissions();
@@ -183,4 +183,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default ClientDashboard;

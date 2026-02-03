@@ -18,7 +18,7 @@ import shadooLogo from '@/assets/shadoo-logo.png';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const navItems = [
-  { id: 'dashboard', label: 'DASHBOARD', href: '/', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard', icon: LayoutDashboard },
   { id: 'missions', label: 'MISSIONS', href: '/missions', icon: ClipboardList },
   { id: 'branches', label: 'BRANCHES', href: '/branches', icon: Building2 },
   { id: 'wallet', label: 'WALLET', href: '/wallet', icon: Wallet },
@@ -71,8 +71,8 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-2 py-4">
         {navItems.map((item) => {
-          const isActive = item.href === '/'
-            ? location.pathname === '/'
+          const isActive = item.href === '/dashboard'
+            ? location.pathname === '/dashboard'
             : location.pathname.startsWith(item.href);
           const Icon = item.icon;
           
