@@ -6,10 +6,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/admin/auth/AdminProtectedRoute";
-import Index from "./pages/Index";
+
+// Public Pages
+import LandingPage from "./pages/Landing";
 import NotFound from "./pages/NotFound";
+
+// Client Auth & Pages
 import AuthPage from "./pages/Auth";
 import ChangePasswordPage from "./pages/ChangePassword";
+import ClientDashboard from "./pages/ClientDashboard";
 import MissionsPage from "./pages/Missions";
 import MissionCreatePage from "./pages/MissionCreate";
 import MissionDetailsPage from "./pages/MissionDetails";
@@ -18,7 +23,8 @@ import ReportsPage from "./pages/Reports";
 import BranchesPage from "./pages/Branches";
 import SettingsPage from "./pages/Settings";
 
-// Admin Pages
+// Admin Auth & Pages
+import AdminAuthPage from "./pages/admin/AdminAuth";
 import AdminDashboardPage from "./pages/admin/AdminDashboard";
 import AdminClientsPage from "./pages/admin/AdminClients";
 import AdminBranchesPage from "./pages/admin/AdminBranches";
@@ -45,7 +51,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Client Auth */}
             <Route path="/auth" element={<AuthPage />} />
             <Route
               path="/change-password"
@@ -57,6 +65,14 @@ const App = () => (
             />
 
             {/* Client Dashboard Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ClientDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/missions"
               element={
@@ -121,6 +137,9 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {/* Admin Auth */}
+            <Route path="/admin/auth" element={<AdminAuthPage />} />
 
             {/* Admin Dashboard Routes */}
             <Route

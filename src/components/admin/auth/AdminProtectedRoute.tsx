@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { LoadingState } from '@/components/common/LoadingState';
 
 interface AdminProtectedRouteProps {
@@ -10,8 +11,32 @@ interface AdminProtectedRouteProps {
 export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [checkingRole, setCheckingRole] = useState(true);
 
-  if (isLoading) {
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setCheckingRole(false);
+        return;
+      }
+
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .in('role', ['super_admin', 'admin', 'support', 'finance', 'operations']);
+
+      setIsAdmin(roles && roles.length > 0);
+      setCheckingRole(false);
+    };
+
+    if (!isLoading) {
+      checkAdminRole();
+    }
+  }, [user, isLoading]);
+
+  if (isLoading || checkingRole) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <LoadingState message="Verifying admin access..." />
@@ -20,12 +45,12 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   }
 
   if (!user) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    return <Navigate to="/admin/auth" state={{ from: location }} replace />;
   }
 
-  // TODO: Add actual admin role check using has_role function
-  // For now, allow any authenticated user to access admin
-  // In production, this should check user_roles table
+  if (!isAdmin) {
+    return <Navigate to="/admin/auth" replace />;
+  }
 
   return <>{children}</>;
 }
