@@ -52,6 +52,33 @@ export default function AdminBranchesPage() {
     },
   });
 
+  const bulkVerifyMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('branches')
+        .update({ 
+          status: 'verified', 
+          rejection_reason: null,
+          updated_at: new Date().toISOString(),
+        })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: (_, ids) => {
+      toast.success(`${ids.length} branches verified successfully`);
+      queryClient.invalidateQueries({ queryKey: ['admin-branches'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleVerifyAll = () => {
+    if (pendingBranches.length === 0) return;
+    const ids = pendingBranches.map(b => b.id);
+    bulkVerifyMutation.mutate(ids);
+  };
+
   const handleVerify = (id: string) => {
     updateStatusMutation.mutate({ id, status: 'verified' });
   };
@@ -185,8 +212,23 @@ export default function AdminBranchesPage() {
 
           <TabsContent value="pending">
             <Card>
-              <CardHeader className="pb-3 md:pb-6">
+              <CardHeader className="pb-3 md:pb-6 flex flex-row items-center justify-between">
                 <CardTitle className="text-sm md:text-base font-bold uppercase">Pending Verification</CardTitle>
+                {pendingBranches.length > 0 && (
+                  <Button 
+                    size="sm" 
+                    onClick={handleVerifyAll}
+                    disabled={bulkVerifyMutation.isPending}
+                    className="gap-1"
+                  >
+                    {bulkVerifyMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                    Verify All ({pendingBranches.length})
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 {isLoading ? (
