@@ -109,6 +109,7 @@ export function useMissionsData() {
       number_of_visits: number;
       purchase_budget_per_visit: number;
       purchase_item_name?: string;
+      is_geo_tagged?: boolean;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -126,6 +127,7 @@ export function useMissionsData() {
         purchase_budget_per_visit: data.purchase_budget_per_visit,
         purchase_item_name: data.purchase_item_name,
         total_purchase_budget: totalBudget,
+        is_geo_tagged: data.is_geo_tagged ?? false,
       };
 
       const { data: mission, error } = await supabase
