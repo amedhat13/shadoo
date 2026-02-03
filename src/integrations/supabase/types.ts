@@ -14,6 +14,214 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_payouts: {
+        Row: {
+          agent_id: string | null
+          amount: number
+          id: string
+          method: string
+          payment_details: Json | null
+          processed_at: string | null
+          processed_by: string | null
+          rejection_reason: string | null
+          requested_at: string | null
+          status: string | null
+          transaction_reference: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          amount: number
+          id?: string
+          method: string
+          payment_details?: Json | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
+          status?: string | null
+          transaction_reference?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          amount?: number
+          id?: string
+          method?: string
+          payment_details?: Json | null
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          requested_at?: string | null
+          status?: string | null
+          transaction_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_payouts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_tiers: {
+        Row: {
+          commission_rate: number | null
+          created_at: string | null
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          min_completed_visits: number | null
+          min_rating: number | null
+          min_subscription_plan: string | null
+          name: string
+          sort_order: number | null
+          tier_code: string
+          updated_at: string | null
+        }
+        Insert: {
+          commission_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          min_completed_visits?: number | null
+          min_rating?: number | null
+          min_subscription_plan?: string | null
+          name: string
+          sort_order?: number | null
+          tier_code: string
+          updated_at?: string | null
+        }
+        Update: {
+          commission_rate?: number | null
+          created_at?: string | null
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          min_completed_visits?: number | null
+          min_rating?: number | null
+          min_subscription_plan?: string | null
+          name?: string
+          sort_order?: number | null
+          tier_code?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_tiers_min_subscription_plan_fkey"
+            columns: ["min_subscription_plan"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          available_balance: number | null
+          bank_details: Json | null
+          completed_visits: number | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          mobile_wallet: string | null
+          national_id: string | null
+          phone: string
+          rating_avg: number | null
+          status: string | null
+          tier: string | null
+          total_earnings: number | null
+          updated_at: string | null
+          user_id: string
+          verification_docs: Json | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          available_balance?: number | null
+          bank_details?: Json | null
+          completed_visits?: number | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          mobile_wallet?: string | null
+          national_id?: string | null
+          phone: string
+          rating_avg?: number | null
+          status?: string | null
+          tier?: string | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id: string
+          verification_docs?: Json | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          available_balance?: number | null
+          bank_details?: Json | null
+          completed_visits?: number | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          mobile_wallet?: string | null
+          national_id?: string | null
+          phone?: string
+          rating_avg?: number | null
+          status?: string | null
+          tier?: string | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id?: string
+          verification_docs?: Json | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: string | null
+          resource_id: string | null
+          resource_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+        }
+        Relationships: []
+      }
       branches: {
         Row: {
           address: string
@@ -133,6 +341,72 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      organization_members: {
+        Row: {
+          accepted_at: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          organization_id: string
+          role: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          organization_id: string
+          role?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          organization_id?: string
+          role?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -163,6 +437,42 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      question_templates: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          questions: Json
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          questions?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          questions?: Json
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -205,6 +515,27 @@ export type Database = {
           price?: number
           sort_order?: number
           visits_per_month?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -251,6 +582,72 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits: {
+        Row: {
+          agent_id: string | null
+          answers: Json | null
+          created_at: string | null
+          id: string
+          mission_id: string | null
+          photos: string[] | null
+          purchase_amount: number | null
+          receipt_photo: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          started_at: string | null
+          status: string | null
+          submitted_at: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          answers?: Json | null
+          created_at?: string | null
+          id?: string
+          mission_id?: string | null
+          photos?: string[] | null
+          purchase_amount?: number | null
+          receipt_photo?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          started_at?: string | null
+          status?: string | null
+          submitted_at?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          answers?: Json | null
+          created_at?: string | null
+          id?: string
+          mission_id?: string | null
+          photos?: string[] | null
+          purchase_amount?: number | null
+          receipt_photo?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          started_at?: string | null
+          status?: string | null
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
             referencedColumns: ["id"]
           },
         ]
@@ -326,10 +723,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "super_admin"
+        | "admin"
+        | "support"
+        | "finance"
+        | "operations"
+        | "client_admin"
+        | "client_manager"
+        | "client_viewer"
+        | "agent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -456,6 +869,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "super_admin",
+        "admin",
+        "support",
+        "finance",
+        "operations",
+        "client_admin",
+        "client_manager",
+        "client_viewer",
+        "agent",
+      ],
+    },
   },
 } as const
