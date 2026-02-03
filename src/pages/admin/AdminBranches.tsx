@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import { Building2, CheckCircle, XCircle, Clock, MapPin, ExternalLink, Loader2 } from 'lucide-react';
 import { AdminCreateBranchDialog } from '@/components/admin/branches/AdminCreateBranchDialog';
+import { AdminBulkBranchDialog } from '@/components/admin/branches/AdminBulkBranchDialog';
 import { useAdminBranches } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,7 +68,12 @@ export default function AdminBranchesPage() {
         <AdminPageHeader
           title="Branch Management"
           description="Verify and manage client branches."
-          actions={<AdminCreateBranchDialog />}
+          actions={
+            <div className="flex gap-2">
+              <AdminBulkBranchDialog />
+              <AdminCreateBranchDialog />
+            </div>
+          }
           badge={
             pendingBranches.length > 0 && (
               <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
