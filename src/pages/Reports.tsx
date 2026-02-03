@@ -3,11 +3,12 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { usePackage } from '@/hooks/usePackage';
+import { MultiSelect } from '@/components/ui/multi-select';
 import {
   ChartContainer,
   ChartTooltip,
@@ -200,9 +201,9 @@ export default function ReportsPage() {
   const { wallet } = useWallet();
   const { subscription } = usePackage();
   
-  // Filters
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  const [selectedBranch, setSelectedBranch] = useState<string>('all');
+  // Filters - now support multiple selections
+  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
+  const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [selectedMissionId, setSelectedMissionId] = useState<string>('all');
 
   // Get selected mission and its responses
@@ -216,32 +217,32 @@ export default function ReportsPage() {
     return generateMockResponses(selectedMission.id, selectedMission.questions);
   }, [selectedMission]);
 
-  // Filter data based on selections
+  // Filter data based on selections (now supports multiple)
   const filteredVisitData = useMemo(() => {
     let data = allVisitData;
-    if (selectedMonth !== 'all') {
-      data = data.filter(d => d.month === selectedMonth);
+    if (selectedMonths.length > 0) {
+      data = data.filter(d => selectedMonths.includes(d.month));
     }
-    if (selectedBranch !== 'all') {
-      data = data.filter(d => d.branch === selectedBranch);
+    if (selectedBranches.length > 0) {
+      data = data.filter(d => selectedBranches.includes(d.branch));
     }
     return data;
-  }, [selectedMonth, selectedBranch]);
+  }, [selectedMonths, selectedBranches]);
 
   const filteredBudgetData = useMemo(() => {
     let data = allBudgetData;
-    if (selectedMonth !== 'all') {
-      data = data.filter(d => d.month === selectedMonth);
+    if (selectedMonths.length > 0) {
+      data = data.filter(d => selectedMonths.includes(d.month));
     }
-    if (selectedBranch !== 'all') {
-      data = data.filter(d => d.branch === selectedBranch);
+    if (selectedBranches.length > 0) {
+      data = data.filter(d => selectedBranches.includes(d.branch));
     }
     return data;
-  }, [selectedMonth, selectedBranch]);
+  }, [selectedMonths, selectedBranches]);
 
   // Aggregate data for charts
   const visitsByMonth = useMemo(() => {
-    const months = selectedMonth === 'all' ? MONTHS : [selectedMonth];
+    const months = selectedMonths.length === 0 ? MONTHS : selectedMonths;
     return months.map(month => {
       const monthData = filteredVisitData.filter(d => d.month === month);
       return {
@@ -250,10 +251,10 @@ export default function ReportsPage() {
         completed: monthData.reduce((sum, d) => sum + d.completed, 0),
       };
     });
-  }, [filteredVisitData, selectedMonth]);
+  }, [filteredVisitData, selectedMonths]);
 
   const visitsByBranch = useMemo(() => {
-    const branches = selectedBranch === 'all' ? BRANCHES : [selectedBranch];
+    const branches = selectedBranches.length === 0 ? BRANCHES : selectedBranches;
     return branches.map(branch => {
       const branchData = filteredVisitData.filter(d => d.branch === branch);
       return {
@@ -265,10 +266,10 @@ export default function ReportsPage() {
           : 0,
       };
     });
-  }, [filteredVisitData, selectedBranch]);
+  }, [filteredVisitData, selectedBranches]);
 
   const budgetByMonth = useMemo(() => {
-    const months = selectedMonth === 'all' ? MONTHS : [selectedMonth];
+    const months = selectedMonths.length === 0 ? MONTHS : selectedMonths;
     return months.map(month => {
       const monthData = filteredBudgetData.filter(d => d.month === month);
       return {
@@ -277,7 +278,7 @@ export default function ReportsPage() {
         used: monthData.reduce((sum, d) => sum + d.used, 0),
       };
     });
-  }, [filteredBudgetData, selectedMonth]);
+  }, [filteredBudgetData, selectedMonths]);
 
   // Mission status pie chart data
   const missionStatusData = [
@@ -325,39 +326,33 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="space-y-2 flex-1 sm:flex-none">
+              <div className="space-y-2 flex-1 sm:flex-none sm:min-w-[200px]">
                 <Label className="flex items-center gap-1 text-sm">
                   <Calendar className="h-3 w-3" />
-                  Month
+                  Months
                 </Label>
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="All Months" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Months</SelectItem>
-                    {MONTHS.map(month => (
-                      <SelectItem key={month} value={month}>{month} 2025</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <MultiSelect
+                  options={MONTHS.map(month => ({ value: month, label: `${month} 2025` }))}
+                  selected={selectedMonths}
+                  onChange={setSelectedMonths}
+                  placeholder="All Months"
+                  searchPlaceholder="Search months..."
+                  emptyMessage="No months found."
+                />
               </div>
-              <div className="space-y-2 flex-1 sm:flex-none">
+              <div className="space-y-2 flex-1 sm:flex-none sm:min-w-[220px]">
                 <Label className="flex items-center gap-1 text-sm">
                   <MapPin className="h-3 w-3" />
-                  Branch
+                  Branches
                 </Label>
-                <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="All Branches" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Branches</SelectItem>
-                    {BRANCHES.map(branch => (
-                      <SelectItem key={branch} value={branch}>{branch}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <MultiSelect
+                  options={BRANCHES.map(branch => ({ value: branch, label: branch }))}
+                  selected={selectedBranches}
+                  onChange={setSelectedBranches}
+                  placeholder="All Branches"
+                  searchPlaceholder="Search branches..."
+                  emptyMessage="No branches found."
+                />
               </div>
             </div>
           </CardContent>
