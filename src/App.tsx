@@ -9,6 +9,7 @@ import { AdminProtectedRoute } from "@/components/admin/auth/AdminProtectedRoute
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
+import ChangePasswordPage from "./pages/ChangePassword";
 import MissionsPage from "./pages/Missions";
 import MissionCreatePage from "./pages/MissionCreate";
 import MissionDetailsPage from "./pages/MissionDetails";
@@ -46,6 +47,14 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route
+              path="/change-password"
+              element={
+                <ProtectedRoute>
+                  <ChangePasswordPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Client Dashboard Routes */}
             <Route
