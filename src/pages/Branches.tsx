@@ -9,13 +9,40 @@ import { BranchForm } from '@/components/branches/BranchForm';
 import { BulkBranchForm } from '@/components/branches/BulkBranchForm';
 import { BranchMapView } from '@/components/branches/BranchMapView';
 import { BranchFiltersBar, BranchFilters } from '@/components/branches/BranchFiltersBar';
-import { useBranches, BranchFormData } from '@/hooks/useBranches';
-import { Branch } from '@/types';
+import { useBranchesData } from '@/hooks/useBranchesData';
+import { Branch, BranchStatus } from '@/types';
 import { Plus, Upload, MapPin, List, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+export interface BranchFormData {
+  name: string;
+  address: string;
+  city: string;
+  district?: string;
+  google_maps_link: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+// Helper to extract coordinates from Google Maps link
+function extractCoordsFromLink(link: string): { lat: number; lng: number } | null {
+  try {
+    const qMatch = link.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (qMatch) {
+      return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+    }
+    const atMatch = link.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+    if (atMatch) {
+      return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function BranchesPage() {
-  const { branches, isLoading, createBranch, createBulkBranches, updateBranch, deleteBranch } = useBranches();
+  const { branches, isLoading, createBranch, updateBranch, deleteBranch } = useBranchesData();
   const { toast } = useToast();
   
   const [formOpen, setFormOpen] = useState(false);
@@ -63,7 +90,16 @@ export default function BranchesPage() {
   }, [branches, filters]);
 
   const handleCreateBranch = async (data: BranchFormData) => {
-    await createBranch(data);
+    const coords = extractCoordsFromLink(data.google_maps_link);
+    await createBranch({
+      name: data.name,
+      address: data.address,
+      city: data.city,
+      district: data.district,
+      google_maps_link: data.google_maps_link,
+      latitude: coords?.lat,
+      longitude: coords?.lng,
+    });
     toast({
       title: 'Branch Added',
       description: 'Your branch has been submitted for verification.',
@@ -72,7 +108,17 @@ export default function BranchesPage() {
 
   const handleUpdateBranch = async (data: BranchFormData) => {
     if (!editingBranch) return;
-    await updateBranch(editingBranch.id, data);
+    const coords = extractCoordsFromLink(data.google_maps_link);
+    await updateBranch(editingBranch.id, {
+      name: data.name,
+      address: data.address,
+      city: data.city,
+      district: data.district,
+      google_maps_link: data.google_maps_link,
+      latitude: coords?.lat,
+      longitude: coords?.lng,
+      status: 'pending_verification' as BranchStatus,
+    });
     setEditingBranch(null);
     toast({
       title: 'Branch Updated',
@@ -89,7 +135,19 @@ export default function BranchesPage() {
   };
 
   const handleBulkCreate = async (branchesData: BranchFormData[]) => {
-    await createBulkBranches(branchesData);
+    // Create branches one by one since we don't have bulk insert in the data hook
+    for (const data of branchesData) {
+      const coords = extractCoordsFromLink(data.google_maps_link);
+      await createBranch({
+        name: data.name,
+        address: data.address,
+        city: data.city,
+        district: data.district,
+        google_maps_link: data.google_maps_link,
+        latitude: coords?.lat,
+        longitude: coords?.lng,
+      });
+    }
     toast({
       title: 'Branches Added',
       description: `${branchesData.length} branches have been submitted for verification.`,
