@@ -1,10 +1,11 @@
-import { DollarSign, Users, AlertTriangle, Info, Calculator, Building2, Wallet, ShoppingBag } from 'lucide-react';
+import { Users, AlertTriangle, Info, Calculator, Building2, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MissionFormData } from '@/types';
+import { MissionFormData, PurchaseItem } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
+import { PurchaseItemsList } from './PurchaseItemsList';
 
 interface StepFundingProps {
   data: MissionFormData;
@@ -24,11 +25,24 @@ export function StepFunding({
   onSaveDraft,
 }: StepFundingProps) {
   const navigate = useNavigate();
-  const budgetPerMission = data.number_of_visits * data.purchase_budget_per_visit;
+  
+  // Calculate budget from purchase items
+  const budgetPerVisit = data.purchase_items.reduce((sum, item) => sum + (item.budget || 0), 0);
+  const budgetPerMission = data.number_of_visits * budgetPerVisit;
   const totalVisitsAllMissions = data.number_of_visits * branchCount;
   const totalPurchaseBudget = budgetPerMission * branchCount;
   const exceedsVisits = totalVisitsAllMissions > visitsRemaining;
   const exceedsBalance = totalPurchaseBudget > walletBalance;
+
+  const handlePurchaseItemsChange = (items: PurchaseItem[]) => {
+    const totalBudget = items.reduce((sum, item) => sum + (item.budget || 0), 0);
+    const itemNames = items.filter(i => i.name).map(i => i.name).join(', ');
+    onChange({
+      purchase_items: items,
+      purchase_budget_per_visit: totalBudget,
+      purchase_item_name: itemNames || undefined,
+    });
+  };
 
   const handleTopUpAndSaveDraft = () => {
     if (onSaveDraft) {
@@ -83,46 +97,11 @@ export function StepFunding({
         </p>
       </div>
 
-      {/* Purchase Item & Budget per Visit */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="purchaseItem" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
-            <ShoppingBag className="h-4 w-4" />
-            Purchase Item & Budget per Visit
-          </Label>
-          <div className="flex gap-3">
-            <Input
-              id="purchaseItem"
-              type="text"
-              placeholder="Item name (e.g., Coffee, Sandwich)"
-              value={data.purchase_item_name || ''}
-              onChange={(e) =>
-                onChange({ purchase_item_name: e.target.value || undefined })
-              }
-              className="flex-1"
-            />
-            <div className="relative w-40">
-              <Input
-                id="budget"
-                type="number"
-                min={0}
-                placeholder="Budget"
-                value={data.purchase_budget_per_visit}
-                onChange={(e) =>
-                  onChange({ purchase_budget_per_visit: parseFloat(e.target.value) || 0 })
-                }
-                className="pr-12"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
-                {CURRENCY.symbol}
-              </span>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Specify what agents should purchase and the budget for each visit.
-          </p>
-        </div>
-      </div>
+      {/* Purchase Items List */}
+      <PurchaseItemsList
+        items={data.purchase_items}
+        onChange={handlePurchaseItemsChange}
+      />
 
       {/* Budget Calculation */}
       <div className="border border-border p-4 space-y-4">
@@ -143,7 +122,7 @@ export function StepFunding({
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
                 <span className="text-muted-foreground">× Budget per Visit</span>
-                <span className="font-semibold">{formatCurrency(data.purchase_budget_per_visit)}</span>
+                <span className="font-semibold">{formatCurrency(budgetPerVisit)}</span>
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
                 <span className="text-muted-foreground">= Budget per Mission</span>

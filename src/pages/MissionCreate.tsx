@@ -28,6 +28,7 @@ const initialFormData: MissionFormData = {
     instructions: '',
   },
   number_of_visits: 10,
+  purchase_items: [{ id: crypto.randomUUID(), name: '', budget: 100 }],
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
 };
@@ -53,6 +54,7 @@ export default function MissionCreatePage() {
         questions: existingMission.questions,
         photo_requirements: existingMission.photo_requirements,
         number_of_visits: existingMission.number_of_visits,
+        purchase_items: [{ id: crypto.randomUUID(), name: '', budget: existingMission.purchase_budget_per_visit }],
         purchase_budget_per_visit: existingMission.purchase_budget_per_visit,
       };
     }

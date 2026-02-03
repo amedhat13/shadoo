@@ -147,6 +147,13 @@ export interface Wallet {
   updated_at: string;
 }
 
+// Purchase Item for mission creation
+export interface PurchaseItem {
+  id: string;
+  name: string;
+  budget: number;
+}
+
 // Form Data for Mission Creation
 export interface MissionFormData {
   // Step 1: Basics
@@ -162,8 +169,9 @@ export interface MissionFormData {
   
   // Step 4: Visits & Funding
   number_of_visits: number;
-  purchase_budget_per_visit: number;
-  purchase_item_name?: string; // Item name for purchase
+  purchase_items: PurchaseItem[]; // Multiple items with individual budgets
+  purchase_budget_per_visit: number; // Computed from purchase_items
+  purchase_item_name?: string; // Legacy - computed from purchase_items
 }
 
 // Computed values helper
