@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, ArrowLeft, Loader2, AlertCircle, UserPlus } from 'lucide-react';
+import { Shield, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import logo from '@/assets/shadoo-logo.png';
-import { generateDemoCredentials } from '@/lib/auth/demoAccount';
+
+// Fixed demo admin credentials
+const DEMO_ADMIN_EMAIL = 'admin@demo.shadoo.app';
+const DEMO_ADMIN_PASSWORD = 'Demo@Admin123!';
 
 export default function AdminAuthPage() {
   const navigate = useNavigate();
@@ -91,49 +94,80 @@ export default function AdminAuthPage() {
     }
   };
 
-  const handleCreateDemoAccount = async () => {
+  const handleDemoLogin = async () => {
     setError(null);
     setCreatingDemo(true);
 
     try {
-      const { email, password, fullName } = generateDemoCredentials();
-      
-      // Sign up the demo user
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: `${fullName} (Admin)` },
-        },
+      // Try to sign in first
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: DEMO_ADMIN_EMAIL,
+        password: DEMO_ADMIN_PASSWORD,
       });
 
-      if (signUpError) {
-        setError(signUpError.message);
+      if (signInError) {
+        // If user doesn't exist, create the account
+        if (signInError.message.includes('Invalid login credentials')) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: DEMO_ADMIN_EMAIL,
+            password: DEMO_ADMIN_PASSWORD,
+            options: {
+              data: { full_name: 'Demo Admin' },
+            },
+          });
+
+          if (signUpError) {
+            setError(signUpError.message);
+            setCreatingDemo(false);
+            return;
+          }
+
+          if (!signUpData.user) {
+            setError('Failed to create demo account');
+            setCreatingDemo(false);
+            return;
+          }
+
+          // Wait for profile trigger
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Assign super_admin role
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({ user_id: signUpData.user.id, role: 'super_admin' });
+
+          if (roleError) {
+            console.error('Role assignment error:', roleError);
+          }
+
+          toast.success('Demo admin account created and logged in!');
+          navigate('/admin');
+          return;
+        }
+        
+        setError(signInError.message);
         setCreatingDemo(false);
         return;
       }
 
-      if (!signUpData.user) {
-        setError('Failed to create demo account');
-        setCreatingDemo(false);
-        return;
+      // Sign in successful, verify admin role
+      if (signInData.user) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', signInData.user.id)
+          .in('role', ['super_admin', 'admin', 'support', 'finance', 'operations']);
+
+        if (!roles || roles.length === 0) {
+          // Add super_admin role if missing
+          await supabase
+            .from('user_roles')
+            .insert({ user_id: signInData.user.id, role: 'super_admin' });
+        }
+
+        toast.success('Welcome back, Demo Admin!');
+        navigate('/admin');
       }
-
-      // Wait a moment for the profile to be created by trigger
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Assign super_admin role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: signUpData.user.id, role: 'super_admin' });
-
-      if (roleError) {
-        console.error('Role assignment error:', roleError);
-        // Continue anyway - user can still access if session exists
-      }
-
-      toast.success('Demo admin account created!');
-      navigate('/admin');
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {
@@ -233,34 +267,33 @@ export default function AdminAuthPage() {
                 )}
               </Button>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+              {/* Demo credentials box */}
+              <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  Demo Admin Credentials
+                </p>
+                <div className="space-y-1 font-mono text-sm">
+                  <p><span className="text-muted-foreground">Email:</span> {DEMO_ADMIN_EMAIL}</p>
+                  <p><span className="text-muted-foreground">Password:</span> {DEMO_ADMIN_PASSWORD}</p>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or</span>
-                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="w-full mt-2"
+                  onClick={handleDemoLogin}
+                  disabled={loading || creatingDemo}
+                >
+                  {creatingDemo ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Use Demo Account'
+                  )}
+                </Button>
               </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={handleCreateDemoAccount}
-                disabled={loading || creatingDemo}
-              >
-                {creatingDemo ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating demo account...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Create Demo Admin
-                  </>
-                )}
-              </Button>
             </form>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
