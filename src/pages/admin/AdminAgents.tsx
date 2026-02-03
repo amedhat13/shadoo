@@ -14,10 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { UserCheck, Users, Clock, Star, Award, Eye, Settings } from 'lucide-react';
+import { UserCheck, Users, Clock, Star, Award, Eye, Settings, ClipboardList } from 'lucide-react';
 import { useAgents, useAgentStats, Agent } from '@/hooks/useAgents';
 import { AgentApprovalDialog } from '@/components/admin/agents/AgentApprovalDialog';
 import { AgentManageDialog } from '@/components/admin/agents/AgentManageDialog';
+import { AgentQuestionnaireEditor } from '@/components/admin/agents/AgentQuestionnaireEditor';
 import { LoadingState } from '@/components/common/LoadingState';
 import { EmptyState } from '@/components/common/EmptyState';
 
@@ -32,6 +33,7 @@ export default function AdminAgentsPage() {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [questionnaireEditorOpen, setQuestionnaireEditorOpen] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useAgentStats();
   const { data: agents, isLoading: agentsLoading } = useAgents(activeTab);
@@ -58,6 +60,12 @@ export default function AdminAgentsPage() {
                 {stats.pending} Pending Approval
               </Badge>
             ) : null
+          }
+          actions={
+            <Button variant="outline" onClick={() => setQuestionnaireEditorOpen(true)}>
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Edit Questionnaire
+            </Button>
           }
         />
 
@@ -389,6 +397,10 @@ export default function AdminAgentsPage() {
         agent={selectedAgent}
         open={manageDialogOpen}
         onOpenChange={setManageDialogOpen}
+      />
+      <AgentQuestionnaireEditor
+        open={questionnaireEditorOpen}
+        onOpenChange={setQuestionnaireEditorOpen}
       />
     </AdminLayout>
   );
