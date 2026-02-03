@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface StatCardProps {
   title: string;
@@ -13,9 +13,13 @@ interface StatCardProps {
     isPositive: boolean;
   };
   variant?: 'default' | 'success' | 'warning' | 'destructive';
+  href?: string;
+  onClick?: () => void;
 }
 
-export function StatCard({ title, value, description, icon: Icon, trend, variant = 'default' }: StatCardProps) {
+export function StatCard({ title, value, description, icon: Icon, trend, variant = 'default', href, onClick }: StatCardProps) {
+  const navigate = useNavigate();
+
   const variantStyles = {
     default: 'bg-card',
     success: 'bg-success/10 border-success/20',
@@ -30,11 +34,28 @@ export function StatCard({ title, value, description, icon: Icon, trend, variant
     destructive: 'text-destructive',
   };
 
+  const isClickable = href || onClick;
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (href) {
+      navigate(href);
+    }
+  };
+
   return (
-    <Card className={cn('border', variantStyles[variant])}>
+    <Card 
+      className={cn(
+        'border', 
+        variantStyles[variant],
+        isClickable && 'cursor-pointer transition-all hover:shadow-md hover:border-primary/30 group'
+      )}
+      onClick={isClickable ? handleClick : undefined}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
+          <div className="space-y-1 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
@@ -51,11 +72,16 @@ export function StatCard({ title, value, description, icon: Icon, trend, variant
               </p>
             )}
           </div>
-          {Icon && (
-            <div className={cn('p-2', iconStyles[variant])}>
-              <Icon className="h-5 w-5" />
-            </div>
-          )}
+          <div className="flex items-center gap-1">
+            {Icon && (
+              <div className={cn('p-2', iconStyles[variant])}>
+                <Icon className="h-5 w-5" />
+              </div>
+            )}
+            {isClickable && (
+              <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
