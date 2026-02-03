@@ -19,31 +19,45 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Users, Search, MoreHorizontal, Eye, UserX, Wallet, Filter } from 'lucide-react';
-
-const mockClients = [
-  { id: '1', company: 'Cairo Electronics Co.', email: 'admin@cairoelec.com', plan: 'Business', status: 'active', balance: 15000, missions: 12 },
-  { id: '2', company: 'Pharma Plus Egypt', email: 'ops@pharmaplus.eg', plan: 'Pro', status: 'active', balance: 8500, missions: 8 },
-  { id: '3', company: 'Fresh Foods Market', email: 'manager@freshfoods.com', plan: 'Starter', status: 'suspended', balance: 0, missions: 3 },
-  { id: '4', company: 'Tech Solutions MENA', email: 'info@techsolutions.me', plan: 'Business', status: 'active', balance: 45000, missions: 24 },
-  { id: '5', company: 'Al-Ahram Retail', email: 'retail@alahram.eg', plan: 'Pro', status: 'active', balance: 12300, missions: 15 },
-];
+import { Users, Search, MoreHorizontal, Eye, UserX, Wallet, Filter, Building2, ClipboardList, Loader2 } from 'lucide-react';
+import { CreateClientDialog } from '@/components/admin/clients/CreateClientDialog';
+import { useAdminClients } from '@/hooks/useAdminClients';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminClientsPage() {
+  const { data: clients, isLoading } = useAdminClients();
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const filteredClients = clients?.filter((client) => {
+    const search = searchQuery.toLowerCase();
+    return (
+      client.companyName?.toLowerCase().includes(search) ||
+      client.fullName?.toLowerCase().includes(search) ||
+      client.email?.toLowerCase().includes(search)
+    );
+  }) || [];
+
+  const totalBalance = clients?.reduce((sum, c) => sum + c.balance, 0) || 0;
+  const activeCount = clients?.filter(c => c.status === 'active').length || 0;
+  const suspendedCount = clients?.filter(c => c.status === 'suspended').length || 0;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <AdminPageHeader
           title="Client Management"
           description="View and manage all registered clients."
+          actions={<CreateClientDialog />}
         />
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">
-          <StatCard title="Total Clients" value="124" icon={Users} />
-          <StatCard title="Active" value="118" variant="success" />
-          <StatCard title="Suspended" value="6" variant="destructive" />
-          <StatCard title="Total Balance" value="1.2M EGP" icon={Wallet} />
+          <StatCard title="Total Clients" value={String(clients?.length || 0)} icon={Users} />
+          <StatCard title="Active" value={String(activeCount)} variant="success" />
+          <StatCard title="Suspended" value={String(suspendedCount)} variant="destructive" />
+          <StatCard title="Total Balance" value={`${totalBalance.toLocaleString()} EGP`} icon={Wallet} />
         </div>
 
         {/* Filters */}
@@ -52,7 +66,12 @@ export default function AdminClientsPage() {
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Search by company name or email..." className="pl-9" />
+                <Input 
+                  placeholder="Search by company name or email..." 
+                  className="pl-9" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
               <Button variant="outline" className="gap-2">
                 <Filter className="h-4 w-4" />
@@ -68,62 +87,78 @@ export default function AdminClientsPage() {
             <CardTitle className="text-base font-bold uppercase">All Clients</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Balance</TableHead>
-                  <TableHead className="text-right">Missions</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockClients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell className="font-medium">{client.company}</TableCell>
-                    <TableCell className="text-muted-foreground">{client.email}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{client.plan}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={client.status === 'active' ? 'default' : 'destructive'}>
-                        {client.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {client.balance.toLocaleString()} EGP
-                    </TableCell>
-                    <TableCell className="text-right">{client.missions}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Wallet className="mr-2 h-4 w-4" />
-                            Adjust Wallet
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <UserX className="mr-2 h-4 w-4" />
-                            Suspend Client
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : filteredClients.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? 'No clients found matching your search.' : 'No clients yet. Create your first client.'}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Balance</TableHead>
+                    <TableHead className="text-center" title="Branches">
+                      <Building2 className="h-4 w-4 inline" />
+                    </TableHead>
+                    <TableHead className="text-center" title="Missions">
+                      <ClipboardList className="h-4 w-4 inline" />
+                    </TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredClients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium">{client.companyName || 'N/A'}</TableCell>
+                      <TableCell className="text-muted-foreground">{client.fullName || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{client.plan || 'No Plan'}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={client.status === 'active' ? 'default' : 'destructive'}>
+                          {client.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {client.balance.toLocaleString()} EGP
+                      </TableCell>
+                      <TableCell className="text-center">{client.branchesCount}</TableCell>
+                      <TableCell className="text-center">{client.missionsCount}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/admin/clients/${client.userId}`)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Wallet className="mr-2 h-4 w-4" />
+                              Adjust Wallet
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              <UserX className="mr-2 h-4 w-4" />
+                              Suspend Client
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
