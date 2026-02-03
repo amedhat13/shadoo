@@ -132,6 +132,7 @@ export type Database = {
           mobile_wallet: string | null
           national_id: string | null
           phone: string
+          questionnaire_answers: Json | null
           rating_avg: number | null
           status: string | null
           tier: string | null
@@ -153,6 +154,7 @@ export type Database = {
           mobile_wallet?: string | null
           national_id?: string | null
           phone: string
+          questionnaire_answers?: Json | null
           rating_avg?: number | null
           status?: string | null
           tier?: string | null
@@ -174,6 +176,7 @@ export type Database = {
           mobile_wallet?: string | null
           national_id?: string | null
           phone?: string
+          questionnaire_answers?: Json | null
           rating_avg?: number | null
           status?: string | null
           tier?: string | null
