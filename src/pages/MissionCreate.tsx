@@ -29,6 +29,7 @@ const initialFormData: MissionFormData = {
   },
   number_of_visits: 10,
   purchase_budget_per_visit: 100,
+  purchase_item_name: '',
 };
 
 export default function MissionCreatePage() {
@@ -220,6 +221,7 @@ export default function MissionCreatePage() {
             visitsRemaining={visitsRemaining}
             walletBalance={wallet.available_balance}
             branchCount={branchCount}
+            onSaveDraft={handleSaveDraft}
           />
         );
       case 4:

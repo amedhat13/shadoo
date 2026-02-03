@@ -45,8 +45,8 @@ export interface QuestionOption {
 
 export interface QuestionPhotoRequirement {
   enabled: boolean;
-  triggerCondition?: 'low_rating' | 'negative_answer' | 'specific_options';
-  triggerValues?: string[]; // Option IDs or threshold values
+  triggerCondition?: 'low_rating' | 'negative_answer';
+  ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
   samplePhotoUrl?: string;
   instructions?: string;
 }
@@ -163,6 +163,7 @@ export interface MissionFormData {
   // Step 4: Visits & Funding
   number_of_visits: number;
   purchase_budget_per_visit: number;
+  purchase_item_name?: string; // Item name for purchase
 }
 
 // Computed values helper
