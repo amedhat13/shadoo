@@ -172,6 +172,9 @@ export interface MissionFormData {
   purchase_items: PurchaseItem[]; // Multiple items with individual budgets
   purchase_budget_per_visit: number; // Computed from purchase_items
   purchase_item_name?: string; // Legacy - computed from purchase_items
+  
+  // Geo Settings
+  is_geo_tagged?: boolean;
 }
 
 // Computed values helper

@@ -33,6 +33,7 @@ export const FORM_STEPS = [
   { id: 'basics', title: 'Basics', description: 'Mission name and branches.' },
   { id: 'agent-tier', title: 'Agent Tier', description: 'Select agent tier.' },
   { id: 'questions', title: 'Questions', description: 'Build questionnaire.' },
+  { id: 'geo-settings', title: 'Geo Settings', description: 'Location verification.' },
   { id: 'funding', title: 'Visits & Funding', description: 'Budget configuration.' },
   { id: 'review', title: 'Review', description: 'Review and publish.' },
 ];

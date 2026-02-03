@@ -11,6 +11,7 @@ import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
+import { StepGeoSettings } from '@/components/missions/form/StepGeoSettings';
 import { StepFunding } from '@/components/missions/form/StepFunding';
 import { StepReview } from '@/components/missions/form/StepReview';
 import { useMissions } from '@/hooks/useMissions';
@@ -31,6 +32,7 @@ const initialFormData: MissionFormData = {
   purchase_items: [{ id: crypto.randomUUID(), name: '', budget: 100 }],
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
+  is_geo_tagged: false,
 };
 
 export default function MissionCreatePage() {
@@ -56,6 +58,7 @@ export default function MissionCreatePage() {
         number_of_visits: existingMission.number_of_visits,
         purchase_items: [{ id: crypto.randomUUID(), name: '', budget: existingMission.purchase_budget_per_visit }],
         purchase_budget_per_visit: existingMission.purchase_budget_per_visit,
+        is_geo_tagged: false,
       };
     }
     return initialFormData;
@@ -90,10 +93,12 @@ export default function MissionCreatePage() {
         return Boolean(formData.agent_tier);
       case 2: // Questions
         return formData.questions.length > 0 && formData.questions.every(q => q.text.trim() !== '');
-      case 3: // Funding
+      case 3: // Geo Settings
+        return true; // Optional step
+      case 4: // Funding
         return formData.number_of_visits > 0;
-      case 4: // Review
-        return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(3);
+      case 5: // Review
+        return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
       default:
         return false;
     }
@@ -217,6 +222,13 @@ export default function MissionCreatePage() {
         );
       case 3:
         return (
+          <StepGeoSettings
+            data={formData}
+            onChange={updateFormData}
+          />
+        );
+      case 4:
+        return (
           <StepFunding
             data={formData}
             onChange={updateFormData}
@@ -226,7 +238,7 @@ export default function MissionCreatePage() {
             onSaveDraft={handleSaveDraft}
           />
         );
-      case 4:
+      case 5:
         return (
           <StepReview
             data={formData}
@@ -331,7 +343,7 @@ export default function MissionCreatePage() {
         </Card>
 
         {/* Navigation Buttons */}
-        {currentStep < 4 && (
+        {currentStep < 5 && (
           <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
             <Button
               variant="outline"

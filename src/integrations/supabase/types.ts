@@ -280,6 +280,7 @@ export type Database = {
           budget_used: number
           created_at: string
           id: string
+          is_geo_tagged: boolean
           name: string
           number_of_visits: number
           photo_requirements: Json
@@ -300,6 +301,7 @@ export type Database = {
           budget_used?: number
           created_at?: string
           id?: string
+          is_geo_tagged?: boolean
           name: string
           number_of_visits?: number
           photo_requirements?: Json
@@ -320,6 +322,7 @@ export type Database = {
           budget_used?: number
           created_at?: string
           id?: string
+          is_geo_tagged?: boolean
           name?: string
           number_of_visits?: number
           photo_requirements?: Json

@@ -14,10 +14,27 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Building2, CheckCircle, XCircle, Clock, MapPin, ExternalLink, Loader2 } from 'lucide-react';
+import { Building2, CheckCircle, XCircle, Clock, MapPin, ExternalLink, Loader2, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { AdminCreateBranchDialog } from '@/components/admin/branches/AdminCreateBranchDialog';
 import { AdminBulkBranchDialog } from '@/components/admin/branches/AdminBulkBranchDialog';
+import { AdminEditBranchDialog } from '@/components/admin/branches/AdminEditBranchDialog';
 import { useAdminBranches } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,6 +43,10 @@ import { toast } from 'sonner';
 export default function AdminBranchesPage() {
   const { data: branches, isLoading } = useAdminBranches();
   const queryClient = useQueryClient();
+  const [editingBranch, setEditingBranch] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [branchToDelete, setBranchToDelete] = useState<any>(null);
 
   const pendingBranches = branches?.filter(b => b.status === 'pending_verification') || [];
   const verifiedBranches = branches?.filter(b => b.status === 'verified') || [];
@@ -73,6 +94,25 @@ export default function AdminBranchesPage() {
     },
   });
 
+  const deleteBranchMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('branches')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Branch deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-branches'] });
+      setDeleteDialogOpen(false);
+      setBranchToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleVerifyAll = () => {
     if (pendingBranches.length === 0) return;
     const ids = pendingBranches.map(b => b.id);
@@ -90,8 +130,24 @@ export default function AdminBranchesPage() {
     }
   };
 
+  const handleEdit = (branch: any) => {
+    setEditingBranch(branch);
+    setEditDialogOpen(true);
+  };
+
+  const handleDelete = (branch: any) => {
+    setBranchToDelete(branch);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (branchToDelete) {
+      deleteBranchMutation.mutate(branchToDelete.id);
+    }
+  };
+
   // Mobile card for branches
-  const BranchCard = ({ branch, showActions = false }: { branch: any; showActions?: boolean }) => (
+  const BranchCard = ({ branch, showActions = false, showEditDelete = false }: { branch: any; showActions?: boolean; showEditDelete?: boolean }) => (
     <Card className="mb-3">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
@@ -99,15 +155,39 @@ export default function AdminBranchesPage() {
             <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
             <span className="font-medium truncate">{branch.name}</span>
           </div>
-          <Badge 
-            variant={
-              branch.status === 'verified' ? 'default' : 
-              branch.status === 'rejected' ? 'destructive' : 'secondary'
-            }
-            className="shrink-0"
-          >
-            {branch.status.replace('_', ' ')}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant={
+                branch.status === 'verified' ? 'default' : 
+                branch.status === 'rejected' ? 'destructive' : 'secondary'
+              }
+              className="shrink-0"
+            >
+              {branch.status.replace('_', ' ')}
+            </Badge>
+            {showEditDelete && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleEdit(branch)}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => handleDelete(branch)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
         <div className="mt-3 space-y-1.5 text-sm">
           <div className="flex justify-between">
@@ -332,7 +412,7 @@ export default function AdminBranchesPage() {
                     {/* Mobile Cards */}
                     <div className="md:hidden space-y-3">
                       {verifiedBranches.map((branch) => (
-                        <BranchCard key={branch.id} branch={branch} />
+                        <BranchCard key={branch.id} branch={branch} showEditDelete />
                       ))}
                     </div>
                     {/* Desktop Table */}
@@ -344,6 +424,7 @@ export default function AdminBranchesPage() {
                             <TableHead>Client</TableHead>
                             <TableHead>City</TableHead>
                             <TableHead>Address</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -353,6 +434,28 @@ export default function AdminBranchesPage() {
                               <TableCell className="text-muted-foreground">{branch.clientName}</TableCell>
                               <TableCell>{branch.city}</TableCell>
                               <TableCell className="text-muted-foreground">{branch.address}</TableCell>
+                              <TableCell className="text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEdit(branch)}>
+                                      <Pencil className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => handleDelete(branch)}
+                                      className="text-destructive focus:text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -466,6 +569,37 @@ export default function AdminBranchesPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Edit Branch Dialog */}
+      <AdminEditBranchDialog
+        branch={editingBranch}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Branch</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{branchToDelete?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteBranchMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { AdminPageHeader } from '@/components/admin/common/AdminPageHeader';
 import { StatCard } from '@/components/admin/common/StatCard';
@@ -20,8 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2 } from 'lucide-react';
-import { AdminCreateMissionDialog } from '@/components/admin/missions/AdminCreateMissionDialog';
+import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus } from 'lucide-react';
 import { useAdminMissions } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -150,7 +150,14 @@ export default function AdminMissionsPage() {
         <AdminPageHeader
           title="Mission Monitoring"
           description="View and manage all missions."
-          actions={<AdminCreateMissionDialog />}
+          actions={
+            <Button asChild className="gap-2">
+              <Link to="/admin/missions/create">
+                <Plus className="h-4 w-4" />
+                Create Mission
+              </Link>
+            </Button>
+          }
         />
 
         {/* Stats */}
