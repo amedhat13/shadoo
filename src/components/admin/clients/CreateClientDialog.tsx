@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -21,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Loader2, Copy, Check, AlertTriangle } from 'lucide-react';
+import { Plus, Loader2, Copy, Check, AlertTriangle, Upload, X, Image } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface CreateClientFormData {
@@ -30,6 +31,10 @@ interface CreateClientFormData {
   fullName: string;
   phone: string;
   planId: string;
+  logoFile: File | null;
+  isFreeTrial: boolean;
+  trialDays: number;
+  trialVisits: number;
 }
 
 interface CreateClientResponse {
@@ -50,9 +55,15 @@ export function CreateClientDialog() {
     fullName: '',
     phone: '',
     planId: '',
+    logoFile: null,
+    isFreeTrial: false,
+    trialDays: 14,
+    trialVisits: 10,
   });
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [result, setResult] = useState<CreateClientResponse | null>(null);
   const [copied, setCopied] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   // Fetch subscription plans
@@ -71,13 +82,37 @@ export function CreateClientDialog() {
 
   const createClientMutation = useMutation({
     mutationFn: async (data: CreateClientFormData) => {
+      // Upload logo if provided
+      let logoUrl: string | undefined;
+      if (data.logoFile) {
+        const fileExt = data.logoFile.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('client-logos')
+          .upload(fileName, data.logoFile);
+        
+        if (uploadError) {
+          console.error('Logo upload failed:', uploadError);
+        } else {
+          const { data: publicUrl } = supabase.storage
+            .from('client-logos')
+            .getPublicUrl(fileName);
+          logoUrl = publicUrl.publicUrl;
+        }
+      }
+
       const { data: response, error } = await supabase.functions.invoke('create-client', {
         body: {
           email: data.email,
           companyName: data.companyName,
           fullName: data.fullName,
           phone: data.phone || undefined,
-          planId: data.planId || undefined,
+          planId: data.isFreeTrial ? undefined : (data.planId || undefined),
+          logoUrl,
+          isFreeTrial: data.isFreeTrial,
+          trialDays: data.isFreeTrial ? data.trialDays : undefined,
+          trialVisits: data.isFreeTrial ? data.trialVisits : undefined,
         },
       });
       if (error) throw error;
@@ -98,6 +133,30 @@ export function CreateClientDialog() {
     },
   });
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Logo must be less than 2MB');
+        return;
+      }
+      setFormData((prev) => ({ ...prev, logoFile: file }));
+      const reader = new FileReader();
+      reader.onload = (e) => setLogoPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = () => {
+    setFormData((prev) => ({ ...prev, logoFile: null }));
+    setLogoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createClientMutation.mutate(formData);
@@ -111,7 +170,12 @@ export function CreateClientDialog() {
       fullName: '',
       phone: '',
       planId: '',
+      logoFile: null,
+      isFreeTrial: false,
+      trialDays: 14,
+      trialVisits: 10,
     });
+    setLogoPreview(null);
     setResult(null);
     setCopied(false);
   };
@@ -132,7 +196,7 @@ export function CreateClientDialog() {
           Create Client
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Client</DialogTitle>
           <DialogDescription>
@@ -169,6 +233,57 @@ export function CreateClientDialog() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Logo Upload */}
+            <div className="space-y-2">
+              <Label>Company Logo</Label>
+              <div className="flex items-center gap-4">
+                {logoPreview ? (
+                  <div className="relative">
+                    <img 
+                      src={logoPreview} 
+                      alt="Logo preview" 
+                      className="h-16 w-16 rounded-lg object-cover border"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeLogo}
+                      className="absolute -top-2 -right-2 rounded-full bg-destructive p-1 text-destructive-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors"
+                  >
+                    <Image className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Max 2MB. PNG, JPG, or SVG.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="companyName">Company Name *</Label>
@@ -214,24 +329,69 @@ export function CreateClientDialog() {
                 />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="plan">Subscription Plan</Label>
-                <Select
-                  value={formData.planId}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, planId: value }))}
-                >
-                  <SelectTrigger id="plan">
-                    <SelectValue placeholder="Select a plan (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {plans?.map((plan) => (
-                      <SelectItem key={plan.id} value={plan.id}>
-                        {plan.name} - {plan.price} {plan.currency}/{plan.billing_period}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Free Trial Toggle */}
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="free-trial">Free Trial</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Give this client a free trial period
+                  </p>
+                </div>
+                <Switch
+                  id="free-trial"
+                  checked={formData.isFreeTrial}
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isFreeTrial: checked }))}
+                />
               </div>
+
+              {formData.isFreeTrial ? (
+                <div className="grid grid-cols-2 gap-4 rounded-lg border p-4 bg-muted/30">
+                  <div className="grid gap-2">
+                    <Label htmlFor="trialDays">Trial Period (days)</Label>
+                    <Input
+                      id="trialDays"
+                      type="number"
+                      min={1}
+                      max={365}
+                      value={formData.trialDays}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, trialDays: parseInt(e.target.value) || 14 }))}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="trialVisits">Visits Allowed</Label>
+                    <Input
+                      id="trialVisits"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={formData.trialVisits}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, trialVisits: parseInt(e.target.value) || 10 }))}
+                    />
+                  </div>
+                  <p className="col-span-2 text-xs text-muted-foreground">
+                    After the trial ends, the client will need to upgrade to a paid plan.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-2">
+                  <Label htmlFor="plan">Subscription Plan</Label>
+                  <Select
+                    value={formData.planId}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, planId: value }))}
+                  >
+                    <SelectTrigger id="plan">
+                      <SelectValue placeholder="Select a plan (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {plans?.map((plan) => (
+                        <SelectItem key={plan.id} value={plan.id}>
+                          {plan.name} - {plan.price} {plan.currency}/{plan.billing_period}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <DialogFooter>
