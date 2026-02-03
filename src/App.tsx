@@ -29,6 +29,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboard";
 import AdminClientsPage from "./pages/admin/AdminClients";
 import AdminBranchesPage from "./pages/admin/AdminBranches";
 import AdminMissionsPage from "./pages/admin/AdminMissions";
+import AdminVisitsPage from "./pages/admin/AdminVisits";
 import AdminAgentsPage from "./pages/admin/AdminAgents";
 import AdminTiersPage from "./pages/admin/AdminTiers";
 import AdminPayoutsPage from "./pages/admin/AdminPayouts";
@@ -171,6 +172,14 @@ const App = () => (
               element={
                 <AdminProtectedRoute>
                   <AdminMissionsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/visits"
+              element={
+                <AdminProtectedRoute>
+                  <AdminVisitsPage />
                 </AdminProtectedRoute>
               }
             />
