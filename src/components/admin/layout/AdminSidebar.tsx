@@ -87,15 +87,15 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
   const location = useLocation();
 
   return (
-    <div className="flex h-full flex-col bg-foreground">
+    <div className="flex h-full flex-col bg-background border-r border-border">
       {/* Logo & Toggle */}
-      <div className="flex h-16 items-center justify-between border-b border-muted-foreground/20 px-3">
+      <div className="flex h-16 items-center justify-between border-b border-border px-3">
         {!collapsed && (
           <div className="flex items-center gap-2">
             <img 
               src={shadooLogo} 
               alt="Shadoo" 
-              className="h-8 w-auto brightness-0 invert"
+              className="h-8 w-auto"
             />
             <span className="text-xs font-bold text-primary uppercase tracking-wider">Admin</span>
           </div>
@@ -105,7 +105,7 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
           size="icon"
           onClick={onToggle}
           className={cn(
-            "h-8 w-8 text-background hover:bg-muted-foreground/20 hidden md:flex",
+            "h-8 w-8 text-foreground hover:bg-muted hidden md:flex",
             collapsed && "mx-auto"
           )}
         >
@@ -140,10 +140,10 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
                       to={item.href}
                       onClick={onNavigate}
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2 text-xs font-semibold tracking-wide transition-colors',
+                        'flex items-center gap-3 px-3 py-2 text-xs font-semibold tracking-wide transition-colors rounded-md',
                         isActive
                           ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:bg-muted-foreground/10 hover:text-background',
+                          : 'text-foreground hover:bg-muted',
                         collapsed && 'justify-center px-0'
                       )}
                       title={collapsed ? item.label : undefined}
@@ -160,14 +160,14 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
       </ScrollArea>
 
       {/* Admin User */}
-      <div className="border-t border-muted-foreground/20 p-4">
+      <div className="border-t border-border p-4">
         <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-          <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0">
+          <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0 rounded-md">
             SA
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <div className="truncate text-sm font-semibold text-background">
+              <div className="truncate text-sm font-semibold text-foreground">
                 Super Admin
               </div>
               <div className="truncate text-xs text-muted-foreground">
@@ -192,12 +192,12 @@ export function AdminSidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChan
           <Button
             variant="ghost"
             size="icon"
-            className="fixed left-4 top-4 z-50 md:hidden h-10 w-10 bg-foreground text-background border-0 shadow-lg"
+            className="fixed left-4 top-4 z-50 md:hidden h-10 w-10 bg-background text-foreground border border-border shadow-lg"
           >
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0 bg-foreground border-0">
+        <SheetContent side="left" className="w-64 p-0 bg-background border-r border-border">
           <SheetTitle className="sr-only">Admin Navigation Menu</SheetTitle>
           <SidebarContent 
             collapsed={false} 
@@ -213,7 +213,7 @@ export function AdminSidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChan
   return (
     <aside 
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-foreground transition-all duration-300 hidden md:block",
+        "fixed left-0 top-0 z-40 h-screen bg-background border-r border-border transition-all duration-300 hidden md:block",
         collapsed ? "w-16" : "w-64"
       )}
     >
