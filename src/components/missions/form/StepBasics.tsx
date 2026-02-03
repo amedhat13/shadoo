@@ -1,8 +1,10 @@
-import { Check, ChevronsUpDown, X } from 'lucide-react';
+import { Check, ChevronsUpDown, X, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Command,
   CommandEmpty,
@@ -81,103 +83,118 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
           Branches<span className="text-destructive">*</span>
         </Label>
         
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between h-auto min-h-10"
-            >
-              <span className="text-muted-foreground">
-                {data.branch_ids.length === 0
-                  ? 'Select branches...'
-                  : `${data.branch_ids.length} branch${data.branch_ids.length > 1 ? 'es' : ''} selected`}
-              </span>
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0" align="start">
-            <Command>
-              <CommandInput placeholder="Search branches..." />
-              <CommandList>
-                <CommandEmpty>No branches found.</CommandEmpty>
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={() => (allSelected ? clearAll() : selectAll())}
-                    className="font-semibold"
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        allSelected ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    Select All Branches
-                  </CommandItem>
-                  {branches.map((branch) => (
-                    <CommandItem
-                      key={branch.id}
-                      value={branch.name}
-                      onSelect={() => toggleBranch(branch.id)}
-                    >
-                      <Check
-                        className={cn(
-                          'mr-2 h-4 w-4',
-                          data.branch_ids.includes(branch.id) ? 'opacity-100' : 'opacity-0'
-                        )}
-                      />
-                      <div className="flex flex-col">
-                        <span>{branch.name}</span>
-                        <span className="text-xs text-muted-foreground">{branch.city}</span>
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-
-        {/* Selected branches badges */}
-        {selectedBranches.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {selectedBranches.map((branch) => (
-              <Badge
-                key={branch.id}
-                variant="secondary"
-                className="gap-1 pr-1"
-              >
-                {branch.name}
-                <button
-                  type="button"
-                  onClick={() => removeBranch(branch.id)}
-                  className="ml-1 hover:bg-muted rounded-sm p-0.5"
+        {branches.length === 0 ? (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No branches available</AlertTitle>
+            <AlertDescription>
+              You need to create branches before creating a mission.{' '}
+              <Link to="/branches" className="underline font-medium text-primary hover:text-primary/80">
+                Go to Branches
+              </Link>
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between h-auto min-h-10"
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-            {selectedBranches.length > 1 && (
-              <button
-                type="button"
-                onClick={clearAll}
-                className="text-xs text-muted-foreground hover:text-foreground underline"
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-        )}
+                  <span className="text-muted-foreground">
+                    {data.branch_ids.length === 0
+                      ? 'Select branches...'
+                      : `${data.branch_ids.length} branch${data.branch_ids.length > 1 ? 'es' : ''} selected`}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search branches..." />
+                  <CommandList>
+                    <CommandEmpty>No branches found.</CommandEmpty>
+                    <CommandGroup>
+                      <CommandItem
+                        onSelect={() => (allSelected ? clearAll() : selectAll())}
+                        className="font-semibold"
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            allSelected ? 'opacity-100' : 'opacity-0'
+                          )}
+                        />
+                        Select All Branches
+                      </CommandItem>
+                      {branches.map((branch) => (
+                        <CommandItem
+                          key={branch.id}
+                          value={branch.name}
+                          onSelect={() => toggleBranch(branch.id)}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              data.branch_ids.includes(branch.id) ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span>{branch.name}</span>
+                            <span className="text-xs text-muted-foreground">{branch.city}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
-        <p className="text-xs text-muted-foreground">
-          Select one or more branches. A separate mission will be created for each selected branch.
-        </p>
-        
-        {data.branch_ids.length > 0 && (
-          <p className="text-xs font-medium text-primary">
-            {getMissionsCountText()}
-          </p>
+            {/* Selected branches badges */}
+            {selectedBranches.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {selectedBranches.map((branch) => (
+                  <Badge
+                    key={branch.id}
+                    variant="secondary"
+                    className="gap-1 pr-1"
+                  >
+                    {branch.name}
+                    <button
+                      type="button"
+                      onClick={() => removeBranch(branch.id)}
+                      className="ml-1 hover:bg-muted rounded-sm p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {selectedBranches.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    className="text-xs text-muted-foreground hover:text-foreground underline"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              Select one or more branches. A separate mission will be created for each selected branch.
+            </p>
+            
+            {data.branch_ids.length > 0 && (
+              <p className="text-xs font-medium text-primary">
+                {getMissionsCountText()}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>
