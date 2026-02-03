@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { FORM_STEPS } from '@/lib/constants';
 import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
+import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
 import { StepFunding } from '@/components/missions/form/StepFunding';
 import { StepReview } from '@/components/missions/form/StepReview';
@@ -19,7 +20,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const initialFormData: MissionFormData = {
   name: '',
-  branch_id: '',
+  branch_ids: [],
+  agent_tier: 'C',
   questions: [],
   photo_requirements: {
     required_count: 3,
@@ -45,7 +47,8 @@ export default function MissionCreatePage() {
     if (existingMission) {
       return {
         name: existingMission.name,
-        branch_id: existingMission.branch_id,
+        branch_ids: [existingMission.branch_id],
+        agent_tier: 'C',
         questions: existingMission.questions,
         photo_requirements: existingMission.photo_requirements,
         number_of_visits: existingMission.number_of_visits,
@@ -56,9 +59,21 @@ export default function MissionCreatePage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalPurchaseBudget = formData.number_of_visits * formData.purchase_budget_per_visit;
+  // Calculate totals based on number of branches
+  const branchCount = formData.branch_ids.length || 1;
+  const totalVisitsPerMission = formData.number_of_visits;
+  const totalPurchaseBudgetPerMission = formData.number_of_visits * formData.purchase_budget_per_visit;
+  const grandTotalBudget = totalPurchaseBudgetPerMission * branchCount;
+  const grandTotalVisits = totalVisitsPerMission * branchCount;
   
-  const { canPublish, reason } = canPublishMission(formData, subscription, wallet);
+  // For validation, we need to check if we can publish ALL missions
+  const mockFormDataForValidation = {
+    ...formData,
+    number_of_visits: grandTotalVisits,
+    purchase_budget_per_visit: grandTotalBudget / grandTotalVisits || 0,
+  };
+  
+  const { canPublish, reason } = canPublishMission(mockFormDataForValidation, subscription, wallet);
 
   const updateFormData = (updates: Partial<MissionFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
@@ -67,13 +82,15 @@ export default function MissionCreatePage() {
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0: // Basics
-        return Boolean(formData.name && formData.branch_id);
-      case 1: // Questions & Photos
+        return Boolean(formData.name && formData.branch_ids.length > 0);
+      case 1: // Agent Tier
+        return Boolean(formData.agent_tier);
+      case 2: // Questions
         return formData.questions.length > 0 && formData.questions.every(q => q.text.trim() !== '');
-      case 2: // Funding
+      case 3: // Funding
         return formData.number_of_visits > 0;
-      case 3: // Review
-        return isStepValid(0) && isStepValid(1) && isStepValid(2);
+      case 4: // Review
+        return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(3);
       default:
         return false;
     }
@@ -94,17 +111,26 @@ export default function MissionCreatePage() {
   const handleSaveDraft = async () => {
     setIsSubmitting(true);
     try {
-      await createMission({
-        name: formData.name,
-        branch_id: formData.branch_id,
-        questions: formData.questions,
-        photo_requirements: formData.photo_requirements,
-        number_of_visits: formData.number_of_visits,
-        purchase_budget_per_visit: formData.purchase_budget_per_visit,
-      });
+      // Create a mission for each selected branch
+      for (const branchId of formData.branch_ids) {
+        const missionName = formData.branch_ids.length > 1
+          ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
+          : formData.name;
+          
+        await createMission({
+          name: missionName,
+          branch_id: branchId,
+          questions: formData.questions,
+          photo_requirements: formData.photo_requirements,
+          number_of_visits: formData.number_of_visits,
+          purchase_budget_per_visit: formData.purchase_budget_per_visit,
+        });
+      }
       toast({
         title: 'Draft saved',
-        description: 'Your mission has been saved as a draft.',
+        description: formData.branch_ids.length > 1
+          ? `${formData.branch_ids.length} missions have been saved as drafts.`
+          : 'Your mission has been saved as a draft.',
       });
       navigate('/missions');
     } catch (error) {
@@ -123,22 +149,32 @@ export default function MissionCreatePage() {
 
     setIsSubmitting(true);
     try {
-      const mission = await createMission({
-        name: formData.name,
-        branch_id: formData.branch_id,
-        questions: formData.questions,
-        photo_requirements: formData.photo_requirements,
-        number_of_visits: formData.number_of_visits,
-        purchase_budget_per_visit: formData.purchase_budget_per_visit,
-      });
+      // Create and publish a mission for each selected branch
+      for (const branchId of formData.branch_ids) {
+        const missionName = formData.branch_ids.length > 1
+          ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
+          : formData.name;
+          
+        const mission = await createMission({
+          name: missionName,
+          branch_id: branchId,
+          questions: formData.questions,
+          photo_requirements: formData.photo_requirements,
+          number_of_visits: formData.number_of_visits,
+          purchase_budget_per_visit: formData.purchase_budget_per_visit,
+        });
+        
+        await publishMission(mission.id);
+      }
       
-      await publishMission(mission.id);
-      await allocateBudget(totalPurchaseBudget);
-      await consumeVisits(formData.number_of_visits);
+      await allocateBudget(grandTotalBudget);
+      await consumeVisits(grandTotalVisits);
       
       toast({
-        title: 'Mission published!',
-        description: `Your mission is now live. ${totalPurchaseBudget.toLocaleString()} EGP has been allocated.`,
+        title: formData.branch_ids.length > 1 ? 'Missions published!' : 'Mission published!',
+        description: formData.branch_ids.length > 1
+          ? `${formData.branch_ids.length} missions are now live. ${grandTotalBudget.toLocaleString()} EGP has been allocated.`
+          : `Your mission is now live. ${grandTotalBudget.toLocaleString()} EGP has been allocated.`,
       });
       navigate('/missions');
     } catch (error) {
@@ -164,21 +200,29 @@ export default function MissionCreatePage() {
         );
       case 1:
         return (
-          <StepQuestions
+          <StepAgentTier
             data={formData}
             onChange={updateFormData}
           />
         );
       case 2:
         return (
+          <StepQuestions
+            data={formData}
+            onChange={updateFormData}
+          />
+        );
+      case 3:
+        return (
           <StepFunding
             data={formData}
             onChange={updateFormData}
             visitsRemaining={visitsRemaining}
             walletBalance={wallet.available_balance}
+            branchCount={branchCount}
           />
         );
-      case 3:
+      case 4:
         return (
           <StepReview
             data={formData}
@@ -221,7 +265,7 @@ export default function MissionCreatePage() {
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center gap-2 md:gap-0 pb-2">
+        <div className="flex items-center gap-2 md:gap-0 pb-2 overflow-x-auto">
           {FORM_STEPS.map((step, index) => (
             <div
               key={step.id}
@@ -266,7 +310,7 @@ export default function MissionCreatePage() {
               {index < FORM_STEPS.length - 1 && (
                 <div
                   className={cn(
-                    'mx-3 md:mx-4 lg:mx-6 h-px w-6 md:w-10 lg:w-16 xl:w-20',
+                    'mx-2 md:mx-3 lg:mx-4 h-px w-4 md:w-8 lg:w-12',
                     index < currentStep ? 'bg-success' : 'bg-border'
                   )}
                 />
@@ -283,7 +327,7 @@ export default function MissionCreatePage() {
         </Card>
 
         {/* Navigation Buttons */}
-        {currentStep < 3 && (
+        {currentStep < 4 && (
           <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
             <Button
               variant="outline"

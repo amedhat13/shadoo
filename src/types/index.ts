@@ -43,6 +43,14 @@ export interface QuestionOption {
   text: string;
 }
 
+export interface QuestionPhotoRequirement {
+  enabled: boolean;
+  triggerCondition?: 'low_rating' | 'negative_answer' | 'specific_options';
+  triggerValues?: string[]; // Option IDs or threshold values
+  samplePhotoUrl?: string;
+  instructions?: string;
+}
+
 export interface Question {
   id: string;
   type: QuestionType;
@@ -50,12 +58,35 @@ export interface Question {
   required: boolean;
   options?: QuestionOption[]; // For multiple_choice
   max_rating?: number; // For rating (default 5)
+  photoRequirement?: QuestionPhotoRequirement; // Per-question photo requirement
 }
 
-// Photo Requirements
+// Photo Requirements (general/legacy)
 export interface PhotoRequirements {
   required_count: number;
   instructions?: string;
+}
+
+// Agent Tiers
+export type AgentTier = 'A' | 'B' | 'C';
+
+export interface AgentTierInfo {
+  tier: AgentTier;
+  name: string;
+  description: string;
+  features: string[];
+  available: boolean;
+  requiresUpgrade: boolean;
+}
+
+// Question Templates
+export type QuestionTemplateType = 'nps' | 'csat' | 'top_2_boxes' | 'top_box' | 'overall_score';
+
+export interface QuestionTemplate {
+  id: QuestionTemplateType;
+  name: string;
+  description: string;
+  questions: Omit<Question, 'id'>[];
 }
 
 // Mission
@@ -120,13 +151,16 @@ export interface Wallet {
 export interface MissionFormData {
   // Step 1: Basics
   name: string;
-  branch_id: string;
+  branch_ids: string[]; // Changed to support multiple branches
   
-  // Step 2: Questions & Photos
+  // Step 2: Agent Tier
+  agent_tier: AgentTier;
+  
+  // Step 3: Questions & Photos
   questions: Question[];
   photo_requirements: PhotoRequirements;
   
-  // Step 3: Visits & Funding
+  // Step 4: Visits & Funding
   number_of_visits: number;
   purchase_budget_per_visit: number;
 }

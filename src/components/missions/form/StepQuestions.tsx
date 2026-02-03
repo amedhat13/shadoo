@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Camera, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,8 +12,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { MissionFormData, Question, QuestionType, QuestionOption } from '@/types';
-import { QUESTION_TYPE_LABELS, EMPTY_STATES } from '@/lib/constants';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement } from '@/types';
+import { QUESTION_TYPE_LABELS, QUESTION_TEMPLATES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 interface StepQuestionsProps {
@@ -23,6 +31,7 @@ interface StepQuestionsProps {
 
 export function StepQuestions({ data, onChange }: StepQuestionsProps) {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -33,6 +42,23 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     };
     onChange({ questions: [...data.questions, newQuestion] });
     setEditingQuestionId(newQuestion.id);
+  };
+
+  const applyTemplate = (templateId: string) => {
+    const template = QUESTION_TEMPLATES.find((t) => t.id === templateId);
+    if (!template) return;
+
+    const newQuestions: Question[] = template.questions.map((q, index) => ({
+      ...q,
+      id: `q-${Date.now()}-${index}`,
+      options: q.options?.map((opt, optIndex) => ({
+        ...opt,
+        id: `opt-${Date.now()}-${index}-${optIndex}`,
+      })),
+    }));
+
+    onChange({ questions: [...data.questions, ...newQuestions] });
+    setTemplateDialogOpen(false);
   };
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
@@ -106,8 +132,89 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     updateQuestion(questionId, updates);
   };
 
+  const updatePhotoRequirement = (questionId: string, photoReq: Partial<QuestionPhotoRequirement>) => {
+    const question = data.questions.find((q) => q.id === questionId);
+    if (!question) return;
+
+    updateQuestion(questionId, {
+      photoRequirement: {
+        enabled: question.photoRequirement?.enabled || false,
+        ...question.photoRequirement,
+        ...photoReq,
+      },
+    });
+  };
+
+  const getPhotoTriggerLabel = (question: Question) => {
+    if (question.type === 'rating') {
+      return 'Require photo for low ratings (1-2)';
+    }
+    if (question.type === 'yes_no') {
+      return 'Require photo for negative answers';
+    }
+    if (question.type === 'multiple_choice') {
+      return 'Require photo for specific options';
+    }
+    return '';
+  };
+
+  const canHavePhotoRequirement = (type: QuestionType) => {
+    return type !== 'short_text';
+  };
+
   return (
     <div className="space-y-6">
+      {/* Template Selection */}
+      <div className="border border-dashed border-border p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide">Quick Start with Templates</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Use pre-built question sets for common metrics like NPS, CSAT, and more.
+            </p>
+          </div>
+          <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button type="button" variant="outline" size="sm" className="gap-2">
+                <FileText className="h-4 w-4" />
+                Use Template
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="font-black uppercase tracking-tight">
+                  Question Templates
+                </DialogTitle>
+                <DialogDescription>
+                  Select a template to add pre-built questions that measure standard metrics.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
+                {QUESTION_TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => applyTemplate(template.id)}
+                    className="flex items-start gap-4 border border-border p-4 text-left hover:border-primary hover:bg-primary/5 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <h4 className="font-bold">{template.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {template.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {template.questions.length} question{template.questions.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <Plus className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
       {/* Questions List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -122,10 +229,10 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
         {data.questions.length === 0 ? (
           <div className="border border-dashed border-border p-8 text-center">
-            <p className="text-muted-foreground text-sm">{EMPTY_STATES.questions.description}</p>
+            <p className="text-muted-foreground text-sm">No questions added yet. Add questions manually or use a template above.</p>
             <Button type="button" variant="outline" size="sm" onClick={addQuestion} className="mt-4 gap-2">
               <Plus className="h-4 w-4" />
-              {EMPTY_STATES.questions.action}
+              Add Question
             </Button>
           </div>
         ) : (
@@ -151,7 +258,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       onFocus={() => setEditingQuestionId(question.id)}
                     />
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                       {/* Question Type */}
                       <Select
                         value={question.type}
@@ -168,16 +275,26 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         </SelectContent>
                       </Select>
 
-                      {/* Required toggle */}
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={question.required}
-                          onCheckedChange={(checked) =>
-                            updateQuestion(question.id, { required: checked })
-                          }
-                        />
-                        <span className="text-xs text-muted-foreground">Required</span>
-                      </div>
+                      {/* Rating max value */}
+                      {question.type === 'rating' && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Max:</span>
+                          <Select
+                            value={String(question.max_rating || 5)}
+                            onValueChange={(value) =>
+                              updateQuestion(question.id, { max_rating: parseInt(value) })
+                            }
+                          >
+                            <SelectTrigger className="w-[70px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                     </div>
 
                     {/* Multiple Choice Options */}
@@ -216,6 +333,98 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         </Button>
                       </div>
                     )}
+
+                    {/* Photo Requirement for non-text questions */}
+                    {canHavePhotoRequirement(question.type) && (
+                      <div className="border-t border-border pt-3 mt-3 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={question.photoRequirement?.enabled || false}
+                            onCheckedChange={(checked) =>
+                              updatePhotoRequirement(question.id, { 
+                                enabled: checked,
+                                triggerCondition: question.type === 'rating' 
+                                  ? 'low_rating' 
+                                  : question.type === 'yes_no'
+                                  ? 'negative_answer'
+                                  : 'specific_options'
+                              })
+                            }
+                          />
+                          <div className="flex items-center gap-2">
+                            <Camera className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">{getPhotoTriggerLabel(question)}</span>
+                          </div>
+                        </div>
+
+                        {question.photoRequirement?.enabled && (
+                          <div className="pl-8 space-y-3">
+                            {/* Sample photo upload */}
+                            <div className="space-y-2">
+                              <Label className="text-xs text-muted-foreground">
+                                Sample Photo (Optional)
+                              </Label>
+                              <div className="flex items-center gap-3">
+                                {question.photoRequirement.samplePhotoUrl ? (
+                                  <div className="relative w-20 h-20 border border-border rounded overflow-hidden">
+                                    <img
+                                      src={question.photoRequirement.samplePhotoUrl}
+                                      alt="Sample"
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        updatePhotoRequirement(question.id, { samplePhotoUrl: undefined })
+                                      }
+                                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <label className="flex items-center gap-2 px-3 py-2 border border-dashed border-border cursor-pointer hover:border-primary transition-colors">
+                                    <Upload className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-xs text-muted-foreground">Upload sample</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          // For demo, create a local URL
+                                          const url = URL.createObjectURL(file);
+                                          updatePhotoRequirement(question.id, { samplePhotoUrl: url });
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                Show agents an example of what photo to capture.
+                              </p>
+                            </div>
+
+                            {/* Photo instructions */}
+                            <div className="space-y-2">
+                              <Label className="text-xs text-muted-foreground">
+                                Photo Instructions (Optional)
+                              </Label>
+                              <Textarea
+                                placeholder="E.g., Take a photo of the issue observed"
+                                value={question.photoRequirement.instructions || ''}
+                                onChange={(e) =>
+                                  updatePhotoRequirement(question.id, { instructions: e.target.value || undefined })
+                                }
+                                rows={2}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <Button
@@ -234,12 +443,15 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
         )}
       </div>
 
-      {/* Photo Requirements */}
+      {/* General Photo Requirements */}
       <div className="border-t border-border pt-6 space-y-4">
         <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Camera className="h-4 w-4" />
-          Photo Requirements
+          General Photo Requirements
         </Label>
+        <p className="text-xs text-muted-foreground">
+          These are additional photos required regardless of question answers.
+        </p>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">

@@ -1,4 +1,4 @@
-import { DollarSign, Users, AlertTriangle, Info, Calculator } from 'lucide-react';
+import { DollarSign, Users, AlertTriangle, Info, Calculator, Building2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MissionFormData } from '@/types';
@@ -9,6 +9,7 @@ interface StepFundingProps {
   onChange: (updates: Partial<MissionFormData>) => void;
   visitsRemaining: number;
   walletBalance: number;
+  branchCount: number;
 }
 
 export function StepFunding({
@@ -16,9 +17,12 @@ export function StepFunding({
   onChange,
   visitsRemaining,
   walletBalance,
+  branchCount,
 }: StepFundingProps) {
-  const totalPurchaseBudget = data.number_of_visits * data.purchase_budget_per_visit;
-  const exceedsVisits = data.number_of_visits > visitsRemaining;
+  const budgetPerMission = data.number_of_visits * data.purchase_budget_per_visit;
+  const totalVisitsAllMissions = data.number_of_visits * branchCount;
+  const totalPurchaseBudget = budgetPerMission * branchCount;
+  const exceedsVisits = totalVisitsAllMissions > visitsRemaining;
   const exceedsBalance = totalPurchaseBudget > walletBalance;
 
   const formatCurrency = (amount: number) => {
@@ -27,17 +31,31 @@ export function StepFunding({
 
   return (
     <div className="space-y-6">
+      {/* Multi-branch info */}
+      {branchCount > 1 && (
+        <div className="flex items-start gap-3 border border-primary/30 bg-primary/5 p-4">
+          <Building2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <div>
+            <div className="font-bold text-xs uppercase tracking-wide">Creating {branchCount} Missions</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              You've selected {branchCount} branches. The settings below will apply to each mission individually.
+              Total costs are calculated across all missions.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Number of Visits */}
       <div className="space-y-2">
         <Label htmlFor="visits" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Users className="h-4 w-4" />
-          Number of Visits<span className="text-destructive">*</span>
+          Number of Visits {branchCount > 1 ? 'per Mission' : ''}<span className="text-destructive">*</span>
         </Label>
         <Input
           id="visits"
           type="number"
           min={1}
-          max={visitsRemaining}
+          max={Math.floor(visitsRemaining / branchCount)}
           value={data.number_of_visits}
           onChange={(e) =>
             onChange({ number_of_visits: parseInt(e.target.value) || 0 })
@@ -46,7 +64,9 @@ export function StepFunding({
         />
         <p className={`text-xs ${exceedsVisits ? 'text-destructive' : 'text-muted-foreground'}`}>
           {exceedsVisits
-            ? `Exceeds your remaining visits (${visitsRemaining} available).`
+            ? `Total visits (${totalVisitsAllMissions}) exceeds your remaining allowance (${visitsRemaining} available).`
+            : branchCount > 1
+            ? `${data.number_of_visits} visits × ${branchCount} missions = ${totalVisitsAllMissions} total visits from your allowance.`
             : MESSAGES.visits.consumption_warning.replace('{count}', String(data.number_of_visits))}
         </p>
       </div>
@@ -85,13 +105,33 @@ export function StepFunding({
         </div>
 
         <div className="space-y-3">
+          {branchCount > 1 && (
+            <>
+              <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Per Mission
+              </div>
+              <div className="flex items-center justify-between text-sm pl-4">
+                <span className="text-muted-foreground">Visits</span>
+                <span className="font-semibold">{data.number_of_visits}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm pl-4">
+                <span className="text-muted-foreground">× Budget per Visit</span>
+                <span className="font-semibold">{formatCurrency(data.purchase_budget_per_visit)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm pl-4">
+                <span className="text-muted-foreground">= Budget per Mission</span>
+                <span className="font-semibold">{formatCurrency(budgetPerMission)}</span>
+              </div>
+              <div className="border-t border-border my-3" />
+              <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Total ({branchCount} Missions)
+              </div>
+            </>
+          )}
+          
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Number of Visits</span>
-            <span className="font-semibold">{data.number_of_visits}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">× Budget per Visit</span>
-            <span className="font-semibold">{formatCurrency(data.purchase_budget_per_visit)}</span>
+            <span className="text-muted-foreground">Total Visits</span>
+            <span className="font-semibold">{totalVisitsAllMissions}</span>
           </div>
           <div className="flex items-center justify-between border-t border-border pt-3">
             <span className="font-bold uppercase tracking-wide text-xs">Total Purchase Budget</span>
