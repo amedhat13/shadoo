@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminProtectedRoute } from "@/components/admin/auth/AdminProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
@@ -16,6 +17,22 @@ import ReportsPage from "./pages/Reports";
 import BranchesPage from "./pages/Branches";
 import SettingsPage from "./pages/Settings";
 
+// Admin Pages
+import AdminDashboardPage from "./pages/admin/AdminDashboard";
+import AdminClientsPage from "./pages/admin/AdminClients";
+import AdminBranchesPage from "./pages/admin/AdminBranches";
+import AdminMissionsPage from "./pages/admin/AdminMissions";
+import AdminAgentsPage from "./pages/admin/AdminAgents";
+import AdminTiersPage from "./pages/admin/AdminTiers";
+import AdminPayoutsPage from "./pages/admin/AdminPayouts";
+import AdminTemplatesPage from "./pages/admin/AdminTemplates";
+import AdminPlansPage from "./pages/admin/AdminPlans";
+import AdminFinancePage from "./pages/admin/AdminFinance";
+import AdminReportsPage from "./pages/admin/AdminReports";
+import AdminConfigPage from "./pages/admin/AdminConfig";
+import AdminAuditPage from "./pages/admin/AdminAudit";
+import AdminAdminsPage from "./pages/admin/AdminAdmins";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,8 +43,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+
+            {/* Client Dashboard Routes */}
             <Route
               path="/missions"
               element={
@@ -92,6 +112,121 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {/* Admin Dashboard Routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminProtectedRoute>
+                  <AdminDashboardPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/clients"
+              element={
+                <AdminProtectedRoute>
+                  <AdminClientsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/branches"
+              element={
+                <AdminProtectedRoute>
+                  <AdminBranchesPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/missions"
+              element={
+                <AdminProtectedRoute>
+                  <AdminMissionsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/agents"
+              element={
+                <AdminProtectedRoute>
+                  <AdminAgentsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/tiers"
+              element={
+                <AdminProtectedRoute>
+                  <AdminTiersPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/payouts"
+              element={
+                <AdminProtectedRoute>
+                  <AdminPayoutsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/templates"
+              element={
+                <AdminProtectedRoute>
+                  <AdminTemplatesPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/plans"
+              element={
+                <AdminProtectedRoute>
+                  <AdminPlansPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/finance"
+              element={
+                <AdminProtectedRoute>
+                  <AdminFinancePage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <AdminProtectedRoute>
+                  <AdminReportsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/config"
+              element={
+                <AdminProtectedRoute>
+                  <AdminConfigPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/audit"
+              element={
+                <AdminProtectedRoute>
+                  <AdminAuditPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/admins"
+              element={
+                <AdminProtectedRoute>
+                  <AdminAdminsPage />
+                </AdminProtectedRoute>
+              }
+            />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
