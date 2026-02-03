@@ -414,6 +414,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          logo_url: string | null
           must_change_password: boolean
           phone: string | null
           updated_at: string
@@ -425,6 +426,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          logo_url?: string | null
           must_change_password?: boolean
           phone?: string | null
           updated_at?: string
@@ -436,6 +438,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          logo_url?: string | null
           must_change_password?: boolean
           phone?: string | null
           updated_at?: string
@@ -551,6 +554,7 @@ export type Database = {
           payment_reference: string | null
           plan_id: string
           status: string
+          trial_visits_allowed: number | null
           updated_at: string
           user_id: string
           visits_used_this_month: number
@@ -563,6 +567,7 @@ export type Database = {
           payment_reference?: string | null
           plan_id: string
           status?: string
+          trial_visits_allowed?: number | null
           updated_at?: string
           user_id: string
           visits_used_this_month?: number
@@ -575,6 +580,7 @@ export type Database = {
           payment_reference?: string | null
           plan_id?: string
           status?: string
+          trial_visits_allowed?: number | null
           updated_at?: string
           user_id?: string
           visits_used_this_month?: number

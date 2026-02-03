@@ -12,6 +12,10 @@ interface CreateClientRequest {
   fullName: string;
   phone?: string;
   planId?: string;
+  logoUrl?: string;
+  isFreeTrial?: boolean;
+  trialDays?: number;
+  trialVisits?: number;
 }
 
 function generateTempPassword(): string {
@@ -28,7 +32,10 @@ async function sendCredentialsEmail(
   fullName: string,
   companyName: string,
   tempPassword: string,
-  loginUrl: string
+  loginUrl: string,
+  isFreeTrial: boolean,
+  trialDays?: number,
+  trialVisits?: number
 ): Promise<boolean> {
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   
@@ -36,6 +43,10 @@ async function sendCredentialsEmail(
     console.warn("RESEND_API_KEY not configured - skipping email send");
     return false;
   }
+
+  const trialInfo = isFreeTrial 
+    ? `<p style="color: #27ae60; margin-top: 15px;"><strong>🎉 You have a ${trialDays}-day free trial with ${trialVisits} visits included!</strong></p>`
+    : '';
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -57,6 +68,7 @@ async function sendCredentialsEmail(
               <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
               <p style="margin: 5px 0;"><strong>Temporary Password:</strong> ${tempPassword}</p>
             </div>
+            ${trialInfo}
             <p style="color: #e74c3c;"><strong>Important:</strong> You will be required to change your password upon first login.</p>
             <a href="${loginUrl}" style="display: inline-block; background: #1a1a2e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">Login to Shadoo</a>
             <p style="margin-top: 30px; color: #666; font-size: 12px;">If you have any questions, please contact support.</p>
@@ -123,7 +135,7 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body: CreateClientRequest = await req.json();
-    const { email, companyName, fullName, phone, planId } = body;
+    const { email, companyName, fullName, phone, planId, logoUrl, isFreeTrial, trialDays, trialVisits } = body;
 
     if (!email || !companyName || !fullName) {
       return new Response(
@@ -159,7 +171,7 @@ Deno.serve(async (req) => {
 
     const userId = newUser.user.id;
 
-    // Create profile with must_change_password flag
+    // Create profile with must_change_password flag and logo
     const { error: profileError } = await adminClient
       .from("profiles")
       .insert({
@@ -167,6 +179,7 @@ Deno.serve(async (req) => {
         full_name: fullName,
         company_name: companyName,
         phone: phone || null,
+        logo_url: logoUrl || null,
         must_change_password: true,
       });
 
@@ -200,8 +213,44 @@ Deno.serve(async (req) => {
       console.error("Error creating wallet:", walletError);
     }
 
-    // Create subscription if plan provided
-    if (planId) {
+    // Create subscription
+    if (isFreeTrial && trialDays && trialVisits) {
+      // Create a free trial subscription
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + trialDays);
+
+      // For trial, we don't need a plan_id - use a dummy insert approach
+      // Since plan_id has a foreign key, we need to handle this
+      // Option: Create a "Free Trial" plan or make plan_id nullable for trials
+      
+      // Get any active plan to satisfy FK (we'll override with trial settings)
+      const { data: anyPlan } = await adminClient
+        .from("subscription_plans")
+        .select("id")
+        .eq("is_active", true)
+        .limit(1)
+        .single();
+
+      if (anyPlan) {
+        const { error: subError } = await adminClient
+          .from("user_subscriptions")
+          .insert({
+            user_id: userId,
+            plan_id: anyPlan.id, // Required by FK
+            status: "trial",
+            current_period_start: new Date().toISOString(),
+            current_period_end: trialEnd.toISOString(),
+            visits_used_this_month: 0,
+            trial_visits_allowed: trialVisits,
+          });
+
+        if (subError) {
+          console.error("Error creating trial subscription:", subError);
+        } else {
+          console.log(`Created free trial for ${email}: ${trialDays} days, ${trialVisits} visits`);
+        }
+      }
+    } else if (planId) {
       const { error: subError } = await adminClient
         .from("user_subscriptions")
         .insert({
@@ -226,10 +275,13 @@ Deno.serve(async (req) => {
       fullName,
       companyName,
       tempPassword,
-      loginUrl
+      loginUrl,
+      isFreeTrial || false,
+      trialDays,
+      trialVisits
     );
 
-    console.log(`Client created successfully: ${email} (${companyName})`);
+    console.log(`Client created successfully: ${email} (${companyName})${isFreeTrial ? ' [FREE TRIAL]' : ''}`);
 
     return new Response(
       JSON.stringify({
