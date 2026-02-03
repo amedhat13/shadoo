@@ -4,6 +4,7 @@ import {
   Users,
   Building2,
   ClipboardList,
+  ClipboardCheck,
   UserCheck,
   Award,
   FileQuestion,
@@ -38,6 +39,7 @@ const navSections = [
       { id: 'clients', label: 'CLIENTS', href: '/admin/clients', icon: Users },
       { id: 'branches', label: 'BRANCHES', href: '/admin/branches', icon: Building2 },
       { id: 'missions', label: 'MISSIONS', href: '/admin/missions', icon: ClipboardList },
+      { id: 'visits', label: 'VISIT REVIEW', href: '/admin/visits', icon: ClipboardCheck },
     ],
   },
   {
