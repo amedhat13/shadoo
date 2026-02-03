@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/shadoo-logo.png';
+import { generateDemoCredentials } from '@/lib/auth/demoAccount';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -75,26 +76,89 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const emailRedirectTo = `${window.location.origin}/missions`;
+      const { data, error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
           data: {
             full_name: signupName,
           },
+          emailRedirectTo,
         },
       });
 
       if (error) throw error;
 
-      toast({
-        title: 'Account created!',
-        description: 'Please check your email to verify your account before logging in.',
-      });
+      if (data.session) {
+        toast({
+          title: 'Account created!',
+          description: 'You are now signed in.',
+        });
+
+        const from = (location.state as { from?: string })?.from || '/missions';
+        navigate(from, { replace: true });
+      } else {
+        toast({
+          title: 'Account created!',
+          description: 'Please check your email to verify your account before logging in.',
+        });
+      }
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast({
         title: 'Signup failed',
+        description: err.message || 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateDemoAccount = async () => {
+    setIsLoading(true);
+    try {
+      const creds = generateDemoCredentials();
+      const emailRedirectTo = `${window.location.origin}/missions`;
+
+      const { data, error } = await supabase.auth.signUp({
+        email: creds.email,
+        password: creds.password,
+        options: {
+          data: { full_name: creds.fullName },
+          emailRedirectTo,
+        },
+      });
+
+      if (error) throw error;
+
+      // If email-confirm is enabled, session may be null. Try logging in directly.
+      if (!data.session) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: creds.email,
+          password: creds.password,
+        });
+        if (signInError) throw signInError;
+      }
+
+      // Best-effort clipboard copy
+      try {
+        await navigator.clipboard?.writeText(`Email: ${creds.email}\nPassword: ${creds.password}`);
+      } catch {
+        // ignore clipboard failures
+      }
+
+      toast({
+        title: 'Demo account ready',
+        description: `Email: ${creds.email} | Password: ${creds.password} (copied)`,
+      });
+
+      navigate('/missions', { replace: true });
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      toast({
+        title: 'Could not create demo account',
         description: err.message || 'Please try again.',
         variant: 'destructive',
       });
@@ -181,6 +245,28 @@ export default function AuthPage() {
                     )}
                   </Button>
                 </form>
+
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full"
+                    onClick={handleCreateDemoAccount}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating demo account...
+                      </>
+                    ) : (
+                      'CREATE DEMO ACCOUNT'
+                    )}
+                  </Button>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Creates a disposable account and signs you in automatically.
+                  </p>
+                </div>
               </TabsContent>
 
               <TabsContent value="signup" className="mt-6">
