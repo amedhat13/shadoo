@@ -147,19 +147,17 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
   const getPhotoTriggerLabel = (question: Question) => {
     if (question.type === 'rating') {
-      return 'Require photo for low ratings (1-2)';
+      const threshold = question.photoRequirement?.ratingThreshold || 70;
+      return `Require photo for ratings below ${threshold}%`;
     }
     if (question.type === 'yes_no') {
-      return 'Require photo for negative answers';
-    }
-    if (question.type === 'multiple_choice') {
-      return 'Require photo for specific options';
+      return 'Require photo for "No" answers';
     }
     return '';
   };
 
   const canHavePhotoRequirement = (type: QuestionType) => {
-    return type !== 'short_text';
+    return type === 'rating' || type === 'yes_no';
   };
 
   return (
@@ -334,7 +332,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
                     )}
 
-                    {/* Photo Requirement for non-text questions */}
+                    {/* Photo Requirement for rating and yes/no questions only */}
                     {canHavePhotoRequirement(question.type) && (
                       <div className="border-t border-border pt-3 mt-3 space-y-3">
                         <div className="flex items-center gap-3">
@@ -345,9 +343,8 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                 enabled: checked,
                                 triggerCondition: question.type === 'rating' 
                                   ? 'low_rating' 
-                                  : question.type === 'yes_no'
-                                  ? 'negative_answer'
-                                  : 'specific_options'
+                                  : 'negative_answer',
+                                ratingThreshold: question.type === 'rating' ? 70 : undefined,
                               })
                             }
                           />
@@ -356,6 +353,34 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             <span className="text-sm">{getPhotoTriggerLabel(question)}</span>
                           </div>
                         </div>
+                        
+                        {/* Rating threshold slider for rating questions */}
+                        {question.photoRequirement?.enabled && question.type === 'rating' && (
+                          <div className="pl-8 space-y-2">
+                            <Label className="text-xs text-muted-foreground">
+                              Trigger photo when rating is below:
+                            </Label>
+                            <div className="flex items-center gap-4">
+                              <input
+                                type="range"
+                                min={10}
+                                max={90}
+                                step={10}
+                                value={question.photoRequirement.ratingThreshold || 70}
+                                onChange={(e) =>
+                                  updatePhotoRequirement(question.id, { ratingThreshold: parseInt(e.target.value) })
+                                }
+                                className="flex-1"
+                              />
+                              <span className="text-sm font-semibold w-12 text-right">
+                                {question.photoRequirement.ratingThreshold || 70}%
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              For a {question.max_rating || 5}-star rating, this triggers at {Math.ceil(((question.photoRequirement.ratingThreshold || 70) / 100) * (question.max_rating || 5))} stars or below.
+                            </p>
+                          </div>
+                        )}
 
                         {question.photoRequirement?.enabled && (
                           <div className="pl-8 space-y-3">

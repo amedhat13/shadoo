@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      branches: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          district: string | null
+          google_maps_link: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          district?: string | null
+          google_maps_link: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          district?: string | null
+          google_maps_link?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          agent_tier: string
+          branch_id: string | null
+          budget_used: number
+          created_at: string
+          id: string
+          name: string
+          number_of_visits: number
+          photo_requirements: Json
+          published_at: string | null
+          purchase_budget_per_visit: number
+          purchase_item_name: string | null
+          questions: Json
+          status: string
+          total_purchase_budget: number
+          updated_at: string
+          user_id: string
+          visits_completed: number
+          visits_pending: number
+        }
+        Insert: {
+          agent_tier?: string
+          branch_id?: string | null
+          budget_used?: number
+          created_at?: string
+          id?: string
+          name: string
+          number_of_visits?: number
+          photo_requirements?: Json
+          published_at?: string | null
+          purchase_budget_per_visit?: number
+          purchase_item_name?: string | null
+          questions?: Json
+          status?: string
+          total_purchase_budget?: number
+          updated_at?: string
+          user_id: string
+          visits_completed?: number
+          visits_pending?: number
+        }
+        Update: {
+          agent_tier?: string
+          branch_id?: string | null
+          budget_used?: number
+          created_at?: string
+          id?: string
+          name?: string
+          number_of_visits?: number
+          photo_requirements?: Json
+          published_at?: string | null
+          purchase_budget_per_visit?: number
+          purchase_item_name?: string | null
+          questions?: Json
+          status?: string
+          total_purchase_budget?: number
+          updated_at?: string
+          user_id?: string
+          visits_completed?: number
+          visits_pending?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

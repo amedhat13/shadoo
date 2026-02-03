@@ -1,7 +1,9 @@
-import { useState, useCallback } from 'react';
-import { Mission, MissionStatus, Branch, Question } from '@/types';
+import { useState, useCallback, useEffect } from 'react';
+import { Mission, MissionStatus, Branch, Question, AgentTier, PhotoRequirements } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock branches (aligned with useBranches)
+// Mock branches for unauthenticated users
 const mockBranches: Branch[] = [
   {
     id: 'branch-1',
@@ -41,119 +43,131 @@ const mockBranches: Branch[] = [
   },
 ];
 
-// Mock questions for demo
-const sampleQuestions: Question[] = [
-  {
-    id: 'q1',
-    type: 'yes_no',
-    text: 'Was the staff friendly and welcoming?',
-    required: true,
-  },
-  {
-    id: 'q2',
-    type: 'rating',
-    text: 'Rate the overall cleanliness of the store',
-    required: true,
-    max_rating: 5,
-  },
-  {
-    id: 'q3',
-    type: 'multiple_choice',
-    text: 'How long did you wait to be served?',
-    required: true,
-    options: [
-      { id: 'opt1', text: 'Less than 2 minutes' },
-      { id: 'opt2', text: '2-5 minutes' },
-      { id: 'opt3', text: '5-10 minutes' },
-      { id: 'opt4', text: 'More than 10 minutes' },
-    ],
-  },
-  {
-    id: 'q4',
-    type: 'short_text',
-    text: 'Any additional comments or observations?',
-    required: false,
-  },
-];
+interface DbMission {
+  id: string;
+  user_id: string;
+  name: string;
+  branch_id: string | null;
+  status: string;
+  agent_tier: string;
+  questions: unknown;
+  photo_requirements: unknown;
+  number_of_visits: number;
+  purchase_budget_per_visit: number;
+  purchase_item_name: string | null;
+  total_purchase_budget: number;
+  visits_completed: number;
+  visits_pending: number;
+  budget_used: number;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  branches?: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    district: string | null;
+    google_maps_link: string;
+    latitude: number | null;
+    longitude: number | null;
+    status: string;
+    rejection_reason: string | null;
+    created_at: string;
+    updated_at: string;
+  } | null;
+}
 
-// Mock missions
-const mockMissions: Mission[] = [
-  {
-    id: 'mission-1',
-    name: 'Customer Service Audit',
-    branch_id: 'branch-1',
-    branch: mockBranches[0],
-    status: 'published',
-    questions: sampleQuestions,
-    photo_requirements: { required_count: 3, instructions: 'Take photos of store entrance, checkout area, and product displays' },
-    number_of_visits: 20,
-    purchase_budget_per_visit: 100,
-    total_purchase_budget: 2000,
-    visits_completed: 12,
-    visits_pending: 3,
-    budget_used: 1150,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-20T14:30:00Z',
-    published_at: '2025-02-01T09:00:00Z',
-  },
-  {
-    id: 'mission-2',
-    name: 'Product Display Check',
-    branch_id: 'branch-2',
-    branch: mockBranches[1],
-    status: 'draft',
-    questions: sampleQuestions.slice(0, 2),
-    photo_requirements: { required_count: 5, instructions: 'Photograph each product category section' },
-    number_of_visits: 15,
-    purchase_budget_per_visit: 50,
-    total_purchase_budget: 750,
-    visits_completed: 0,
-    visits_pending: 0,
-    budget_used: 0,
-    created_at: '2025-01-28T11:00:00Z',
-    updated_at: '2025-01-28T11:00:00Z',
-  },
-  {
-    id: 'mission-3',
-    name: 'Mystery Dining Experience',
-    branch_id: 'branch-1',
-    branch: mockBranches[0],
-    status: 'paused',
-    questions: sampleQuestions,
-    photo_requirements: { required_count: 4, instructions: 'Photo of menu, food served, receipt, and restaurant ambiance' },
-    number_of_visits: 10,
-    purchase_budget_per_visit: 200,
-    total_purchase_budget: 2000,
-    visits_completed: 5,
-    visits_pending: 1,
-    budget_used: 980,
-    created_at: '2025-01-10T09:00:00Z',
-    updated_at: '2025-01-25T16:00:00Z',
-    published_at: '2025-01-20T08:00:00Z',
-  },
-  {
-    id: 'mission-4',
-    name: 'Competitor Price Survey',
-    branch_id: 'branch-3',
-    branch: mockBranches[2],
-    status: 'completed',
-    questions: [sampleQuestions[2], sampleQuestions[3]],
-    photo_requirements: { required_count: 10, instructions: 'Photograph price tags for all listed products' },
-    number_of_visits: 8,
-    purchase_budget_per_visit: 0,
-    total_purchase_budget: 0,
-    visits_completed: 8,
-    visits_pending: 0,
-    budget_used: 0,
-    created_at: '2025-01-05T09:00:00Z',
-    updated_at: '2025-01-30T16:00:00Z',
-    published_at: '2025-01-06T08:00:00Z',
-  },
-];
+function mapDbMissionToMission(dbMission: DbMission): Mission {
+  return {
+    id: dbMission.id,
+    name: dbMission.name,
+    branch_id: dbMission.branch_id || '',
+    branch: dbMission.branches ? {
+      id: dbMission.branches.id,
+      name: dbMission.branches.name,
+      address: dbMission.branches.address,
+      city: dbMission.branches.city,
+      district: dbMission.branches.district || undefined,
+      google_maps_link: dbMission.branches.google_maps_link,
+      latitude: dbMission.branches.latitude || undefined,
+      longitude: dbMission.branches.longitude || undefined,
+      status: dbMission.branches.status as 'pending_verification' | 'verified' | 'rejected',
+      rejection_reason: dbMission.branches.rejection_reason || undefined,
+      created_at: dbMission.branches.created_at,
+      updated_at: dbMission.branches.updated_at,
+    } : undefined,
+    status: dbMission.status as MissionStatus,
+    questions: dbMission.questions as Question[],
+    photo_requirements: dbMission.photo_requirements as PhotoRequirements,
+    number_of_visits: dbMission.number_of_visits,
+    purchase_budget_per_visit: dbMission.purchase_budget_per_visit,
+    total_purchase_budget: dbMission.total_purchase_budget,
+    visits_completed: dbMission.visits_completed,
+    visits_pending: dbMission.visits_pending,
+    budget_used: dbMission.budget_used,
+    created_at: dbMission.created_at,
+    updated_at: dbMission.updated_at,
+    published_at: dbMission.published_at || undefined,
+  };
+}
 
 export function useMissions() {
-  const [missions, setMissions] = useState<Mission[]>(mockMissions);
-  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const [missions, setMissions] = useState<Mission[]>([]);
+  const [branches, setBranches] = useState<Branch[]>(mockBranches);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Fetch missions and branches from database
+  useEffect(() => {
+    async function fetchData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+
+      if (user) {
+        try {
+          // Fetch missions
+          const { data: missionsData, error: missionsError } = await supabase
+            .from('missions')
+            .select(`*, branches (*)`)
+            .order('created_at', { ascending: false });
+
+          if (missionsError) throw missionsError;
+          setMissions((missionsData || []).map((m) => mapDbMissionToMission(m as DbMission)));
+
+          // Fetch branches
+          const { data: branchesData, error: branchesError } = await supabase
+            .from('branches')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (branchesError) throw branchesError;
+          if (branchesData && branchesData.length > 0) {
+            setBranches(branchesData.map((b) => ({
+              id: b.id,
+              name: b.name,
+              address: b.address,
+              city: b.city,
+              district: b.district || undefined,
+              google_maps_link: b.google_maps_link,
+              latitude: b.latitude || undefined,
+              longitude: b.longitude || undefined,
+              status: b.status as 'pending_verification' | 'verified' | 'rejected',
+              rejection_reason: b.rejection_reason || undefined,
+              created_at: b.created_at,
+              updated_at: b.updated_at,
+            })));
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+      setIsLoading(false);
+    }
+
+    fetchData();
+  }, []);
 
   const getMission = useCallback((id: string) => {
     return missions.find((m) => m.id === id);
@@ -161,115 +175,225 @@ export function useMissions() {
 
   const updateMissionStatus = useCallback(async (id: string, status: MissionStatus) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setMissions((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? { ...m, status, updated_at: new Date().toISOString() }
-          : m
-      )
-    );
-    setIsLoading(false);
-  }, []);
+    try {
+      if (isAuthenticated) {
+        const { error } = await supabase
+          .from('missions')
+          .update({ status })
+          .eq('id', id);
+        if (error) throw error;
+      }
+      
+      setMissions((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? { ...m, status, updated_at: new Date().toISOString() }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error('Error updating mission status:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
   const publishMission = useCallback(async (id: string) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setMissions((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? {
-              ...m,
-              status: 'published' as MissionStatus,
-              published_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            }
-          : m
-      )
-    );
-    
-    setIsLoading(false);
-  }, []);
+    try {
+      const now = new Date().toISOString();
+      
+      if (isAuthenticated) {
+        const { error } = await supabase
+          .from('missions')
+          .update({ status: 'published', published_at: now })
+          .eq('id', id);
+        if (error) throw error;
+      }
+      
+      setMissions((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? { ...m, status: 'published' as MissionStatus, published_at: now, updated_at: now }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error('Error publishing mission:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
-  const createMission = useCallback(async (data: Partial<Mission>) => {
+  const createMission = useCallback(async (data: {
+    name: string;
+    branch_id: string;
+    agent_tier?: AgentTier;
+    questions: Question[];
+    photo_requirements: PhotoRequirements;
+    number_of_visits: number;
+    purchase_budget_per_visit: number;
+    purchase_item_name?: string;
+  }): Promise<Mission> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    
-    const totalBudget = (data.number_of_visits || 0) * (data.purchase_budget_per_visit || 0);
-    
-    const newMission: Mission = {
-      id: `mission-${Date.now()}`,
-      name: data.name || '',
-      branch_id: data.branch_id || '',
-      branch: mockBranches.find((b) => b.id === data.branch_id),
-      status: 'draft',
-      questions: data.questions || [],
-      photo_requirements: data.photo_requirements || { required_count: 0 },
-      number_of_visits: data.number_of_visits || 0,
-      purchase_budget_per_visit: data.purchase_budget_per_visit || 0,
-      total_purchase_budget: totalBudget,
-      visits_completed: 0,
-      visits_pending: 0,
-      budget_used: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    try {
+      const totalBudget = data.number_of_visits * data.purchase_budget_per_visit;
+      
+      if (isAuthenticated) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
 
-    setMissions((prev) => [newMission, ...prev]);
-    setIsLoading(false);
-    return newMission;
-  }, []);
+        const insertData = {
+          user_id: user.id,
+          name: data.name,
+          branch_id: data.branch_id,
+          agent_tier: data.agent_tier || 'C',
+          questions: JSON.parse(JSON.stringify(data.questions)),
+          photo_requirements: JSON.parse(JSON.stringify(data.photo_requirements)),
+          number_of_visits: data.number_of_visits,
+          purchase_budget_per_visit: data.purchase_budget_per_visit,
+          purchase_item_name: data.purchase_item_name,
+          total_purchase_budget: totalBudget,
+        };
+
+        const { data: mission, error } = await supabase
+          .from('missions')
+          .insert(insertData as never)
+          .select(`*, branches (*)`)
+          .single();
+
+        if (error) throw error;
+        const newMission = mapDbMissionToMission(mission as DbMission);
+        setMissions((prev) => [newMission, ...prev]);
+        return newMission;
+      } else {
+        // Mock mode for unauthenticated users
+        const newMission: Mission = {
+          id: `mission-${Date.now()}`,
+          name: data.name,
+          branch_id: data.branch_id,
+          branch: branches.find((b) => b.id === data.branch_id),
+          status: 'draft',
+          questions: data.questions,
+          photo_requirements: data.photo_requirements,
+          number_of_visits: data.number_of_visits,
+          purchase_budget_per_visit: data.purchase_budget_per_visit,
+          total_purchase_budget: totalBudget,
+          visits_completed: 0,
+          visits_pending: 0,
+          budget_used: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setMissions((prev) => [newMission, ...prev]);
+        return newMission;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, branches]);
 
   const updateMission = useCallback(async (id: string, data: Partial<Mission>) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    
-    setMissions((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? {
-              ...m,
-              ...data,
-              total_purchase_budget: (data.number_of_visits ?? m.number_of_visits) * (data.purchase_budget_per_visit ?? m.purchase_budget_per_visit),
-              updated_at: new Date().toISOString(),
-            }
-          : m
-      )
-    );
-    
-    setIsLoading(false);
-  }, []);
+    try {
+      if (isAuthenticated) {
+        const updateData: Record<string, unknown> = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.branch_id !== undefined) updateData.branch_id = data.branch_id;
+        if (data.status !== undefined) updateData.status = data.status;
+        if (data.questions !== undefined) updateData.questions = JSON.parse(JSON.stringify(data.questions));
+        if (data.photo_requirements !== undefined) updateData.photo_requirements = JSON.parse(JSON.stringify(data.photo_requirements));
+        if (data.number_of_visits !== undefined) updateData.number_of_visits = data.number_of_visits;
+        if (data.purchase_budget_per_visit !== undefined) updateData.purchase_budget_per_visit = data.purchase_budget_per_visit;
+        
+        if (data.number_of_visits !== undefined && data.purchase_budget_per_visit !== undefined) {
+          updateData.total_purchase_budget = data.number_of_visits * data.purchase_budget_per_visit;
+        }
+
+        const { error } = await supabase
+          .from('missions')
+          .update(updateData as never)
+          .eq('id', id);
+        if (error) throw error;
+      }
+      
+      setMissions((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? {
+                ...m,
+                ...data,
+                total_purchase_budget: (data.number_of_visits ?? m.number_of_visits) * (data.purchase_budget_per_visit ?? m.purchase_budget_per_visit),
+                updated_at: new Date().toISOString(),
+              }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error('Error updating mission:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
 
   const duplicateMission = useCallback(async (id: string): Promise<Mission | undefined> => {
     const original = missions.find((m) => m.id === id);
     if (!original) return undefined;
 
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    
-    const duplicatedMission: Mission = {
-      id: `mission-${Date.now()}`,
-      name: `${original.name} (Copy)`,
-      branch_id: original.branch_id,
-      branch: original.branch,
-      status: 'draft',
-      questions: original.questions.map(q => ({ ...q, id: `${q.id}-copy-${Date.now()}` })),
-      photo_requirements: { ...original.photo_requirements },
-      number_of_visits: original.number_of_visits,
-      purchase_budget_per_visit: original.purchase_budget_per_visit,
-      total_purchase_budget: original.total_purchase_budget,
-      visits_completed: 0,
-      visits_pending: 0,
-      budget_used: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    try {
+      if (isAuthenticated) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
 
-    setMissions((prev) => [duplicatedMission, ...prev]);
-    setIsLoading(false);
-    return duplicatedMission;
-  }, [missions]);
+        const insertData = {
+          user_id: user.id,
+          name: `${original.name} (Copy)`,
+          branch_id: original.branch_id,
+          agent_tier: 'C',
+          questions: JSON.parse(JSON.stringify(original.questions)),
+          photo_requirements: JSON.parse(JSON.stringify(original.photo_requirements)),
+          number_of_visits: original.number_of_visits,
+          purchase_budget_per_visit: original.purchase_budget_per_visit,
+          total_purchase_budget: original.total_purchase_budget,
+        };
+
+        const { data: mission, error } = await supabase
+          .from('missions')
+          .insert(insertData as never)
+          .select(`*, branches (*)`)
+          .single();
+
+        if (error) throw error;
+        const newMission = mapDbMissionToMission(mission as DbMission);
+        setMissions((prev) => [newMission, ...prev]);
+        return newMission;
+      } else {
+        // Mock mode
+        const duplicatedMission: Mission = {
+          id: `mission-${Date.now()}`,
+          name: `${original.name} (Copy)`,
+          branch_id: original.branch_id,
+          branch: original.branch,
+          status: 'draft',
+          questions: original.questions.map(q => ({ ...q, id: `${q.id}-copy-${Date.now()}` })),
+          photo_requirements: { ...original.photo_requirements },
+          number_of_visits: original.number_of_visits,
+          purchase_budget_per_visit: original.purchase_budget_per_visit,
+          total_purchase_budget: original.total_purchase_budget,
+          visits_completed: 0,
+          visits_pending: 0,
+          budget_used: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        setMissions((prev) => [duplicatedMission, ...prev]);
+        return duplicatedMission;
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [missions, isAuthenticated]);
 
   return {
     missions,
@@ -280,6 +404,6 @@ export function useMissions() {
     createMission,
     updateMission,
     duplicateMission,
-    branches: mockBranches,
+    branches,
   };
 }

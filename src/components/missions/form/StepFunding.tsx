@@ -1,6 +1,8 @@
-import { DollarSign, Users, AlertTriangle, Info, Calculator, Building2 } from 'lucide-react';
+import { DollarSign, Users, AlertTriangle, Info, Calculator, Building2, Wallet, ShoppingBag } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { MissionFormData } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
 
@@ -10,6 +12,7 @@ interface StepFundingProps {
   visitsRemaining: number;
   walletBalance: number;
   branchCount: number;
+  onSaveDraft?: () => void;
 }
 
 export function StepFunding({
@@ -18,12 +21,21 @@ export function StepFunding({
   visitsRemaining,
   walletBalance,
   branchCount,
+  onSaveDraft,
 }: StepFundingProps) {
+  const navigate = useNavigate();
   const budgetPerMission = data.number_of_visits * data.purchase_budget_per_visit;
   const totalVisitsAllMissions = data.number_of_visits * branchCount;
   const totalPurchaseBudget = budgetPerMission * branchCount;
   const exceedsVisits = totalVisitsAllMissions > visitsRemaining;
   const exceedsBalance = totalPurchaseBudget > walletBalance;
+
+  const handleTopUpAndSaveDraft = () => {
+    if (onSaveDraft) {
+      onSaveDraft();
+    }
+    navigate('/wallet');
+  };
 
   const formatCurrency = (amount: number) => {
     return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
@@ -71,30 +83,45 @@ export function StepFunding({
         </p>
       </div>
 
-      {/* Purchase Budget per Visit */}
-      <div className="space-y-2">
-        <Label htmlFor="budget" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
-          <DollarSign className="h-4 w-4" />
-          Purchase Budget per Visit
-        </Label>
-        <div className="relative">
-          <Input
-            id="budget"
-            type="number"
-            min={0}
-            value={data.purchase_budget_per_visit}
-            onChange={(e) =>
-              onChange({ purchase_budget_per_visit: parseFloat(e.target.value) || 0 })
-            }
-            className="pr-16"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
-            {CURRENCY.symbol}
-          </span>
+      {/* Purchase Item & Budget per Visit */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="purchaseItem" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+            <ShoppingBag className="h-4 w-4" />
+            Purchase Item & Budget per Visit
+          </Label>
+          <div className="flex gap-3">
+            <Input
+              id="purchaseItem"
+              type="text"
+              placeholder="Item name (e.g., Coffee, Sandwich)"
+              value={data.purchase_item_name || ''}
+              onChange={(e) =>
+                onChange({ purchase_item_name: e.target.value || undefined })
+              }
+              className="flex-1"
+            />
+            <div className="relative w-40">
+              <Input
+                id="budget"
+                type="number"
+                min={0}
+                placeholder="Budget"
+                value={data.purchase_budget_per_visit}
+                onChange={(e) =>
+                  onChange({ purchase_budget_per_visit: parseFloat(e.target.value) || 0 })
+                }
+                className="pr-12"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
+                {CURRENCY.symbol}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Specify what agents should purchase and the budget for each visit.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Budget allocated for agent purchases during each visit.
-        </p>
       </div>
 
       {/* Budget Calculation */}
@@ -171,11 +198,20 @@ export function StepFunding({
       {exceedsBalance && !exceedsVisits && (
         <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div>
+          <div className="flex-1">
             <div className="font-bold text-xs uppercase tracking-wide text-destructive">Insufficient Balance</div>
             <p className="text-sm text-muted-foreground mt-1">
               {MESSAGES.funding.insufficient_balance}
             </p>
+            <Button
+              type="button"
+              onClick={handleTopUpAndSaveDraft}
+              className="mt-3 gap-2"
+              size="sm"
+            >
+              <Wallet className="h-4 w-4" />
+              Top Up & Save as Draft
+            </Button>
           </div>
         </div>
       )}
