@@ -3,46 +3,6 @@ import { Mission, MissionStatus, Branch, Question, AgentTier, PhotoRequirements 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-// Mock branches for unauthenticated users
-const mockBranches: Branch[] = [
-  {
-    id: 'branch-1',
-    name: 'Cairo Downtown',
-    address: '123 Tahrir Square',
-    city: 'Cairo',
-    google_maps_link: 'https://maps.google.com/?q=30.0444,31.2357',
-    latitude: 30.0444,
-    longitude: 31.2357,
-    status: 'verified',
-    created_at: '2025-01-01T10:00:00Z',
-    updated_at: '2025-01-01T10:00:00Z',
-  },
-  {
-    id: 'branch-2',
-    name: 'Alexandria Mall',
-    address: '456 Corniche Road',
-    city: 'Alexandria',
-    google_maps_link: 'https://maps.google.com/?q=31.2001,29.9187',
-    latitude: 31.2001,
-    longitude: 29.9187,
-    status: 'verified',
-    created_at: '2025-01-05T10:00:00Z',
-    updated_at: '2025-01-05T10:00:00Z',
-  },
-  {
-    id: 'branch-3',
-    name: 'Giza Plaza',
-    address: '789 Pyramids Road',
-    city: 'Giza',
-    google_maps_link: 'https://maps.google.com/?q=29.9773,31.1325',
-    latitude: 29.9773,
-    longitude: 31.1325,
-    status: 'pending_verification',
-    created_at: '2025-01-20T10:00:00Z',
-    updated_at: '2025-01-20T10:00:00Z',
-  },
-];
-
 interface DbMission {
   id: string;
   user_id: string;
@@ -115,7 +75,7 @@ function mapDbMissionToMission(dbMission: DbMission): Mission {
 export function useMissions() {
   const { toast } = useToast();
   const [missions, setMissions] = useState<Mission[]>([]);
-  const [branches, setBranches] = useState<Branch[]>(mockBranches);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
