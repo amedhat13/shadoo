@@ -13,9 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, XCircle, User, MapPin, Camera, MessageSquare, Receipt, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, User, MapPin, Camera, MessageSquare, Receipt, Loader2, Calendar, Clock, Timer } from 'lucide-react';
 import { AdminVisit, useApproveVisit, useRejectVisit } from '@/hooks/useAdminVisits';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 interface VisitReviewDialogProps {
   visit: AdminVisit | null;
@@ -51,6 +51,25 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
   const photos = visit.photos || [];
   const isSubmitted = visit.status === 'submitted';
   const isReviewed = visit.status === 'approved' || visit.status === 'rejected';
+
+  // Get schedule info - either from denormalized fields or lookup from mission schedules
+  const scheduleInfo = visit.scheduled_date 
+    ? {
+        date: visit.scheduled_date,
+        time: visit.scheduled_time,
+        duration: visit.scheduled_duration,
+      }
+    : visit.schedule_id && visit.mission?.visit_schedules
+      ? (visit.mission.visit_schedules as any[])?.find((s: any) => s.id === visit.schedule_id)
+      : null;
+
+  const formatDuration = (minutes: number | null) => {
+    if (!minutes) return 'N/A';
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,6 +121,46 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                 </div>
               </CardContent>
             </Card>
+
+            {/* Schedule Info */}
+            {scheduleInfo && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Scheduled Visit Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <span className="text-muted-foreground block text-xs">Date</span>
+                      <span className="font-medium">
+                        {scheduleInfo.date 
+                          ? format(parseISO(scheduleInfo.date), 'MMM d, yyyy')
+                          : 'N/A'
+                        }
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <span className="text-muted-foreground block text-xs">Time</span>
+                      <span className="font-medium">{scheduleInfo.time || 'N/A'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Timer className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <span className="text-muted-foreground block text-xs">Duration</span>
+                      <span className="font-medium">{formatDuration(scheduleInfo.duration)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Purchase Info */}
             <Card>
