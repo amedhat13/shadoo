@@ -16,10 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Eye, Search, CheckCircle, XCircle, Clock, Loader2, FileCheck } from 'lucide-react';
+import { Eye, Search, CheckCircle, XCircle, Clock, Loader2, FileCheck, Calendar } from 'lucide-react';
 import { useAdminVisits, useVisitStats } from '@/hooks/useAdminVisits';
 import { VisitReviewDialog } from '@/components/admin/visits/VisitReviewDialog';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
@@ -83,6 +83,17 @@ export default function AdminVisitsPage() {
               }
             </span>
           </div>
+          {visit.scheduled_date && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Calendar className="h-3 w-3" /> Scheduled
+              </span>
+              <span className="text-xs">
+                {format(parseISO(visit.scheduled_date), 'MMM d')}
+                {visit.scheduled_time && ` @ ${visit.scheduled_time}`}
+              </span>
+            </div>
+          )}
         </div>
         <div className="mt-4 pt-3 border-t">
           <Button 
@@ -200,6 +211,7 @@ export default function AdminVisitsPage() {
                         <TableHead>Mission</TableHead>
                         <TableHead>Agent</TableHead>
                         <TableHead>Client</TableHead>
+                        <TableHead>Scheduled</TableHead>
                         <TableHead>Submitted</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
@@ -222,6 +234,19 @@ export default function AdminVisitsPage() {
                           </TableCell>
                           <TableCell className="text-muted-foreground">
                             {visit.client?.company_name || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {visit.scheduled_date ? (
+                              <div className="flex items-center gap-1 text-sm">
+                                <Calendar className="h-3 w-3 text-muted-foreground" />
+                                <span>{format(parseISO(visit.scheduled_date), 'MMM d')}</span>
+                                {visit.scheduled_time && (
+                                  <span className="text-muted-foreground">@ {visit.scheduled_time}</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             {visit.submitted_at 

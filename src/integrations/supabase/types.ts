@@ -617,6 +617,10 @@ export type Database = {
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          schedule_id: string | null
+          scheduled_date: string | null
+          scheduled_duration: number | null
+          scheduled_time: string | null
           started_at: string | null
           status: string | null
           submitted_at: string | null
@@ -633,6 +637,10 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          schedule_id?: string | null
+          scheduled_date?: string | null
+          scheduled_duration?: number | null
+          scheduled_time?: string | null
           started_at?: string | null
           status?: string | null
           submitted_at?: string | null
@@ -649,6 +657,10 @@ export type Database = {
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          schedule_id?: string | null
+          scheduled_date?: string | null
+          scheduled_duration?: number | null
+          scheduled_time?: string | null
           started_at?: string | null
           status?: string | null
           submitted_at?: string | null

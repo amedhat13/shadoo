@@ -17,6 +17,11 @@ export interface AdminVisit {
   reviewed_by: string | null;
   rejection_reason: string | null;
   created_at: string;
+  // Schedule info (denormalized from mission visit_schedules)
+  schedule_id: string | null;
+  scheduled_date: string | null;
+  scheduled_time: string | null;
+  scheduled_duration: number | null;
   // Joined data
   mission?: {
     id: string;
@@ -25,6 +30,7 @@ export interface AdminVisit {
     photo_requirements: any;
     purchase_budget_per_visit: number;
     user_id: string;
+    visit_schedules: any;
   };
   agent?: {
     id: string;
@@ -53,7 +59,8 @@ export function useAdminVisits(status?: string) {
             questions,
             photo_requirements,
             purchase_budget_per_visit,
-            user_id
+            user_id,
+            visit_schedules
           ),
           agent:agents (
             id,
