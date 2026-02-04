@@ -1,4 +1,5 @@
-import { CheckCircle, MapPin, HelpCircle, DollarSign, Users, MapPinned, Loader2 } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { CheckCircle, MapPin, HelpCircle, DollarSign, Users, MapPinned, Loader2, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,9 +27,17 @@ interface AdminStepReviewProps {
 export function AdminStepReview({ data, branches, onCreate, isSubmitting }: AdminStepReviewProps) {
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const branchCount = selectedBranches.length || 1;
-  const totalBudget = data.number_of_visits * data.purchase_budget_per_visit * branchCount;
-  const totalVisits = data.number_of_visits * branchCount;
+  const numberOfVisits = data.visit_schedules.length;
+  const totalBudget = numberOfVisits * data.purchase_budget_per_visit * branchCount;
+  const totalVisits = numberOfVisits * branchCount;
   const selectedTier = AGENT_TIERS.find((t) => t.tier === data.agent_tier);
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
 
   return (
     <div className="space-y-6">
@@ -148,8 +157,8 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Visits per Mission</span>
-              <span className="font-medium">{data.number_of_visits}</span>
+              <span className="text-muted-foreground">Scheduled Visits</span>
+              <span className="font-medium">{numberOfVisits} per mission</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Budget per Visit</span>
@@ -167,6 +176,45 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           </CardContent>
         </Card>
       </div>
+
+      {/* Visit Schedules */}
+      {data.visit_schedules.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Visit Schedules ({numberOfVisits})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-h-[150px] overflow-y-auto">
+              {data.visit_schedules.slice(0, 5).map((schedule, i) => (
+                <div key={schedule.id} className="flex items-center gap-3 text-sm p-2 bg-muted/50 rounded">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-muted text-xs font-bold rounded">
+                    {i + 1}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3 w-3 text-muted-foreground" />
+                    <span>{format(parseISO(schedule.date), 'MMM d, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <span>{schedule.time}</span>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {formatDuration(schedule.duration)}
+                  </Badge>
+                </div>
+              ))}
+              {data.visit_schedules.length > 5 && (
+                <p className="text-xs text-muted-foreground">
+                  +{data.visit_schedules.length - 5} more scheduled visits
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Create Button */}
       <div className="flex flex-col items-center gap-4 pt-4">

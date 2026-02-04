@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format, parseISO } from 'date-fns';
 import {
   Users,
   Camera,
@@ -8,6 +9,8 @@ import {
   Check,
   Building2,
   Star,
+  Calendar,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,10 +52,18 @@ export function StepReview({
 
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const branchCount = selectedBranches.length || 1;
-  const budgetPerMission = data.number_of_visits * data.purchase_budget_per_visit;
-  const totalVisitsAllMissions = data.number_of_visits * branchCount;
+  const numberOfVisits = data.visit_schedules.length;
+  const budgetPerMission = numberOfVisits * data.purchase_budget_per_visit;
+  const totalVisitsAllMissions = numberOfVisits * branchCount;
   const totalPurchaseBudget = budgetPerMission * branchCount;
   const selectedTier = AGENT_TIERS.find((t) => t.tier === data.agent_tier);
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
 
   const formatCurrency = (amount: number) => {
     return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
@@ -186,6 +197,43 @@ export function StepReview({
         </div>
       </div>
 
+      {/* Visit Schedules */}
+      <div className="border border-border p-4 space-y-3">
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+          <Calendar className="h-4 w-4" />
+          Scheduled Visits ({numberOfVisits})
+        </h3>
+        {data.visit_schedules.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No visits scheduled</p>
+        ) : (
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {data.visit_schedules.slice(0, 5).map((schedule, i) => (
+              <div key={schedule.id} className="flex items-center gap-3 text-sm p-2 bg-muted/50">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center bg-muted text-xs font-bold">
+                  {i + 1}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3 w-3 text-muted-foreground" />
+                  <span>{format(parseISO(schedule.date), 'MMM d, yyyy')}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span>{schedule.time}</span>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {formatDuration(schedule.duration)}
+                </Badge>
+              </div>
+            ))}
+            {data.visit_schedules.length > 5 && (
+              <p className="text-xs text-muted-foreground pl-8">
+                +{data.visit_schedules.length - 5} more scheduled visits
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Budget Breakdown */}
       <div className="border border-border p-4 space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wide">Budget Breakdown</h3>
@@ -197,7 +245,7 @@ export function StepReview({
               <div className="text-xs text-muted-foreground uppercase tracking-wide">
                 {branchCount > 1 ? 'Visits/Mission' : 'Visits'}
               </div>
-              <div className="text-lg font-black">{data.number_of_visits}</div>
+              <div className="text-lg font-black">{numberOfVisits}</div>
             </div>
           </div>
           <div className="flex items-center gap-3 border border-border p-3">
@@ -277,10 +325,10 @@ export function StepReview({
             <div className="font-bold text-xs uppercase tracking-wide text-success">Ready to Publish</div>
             <p className="text-sm text-muted-foreground mt-1">
               {branchCount > 1
-                ? `Publishing will create ${branchCount} missions and allocate ${formatCurrency(totalPurchaseBudget)} from your wallet.`
-                : MESSAGES.publish.confirmation
-                    .replace('{amount}', formatCurrency(totalPurchaseBudget))
-                    .replace('{visits}', String(data.number_of_visits))}
+        ? `Publishing will create ${branchCount} missions and allocate ${formatCurrency(totalPurchaseBudget)} from your wallet.`
+        : MESSAGES.publish.confirmation
+            .replace('{amount}', formatCurrency(totalPurchaseBudget))
+            .replace('{visits}', String(numberOfVisits))}
             </p>
           </div>
         </div>
@@ -312,10 +360,10 @@ export function StepReview({
             <DialogTitle className="font-black uppercase tracking-tight">Confirm Publication</DialogTitle>
             <DialogDescription className="pt-2">
               {branchCount > 1
-                ? `You are about to create and publish ${branchCount} missions.`
-                : MESSAGES.publish.confirmation
-                    .replace('{amount}', formatCurrency(totalPurchaseBudget))
-                    .replace('{visits}', String(data.number_of_visits))}
+          ? `You are about to create and publish ${branchCount} missions.`
+          : MESSAGES.publish.confirmation
+              .replace('{amount}', formatCurrency(totalPurchaseBudget))
+              .replace('{visits}', String(numberOfVisits))}
             </DialogDescription>
           </DialogHeader>
           <div className="border border-border p-4 my-4">

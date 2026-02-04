@@ -147,6 +147,14 @@ export interface Wallet {
   updated_at: string;
 }
 
+// Visit Schedule for mission creation
+export interface VisitSchedule {
+  id: string;
+  date: string; // ISO date string (YYYY-MM-DD)
+  time: string; // Time string (HH:mm)
+  duration: number; // Duration in minutes
+}
+
 // Purchase Item for mission creation
 export interface PurchaseItem {
   id: string;
@@ -169,6 +177,7 @@ export interface MissionFormData {
   
   // Step 4: Visits & Funding
   number_of_visits: number;
+  visit_schedules: VisitSchedule[]; // Scheduled visits with date, time, duration
   purchase_items: PurchaseItem[]; // Multiple items with individual budgets
   purchase_budget_per_visit: number; // Computed from purchase_items
   purchase_item_name?: string; // Legacy - computed from purchase_items
