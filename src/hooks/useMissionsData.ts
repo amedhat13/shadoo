@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Mission, MissionStatus, Question, PhotoRequirements, AgentTier } from '@/types';
+import { Mission, MissionStatus, Question, PhotoRequirements, AgentTier, VisitSchedule } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface DbMission {
@@ -107,6 +107,7 @@ export function useMissionsData() {
       questions: Question[];
       photo_requirements: PhotoRequirements;
       number_of_visits: number;
+      visit_schedules?: VisitSchedule[];
       purchase_budget_per_visit: number;
       purchase_item_name?: string;
       is_geo_tagged?: boolean;
@@ -124,6 +125,7 @@ export function useMissionsData() {
         questions: JSON.parse(JSON.stringify(data.questions)),
         photo_requirements: JSON.parse(JSON.stringify(data.photo_requirements)),
         number_of_visits: data.number_of_visits,
+        visit_schedules: data.visit_schedules ? JSON.parse(JSON.stringify(data.visit_schedules)) : [],
         purchase_budget_per_visit: data.purchase_budget_per_visit,
         purchase_item_name: data.purchase_item_name,
         total_purchase_budget: totalBudget,

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { MissionFormData, Question, PhotoRequirements } from '@/types';
+import { MissionFormData, Question, PhotoRequirements, VisitSchedule } from '@/types';
 import { AdminStepBasics } from '@/components/admin/missions/form/AdminStepBasics';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
@@ -41,7 +41,8 @@ const initialFormData: AdminMissionFormData = {
     required_count: 3,
     instructions: '',
   },
-  number_of_visits: 10,
+  number_of_visits: 0,
+  visit_schedules: [],
   purchase_items: [{ id: crypto.randomUUID(), name: '', budget: 100 }],
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
@@ -66,6 +67,7 @@ export default function AdminMissionCreatePage() {
       questions: Question[];
       photoRequirements: PhotoRequirements;
       numberOfVisits: number;
+      visitSchedules: VisitSchedule[];
       purchaseBudgetPerVisit: number;
       isGeoTagged: boolean;
     }) => {
@@ -79,6 +81,7 @@ export default function AdminMissionCreatePage() {
         questions: JSON.parse(JSON.stringify(data.questions)),
         photo_requirements: JSON.parse(JSON.stringify(data.photoRequirements)),
         number_of_visits: data.numberOfVisits,
+        visit_schedules: JSON.parse(JSON.stringify(data.visitSchedules)),
         purchase_budget_per_visit: data.purchaseBudgetPerVisit,
         total_purchase_budget: totalBudget,
         is_geo_tagged: data.isGeoTagged,
@@ -107,7 +110,7 @@ export default function AdminMissionCreatePage() {
       case 3:
         return true; // Geo settings is optional
       case 4:
-        return formData.number_of_visits > 0;
+        return formData.visit_schedules.length > 0;
       case 5:
         return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
       default:
@@ -144,7 +147,8 @@ export default function AdminMissionCreatePage() {
           agentTier: formData.agent_tier,
           questions: formData.questions,
           photoRequirements: formData.photo_requirements,
-          numberOfVisits: formData.number_of_visits,
+          numberOfVisits: formData.visit_schedules.length,
+          visitSchedules: formData.visit_schedules,
           purchaseBudgetPerVisit: formData.purchase_budget_per_visit,
           isGeoTagged: formData.is_geo_tagged ?? false,
         });

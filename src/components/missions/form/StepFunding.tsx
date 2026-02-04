@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MissionFormData, PurchaseItem } from '@/types';
+import { MissionFormData, PurchaseItem, VisitSchedule } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
 import { PurchaseItemsList } from './PurchaseItemsList';
+import { VisitScheduleEditor } from './VisitScheduleEditor';
 
 interface StepFundingProps {
   data: MissionFormData;
@@ -28,8 +29,9 @@ export function StepFunding({
   
   // Calculate budget from purchase items
   const budgetPerVisit = data.purchase_items.reduce((sum, item) => sum + (item.budget || 0), 0);
-  const budgetPerMission = data.number_of_visits * budgetPerVisit;
-  const totalVisitsAllMissions = data.number_of_visits * branchCount;
+  const numberOfVisits = data.visit_schedules.length;
+  const budgetPerMission = numberOfVisits * budgetPerVisit;
+  const totalVisitsAllMissions = numberOfVisits * branchCount;
   const totalPurchaseBudget = budgetPerMission * branchCount;
   const exceedsVisits = totalVisitsAllMissions > visitsRemaining;
   const exceedsBalance = totalPurchaseBudget > walletBalance;
@@ -41,6 +43,13 @@ export function StepFunding({
       purchase_items: items,
       purchase_budget_per_visit: totalBudget,
       purchase_item_name: itemNames || undefined,
+    });
+  };
+
+  const handleSchedulesChange = (schedules: VisitSchedule[]) => {
+    onChange({
+      visit_schedules: schedules,
+      number_of_visits: schedules.length,
     });
   };
 
@@ -71,31 +80,25 @@ export function StepFunding({
         </div>
       )}
 
-      {/* Number of Visits */}
-      <div className="space-y-2">
-        <Label htmlFor="visits" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
-          <Users className="h-4 w-4" />
-          Number of Visits {branchCount > 1 ? 'per Mission' : ''}<span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="visits"
-          type="number"
-          min={1}
-          max={Math.floor(visitsRemaining / branchCount)}
-          value={data.number_of_visits}
-          onChange={(e) =>
-            onChange({ number_of_visits: parseInt(e.target.value) || 0 })
-          }
-          className={exceedsVisits ? 'border-destructive' : ''}
-        />
-        <p className={`text-xs ${exceedsVisits ? 'text-destructive' : 'text-muted-foreground'}`}>
-          {exceedsVisits
-            ? `Total visits (${totalVisitsAllMissions}) exceeds your remaining allowance (${visitsRemaining} available).`
-            : branchCount > 1
-            ? `${data.number_of_visits} visits × ${branchCount} missions = ${totalVisitsAllMissions} total visits from your allowance.`
-            : MESSAGES.visits.consumption_warning.replace('{count}', String(data.number_of_visits))}
-        </p>
-      </div>
+      {/* Visit Schedules */}
+      <VisitScheduleEditor
+        schedules={data.visit_schedules}
+        onChange={handleSchedulesChange}
+        maxVisits={Math.floor(visitsRemaining / branchCount)}
+      />
+
+      {/* Visit Count Warning */}
+      {exceedsVisits && numberOfVisits > 0 && (
+        <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <div className="font-bold text-xs uppercase tracking-wide text-destructive">Visit Limit Exceeded</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Total visits ({totalVisitsAllMissions}) exceeds your remaining allowance ({visitsRemaining} available).
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Purchase Items List */}
       <PurchaseItemsList
@@ -117,8 +120,8 @@ export function StepFunding({
                 Per Mission
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
-                <span className="text-muted-foreground">Visits</span>
-                <span className="font-semibold">{data.number_of_visits}</span>
+                <span className="text-muted-foreground">Scheduled Visits</span>
+                <span className="font-semibold">{numberOfVisits}</span>
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
                 <span className="text-muted-foreground">× Budget per Visit</span>
@@ -162,19 +165,7 @@ export function StepFunding({
       </div>
 
       {/* Warning Messages */}
-      {exceedsVisits && (
-        <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
-          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div>
-            <div className="font-bold text-xs uppercase tracking-wide text-destructive">Insufficient Visits</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {MESSAGES.funding.insufficient_visits}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {exceedsBalance && !exceedsVisits && (
+      {exceedsBalance && !exceedsVisits && numberOfVisits > 0 && (
         <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div className="flex-1">
@@ -195,7 +186,7 @@ export function StepFunding({
         </div>
       )}
 
-      {!exceedsVisits && !exceedsBalance && (
+      {!exceedsVisits && !exceedsBalance && numberOfVisits > 0 && (
         <div className="flex items-start gap-3 border border-primary/30 bg-primary/5 p-4">
           <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>

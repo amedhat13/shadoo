@@ -28,7 +28,8 @@ const initialFormData: MissionFormData = {
     required_count: 3,
     instructions: '',
   },
-  number_of_visits: 10,
+  number_of_visits: 0,
+  visit_schedules: [],
   purchase_items: [{ id: crypto.randomUUID(), name: '', budget: 100 }],
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
@@ -56,6 +57,7 @@ export default function MissionCreatePage() {
         questions: existingMission.questions,
         photo_requirements: existingMission.photo_requirements,
         number_of_visits: existingMission.number_of_visits,
+        visit_schedules: [],
         purchase_items: [{ id: crypto.randomUUID(), name: '', budget: existingMission.purchase_budget_per_visit }],
         purchase_budget_per_visit: existingMission.purchase_budget_per_visit,
         is_geo_tagged: false,
@@ -96,7 +98,7 @@ export default function MissionCreatePage() {
       case 3: // Geo Settings
         return true; // Optional step
       case 4: // Funding
-        return formData.number_of_visits > 0;
+        return formData.visit_schedules.length > 0;
       case 5: // Review
         return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
       default:
@@ -130,8 +132,10 @@ export default function MissionCreatePage() {
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
-          number_of_visits: formData.number_of_visits,
+          number_of_visits: formData.visit_schedules.length,
+          visit_schedules: formData.visit_schedules,
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
+          is_geo_tagged: formData.is_geo_tagged,
         });
       }
       toast({
@@ -168,8 +172,10 @@ export default function MissionCreatePage() {
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
-          number_of_visits: formData.number_of_visits,
+          number_of_visits: formData.visit_schedules.length,
+          visit_schedules: formData.visit_schedules,
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
+          is_geo_tagged: formData.is_geo_tagged,
         });
         
         await publishMission(mission.id);

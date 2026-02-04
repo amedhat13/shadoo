@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Mission, MissionStatus, Branch, Question, AgentTier, PhotoRequirements } from '@/types';
+import { Mission, MissionStatus, Branch, Question, AgentTier, PhotoRequirements, VisitSchedule } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -192,8 +192,10 @@ export function useMissions() {
     questions: Question[];
     photo_requirements: PhotoRequirements;
     number_of_visits: number;
+    visit_schedules?: VisitSchedule[];
     purchase_budget_per_visit: number;
     purchase_item_name?: string;
+    is_geo_tagged?: boolean;
   }): Promise<Mission> => {
     setIsLoading(true);
     try {
@@ -211,9 +213,11 @@ export function useMissions() {
           questions: JSON.parse(JSON.stringify(data.questions)),
           photo_requirements: JSON.parse(JSON.stringify(data.photo_requirements)),
           number_of_visits: data.number_of_visits,
+          visit_schedules: data.visit_schedules ? JSON.parse(JSON.stringify(data.visit_schedules)) : [],
           purchase_budget_per_visit: data.purchase_budget_per_visit,
           purchase_item_name: data.purchase_item_name,
           total_purchase_budget: totalBudget,
+          is_geo_tagged: data.is_geo_tagged ?? false,
         };
 
         const { data: mission, error } = await supabase

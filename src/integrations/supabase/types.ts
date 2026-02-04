@@ -292,6 +292,7 @@ export type Database = {
           total_purchase_budget: number
           updated_at: string
           user_id: string
+          visit_schedules: Json | null
           visits_completed: number
           visits_pending: number
         }
@@ -313,6 +314,7 @@ export type Database = {
           total_purchase_budget?: number
           updated_at?: string
           user_id: string
+          visit_schedules?: Json | null
           visits_completed?: number
           visits_pending?: number
         }
@@ -334,6 +336,7 @@ export type Database = {
           total_purchase_budget?: number
           updated_at?: string
           user_id?: string
+          visit_schedules?: Json | null
           visits_completed?: number
           visits_pending?: number
         }

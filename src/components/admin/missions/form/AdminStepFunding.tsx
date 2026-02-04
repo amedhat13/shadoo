@@ -2,8 +2,8 @@ import { Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { MissionFormData } from '@/types';
+import { MissionFormData, VisitSchedule } from '@/types';
+import { VisitScheduleEditor } from '@/components/missions/form/VisitScheduleEditor';
 
 interface AdminStepFundingProps {
   data: MissionFormData;
@@ -12,32 +12,26 @@ interface AdminStepFundingProps {
 }
 
 export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundingProps) {
-  const totalVisitsPerMission = data.number_of_visits;
-  const totalPurchaseBudgetPerMission = data.number_of_visits * data.purchase_budget_per_visit;
+  const numberOfVisits = data.visit_schedules.length;
+  const totalPurchaseBudgetPerMission = numberOfVisits * data.purchase_budget_per_visit;
   const grandTotalBudget = totalPurchaseBudgetPerMission * branchCount;
-  const grandTotalVisits = totalVisitsPerMission * branchCount;
+  const grandTotalVisits = numberOfVisits * branchCount;
+
+  const handleSchedulesChange = (schedules: VisitSchedule[]) => {
+    onChange({
+      visit_schedules: schedules,
+      number_of_visits: schedules.length,
+    });
+  };
 
   return (
     <div className="space-y-6">
-      {/* Number of Visits */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-bold uppercase tracking-wide">Number of Visits per Mission</Label>
-          <span className="text-2xl font-black">{data.number_of_visits}</span>
-        </div>
-        <Slider
-          value={[data.number_of_visits]}
-          onValueChange={([value]) => onChange({ number_of_visits: value })}
-          min={1}
-          max={100}
-          step={1}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>1 visit</span>
-          <span>100 visits</span>
-        </div>
-      </div>
+      {/* Visit Schedules */}
+      <VisitScheduleEditor
+        schedules={data.visit_schedules}
+        onChange={handleSchedulesChange}
+        maxVisits={100}
+      />
 
       {/* Purchase Budget */}
       <div className="space-y-4">
@@ -69,7 +63,7 @@ export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundi
             <div className="text-sm space-y-1">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Per Mission:</span>
-                <span>{totalPurchaseBudgetPerMission.toLocaleString()} EGP ({totalVisitsPerMission} visits)</span>
+                <span>{totalPurchaseBudgetPerMission.toLocaleString()} EGP ({numberOfVisits} visits)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Number of Missions:</span>
