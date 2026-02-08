@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { EGYPT_CITIES } from '@/lib/egypt-locations';
 import { BranchStatus } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export interface BranchFilters {
   search: string;
@@ -22,14 +23,8 @@ interface BranchFiltersBarProps {
   onFiltersChange: (filters: BranchFilters) => void;
 }
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'verified', label: 'Verified' },
-  { value: 'pending_verification', label: 'Pending' },
-  { value: 'rejected', label: 'Rejected' },
-];
-
 export function BranchFiltersBar({ filters, onFiltersChange }: BranchFiltersBarProps) {
+  const { t } = useTranslation('branches');
   const hasActiveFilters = filters.search || filters.city || filters.status !== 'all';
 
   const clearFilters = () => {
@@ -40,12 +35,12 @@ export function BranchFiltersBar({ filters, onFiltersChange }: BranchFiltersBarP
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       {/* Search */}
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search branches..."
+          placeholder={t('search_placeholder')}
           value={filters.search}
           onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
-          className="pl-9"
+          className="ps-9"
         />
       </div>
 
@@ -55,10 +50,10 @@ export function BranchFiltersBar({ filters, onFiltersChange }: BranchFiltersBarP
         onValueChange={(value) => onFiltersChange({ ...filters, city: value === 'all' ? '' : value })}
       >
         <SelectTrigger className="w-full sm:w-[160px]">
-          <SelectValue placeholder="All Cities" />
+          <SelectValue placeholder={t('all_cities')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Cities</SelectItem>
+          <SelectItem value="all">{t('all_cities')}</SelectItem>
           {EGYPT_CITIES.map((city) => (
             <SelectItem key={city.id} value={city.name}>
               {city.name}
@@ -73,14 +68,13 @@ export function BranchFiltersBar({ filters, onFiltersChange }: BranchFiltersBarP
         onValueChange={(value) => onFiltersChange({ ...filters, status: value as BranchStatus | 'all' })}
       >
         <SelectTrigger className="w-full sm:w-[160px]">
-          <SelectValue placeholder="All Statuses" />
+          <SelectValue placeholder={t('all_statuses')} />
         </SelectTrigger>
         <SelectContent>
-          {STATUS_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
+          <SelectItem value="all">{t('all_statuses')}</SelectItem>
+          <SelectItem value="verified">{t('statuses.verified')}</SelectItem>
+          <SelectItem value="pending_verification">{t('statuses.pending_verification')}</SelectItem>
+          <SelectItem value="rejected">{t('statuses.rejected')}</SelectItem>
         </SelectContent>
       </Select>
 
@@ -88,7 +82,7 @@ export function BranchFiltersBar({ filters, onFiltersChange }: BranchFiltersBarP
       {hasActiveFilters && (
         <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
           <X className="h-4 w-4" />
-          Clear
+          {t('clear')}
         </Button>
       )}
     </div>

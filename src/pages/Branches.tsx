@@ -13,6 +13,7 @@ import { useBranchesData } from '@/hooks/useBranchesData';
 import { Branch, BranchStatus } from '@/types';
 import { Plus, Upload, MapPin, List, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export interface BranchFormData {
   name: string;
@@ -44,6 +45,7 @@ function extractCoordsFromLink(link: string): { lat: number; lng: number } | nul
 export default function BranchesPage() {
   const { branches, isLoading, createBranch, updateBranch, deleteBranch } = useBranchesData();
   const { toast } = useToast();
+  const { t } = useTranslation('branches');
   
   const [formOpen, setFormOpen] = useState(false);
   const [bulkFormOpen, setBulkFormOpen] = useState(false);
@@ -101,8 +103,8 @@ export default function BranchesPage() {
       longitude: coords?.lng,
     });
     toast({
-      title: 'Branch Added',
-      description: 'Your branch has been submitted for verification.',
+      title: t('toast.added'),
+      description: t('toast.added_description'),
     });
   };
 
@@ -121,16 +123,16 @@ export default function BranchesPage() {
     });
     setEditingBranch(null);
     toast({
-      title: 'Branch Updated',
-      description: 'The branch has been updated and submitted for re-verification.',
+      title: t('toast.updated'),
+      description: t('toast.updated_description'),
     });
   };
 
   const handleDeleteBranch = async (id: string) => {
     await deleteBranch(id);
     toast({
-      title: 'Branch Deleted',
-      description: 'The branch has been removed.',
+      title: t('toast.deleted'),
+      description: t('toast.deleted_description'),
     });
   };
 
@@ -149,8 +151,8 @@ export default function BranchesPage() {
       });
     }
     toast({
-      title: 'Branches Added',
-      description: `${branchesData.length} branches have been submitted for verification.`,
+      title: t('toast.added'),
+      description: `${branchesData.length} ${t('toast.added_description')}`,
     });
   };
 
@@ -168,19 +170,19 @@ export default function BranchesPage() {
     <DashboardLayout>
       <div className="space-y-4 md:space-y-6">
         <PageHeader
-          title="Branches"
-          description="Manage your locations. Branches must be verified by Shadoo admin before use in missions."
+          title={t('title')}
+          description={t('description')}
           actions={
             <div className="flex gap-2 w-full sm:w-auto">
               <Button variant="outline" onClick={() => setBulkFormOpen(true)} className="flex-1 sm:flex-none">
-                <Upload className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Bulk Add</span>
-                <span className="sm:hidden">Bulk</span>
+                <Upload className="h-4 w-4 me-2" />
+                <span className="hidden sm:inline">{t('bulk_add')}</span>
+                <span className="sm:hidden">{t('bulk_add')}</span>
               </Button>
               <Button onClick={() => { setEditingBranch(null); setFormOpen(true); }} className="flex-1 sm:flex-none">
-                <Plus className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Add Branch</span>
-                <span className="sm:hidden">Add</span>
+                <Plus className="h-4 w-4 me-2" />
+                <span className="hidden sm:inline">{t('add_branch')}</span>
+                <span className="sm:hidden">{t('add_branch')}</span>
               </Button>
             </div>
           }
@@ -190,7 +192,7 @@ export default function BranchesPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Total</CardTitle>
+              <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.total')}</CardTitle>
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
@@ -199,32 +201,32 @@ export default function BranchesPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Verified</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.verified')}</CardTitle>
+              <CheckCircle className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
-              <div className="text-xl sm:text-2xl font-bold text-green-600">{verifiedCount}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Ready for missions</p>
+              <div className="text-xl sm:text-2xl font-bold text-success">{verifiedCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t('stats.ready_for_missions')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Pending</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-500" />
+              <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.pending')}</CardTitle>
+              <Clock className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
-              <div className="text-xl sm:text-2xl font-bold text-yellow-600">{pendingCount}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Awaiting verification</p>
+              <div className="text-xl sm:text-2xl font-bold text-primary">{pendingCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t('stats.awaiting_verification')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6 md:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Rejected</CardTitle>
-              <XCircle className="h-4 w-4 text-red-500" />
+              <CardTitle className="text-xs sm:text-sm font-medium">{t('stats.rejected')}</CardTitle>
+              <XCircle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent className="p-3 md:p-6 pt-0 md:pt-0">
-              <div className="text-xl sm:text-2xl font-bold text-red-600">{rejectedCount}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Need attention</p>
+              <div className="text-xl sm:text-2xl font-bold text-destructive">{rejectedCount}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{t('stats.need_attention')}</p>
             </CardContent>
           </Card>
         </div>
@@ -234,11 +236,11 @@ export default function BranchesPage() {
           <TabsList className="w-full sm:w-auto">
             <TabsTrigger value="list" className="flex items-center gap-1.5 flex-1 sm:flex-none">
               <List className="h-4 w-4" />
-              <span className="text-xs sm:text-sm">List</span>
+              <span className="text-xs sm:text-sm">{t('list')}</span>
             </TabsTrigger>
             <TabsTrigger value="map" className="flex items-center gap-1.5 flex-1 sm:flex-none">
               <MapPin className="h-4 w-4" />
-              <span className="text-xs sm:text-sm">Map</span>
+              <span className="text-xs sm:text-sm">{t('map')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -250,16 +252,16 @@ export default function BranchesPage() {
                 {filteredBranches.length === 0 && (filters.search || filters.city || filters.status !== 'all') ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium">No branches found</h3>
+                    <h3 className="text-lg font-medium">{t('no_branches_found')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Try adjusting your filters or search terms.
+                      {t('no_branches_found_description')}
                     </p>
                     <Button 
                       variant="outline" 
                       className="mt-4"
                       onClick={() => setFilters({ search: '', city: '', status: 'all' })}
                     >
-                      Clear Filters
+                      {t('clear_filters')}
                     </Button>
                   </div>
                 ) : (

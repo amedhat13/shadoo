@@ -159,22 +159,10 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChange }:
   const { start } = useDirectionalSide();
   const { isRTL } = useLanguage();
 
-  // Mobile: Use Sheet
+  // Mobile: Use Sheet (triggered from Header, not floating button)
   if (isMobile) {
     return (
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "fixed top-4 z-50 md:hidden h-10 w-10 bg-background border border-border shadow-sm",
-              isRTL ? "right-4" : "left-4"
-            )}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
         <SheetContent side={start} className="w-64 p-0 bg-sidebar">
           <SheetTitle className="sr-only">{t('navigation_menu')}</SheetTitle>
           <SidebarContent 

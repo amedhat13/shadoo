@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MissionStatus, Branch } from '@/types';
-import { MISSION_STATUS_LABELS } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 export interface MissionFilters {
   search: string;
@@ -28,6 +28,8 @@ export function MissionFiltersComponent({
   onFiltersChange,
   branches,
 }: MissionFiltersComponentProps) {
+  const { t } = useTranslation('missions');
+  
   const handleClear = () => {
     onFiltersChange({
       search: '',
@@ -42,13 +44,13 @@ export function MissionFiltersComponent({
     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
       {/* Search */}
       <div className="relative flex-1 min-w-0">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search missions..."
+          placeholder={t('search_placeholder')}
           value={filters.search}
           onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
-          className="pl-9 border-border w-full"
+          className="ps-9 border-border w-full"
         />
       </div>
 
@@ -59,16 +61,16 @@ export function MissionFiltersComponent({
           onValueChange={(value) => onFiltersChange({ ...filters, status: value as MissionStatus | 'all' })}
         >
           <SelectTrigger className="flex-1 sm:flex-none sm:w-[180px] border-border">
-            <Filter className="mr-2 h-4 w-4 shrink-0" />
-            <SelectValue placeholder="Status" className="truncate" />
+            <Filter className="me-2 h-4 w-4 shrink-0" />
+            <SelectValue placeholder={t('status')} className="truncate" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {Object.entries(MISSION_STATUS_LABELS).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
+            <SelectItem value="all">{t('all_statuses')}</SelectItem>
+            <SelectItem value="draft">{t('statuses.draft')}</SelectItem>
+            <SelectItem value="published">{t('statuses.published')}</SelectItem>
+            <SelectItem value="paused">{t('statuses.paused')}</SelectItem>
+            <SelectItem value="completed">{t('statuses.completed')}</SelectItem>
+            <SelectItem value="archived">{t('statuses.archived')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -78,10 +80,10 @@ export function MissionFiltersComponent({
           onValueChange={(value) => onFiltersChange({ ...filters, branch: value })}
         >
           <SelectTrigger className="flex-1 sm:flex-none sm:w-[160px] border-border">
-            <SelectValue placeholder="Branch" />
+            <SelectValue placeholder={t('branch')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Branches</SelectItem>
+            <SelectItem value="all">{t('all_branches')}</SelectItem>
             {branches.map((branch) => (
               <SelectItem key={branch.id} value={branch.id}>
                 {branch.name}

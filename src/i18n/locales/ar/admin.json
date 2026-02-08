@@ -1,6 +1,16 @@
 {
   "super_admin": "المدير العام",
   "admin_email": "admin@shadoo.com",
+  "search_placeholder": "بحث...",
+  "notifications": "الإشعارات",
+  "notification_agent_registration": "تسجيل وكيل جديد",
+  "notification_agent_registration_desc": "أحمد حسن طلب الموافقة",
+  "notification_branch_pending": "فرع بانتظار التحقق",
+  "notification_branch_pending_desc": "3 فروع في انتظار المراجعة",
+  "notification_payout_request": "طلب صرف",
+  "notification_payout_request_desc": "5 طلبات صرف معلقة (12,500 ج.م)",
+  "switch_to_client_view": "التبديل لعرض العميل",
+  "sign_out": "تسجيل الخروج",
   "create_mission_title": "إنشاء مهمة للعميل",
   "steps": {
     "basics": "الأساسيات",
@@ -18,5 +28,12 @@
   },
   "missions_created_multi": "تم إنشاء {{count}} مهام بنجاح",
   "mission_created": "تم إنشاء المهمة بنجاح",
-  "mission_create_error": "فشل إنشاء المهمة. يرجى المحاولة مرة أخرى."
+  "mission_create_error": "فشل إنشاء المهمة. يرجى المحاولة مرة أخرى.",
+  "dashboard": {
+    "title": "لوحة تحكم المدير",
+    "total_clients": "إجمالي العملاء",
+    "active_missions": "المهام النشطة",
+    "pending_visits": "الزيارات المعلقة",
+    "total_agents": "إجمالي الوكلاء"
+  }
 }
