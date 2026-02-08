@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ClipboardList } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MissionTable } from '@/components/missions/MissionTable';
@@ -11,88 +12,51 @@ import { Button } from '@/components/ui/button';
 import { useMissions } from '@/hooks/useMissions';
 import { usePackage } from '@/hooks/usePackage';
 import { Mission } from '@/types';
-import { EMPTY_STATES, MESSAGES } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 
 export default function MissionsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation('missions');
   const { missions, branches, updateMissionStatus, duplicateMission } = useMissions();
   const { visitsRemaining, visitsTotal } = usePackage();
 
-  const [filters, setFilters] = useState<MissionFilters>({
-    search: '',
-    status: 'all',
-    branch: 'all',
-  });
-
+  const [filters, setFilters] = useState<MissionFilters>({ search: '', status: 'all', branch: 'all' });
   const canCreateMission = visitsRemaining > 0;
 
-  // Filter missions
   const filteredMissions = missions.filter((mission) => {
-    // Search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      if (!mission.name.toLowerCase().includes(searchLower)) {
-        return false;
-      }
-    }
-
-    // Status filter
-    if (filters.status !== 'all' && mission.status !== filters.status) {
-      return false;
-    }
-
-    // Branch filter
-    if (filters.branch !== 'all' && mission.branch_id !== filters.branch) {
-      return false;
-    }
-
+    if (filters.search && !mission.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.status !== 'all' && mission.status !== filters.status) return false;
+    if (filters.branch !== 'all' && mission.branch_id !== filters.branch) return false;
     return true;
   });
 
   const handlePause = async (mission: Mission) => {
     await updateMissionStatus(mission.id, 'paused');
-    toast({
-      title: 'Mission paused',
-      description: `"${mission.name}" has been paused.`,
-    });
+    toast({ title: t('mission_paused'), description: t('mission_paused_desc', { name: mission.name }) });
   };
 
   const handleResume = async (mission: Mission) => {
     await updateMissionStatus(mission.id, 'published');
-    toast({
-      title: 'Mission resumed',
-      description: `"${mission.name}" is now live.`,
-    });
+    toast({ title: t('mission_resumed'), description: t('mission_resumed_desc', { name: mission.name }) });
   };
 
   const handleArchive = async (mission: Mission) => {
     await updateMissionStatus(mission.id, 'archived');
-    toast({
-      title: 'Mission archived',
-      description: `"${mission.name}" has been archived.`,
-    });
+    toast({ title: t('mission_archived'), description: t('mission_archived_desc', { name: mission.name }) });
   };
 
   const handleDuplicate = async (mission: Mission) => {
     const duplicated = await duplicateMission(mission.id);
     if (duplicated) {
-      toast({
-        title: 'Mission duplicated',
-        description: `"${duplicated.name}" created as a draft. Review and publish when ready.`,
-      });
+      toast({ title: t('mission_duplicated'), description: t('mission_duplicated_desc', { name: duplicated.name }) });
       navigate(`/missions/${duplicated.id}/edit`);
     }
   };
 
   const handleCreateClick = () => {
     if (!canCreateMission) {
-      toast({
-        title: 'No visits remaining',
-        description: MESSAGES.visits.none_remaining,
-        variant: 'destructive',
-      });
+      toast({ title: t('no_missions'), description: t('funding.insufficient_visits'), variant: 'destructive' });
       return;
     }
     navigate('/missions/create');
@@ -102,58 +66,32 @@ export default function MissionsPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Missions"
-          description="Create and manage mystery shopping missions for your organization."
+          title={t('title')}
+          description={t('description')}
           actions={
             <Button onClick={handleCreateClick} className="gap-2" disabled={!canCreateMission}>
               <Plus className="h-4 w-4" />
-              Create Mission
+              {t('create_mission')}
             </Button>
           }
         />
 
-        {/* Visits remaining widget */}
-        <VisitsRemainingWidget
-          visitsRemaining={visitsRemaining}
-          visitsTotal={visitsTotal}
-          variant="card"
-        />
+        <VisitsRemainingWidget visitsRemaining={visitsRemaining} visitsTotal={visitsTotal} variant="card" />
 
         {missions.length === 0 ? (
           <EmptyState
             icon={<ClipboardList className="h-7 w-7 text-muted-foreground" />}
-            title={EMPTY_STATES.missions.title}
-            description={EMPTY_STATES.missions.description}
-            action={
-              canCreateMission
-                ? {
-                    label: EMPTY_STATES.missions.action,
-                    onClick: () => navigate('/missions/create'),
-                  }
-                : undefined
-            }
+            title={t('no_missions')}
+            description={t('no_missions_desc')}
+            action={canCreateMission ? { label: t('create_mission'), onClick: () => navigate('/missions/create') } : undefined}
           />
         ) : (
           <>
-            <MissionFiltersComponent
-              filters={filters}
-              onFiltersChange={setFilters}
-              branches={branches}
-            />
-
+            <MissionFiltersComponent filters={filters} onFiltersChange={setFilters} branches={branches} />
             {filteredMissions.length === 0 ? (
-              <EmptyState
-                title="No missions found"
-                description="Try adjusting your filters to find what you're looking for."
-              />
+              <EmptyState title={t('no_missions_found')} description={t('no_missions_found_desc')} />
             ) : (
-              <MissionTable
-                missions={filteredMissions}
-                onPause={handlePause}
-                onResume={handleResume}
-                onArchive={handleArchive}
-                onDuplicate={handleDuplicate}
-              />
+              <MissionTable missions={filteredMissions} onPause={handlePause} onResume={handleResume} onArchive={handleArchive} onDuplicate={handleDuplicate} />
             )}
           </>
         )}
