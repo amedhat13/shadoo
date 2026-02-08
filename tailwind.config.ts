@@ -73,8 +73,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Montserrat", "system-ui", "sans-serif"],
-        heading: ["Montserrat", "system-ui", "sans-serif"],
+        sans: ["SF Compact Text", "SF Compact Display", "-apple-system", "system-ui", "sans-serif"],
+        heading: ["SF Compact Display", "SF Compact Text", "-apple-system", "system-ui", "sans-serif"],
+        ar: ["Cairo", "SF Compact Text", "-apple-system", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

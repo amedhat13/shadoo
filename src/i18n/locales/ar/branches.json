@@ -1,0 +1,34 @@
+{
+  "title": "الفروع",
+  "description": "إدارة مواقع فروعك عبر مصر.",
+  "add_branch": "إضافة فرع",
+  "edit_branch": "تعديل الفرع",
+  "no_branches": "لا توجد فروع بعد",
+  "no_branches_description": "أضف أول فرع لتنظيم المهام حسب الموقع.",
+  "form": {
+    "branch_name": "اسم الفرع",
+    "branch_name_placeholder": "مثال: وسط القاهرة",
+    "city": "المدينة",
+    "city_placeholder": "اختر المدينة",
+    "district": "المنطقة",
+    "district_placeholder": "اختر المنطقة",
+    "district_placeholder_no_city": "اختر المدينة أولاً",
+    "address": "العنوان",
+    "address_placeholder": "مثال: 123 الشارع الرئيسي",
+    "google_maps_link": "رابط خرائط جوجل",
+    "google_maps_placeholder": "https://maps.google.com/...",
+    "google_maps_help": "افتح خرائط جوجل، ابحث عن موقعك، وانسخ رابط المشاركة.",
+    "add_dialog_title": "إضافة فرع جديد",
+    "add_dialog_desc": "أضف موقع فرع جديد. سيتم التحقق منه بواسطة إدارة شادو قبل استخدامه في المهام.",
+    "edit_dialog_title": "تعديل الفرع",
+    "edit_dialog_desc": "تحديث تفاصيل الفرع. التغييرات ستتطلب إعادة التحقق من إدارة شادو.",
+    "update_branch": "تحديث الفرع"
+  },
+  "validation": {
+    "name_required": "اسم الفرع مطلوب.",
+    "address_required": "العنوان مطلوب.",
+    "city_required": "المدينة مطلوبة.",
+    "maps_required": "رابط خرائط جوجل مطلوب.",
+    "maps_invalid": "يرجى إدخال رابط خرائط جوجل صالح."
+  }
+}

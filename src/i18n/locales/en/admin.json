@@ -1,0 +1,22 @@
+{
+  "super_admin": "Super Admin",
+  "admin_email": "admin@shadoo.com",
+  "create_mission_title": "Create Mission for Client",
+  "steps": {
+    "basics": "Basics",
+    "basics_desc": "Client, name and branches.",
+    "agent_tier": "Agent Tier",
+    "agent_tier_desc": "Select agent tier.",
+    "questions": "Questions",
+    "questions_desc": "Build questionnaire.",
+    "geo_settings": "Geo Settings",
+    "geo_settings_desc": "Location verification.",
+    "funding": "Visits & Funding",
+    "funding_desc": "Budget configuration.",
+    "review": "Review",
+    "review_desc": "Review and create."
+  },
+  "missions_created_multi": "{{count}} missions created successfully",
+  "mission_created": "Mission created successfully",
+  "mission_create_error": "Failed to create mission. Please try again."
+}

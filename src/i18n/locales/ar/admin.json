@@ -1,0 +1,22 @@
+{
+  "super_admin": "المدير العام",
+  "admin_email": "admin@shadoo.com",
+  "create_mission_title": "إنشاء مهمة للعميل",
+  "steps": {
+    "basics": "الأساسيات",
+    "basics_desc": "العميل والاسم والفروع.",
+    "agent_tier": "فئة الوكيل",
+    "agent_tier_desc": "اختيار فئة الوكيل.",
+    "questions": "الأسئلة",
+    "questions_desc": "بناء الاستبيان.",
+    "geo_settings": "إعدادات الموقع",
+    "geo_settings_desc": "التحقق من الموقع.",
+    "funding": "الزيارات والتمويل",
+    "funding_desc": "إعداد الميزانية.",
+    "review": "المراجعة",
+    "review_desc": "مراجعة وإنشاء."
+  },
+  "missions_created_multi": "تم إنشاء {{count}} مهام بنجاح",
+  "mission_created": "تم إنشاء المهمة بنجاح",
+  "mission_create_error": "فشل إنشاء المهمة. يرجى المحاولة مرة أخرى."
+}

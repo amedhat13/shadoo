@@ -1,0 +1,29 @@
+{
+  "title": "المحفظة",
+  "description": "إدارة رصيدك وعرض الأموال المخصصة للمهام.",
+  "available_balance": "الرصيد المتاح",
+  "allocated": "المخصص",
+  "wallet_overview": "نظرة عامة على المحفظة",
+  "total_balance": "إجمالي الرصيد",
+  "available": "متاح",
+  "recent_activity": "النشاط الأخير",
+  "no_transactions": "لا توجد معاملات بعد",
+  "top_up": "شحن المحفظة",
+  "top_up_title": "شحن المحفظة",
+  "top_up_desc": "إضافة أموال إلى محفظتك عبر الدفع الآمن بـ PayMob.",
+  "select_amount": "اختر المبلغ",
+  "custom_amount": "أو أدخل مبلغاً مخصصاً",
+  "enter_amount": "أدخل المبلغ",
+  "min_amount": "الحد الأدنى: 100 {{currency}}",
+  "amount_to_add": "المبلغ المراد إضافته",
+  "proceed_to_payment": "المتابعة للدفع",
+  "processing_payment": "جاري معالجة الدفع",
+  "connecting_paymob": "جاري الاتصال بـ PayMob...",
+  "payment_successful": "تم الدفع بنجاح!",
+  "payment_added": "تمت إضافة {{amount}} {{currency}} إلى محفظتك.",
+  "transaction_types": {
+    "topup": "شحن",
+    "allocation": "تخصيص للمهمة",
+    "release": "إفراج عن الميزانية"
+  }
+}

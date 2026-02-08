@@ -1,0 +1,40 @@
+{
+  "dashboard": "لوحة التحكم",
+  "missions": "المهام",
+  "branches": "الفروع",
+  "wallet": "المحفظة",
+  "reports": "التقارير",
+  "settings": "الإعدادات",
+  "wallet_balance": "رصيد المحفظة",
+  "on_hold": "{{amount}} محجوز",
+  "admin": {
+    "badge": "مدير",
+    "sections": {
+      "overview": "نظرة عامة",
+      "management": "الإدارة",
+      "agents": "الوكلاء",
+      "configuration": "التهيئة",
+      "finance": "المالية",
+      "system": "النظام"
+    },
+    "items": {
+      "dashboard": "لوحة التحكم",
+      "clients": "العملاء",
+      "branches": "الفروع",
+      "missions": "المهام",
+      "visits": "مراجعة الزيارات",
+      "agents": "الوكلاء",
+      "tiers": "فئات الوكلاء",
+      "payouts": "المدفوعات",
+      "templates": "القوالب",
+      "plans": "الخطط",
+      "finances": "المالية",
+      "reports": "التقارير",
+      "config": "التهيئة",
+      "audit": "سجل المراجعة",
+      "admins": "مستخدمو الإدارة"
+    }
+  },
+  "navigation_menu": "قائمة التنقل",
+  "admin_navigation_menu": "قائمة تنقل الإدارة"
+}

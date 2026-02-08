@@ -1,18 +1,28 @@
 import { useNavigate } from 'react-router-dom';
-import { Building2, Shield, ArrowRight } from 'lucide-react';
+import { Building2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import logo from '@/assets/shadoo-logo.png';
+import { useTranslation } from 'react-i18next';
+import { useDirectionalIcons } from '@/i18n/utils';
+import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation('landing');
+  const { t: tc } = useTranslation('common');
+  const { ArrowEnd } = useDirectionalIcons();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-center">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="w-20" />
           <img src={logo} alt="Shadoo" className="h-10" />
+          <div className="w-20 flex justify-end">
+            <LanguageSwitcher variant="text" />
+          </div>
         </div>
       </header>
 
@@ -21,10 +31,10 @@ export default function LandingPage() {
         <div className="w-full max-w-4xl">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">
-              Welcome to Shadoo
+              {t('welcome')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Egypt's premier mystery shopping platform. Choose your portal to continue.
+              {t('subtitle')}
             </p>
           </div>
 
@@ -38,33 +48,21 @@ export default function LandingPage() {
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-primary/10 text-primary">
                   <Building2 className="h-8 w-8" />
                 </div>
-                <CardTitle className="text-xl font-bold uppercase">Client Portal</CardTitle>
-                <CardDescription>
-                  For businesses managing mystery shopping campaigns
-                </CardDescription>
+                <CardTitle className="text-xl font-bold uppercase">{t('client_portal')}</CardTitle>
+                <CardDescription>{t('client_desc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-primary" />
-                    Create and manage missions
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-primary" />
-                    Track visit reports and analytics
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-primary" />
-                    Manage branches and locations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-primary" />
-                    Fund wallet and control budgets
-                  </li>
+                  {(t('client_features', { returnObjects: true }) as string[]).map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <ArrowEnd className="h-4 w-4 text-primary shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
                 </ul>
                 <Button className="w-full gap-2 group-hover:bg-primary">
-                  Enter Client Portal
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {t('enter_client')}
+                  <ArrowEnd className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                 </Button>
               </CardContent>
             </Card>
@@ -78,40 +76,28 @@ export default function LandingPage() {
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center bg-warning/10 text-warning">
                   <Shield className="h-8 w-8" />
                 </div>
-                <CardTitle className="text-xl font-bold uppercase">Admin Portal</CardTitle>
-                <CardDescription>
-                  For platform administrators and operations team
-                </CardDescription>
+                <CardTitle className="text-xl font-bold uppercase">{t('admin_portal')}</CardTitle>
+                <CardDescription>{t('admin_desc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-warning" />
-                    Manage clients and subscriptions
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-warning" />
-                    Approve and manage agents
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-warning" />
-                    Monitor platform operations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4 text-warning" />
-                    Handle payouts and finance
-                  </li>
+                  {(t('admin_features', { returnObjects: true }) as string[]).map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <ArrowEnd className="h-4 w-4 text-warning shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
                 </ul>
                 <Button variant="outline" className="w-full gap-2 border-warning text-warning hover:bg-warning hover:text-warning-foreground">
-                  Enter Admin Portal
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {t('enter_admin')}
+                  <ArrowEnd className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                 </Button>
               </CardContent>
             </Card>
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            Are you a mystery shopper? Download our mobile app to start earning.
+            {t('agent_cta')}
           </p>
         </div>
       </main>
@@ -119,7 +105,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border py-4">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Shadoo. All rights reserved.
+          {tc('copyright', { year: new Date().getFullYear() })}
         </div>
       </footer>
     </div>

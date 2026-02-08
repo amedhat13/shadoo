@@ -8,7 +8,7 @@
    Typography: Posterama 1927 (headings), Proxima Nova (body)
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -114,7 +114,7 @@
 
   /* Typography - Brand fonts */
   h1, h2, h3, .heading {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: 'SF Compact Display', 'SF Compact Text', -apple-system, system-ui, sans-serif;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: -0.02em;
@@ -122,14 +122,25 @@
   }
 
   body, p, span, div, input, textarea, button, label {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: 'SF Compact Text', 'SF Compact Display', -apple-system, system-ui, sans-serif;
+  }
+
+  /* Arabic font override */
+  .font-ar, .font-ar * {
+    font-family: 'Cairo', 'SF Compact Text', -apple-system, system-ui, sans-serif;
+  }
+  
+  .font-ar h1, .font-ar h2, .font-ar h3, .font-ar .heading {
+    font-family: 'Cairo', 'SF Compact Display', -apple-system, system-ui, sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
   }
 }
 
 @layer utilities {
   /* Brand heading style */
   .brand-heading {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: 'SF Compact Display', 'SF Compact Text', -apple-system, system-ui, sans-serif;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: -0.02em;
@@ -138,7 +149,7 @@
 
   /* Brand body style */
   .brand-body {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: 'SF Compact Text', 'SF Compact Display', -apple-system, system-ui, sans-serif;
     font-weight: 400;
   }
 

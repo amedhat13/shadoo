@@ -1,0 +1,11 @@
+{
+  "title": "Settings",
+  "description": "Manage your account, team, and preferences.",
+  "tabs": {
+    "account": "Account",
+    "users": "Users",
+    "notifications": "Notifications",
+    "security": "Security",
+    "billing": "Billing"
+  }
+}
