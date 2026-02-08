@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { CURRENCY } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 export interface PurchaseItem {
   id: string;
@@ -16,6 +17,8 @@ interface PurchaseItemsListProps {
 }
 
 export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
+  const { t } = useTranslation('missions');
+
   const addItem = () => {
     const newItem: PurchaseItem = {
       id: crypto.randomUUID(),
@@ -34,7 +37,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
   };
 
   const removeItem = (id: string) => {
-    if (items.length <= 1) return; // Keep at least one item
+    if (items.length <= 1) return;
     onChange(items.filter((item) => item.id !== id));
   };
 
@@ -45,7 +48,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
       <div className="flex items-center justify-between">
         <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <ShoppingBag className="h-4 w-4" />
-          Purchase Items
+          {t('funding.purchase_items')}
         </Label>
         <Button
           type="button"
@@ -55,7 +58,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          Add Item
+          {t('funding.add_item')}
         </Button>
       </div>
 
@@ -67,7 +70,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
           >
             <div className="flex-1 space-y-2">
               <Input
-                placeholder={`Item ${index + 1} name (e.g., Coffee, Sandwich)`}
+                placeholder={t('funding.item_placeholder', { index: index + 1 })}
                 value={item.name}
                 onChange={(e) => updateItem(item.id, { name: e.target.value })}
               />
@@ -76,7 +79,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
               <Input
                 type="number"
                 min={0}
-                placeholder="Budget"
+                placeholder={t('funding.budget_label')}
                 value={item.budget || ''}
                 onChange={(e) =>
                   updateItem(item.id, { budget: parseFloat(e.target.value) || 0 })
@@ -102,14 +105,14 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
       </div>
 
       <div className="flex items-center justify-between text-sm pt-2 border-t border-border">
-        <span className="text-muted-foreground">Total Budget per Visit</span>
+        <span className="text-muted-foreground">{t('funding.total_budget_per_visit')}</span>
         <span className="font-bold">
           {totalBudget.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
         </span>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Specify what agents should purchase and the budget for each item per visit.
+        {t('funding.purchase_items_help')}
       </p>
     </div>
   );

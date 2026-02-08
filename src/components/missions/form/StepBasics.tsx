@@ -21,6 +21,7 @@ import {
 import { MissionFormData, Branch } from '@/types';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface StepBasicsProps {
   data: MissionFormData;
@@ -30,6 +31,7 @@ interface StepBasicsProps {
 
 export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation('missions');
 
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const allSelected = data.branch_ids.length === branches.length && branches.length > 0;
@@ -57,40 +59,40 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   const getMissionsCountText = () => {
     const count = data.branch_ids.length;
     if (count === 0) return '';
-    if (count === 1) return '1 mission will be created';
-    return `${count} separate missions will be created (one per branch)`;
+    if (count === 1) return t('form.missions_count_single');
+    return t('form.missions_count_multi', { count });
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">
-          Mission Name<span className="text-destructive">*</span>
+          {t('form.mission_name')}<span className="text-destructive">*</span>
         </Label>
         <Input
           id="name"
-          placeholder="Enter a descriptive name for this mission"
+          placeholder={t('form.mission_name_placeholder')}
           value={data.name}
           onChange={(e) => onChange({ name: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
-          This name will be used as a base for all missions created.
+          {t('form.mission_name_help')}
         </p>
       </div>
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">
-          Branches<span className="text-destructive">*</span>
+          {t('form.branches_label')}<span className="text-destructive">*</span>
         </Label>
         
         {branches.length === 0 ? (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>No branches available</AlertTitle>
+            <AlertTitle>{t('form.no_branches_available')}</AlertTitle>
             <AlertDescription>
-              You need to create branches before creating a mission.{' '}
+              {t('form.no_branches_available_desc')}{' '}
               <Link to="/branches" className="underline font-medium text-primary hover:text-primary/80">
-                Go to Branches
+                {t('form.go_to_branches')}
               </Link>
             </AlertDescription>
           </Alert>
@@ -106,17 +108,17 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
                 >
                   <span className="text-muted-foreground">
                     {data.branch_ids.length === 0
-                      ? 'Select branches...'
-                      : `${data.branch_ids.length} branch${data.branch_ids.length > 1 ? 'es' : ''} selected`}
+                      ? t('form.select_branches')
+                      : t('form.branches_selected', { count: data.branch_ids.length })}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
-                  <CommandInput placeholder="Search branches..." />
+                  <CommandInput placeholder={t('form.search_branches')} />
                   <CommandList>
-                    <CommandEmpty>No branches found.</CommandEmpty>
+                    <CommandEmpty>{t('form.no_branches_found')}</CommandEmpty>
                     <CommandGroup>
                       <CommandItem
                         onSelect={() => (allSelected ? clearAll() : selectAll())}
@@ -128,7 +130,7 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
                             allSelected ? 'opacity-100' : 'opacity-0'
                           )}
                         />
-                        Select All Branches
+                        {t('form.select_all')}
                       </CommandItem>
                       {branches.map((branch) => (
                         <CommandItem
@@ -179,14 +181,14 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
                     onClick={clearAll}
                     className="text-xs text-muted-foreground hover:text-foreground underline"
                   >
-                    Clear all
+                    {t('form.clear_all')}
                   </button>
                 )}
               </div>
             )}
 
             <p className="text-xs text-muted-foreground">
-              Select one or more branches. A separate mission will be created for each selected branch.
+              {t('form.branches_help')}
             </p>
             
             {data.branch_ids.length > 0 && (

@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { VisitSchedule } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 interface VisitScheduleEditorProps {
   schedules: VisitSchedule[];
@@ -29,6 +30,7 @@ const DURATION_OPTIONS = [
 
 export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: VisitScheduleEditorProps) {
   const [bulkCount, setBulkCount] = useState(5);
+  const { t } = useTranslation('missions');
 
   const addSchedule = () => {
     if (schedules.length >= maxVisits) return;
@@ -105,7 +107,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
       <div className="flex items-center justify-between">
         <Label className="text-xs font-bold uppercase tracking-wide">
           <Calendar className="h-4 w-4 inline mr-2" />
-          Visit Schedules ({schedules.length})
+          {t('funding.visit_schedules', { count: schedules.length })}
         </Label>
         <div className="flex items-center gap-2">
           <Input
@@ -123,7 +125,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
             onClick={addBulkSchedules}
             disabled={schedules.length >= maxVisits}
           >
-            Add Bulk
+            {t('funding.add_bulk')}
           </Button>
           <Button
             type="button"
@@ -140,7 +142,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
       {schedules.length === 0 ? (
         <div className="border border-dashed border-border p-6 text-center">
           <Calendar className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground">No visits scheduled yet.</p>
+          <p className="text-sm text-muted-foreground">{t('funding.no_visits_scheduled')}</p>
           <Button
             type="button"
             variant="outline"
@@ -149,7 +151,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
             className="mt-3"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add First Visit
+            {t('funding.add_first_visit')}
           </Button>
         </div>
       ) : (
@@ -177,7 +179,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
                     <Calendar className="h-4 w-4 mr-2" />
                     {schedule.date
                       ? format(parseISO(schedule.date), 'MMM d, yyyy')
-                      : 'Pick date'}
+                      : t('funding.pick_date')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -255,7 +257,7 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
       )}
 
       <p className="text-xs text-muted-foreground">
-        Each visit must have a scheduled date, time, and expected duration.
+        {t('funding.schedule_help')}
       </p>
     </div>
   );

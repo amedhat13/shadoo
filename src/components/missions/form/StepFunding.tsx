@@ -7,6 +7,7 @@ import { MissionFormData, PurchaseItem, VisitSchedule } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
 import { PurchaseItemsList } from './PurchaseItemsList';
 import { VisitScheduleEditor } from './VisitScheduleEditor';
+import { useTranslation } from 'react-i18next';
 
 interface StepFundingProps {
   data: MissionFormData;
@@ -26,8 +27,8 @@ export function StepFunding({
   onSaveDraft,
 }: StepFundingProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('missions');
   
-  // Calculate budget from purchase items
   const budgetPerVisit = data.purchase_items.reduce((sum, item) => sum + (item.budget || 0), 0);
   const numberOfVisits = data.visit_schedules.length;
   const budgetPerMission = numberOfVisits * budgetPerVisit;
@@ -71,10 +72,9 @@ export function StepFunding({
         <div className="flex items-start gap-3 border border-primary/30 bg-primary/5 p-4">
           <Building2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <div className="font-bold text-xs uppercase tracking-wide">Creating {branchCount} Missions</div>
+            <div className="font-bold text-xs uppercase tracking-wide">{t('funding.creating_missions', { count: branchCount })}</div>
             <p className="text-sm text-muted-foreground mt-1">
-              You've selected {branchCount} branches. The settings below will apply to each mission individually.
-              Total costs are calculated across all missions.
+              {t('funding.multi_branch_desc', { count: branchCount })}
             </p>
           </div>
         </div>
@@ -92,9 +92,9 @@ export function StepFunding({
         <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div>
-            <div className="font-bold text-xs uppercase tracking-wide text-destructive">Visit Limit Exceeded</div>
+            <div className="font-bold text-xs uppercase tracking-wide text-destructive">{t('funding.visit_limit_exceeded')}</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Total visits ({totalVisitsAllMissions}) exceeds your remaining allowance ({visitsRemaining} available).
+              {t('funding.visit_limit_desc', { total: totalVisitsAllMissions, remaining: visitsRemaining })}
             </p>
           </div>
         </div>
@@ -110,40 +110,40 @@ export function StepFunding({
       <div className="border border-border p-4 space-y-4">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Calculator className="h-4 w-4" />
-          Budget Breakdown
+          {t('funding.budget_breakdown')}
         </div>
 
         <div className="space-y-3">
           {branchCount > 1 && (
             <>
               <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                Per Mission
+                {t('funding.per_mission')}
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
-                <span className="text-muted-foreground">Scheduled Visits</span>
+                <span className="text-muted-foreground">{t('funding.scheduled_visits')}</span>
                 <span className="font-semibold">{numberOfVisits}</span>
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
-                <span className="text-muted-foreground">× Budget per Visit</span>
+                <span className="text-muted-foreground">{t('funding.budget_per_visit')}</span>
                 <span className="font-semibold">{formatCurrency(budgetPerVisit)}</span>
               </div>
               <div className="flex items-center justify-between text-sm pl-4">
-                <span className="text-muted-foreground">= Budget per Mission</span>
+                <span className="text-muted-foreground">{t('funding.budget_per_mission')}</span>
                 <span className="font-semibold">{formatCurrency(budgetPerMission)}</span>
               </div>
               <div className="border-t border-border my-3" />
               <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                Total ({branchCount} Missions)
+                {t('funding.total_missions', { count: branchCount })}
               </div>
             </>
           )}
           
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Total Visits</span>
+            <span className="text-muted-foreground">{t('funding.total_visits')}</span>
             <span className="font-semibold">{totalVisitsAllMissions}</span>
           </div>
           <div className="flex items-center justify-between border-t border-border pt-3">
-            <span className="font-bold uppercase tracking-wide text-xs">Total Purchase Budget</span>
+            <span className="font-bold uppercase tracking-wide text-xs">{t('funding.total_purchase_budget')}</span>
             <span className={`text-xl font-black ${exceedsBalance ? 'text-destructive' : 'text-primary'}`}>
               {formatCurrency(totalPurchaseBudget)}
             </span>
@@ -152,11 +152,11 @@ export function StepFunding({
 
         <div className="border-t border-border pt-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Wallet Available</span>
+            <span className="text-muted-foreground">{t('funding.wallet_available')}</span>
             <span className="font-semibold">{formatCurrency(walletBalance)}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">After Funding</span>
+            <span className="text-muted-foreground">{t('funding.after_funding')}</span>
             <span className={`font-bold ${exceedsBalance ? 'text-destructive' : 'text-success'}`}>
               {formatCurrency(walletBalance - totalPurchaseBudget)}
             </span>
@@ -169,7 +169,7 @@ export function StepFunding({
         <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div className="flex-1">
-            <div className="font-bold text-xs uppercase tracking-wide text-destructive">Insufficient Balance</div>
+            <div className="font-bold text-xs uppercase tracking-wide text-destructive">{t('funding.insufficient_balance')}</div>
             <p className="text-sm text-muted-foreground mt-1">
               {MESSAGES.funding.insufficient_balance}
             </p>
@@ -180,7 +180,7 @@ export function StepFunding({
               size="sm"
             >
               <Wallet className="h-4 w-4" />
-              Top Up & Save as Draft
+              {t('funding.top_up_save_draft')}
             </Button>
           </div>
         </div>
@@ -190,7 +190,7 @@ export function StepFunding({
         <div className="flex items-start gap-3 border border-primary/30 bg-primary/5 p-4">
           <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <div className="font-bold text-xs uppercase tracking-wide">Funding Information</div>
+            <div className="font-bold text-xs uppercase tracking-wide">{t('funding.funding_info')}</div>
             <p className="text-sm text-muted-foreground mt-1">
               {MESSAGES.funding.info}
             </p>
