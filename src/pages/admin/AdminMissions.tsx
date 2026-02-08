@@ -72,7 +72,7 @@ export default function AdminMissionsPage() {
             <p className="font-medium truncate">{mission.name}</p>
             <p className="text-xs text-muted-foreground truncate">{mission.clientName}</p>
           </div>
-          <Badge className={statusColors[mission.status] || ''}>{tc(`statuses.${mission.status}`, mission.status)}</Badge>
+          <Badge className={statusColors[mission.status] || ''}>{String(tc(`statuses.${mission.status}`, mission.status))}</Badge>
         </div>
         <div className="mt-3 space-y-1.5 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">{t('missions.branch')}</span><span className="truncate ms-2">{mission.branchName || 'N/A'}</span></div>
