@@ -29,6 +29,8 @@
   "delete_confirmation": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
   "delete_confirmation_missions": "Any missions linked to this branch will be affected.",
   "cancel": "Cancel",
+  "saving": "Saving...",
+  "update_branch": "Update Branch",
   "stats": {
     "total": "Total",
     "verified": "Verified",
@@ -66,6 +68,28 @@
     "edit_dialog_title": "Edit Branch",
     "edit_dialog_desc": "Update branch details. Changes will require re-verification by Shadoo admin.",
     "update_branch": "Update Branch"
+  },
+  "bulk": {
+    "title": "Bulk Add Branches",
+    "description": "Upload a CSV file to add multiple branches at once. All branches will require verification by Shadoo admin.",
+    "step1": "Step 1: Download Sample Template",
+    "download_sample": "Download Sample CSV",
+    "step1_desc": "Download and fill in the sample template with your branch data.",
+    "step2": "Step 2: Upload Your CSV File",
+    "choose_file": "Choose CSV File",
+    "csv_format": "CSV format: name, address, city, district, google_maps_link.",
+    "valid_cities": "Valid Cities:",
+    "ready_to_add": "{{count}} branch(es) ready to add.",
+    "errors_found": "{{count}} error(s) found:",
+    "more_errors": "...and {{count}} more errors.",
+    "preview": "Preview ({{count}} branches)",
+    "preview_name": "Name",
+    "preview_city": "City",
+    "preview_district": "District",
+    "more_branches": "...and {{count}} more",
+    "adding": "Adding...",
+    "add_branches": "Add {{count}} Branch(es)",
+    "add_branches_default": "Add Branches"
   },
   "validation": {
     "name_required": "Branch name is required.",
