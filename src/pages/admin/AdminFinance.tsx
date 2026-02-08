@@ -73,7 +73,7 @@ export default function AdminFinancePage() {
                         <TableCell className="text-muted-foreground">{tx.method}</TableCell>
                         <TableCell className={`text-end font-bold ${tx.amount > 0 ? 'text-success' : 'text-destructive'}`}>{tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} {tc('currency_code')}</TableCell>
                         <TableCell className="text-muted-foreground">{tx.date}</TableCell>
-                        <TableCell><Badge variant="default" className="bg-success text-success-foreground">{{tc(`statuses.${tx.status}`) as string}}</Badge></TableCell>
+                        <TableCell><Badge variant="default" className="bg-success text-success-foreground">{tc(`statuses.${tx.status}`)}</Badge></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

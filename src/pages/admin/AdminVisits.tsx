@@ -54,7 +54,7 @@ export default function AdminVisitsPage() {
             <p className="font-medium truncate">{visit.mission?.name || 'Unknown Mission'}</p>
             <p className="text-xs text-muted-foreground truncate">{visit.agent?.full_name || 'Unknown'}</p>
           </div>
-          <Badge className={statusColors[visit.status] || ''}>{tc(`statuses.${visit.status}`, visit.status?.replace('_', ' '))}</Badge>
+          <Badge className={statusColors[visit.status] || ''}>{String(tc(`statuses.${visit.status}`, visit.status?.replace('_', ' ')))}</Badge>
         </div>
         <div className="mt-3 space-y-1.5 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">{t('visits.client_col')}</span><span className="truncate ms-2">{visit.client?.company_name || 'N/A'}</span></div>

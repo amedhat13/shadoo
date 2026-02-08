@@ -46,7 +46,7 @@ export default function AdminClientsPage() {
             <p className="font-medium truncate">{client.companyName || 'N/A'}</p>
             <p className="text-xs text-muted-foreground truncate">{client.fullName || 'N/A'}</p>
           </div>
-          <Badge variant={client.status === 'active' ? 'default' : 'destructive'}>{tc(`statuses.${client.status}`, client.status)}</Badge>
+          <Badge variant={client.status === 'active' ? 'default' : 'destructive'}>{String(tc(`statuses.${client.status}`, client.status))}</Badge>
         </div>
         <div className="mt-3 space-y-1.5 text-sm">
           <div className="flex justify-between"><span className="text-muted-foreground">{t('clients.plan')}</span><Badge variant="outline">{client.plan || t('clients.no_plan')}</Badge></div>
