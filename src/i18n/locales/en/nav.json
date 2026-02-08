@@ -1,0 +1,40 @@
+{
+  "dashboard": "DASHBOARD",
+  "missions": "MISSIONS",
+  "branches": "BRANCHES",
+  "wallet": "WALLET",
+  "reports": "REPORTS",
+  "settings": "SETTINGS",
+  "wallet_balance": "Wallet Balance",
+  "on_hold": "{{amount}} on hold",
+  "admin": {
+    "badge": "Admin",
+    "sections": {
+      "overview": "Overview",
+      "management": "Management",
+      "agents": "Agents",
+      "configuration": "Configuration",
+      "finance": "Finance",
+      "system": "System"
+    },
+    "items": {
+      "dashboard": "DASHBOARD",
+      "clients": "CLIENTS",
+      "branches": "BRANCHES",
+      "missions": "MISSIONS",
+      "visits": "VISIT REVIEW",
+      "agents": "AGENTS",
+      "tiers": "AGENT TIERS",
+      "payouts": "PAYOUTS",
+      "templates": "TEMPLATES",
+      "plans": "PLANS",
+      "finances": "FINANCES",
+      "reports": "REPORTS",
+      "config": "CONFIGURATION",
+      "audit": "AUDIT LOGS",
+      "admins": "ADMIN USERS"
+    }
+  },
+  "navigation_menu": "Navigation Menu",
+  "admin_navigation_menu": "Admin Navigation Menu"
+}

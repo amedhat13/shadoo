@@ -1,0 +1,29 @@
+{
+  "title": "Wallet",
+  "description": "Manage your balance and view funds allocated to missions.",
+  "available_balance": "Available Balance",
+  "allocated": "Allocated",
+  "wallet_overview": "Wallet Overview",
+  "total_balance": "Total Balance",
+  "available": "Available",
+  "recent_activity": "Recent Activity",
+  "no_transactions": "No transactions yet",
+  "top_up": "Top Up Wallet",
+  "top_up_title": "Top Up Wallet",
+  "top_up_desc": "Add funds to your wallet using PayMob secure payment.",
+  "select_amount": "Select Amount",
+  "custom_amount": "Or Enter Custom Amount",
+  "enter_amount": "Enter amount",
+  "min_amount": "Minimum amount: 100 {{currency}}",
+  "amount_to_add": "Amount to add",
+  "proceed_to_payment": "Proceed to Payment",
+  "processing_payment": "Processing Payment",
+  "connecting_paymob": "Connecting to PayMob...",
+  "payment_successful": "Payment Successful!",
+  "payment_added": "{{amount}} {{currency}} has been added to your wallet.",
+  "transaction_types": {
+    "topup": "Top Up",
+    "allocation": "Mission Allocation",
+    "release": "Budget Released"
+  }
+}

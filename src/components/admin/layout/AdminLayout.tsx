@@ -3,6 +3,7 @@ import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { isRTL } = useLanguage();
 
   return (
     <div className="flex min-h-screen bg-muted/30">
@@ -24,8 +26,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div 
         className={cn(
           "flex flex-1 flex-col transition-all duration-300",
-          !isMobile && (sidebarCollapsed ? "pl-16" : "pl-64"),
-          isMobile && "pl-0"
+          !isMobile && (sidebarCollapsed
+            ? (isRTL ? "pr-16" : "pl-16")
+            : (isRTL ? "pr-64" : "pl-64")),
+          isMobile && "ps-0"
         )}
       >
         <AdminHeader onMenuClick={() => setMobileOpen(true)} />

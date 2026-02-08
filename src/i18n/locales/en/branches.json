@@ -1,0 +1,34 @@
+{
+  "title": "Branches",
+  "description": "Manage your branch locations across Egypt.",
+  "add_branch": "Add Branch",
+  "edit_branch": "Edit Branch",
+  "no_branches": "No branches yet",
+  "no_branches_description": "Add your first branch to organize missions by location.",
+  "form": {
+    "branch_name": "Branch Name",
+    "branch_name_placeholder": "e.g., Cairo Downtown",
+    "city": "City",
+    "city_placeholder": "Select city",
+    "district": "District",
+    "district_placeholder": "Select district",
+    "district_placeholder_no_city": "Select city first",
+    "address": "Address",
+    "address_placeholder": "e.g., 123 Main Street",
+    "google_maps_link": "Google Maps Link",
+    "google_maps_placeholder": "https://maps.google.com/...",
+    "google_maps_help": "Open Google Maps, find your location, and copy the share link.",
+    "add_dialog_title": "Add New Branch",
+    "add_dialog_desc": "Add a new branch location. It will be verified by Shadoo admin before it can be used in missions.",
+    "edit_dialog_title": "Edit Branch",
+    "edit_dialog_desc": "Update branch details. Changes will require re-verification by Shadoo admin.",
+    "update_branch": "Update Branch"
+  },
+  "validation": {
+    "name_required": "Branch name is required.",
+    "address_required": "Address is required.",
+    "city_required": "City is required.",
+    "maps_required": "Google Maps link is required.",
+    "maps_invalid": "Please enter a valid Google Maps link."
+  }
+}

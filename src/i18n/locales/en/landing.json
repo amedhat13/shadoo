@@ -1,0 +1,23 @@
+{
+  "welcome": "Welcome to Shadoo",
+  "subtitle": "Egypt's premier mystery shopping platform. Choose your portal to continue.",
+  "client_portal": "Client Portal",
+  "client_desc": "For businesses managing mystery shopping campaigns",
+  "client_features": [
+    "Create and manage missions",
+    "Track visit reports and analytics",
+    "Manage branches and locations",
+    "Fund wallet and control budgets"
+  ],
+  "enter_client": "Enter Client Portal",
+  "admin_portal": "Admin Portal",
+  "admin_desc": "For platform administrators and operations team",
+  "admin_features": [
+    "Manage clients and subscriptions",
+    "Approve and manage agents",
+    "Monitor platform operations",
+    "Handle payouts and finance"
+  ],
+  "enter_admin": "Enter Admin Portal",
+  "agent_cta": "Are you a mystery shopper? Download our mobile app to start earning."
+}

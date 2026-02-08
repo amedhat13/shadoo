@@ -1,0 +1,18 @@
+{
+  "title": "لوحة التحكم",
+  "welcome": "مرحباً بعودتك! إليك نظرة عامة على مؤسستك.",
+  "create_mission": "إنشاء مهمة",
+  "active_missions": "المهام النشطة",
+  "visits_completed_across": "{{count}} زيارة مكتملة عبر جميع المهام",
+  "view_all_missions": "عرض جميع المهام",
+  "manage_missions": "إدارة مهام التسوق الخفي",
+  "wallet_funding": "المحفظة والتمويل",
+  "view_balance": "عرض الرصيد وإضافة أموال",
+  "recent_missions": "المهام الأخيرة",
+  "package_label": "الباقة: {{name}}",
+  "visits_left": "الزيارات المتبقية",
+  "visits_this_month": "زيارات هذا الشهر",
+  "visits_left_count": "{{count}} زيارة متبقية",
+  "visits_used_all": "لقد استخدمت جميع الزيارات هذا الشهر. قم بترقية خطتك أو انتظر حتى الشهر القادم.",
+  "no_visits_remaining": "لا توجد زيارات متبقية"
+}
