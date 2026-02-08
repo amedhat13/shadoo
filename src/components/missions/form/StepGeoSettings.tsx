@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { MissionFormData } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 interface StepGeoSettingsProps {
   data: MissionFormData;
@@ -9,6 +10,8 @@ interface StepGeoSettingsProps {
 }
 
 export function StepGeoSettings({ data, onChange }: StepGeoSettingsProps) {
+  const { t } = useTranslation('missions');
+
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4 p-4 border rounded-lg">
@@ -18,7 +21,7 @@ export function StepGeoSettings({ data, onChange }: StepGeoSettingsProps) {
         <div className="flex-1 space-y-1">
           <div className="flex items-center justify-between">
             <Label htmlFor="geo-tagged" className="text-base font-semibold cursor-pointer">
-              Geo-Tagged Mission
+              {t('geo.title')}
             </Label>
             <Switch
               id="geo-tagged"
@@ -27,20 +30,19 @@ export function StepGeoSettings({ data, onChange }: StepGeoSettingsProps) {
             />
           </div>
           <p className="text-sm text-muted-foreground">
-            When enabled, agents must be within the branch's location to submit their visit. 
-            This ensures physical presence at the designated location.
+            {t('geo.description')}
           </p>
         </div>
       </div>
 
       {data.is_geo_tagged && (
         <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-          <h4 className="text-sm font-medium">How it works:</h4>
+          <h4 className="text-sm font-medium">{t('geo.how_it_works')}</h4>
           <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-            <li>Agent's GPS location is verified when submitting the visit</li>
-            <li>A tolerance radius of ~100 meters is allowed</li>
-            <li>Visits from outside the area will be flagged for review</li>
-            <li>Branch must have valid coordinates (latitude/longitude)</li>
+            <li>{t('geo.gps_verified')}</li>
+            <li>{t('geo.tolerance')}</li>
+            <li>{t('geo.flagged')}</li>
+            <li>{t('geo.valid_coords')}</li>
           </ul>
         </div>
       )}

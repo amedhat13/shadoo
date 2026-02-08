@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MissionFormData, AgentTier } from '@/types';
 import { AGENT_TIERS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface StepAgentTierProps {
   data: MissionFormData;
@@ -18,14 +19,16 @@ const tierIcons: Record<AgentTier, React.ReactNode> = {
 };
 
 export function StepAgentTier({ data, onChange }: StepAgentTierProps) {
+  const { t } = useTranslation('missions');
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">
-          Select Agent Tier<span className="text-destructive">*</span>
+          {t('agent_tiers.title')}<span className="text-destructive">*</span>
         </Label>
         <p className="text-sm text-muted-foreground">
-          Choose the agent tier for this mission. Higher tiers provide more experienced agents with better reporting.
+          {t('agent_tiers.description')}
         </p>
       </div>
 
@@ -71,13 +74,13 @@ export function StepAgentTier({ data, onChange }: StepAgentTierProps) {
                   <h3 className="font-bold uppercase tracking-wide">{tierInfo.name}</h3>
                   {isLocked && (
                     <Badge variant="outline" className="text-xs">
-                      Upgrade Required
+                      {t('agent_tiers.upgrade_required')}
                     </Badge>
                   )}
                   {isSelected && !isLocked && (
                     <Badge className="bg-primary text-primary-foreground text-xs">
                       <Check className="h-3 w-3 mr-1" />
-                      Selected
+                      {t('agent_tiers.selected')}
                     </Badge>
                   )}
                 </div>
@@ -102,12 +105,11 @@ export function StepAgentTier({ data, onChange }: StepAgentTierProps) {
                   className="shrink-0 gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Navigate to upgrade page or open upgrade modal
                     window.location.href = '/settings?tab=billing';
                   }}
                 >
                   <Crown className="h-4 w-4" />
-                  Upgrade Plan
+                  {t('agent_tiers.upgrade_plan')}
                 </Button>
               )}
             </button>
@@ -117,7 +119,7 @@ export function StepAgentTier({ data, onChange }: StepAgentTierProps) {
 
       <div className="border border-primary/30 bg-primary/5 p-4">
         <p className="text-sm">
-          <strong>Tip:</strong> For complex evaluations or high-stakes visits, consider upgrading to access Class A agents who provide executive-level reports and dedicated support.
+          <strong>{t('agent_tiers.tip')}</strong>
         </p>
       </div>
     </div>
