@@ -5,15 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { DollarSign, TrendingUp, Wallet, CreditCard, ArrowUpRight, ArrowDownRight, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const mockTransactions = [
   { id: '1', type: 'topup', client: 'Cairo Electronics Co.', amount: 5000, method: 'Card', date: '2 hours ago', status: 'completed' },
@@ -24,74 +20,44 @@ const mockTransactions = [
 ];
 
 export default function AdminFinancePage() {
+  const { t } = useTranslation('admin');
+  const { t: tc } = useTranslation('common');
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <AdminPageHeader
-          title="Financial Management"
-          description="Revenue tracking, transactions, and financial reports."
-          actions={
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Export Report
-            </Button>
-          }
+          title={t('finance.title')}
+          description={t('finance.description')}
+          actions={<Button variant="outline" className="gap-2"><Download className="h-4 w-4" />{t('finance.export_report')}</Button>}
         />
-
-        {/* Revenue Stats */}
         <div className="grid gap-4 md:grid-cols-4">
-          <StatCard 
-            title="Total Revenue (MTD)" 
-            value="298,500 EGP" 
-            icon={DollarSign}
-            variant="success"
-            trend={{ value: 12, isPositive: true }}
-          />
-          <StatCard 
-            title="Subscription Revenue" 
-            value="215,000 EGP" 
-            icon={CreditCard}
-            description="132 active subscribers"
-          />
-          <StatCard 
-            title="Wallet Topups" 
-            value="125,000 EGP" 
-            icon={Wallet}
-            description="This month"
-          />
-          <StatCard 
-            title="Agent Payouts" 
-            value="85,000 EGP" 
-            icon={TrendingUp}
-            description="This month"
-          />
+          <StatCard title={t('finance.total_revenue_mtd')} value="298,500 EGP" icon={DollarSign} variant="success" trend={{ value: 12, isPositive: true }} />
+          <StatCard title={t('finance.subscription_revenue')} value="215,000 EGP" icon={CreditCard} description={t('finance.active_subscribers', { count: 132 })} />
+          <StatCard title={t('finance.wallet_topups')} value="125,000 EGP" icon={Wallet} description={t('finance.this_month')} />
+          <StatCard title={t('finance.agent_payouts')} value="85,000 EGP" icon={TrendingUp} description={t('finance.this_month')} />
         </div>
-
-        {/* Tabs */}
         <Tabs defaultValue="transactions" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="transactions">All Transactions</TabsTrigger>
-            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-            <TabsTrigger value="topups">Wallet Topups</TabsTrigger>
-            <TabsTrigger value="payouts">Agent Payouts</TabsTrigger>
-            <TabsTrigger value="refunds">Refunds</TabsTrigger>
+            <TabsTrigger value="transactions">{t('finance.all_transactions')}</TabsTrigger>
+            <TabsTrigger value="subscriptions">{t('finance.subscriptions')}</TabsTrigger>
+            <TabsTrigger value="topups">{t('finance.topups')}</TabsTrigger>
+            <TabsTrigger value="payouts">{t('finance.payouts')}</TabsTrigger>
+            <TabsTrigger value="refunds">{t('finance.refunds')}</TabsTrigger>
           </TabsList>
-
           <TabsContent value="transactions">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-bold uppercase">Recent Transactions</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle className="text-base font-bold uppercase">{t('finance.recent_transactions')}</CardTitle></CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Client/Agent</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t('finance.type')}</TableHead>
+                      <TableHead>{t('finance.client_agent')}</TableHead>
+                      <TableHead>{t('finance.method')}</TableHead>
+                      <TableHead className="text-end">{t('finance.amount')}</TableHead>
+                      <TableHead>{t('finance.date')}</TableHead>
+                      <TableHead>{t('finance.status')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -99,25 +65,15 @@ export default function AdminFinancePage() {
                       <TableRow key={tx.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {tx.amount > 0 ? (
-                              <ArrowUpRight className="h-4 w-4 text-success" />
-                            ) : (
-                              <ArrowDownRight className="h-4 w-4 text-destructive" />
-                            )}
+                            {tx.amount > 0 ? <ArrowUpRight className="h-4 w-4 text-success" /> : <ArrowDownRight className="h-4 w-4 text-destructive" />}
                             <Badge variant="outline" className="capitalize">{tx.type}</Badge>
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">{tx.client}</TableCell>
                         <TableCell className="text-muted-foreground">{tx.method}</TableCell>
-                        <TableCell className={`text-right font-bold ${tx.amount > 0 ? 'text-success' : 'text-destructive'}`}>
-                          {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} EGP
-                        </TableCell>
+                        <TableCell className={`text-end font-bold ${tx.amount > 0 ? 'text-success' : 'text-destructive'}`}>{tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} {tc('currency_code')}</TableCell>
                         <TableCell className="text-muted-foreground">{tx.date}</TableCell>
-                        <TableCell>
-                          <Badge variant="default" className="bg-success text-success-foreground">
-                            {tx.status}
-                          </Badge>
-                        </TableCell>
+                        <TableCell><Badge variant="default" className="bg-success text-success-foreground">{{tc(`statuses.${tx.status}`) as string}}</Badge></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -125,38 +81,10 @@ export default function AdminFinancePage() {
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value="subscriptions">
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                Subscription payments will be shown here.
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="topups">
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                Wallet topup transactions will be shown here.
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="payouts">
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                Agent payout history will be shown here.
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="refunds">
-            <Card>
-              <CardContent className="p-8 text-center text-muted-foreground">
-                Refund transactions will be shown here.
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <TabsContent value="subscriptions"><Card><CardContent className="p-8 text-center text-muted-foreground">{t('finance.placeholder_subscriptions')}</CardContent></Card></TabsContent>
+          <TabsContent value="topups"><Card><CardContent className="p-8 text-center text-muted-foreground">{t('finance.placeholder_topups')}</CardContent></Card></TabsContent>
+          <TabsContent value="payouts"><Card><CardContent className="p-8 text-center text-muted-foreground">{t('finance.placeholder_payouts')}</CardContent></Card></TabsContent>
+          <TabsContent value="refunds"><Card><CardContent className="p-8 text-center text-muted-foreground">{t('finance.placeholder_refunds')}</CardContent></Card></TabsContent>
         </Tabs>
       </div>
     </AdminLayout>
