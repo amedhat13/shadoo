@@ -2,6 +2,8 @@ import { Wallet, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { CURRENCY } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface WalletCardProps {
   availableBalance: number;
@@ -16,8 +18,11 @@ export function WalletCard({
   className,
   compact = false 
 }: WalletCardProps) {
+  const { t } = useTranslation('wallet');
+  const { isRTL } = useLanguage();
+  
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${CURRENCY.symbol}`;
   };
 
   const totalBalance = availableBalance + allocatedToMissions;
@@ -32,12 +37,12 @@ export function WalletCard({
                 <Wallet className="h-5 w-5 text-background" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Available Balance</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">{t('available_balance')}</div>
                 <div className="text-xl font-black text-success">{formatCurrency(availableBalance)}</div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground uppercase tracking-wide">Allocated</div>
+            <div className={isRTL ? "text-start" : "text-end"}>
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">{t('allocated')}</div>
               <div className="text-lg font-bold text-foreground">{formatCurrency(allocatedToMissions)}</div>
             </div>
           </div>
@@ -51,13 +56,13 @@ export function WalletCard({
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
           <Wallet className="h-4 w-4" />
-          Wallet Overview
+          {t('wallet_overview')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Total Balance */}
         <div>
-          <div className="text-xs text-muted-foreground uppercase tracking-wide">Total Balance</div>
+          <div className="text-xs text-muted-foreground uppercase tracking-wide">{t('total_balance')}</div>
           <div className="text-2xl font-black">{formatCurrency(totalBalance)}</div>
         </div>
 
@@ -66,14 +71,14 @@ export function WalletCard({
           <div className="border border-success/30 bg-success/5 p-3">
             <div className="flex items-center gap-2 text-xs text-success uppercase tracking-wide">
               <Wallet className="h-3.5 w-3.5" />
-              Available
+              {t('available')}
             </div>
             <div className="mt-1 text-lg font-black text-success">{formatCurrency(availableBalance)}</div>
           </div>
           <div className="border border-border bg-muted/30 p-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wide">
               <Lock className="h-3.5 w-3.5" />
-              Allocated
+              {t('allocated')}
             </div>
             <div className="mt-1 text-lg font-bold">{formatCurrency(allocatedToMissions)}</div>
           </div>

@@ -3,8 +3,51 @@
   "description": "Manage your branch locations across Egypt.",
   "add_branch": "Add Branch",
   "edit_branch": "Edit Branch",
+  "bulk_add": "Bulk Add",
+  "search_placeholder": "Search branches...",
+  "all_cities": "All Cities",
+  "all_statuses": "All Statuses",
+  "clear": "Clear",
   "no_branches": "No branches yet",
   "no_branches_description": "Add your first branch to organize missions by location.",
+  "no_branches_found": "No branches found",
+  "no_branches_found_description": "Try adjusting your filters or search terms.",
+  "clear_filters": "Clear Filters",
+  "view_map": "View Map",
+  "view": "View",
+  "list": "List",
+  "map": "Map",
+  "name": "Name",
+  "address": "Address",
+  "city": "City",
+  "district": "District",
+  "google_maps": "Google Maps",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete",
+  "delete_branch": "Delete Branch",
+  "delete_confirmation": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+  "delete_confirmation_missions": "Any missions linked to this branch will be affected.",
+  "cancel": "Cancel",
+  "stats": {
+    "total": "Total",
+    "verified": "Verified",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "ready_for_missions": "Ready for missions.",
+    "awaiting_verification": "Awaiting verification.",
+    "need_attention": "Need attention."
+  },
+  "statuses": {
+    "pending_verification": "Pending",
+    "verified": "Verified",
+    "rejected": "Rejected"
+  },
+  "status_descriptions": {
+    "pending_verification": "Branch is awaiting verification by Shadoo admin.",
+    "verified": "Branch has been verified and can be used in missions.",
+    "rejected": "Branch verification was rejected. Check the reason and resubmit."
+  },
   "form": {
     "branch_name": "Branch Name",
     "branch_name_placeholder": "e.g., Cairo Downtown",
@@ -30,5 +73,13 @@
     "city_required": "City is required.",
     "maps_required": "Google Maps link is required.",
     "maps_invalid": "Please enter a valid Google Maps link."
+  },
+  "toast": {
+    "added": "Branch Added",
+    "added_description": "Your branch has been submitted for verification.",
+    "updated": "Branch Updated",
+    "updated_description": "The branch has been updated and submitted for re-verification.",
+    "deleted": "Branch Deleted",
+    "deleted_description": "The branch has been removed."
   }
 }

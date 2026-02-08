@@ -1,6 +1,8 @@
 import { ArrowDownLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { CURRENCY } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 export interface Transaction {
   id: string;
@@ -15,34 +17,37 @@ interface TransactionListProps {
   transactions: Transaction[];
 }
 
-const TYPE_CONFIG = {
-  topup: {
-    icon: ArrowDownLeft,
-    label: 'Top Up',
-    colorClass: 'text-success',
-    bgClass: 'bg-success/10',
-  },
-  allocation: {
-    icon: ArrowUpRight,
-    label: 'Mission Allocation',
-    colorClass: 'text-foreground',
-    bgClass: 'bg-muted',
-  },
-  release: {
-    icon: ArrowDownLeft,
-    label: 'Budget Released',
-    colorClass: 'text-success',
-    bgClass: 'bg-success/10',
-  },
-};
-
 export function TransactionList({ transactions }: TransactionListProps) {
+  const { t } = useTranslation('wallet');
+  const { isRTL } = useLanguage();
+
+  const TYPE_CONFIG = {
+    topup: {
+      icon: ArrowDownLeft,
+      label: t('transaction_types.topup'),
+      colorClass: 'text-success',
+      bgClass: 'bg-success/10',
+    },
+    allocation: {
+      icon: ArrowUpRight,
+      label: t('transaction_types.allocation'),
+      colorClass: 'text-foreground',
+      bgClass: 'bg-muted',
+    },
+    release: {
+      icon: ArrowDownLeft,
+      label: t('transaction_types.release'),
+      colorClass: 'text-success',
+      bgClass: 'bg-success/10',
+    },
+  };
+
   if (transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
         <Clock className="h-8 w-8 text-muted-foreground/50" />
         <p className="mt-2 text-sm text-muted-foreground">
-          No transactions yet
+          {t('no_transactions')}
         </p>
       </div>
     );
@@ -67,7 +72,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               <div>
                 <div className="text-sm font-medium">{tx.description}</div>
                 <div className="text-xs text-muted-foreground">
-                  {new Date(tx.created_at).toLocaleDateString('en-EG', {
+                  {new Date(tx.created_at).toLocaleDateString(isRTL ? 'ar-EG' : 'en-EG', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
@@ -78,7 +83,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               </div>
             </div>
             <div className={cn('text-sm font-bold', isPositive ? 'text-success' : 'text-foreground')}>
-              {isPositive ? '+' : '-'}{tx.amount.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
+              {isPositive ? '+' : '-'}{tx.amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} {CURRENCY.symbol}
             </div>
           </div>
         );

@@ -167,21 +167,10 @@ export function AdminSidebar({ collapsed, onToggle, mobileOpen, onMobileOpenChan
   const { start } = useDirectionalSide();
   const { isRTL } = useLanguage();
 
+  // Mobile: Use Sheet (triggered from Header, not floating button)
   if (isMobile) {
     return (
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "fixed top-4 z-50 md:hidden h-10 w-10 bg-background text-foreground border border-border shadow-lg",
-              isRTL ? "right-4" : "left-4"
-            )}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
         <SheetContent side={start} className="w-64 p-0 bg-background border-e border-border">
           <SheetTitle className="sr-only">{t('admin_navigation_menu')}</SheetTitle>
           <SidebarContent 

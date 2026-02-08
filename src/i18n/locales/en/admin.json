@@ -1,6 +1,16 @@
 {
   "super_admin": "Super Admin",
   "admin_email": "admin@shadoo.com",
+  "search_placeholder": "Search...",
+  "notifications": "Notifications",
+  "notification_agent_registration": "New agent registration",
+  "notification_agent_registration_desc": "Ahmed Hassan requested approval",
+  "notification_branch_pending": "Branch pending verification",
+  "notification_branch_pending_desc": "3 branches awaiting review",
+  "notification_payout_request": "Payout request",
+  "notification_payout_request_desc": "5 pending payouts (12,500 EGP)",
+  "switch_to_client_view": "Switch to Client View",
+  "sign_out": "Sign Out",
   "create_mission_title": "Create Mission for Client",
   "steps": {
     "basics": "Basics",
@@ -18,5 +28,12 @@
   },
   "missions_created_multi": "{{count}} missions created successfully",
   "mission_created": "Mission created successfully",
-  "mission_create_error": "Failed to create mission. Please try again."
+  "mission_create_error": "Failed to create mission. Please try again.",
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "total_clients": "Total Clients",
+    "active_missions": "Active Missions",
+    "pending_visits": "Pending Visits",
+    "total_agents": "Total Agents"
+  }
 }

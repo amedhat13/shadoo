@@ -3,8 +3,51 @@
   "description": "إدارة مواقع فروعك عبر مصر.",
   "add_branch": "إضافة فرع",
   "edit_branch": "تعديل الفرع",
+  "bulk_add": "إضافة متعددة",
+  "search_placeholder": "البحث في الفروع...",
+  "all_cities": "جميع المدن",
+  "all_statuses": "جميع الحالات",
+  "clear": "مسح",
   "no_branches": "لا توجد فروع بعد",
   "no_branches_description": "أضف أول فرع لتنظيم المهام حسب الموقع.",
+  "no_branches_found": "لم يتم العثور على فروع",
+  "no_branches_found_description": "حاول تعديل الفلاتر أو عبارات البحث.",
+  "clear_filters": "مسح الفلاتر",
+  "view_map": "عرض الخريطة",
+  "view": "عرض",
+  "list": "قائمة",
+  "map": "خريطة",
+  "name": "الاسم",
+  "address": "العنوان",
+  "city": "المدينة",
+  "district": "المنطقة",
+  "google_maps": "خرائط جوجل",
+  "actions": "الإجراءات",
+  "edit": "تعديل",
+  "delete": "حذف",
+  "delete_branch": "حذف الفرع",
+  "delete_confirmation": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+  "delete_confirmation_missions": "ستتأثر أي مهام مرتبطة بهذا الفرع.",
+  "cancel": "إلغاء",
+  "stats": {
+    "total": "الإجمالي",
+    "verified": "موثق",
+    "pending": "قيد الانتظار",
+    "rejected": "مرفوض",
+    "ready_for_missions": "جاهز للمهام.",
+    "awaiting_verification": "في انتظار التحقق.",
+    "need_attention": "يحتاج انتباه."
+  },
+  "statuses": {
+    "pending_verification": "قيد الانتظار",
+    "verified": "موثق",
+    "rejected": "مرفوض"
+  },
+  "status_descriptions": {
+    "pending_verification": "الفرع في انتظار التحقق من قبل مسؤول شادو.",
+    "verified": "تم التحقق من الفرع ويمكن استخدامه في المهام.",
+    "rejected": "تم رفض التحقق من الفرع. راجع السبب وأعد الإرسال."
+  },
   "form": {
     "branch_name": "اسم الفرع",
     "branch_name_placeholder": "مثال: وسط القاهرة",
@@ -30,5 +73,13 @@
     "city_required": "المدينة مطلوبة.",
     "maps_required": "رابط خرائط جوجل مطلوب.",
     "maps_invalid": "يرجى إدخال رابط خرائط جوجل صالح."
+  },
+  "toast": {
+    "added": "تمت إضافة الفرع",
+    "added_description": "تم تقديم فرعك للتحقق.",
+    "updated": "تم تحديث الفرع",
+    "updated_description": "تم تحديث الفرع وتقديمه لإعادة التحقق.",
+    "deleted": "تم حذف الفرع",
+    "deleted_description": "تم إزالة الفرع."
   }
 }

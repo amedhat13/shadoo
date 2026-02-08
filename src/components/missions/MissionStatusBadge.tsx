@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { MissionStatus } from '@/types';
-import { MISSION_STATUS_LABELS, MISSION_STATUS_DESCRIPTIONS } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 import {
   Tooltip,
   TooltipContent,
@@ -22,6 +22,8 @@ const statusStyles: Record<MissionStatus, string> = {
 };
 
 export function MissionStatusBadge({ status, className }: MissionStatusBadgeProps) {
+  const { t } = useTranslation('missions');
+  
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -32,11 +34,11 @@ export function MissionStatusBadge({ status, className }: MissionStatusBadgeProp
             className
           )}
         >
-          {MISSION_STATUS_LABELS[status]}
+          {t(`statuses.${status}`)}
         </span>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{MISSION_STATUS_DESCRIPTIONS[status]}</p>
+        <p>{t(`status_descriptions.${status}`)}</p>
       </TooltipContent>
     </Tooltip>
   );

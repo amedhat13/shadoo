@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, ChevronRight, Copy } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, Copy } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -21,6 +21,9 @@ import { Mission } from '@/types';
 import { MissionStatusBadge } from './MissionStatusBadge';
 import { CURRENCY } from '@/lib/constants';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { useDirectionalIcons } from '@/i18n/utils';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface MissionTableProps {
   missions: Mission[];
@@ -33,9 +36,12 @@ interface MissionTableProps {
 export function MissionTable({ missions, onPause, onResume, onArchive, onDuplicate }: MissionTableProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { t } = useTranslation('missions');
+  const { ChevronEnd } = useDirectionalIcons();
+  const { isRTL } = useLanguage();
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${CURRENCY.symbol}`;
   };
 
   // Mobile: Card-based layout
@@ -55,7 +61,7 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                     <MissionStatusBadge status={mission.status} />
                   </div>
                   <h3 className="font-semibold text-foreground truncate">{mission.name}</h3>
-                  <p className="text-sm text-muted-foreground">{mission.branch?.name || 'No branch'}</p>
+                  <p className="text-sm text-muted-foreground">{mission.branch?.name || t('no_branch')}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <DropdownMenu>
@@ -64,21 +70,21 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align={isRTL ? "start" : "end"}>
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/missions/${mission.id}`);
                       }}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Details
+                        <Eye className="me-2 h-4 w-4" />
+                        {t('view_details')}
                       </DropdownMenuItem>
                       {mission.status === 'draft' && (
                         <DropdownMenuItem onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/missions/${mission.id}/edit`);
                         }}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
+                          <Edit className="me-2 h-4 w-4" />
+                          {t('edit')}
                         </DropdownMenuItem>
                       )}
                       {onDuplicate && (
@@ -86,8 +92,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                           e.stopPropagation();
                           onDuplicate(mission);
                         }}>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Duplicate
+                          <Copy className="me-2 h-4 w-4" />
+                          {t('duplicate')}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -96,8 +102,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                           e.stopPropagation();
                           onPause(mission);
                         }}>
-                          <Pause className="mr-2 h-4 w-4" />
-                          Pause
+                          <Pause className="me-2 h-4 w-4" />
+                          {t('pause')}
                         </DropdownMenuItem>
                       )}
                       {mission.status === 'paused' && onResume && (
@@ -105,8 +111,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                           e.stopPropagation();
                           onResume(mission);
                         }}>
-                          <Play className="mr-2 h-4 w-4" />
-                          Resume
+                          <Play className="me-2 h-4 w-4" />
+                          {t('resume')}
                         </DropdownMenuItem>
                       )}
                       {(mission.status === 'published' || mission.status === 'paused') && onArchive && (
@@ -117,26 +123,26 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                           }}
                           className="text-destructive focus:text-destructive"
                         >
-                          <Archive className="mr-2 h-4 w-4" />
-                          Archive
+                          <Archive className="me-2 h-4 w-4" />
+                          {t('archive')}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <ChevronEnd className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-border">
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase">Visits</p>
+                  <p className="text-xs text-muted-foreground uppercase">{t('visits')}</p>
                   <p className="font-semibold">
                     <span className="text-success">{mission.visits_completed}</span>
                     <span className="text-muted-foreground"> / {mission.number_of_visits}</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase">Budget</p>
+                  <p className="text-xs text-muted-foreground uppercase">{t('budget')}</p>
                   <p className="font-semibold">{formatCurrency(mission.total_purchase_budget)}</p>
                 </div>
               </div>
@@ -153,12 +159,12 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border">
-            <TableHead className="w-[250px] text-xs font-bold uppercase tracking-wide">Mission</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wide">Branch</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wide">Status</TableHead>
-            <TableHead className="text-center text-xs font-bold uppercase tracking-wide">Visits</TableHead>
-            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Budget/Visit</TableHead>
-            <TableHead className="text-right text-xs font-bold uppercase tracking-wide">Total Budget</TableHead>
+            <TableHead className="w-[250px] text-xs font-bold uppercase tracking-wide">{t('mission')}</TableHead>
+            <TableHead className="text-xs font-bold uppercase tracking-wide">{t('branch')}</TableHead>
+            <TableHead className="text-xs font-bold uppercase tracking-wide">{t('status')}</TableHead>
+            <TableHead className="text-center text-xs font-bold uppercase tracking-wide">{t('visits')}</TableHead>
+            <TableHead className={`text-xs font-bold uppercase tracking-wide ${isRTL ? 'text-start' : 'text-end'}`}>{t('budget_per_visit')}</TableHead>
+            <TableHead className={`text-xs font-bold uppercase tracking-wide ${isRTL ? 'text-start' : 'text-end'}`}>{t('total_budget')}</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -174,11 +180,11 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                   {mission.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {mission.questions.length} questions • {mission.photo_requirements.required_count} photos
+                  {t('questions_photos', { questions: mission.questions.length, photos: mission.photo_requirements.required_count })}
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {mission.branch?.name || 'No branch'}
+                {mission.branch?.name || t('no_branch')}
               </TableCell>
               <TableCell>
                 <MissionStatusBadge status={mission.status} />
@@ -187,10 +193,10 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                 <span className="text-success font-bold">{mission.visits_completed}</span>
                 <span className="text-muted-foreground"> / {mission.number_of_visits}</span>
               </TableCell>
-              <TableCell className="text-right font-semibold">
+              <TableCell className={`font-semibold ${isRTL ? 'text-start' : 'text-end'}`}>
                 {formatCurrency(mission.purchase_budget_per_visit)}
               </TableCell>
-              <TableCell className="text-right font-bold">
+              <TableCell className={`font-bold ${isRTL ? 'text-start' : 'text-end'}`}>
                 {formatCurrency(mission.total_purchase_budget)}
               </TableCell>
               <TableCell>
@@ -200,21 +206,21 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align={isRTL ? "start" : "end"}>
                     <DropdownMenuItem onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/missions/${mission.id}`);
                     }}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View Details
+                      <Eye className="me-2 h-4 w-4" />
+                      {t('view_details')}
                     </DropdownMenuItem>
                     {mission.status === 'draft' && (
                       <DropdownMenuItem onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/missions/${mission.id}/edit`);
                       }}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
+                        <Edit className="me-2 h-4 w-4" />
+                        {t('edit')}
                       </DropdownMenuItem>
                     )}
                     {onDuplicate && (
@@ -222,8 +228,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         e.stopPropagation();
                         onDuplicate(mission);
                       }}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        Duplicate
+                        <Copy className="me-2 h-4 w-4" />
+                        {t('duplicate')}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
@@ -232,8 +238,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         e.stopPropagation();
                         onPause(mission);
                       }}>
-                        <Pause className="mr-2 h-4 w-4" />
-                        Pause
+                        <Pause className="me-2 h-4 w-4" />
+                        {t('pause')}
                       </DropdownMenuItem>
                     )}
                     {mission.status === 'paused' && onResume && (
@@ -241,8 +247,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         e.stopPropagation();
                         onResume(mission);
                       }}>
-                        <Play className="mr-2 h-4 w-4" />
-                        Resume
+                        <Play className="me-2 h-4 w-4" />
+                        {t('resume')}
                       </DropdownMenuItem>
                     )}
                     {(mission.status === 'published' || mission.status === 'paused') && onArchive && (
@@ -253,8 +259,8 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         }}
                         className="text-destructive focus:text-destructive"
                       >
-                        <Archive className="mr-2 h-4 w-4" />
-                        Archive
+                        <Archive className="me-2 h-4 w-4" />
+                        {t('archive')}
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
