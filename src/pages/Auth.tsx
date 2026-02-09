@@ -138,7 +138,7 @@ export default function AuthPage() {
                 </TabsList>
 
                 <TabsContent value="login" className="mt-6">
-                  <form onSubmit={handleLogin} className="space-y-4">
+                  <form onSubmit={handleLogin} className="space-y-4 text-start">
                     <div className="space-y-2">
                       <Label htmlFor="login-email">{t('email')}</Label>
                       <div className="relative">
@@ -164,12 +164,12 @@ export default function AuthPage() {
                     <Button type="button" variant="secondary" className="w-full" onClick={handleCreateDemoAccount} disabled={isLoading}>
                       {isLoading ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('creating_demo')}</> : t('create_demo')}
                     </Button>
-                    <p className="mt-2 text-xs text-muted-foreground">{t('demo_desc')}</p>
+                    <p className="mt-2 text-xs text-muted-foreground text-start">{t('demo_desc')}</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="signup" className="mt-6">
-                  <form onSubmit={handleSignup} className="space-y-4">
+                  <form onSubmit={handleSignup} className="space-y-4 text-start">
                     <div className="space-y-2">
                       <Label htmlFor="signup-name">{t('full_name')}</Label>
                       <div className="relative">
