@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { MissionFormData, Question } from '@/types';
-import { AGENT_TIERS, QUESTION_TYPE_LABELS } from '@/lib/constants';
+import { AGENT_TIERS } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 interface Branch {
   id: string;
@@ -25,12 +26,13 @@ interface AdminStepReviewProps {
 }
 
 export function AdminStepReview({ data, branches, onCreate, isSubmitting }: AdminStepReviewProps) {
+  const { t } = useTranslation('missions');
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const branchCount = selectedBranches.length || 1;
   const numberOfVisits = data.visit_schedules.length;
   const totalBudget = numberOfVisits * data.purchase_budget_per_visit * branchCount;
   const totalVisits = numberOfVisits * branchCount;
-  const selectedTier = AGENT_TIERS.find((t) => t.tier === data.agent_tier);
+  const selectedTier = AGENT_TIERS.find((tier) => tier.tier === data.agent_tier);
 
   const formatDuration = (minutes: number) => {
     if (minutes < 60) return `${minutes} min`;
@@ -42,9 +44,9 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
   return (
     <div className="space-y-6">
       <div className="text-center pb-4">
-        <h3 className="text-lg font-bold">Review Your Mission</h3>
+        <h3 className="text-lg font-bold">{t('admin.review_title')}</h3>
         <p className="text-sm text-muted-foreground">
-          Please review the details before creating.
+          {t('admin.review_desc')}
         </p>
       </div>
 
@@ -54,18 +56,18 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
               <MapPin className="h-4 w-4" />
-              Basic Info
+              {t('admin.basic_info')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Mission Name</span>
-              <span className="font-medium">{data.name || 'Not set'}</span>
+              <span className="text-muted-foreground">{t('review.name_label')}</span>
+              <span className="font-medium">{data.name || t('review.not_specified')}</span>
             </div>
             <Separator />
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Branches</span>
-              <span className="font-medium">{selectedBranches.length} selected</span>
+              <span className="text-muted-foreground">{t('review.branches_label')}</span>
+              <span className="font-medium">{t('form.branches_selected', { count: selectedBranches.length })}</span>
             </div>
             {selectedBranches.length > 0 && (
               <div className="flex flex-wrap gap-1">
@@ -76,22 +78,22 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
                 ))}
                 {selectedBranches.length > 3 && (
                   <Badge variant="outline" className="text-xs">
-                    +{selectedBranches.length - 3} more
+                    {t('review.more_branches', { count: selectedBranches.length - 3 })}
                   </Badge>
                 )}
               </div>
             )}
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Geo-Tagged</span>
+              <span className="text-muted-foreground">{t('geo.title')}</span>
               <Badge variant={data.is_geo_tagged ? 'default' : 'secondary'}>
                 {data.is_geo_tagged ? (
                   <>
-                    <MapPinned className="h-3 w-3 mr-1" />
-                    Enabled
+                    <MapPinned className="h-3 w-3 me-1" />
+                    {t('admin.enabled')}
                   </>
                 ) : (
-                  'Disabled'
+                  t('admin.disabled')
                 )}
               </Badge>
             </div>
@@ -103,12 +105,12 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Agent Tier
+              {t('review.agent_tier')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Selected Tier</span>
+              <span className="text-muted-foreground">{t('admin.selected_tier')}</span>
               <Badge variant="outline">{selectedTier?.name || data.agent_tier}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -122,24 +124,24 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
               <HelpCircle className="h-4 w-4" />
-              Questions
+              {t('review.questions_label', { count: data.questions.length })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Total Questions</span>
+              <span className="text-muted-foreground">{t('admin.total_questions')}</span>
               <span className="font-medium">{data.questions.length}</span>
             </div>
             {data.questions.length > 0 && (
               <div className="space-y-1 mt-2">
                 {data.questions.slice(0, 3).map((q: Question, i: number) => (
                   <div key={q.id} className="text-xs text-muted-foreground truncate">
-                    {i + 1}. {q.text} ({QUESTION_TYPE_LABELS[q.type]})
+                    {i + 1}. {q.text}
                   </div>
                 ))}
                 {data.questions.length > 3 && (
                   <div className="text-xs text-muted-foreground">
-                    +{data.questions.length - 3} more questions
+                    {t('review.more_branches', { count: data.questions.length - 3 })}
                   </div>
                 )}
               </div>
@@ -152,26 +154,26 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Funding
+              {t('admin.funding')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Scheduled Visits</span>
-              <span className="font-medium">{numberOfVisits} per mission</span>
+              <span className="text-muted-foreground">{t('funding.scheduled_visits')}</span>
+              <span className="font-medium">{numberOfVisits} {t('admin.per_mission')}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Budget per Visit</span>
+              <span className="text-muted-foreground">{t('review.budget_per_visit')}</span>
               <span className="font-medium">{data.purchase_budget_per_visit.toLocaleString()} EGP</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold">
-              <span>Total Budget</span>
+              <span>{t('review.total_purchase_budget')}</span>
               <span>{totalBudget.toLocaleString()} EGP</span>
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Total Visits</span>
-              <span>{totalVisits} visits across {branchCount} mission(s)</span>
+              <span>{t('review.total_visits')}</span>
+              <span>{totalVisits} {t('admin.visits_across', { count: branchCount })}</span>
             </div>
           </CardContent>
         </Card>
@@ -183,7 +185,7 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Visit Schedules ({numberOfVisits})
+              {t('review.scheduled_visits', { count: numberOfVisits })}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -208,7 +210,7 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
               ))}
               {data.visit_schedules.length > 5 && (
                 <p className="text-xs text-muted-foreground">
-                  +{data.visit_schedules.length - 5} more scheduled visits
+                  {t('review.more_visits', { count: data.visit_schedules.length - 5 })}
                 </p>
               )}
             </div>
@@ -229,10 +231,12 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           ) : (
             <CheckCircle className="h-5 w-5" />
           )}
-          {branchCount > 1 ? `Create ${branchCount} Missions` : 'Create Mission'}
+          {branchCount > 1
+            ? t('admin.create_missions', { count: branchCount })
+            : t('admin.create_mission')}
         </Button>
         <p className="text-xs text-muted-foreground text-center">
-          Missions will be saved as drafts. You can publish them later.
+          {t('admin.missions_saved_as_drafts')}
         </p>
       </div>
     </div>
