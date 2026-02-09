@@ -1,0 +1,97 @@
+{
+  "title": "Reports & Analytics",
+  "description": "Analyze visit outcomes, mission performance, and budget utilization.",
+  "filters": {
+    "title": "Filters",
+    "months": "Months",
+    "branches": "Branches",
+    "all_months": "All Months",
+    "all_branches": "All Branches",
+    "search_months": "Search months...",
+    "search_branches": "Search branches...",
+    "no_months": "No months found.",
+    "no_branches": "No branches found."
+  },
+  "metrics": {
+    "visit_completion": "Visit Completion",
+    "visits_of_total": "{{completed}} of {{planned}} visits",
+    "budget_utilization": "Budget Utilization",
+    "budget_of_total": "{{used}} of {{allocated}} EGP",
+    "active_missions": "Active Missions",
+    "completed_total": "{{count}} completed total",
+    "package_usage": "Package Usage",
+    "visits_used_month": "Visits used this month"
+  },
+  "tabs": {
+    "visits": "Visits",
+    "budget": "Budget",
+    "performance": "Performance",
+    "perf": "Perf",
+    "responses": "Responses"
+  },
+  "visits_tab": {
+    "completion_over_time": "Visit Completion Over Time",
+    "completion_over_time_desc": "Planned vs completed visits by month",
+    "mission_status_dist": "Mission Status Distribution",
+    "mission_status_dist_desc": "Current status of all missions",
+    "visits_by_branch": "Visits by Branch",
+    "visits_by_branch_desc": "Comparison of planned vs completed visits across branches"
+  },
+  "budget_tab": {
+    "allocation_vs_usage": "Budget Allocation vs Usage",
+    "allocation_vs_usage_desc": "Track how your purchase budget is being utilized over time",
+    "total_allocated": "Total Allocated",
+    "across_all_missions": "Across all missions",
+    "total_used": "Total Used",
+    "spent_on_visits": "Spent on visits",
+    "available_balance": "Available Balance",
+    "in_wallet": "In wallet"
+  },
+  "performance_tab": {
+    "branch_ratings": "Branch Ratings",
+    "branch_ratings_desc": "Average customer satisfaction rating by branch",
+    "branch_details": "Branch Details",
+    "branch_details_desc": "Performance metrics by location",
+    "visits": "Visits",
+    "completion": "Completion"
+  },
+  "responses_tab": {
+    "select_mission": "Select Mission",
+    "select_mission_desc": "Choose a mission to view response analytics for its specific questions",
+    "select_mission_placeholder": "Select a mission...",
+    "select_mission_prompt": "Select a mission to view responses",
+    "select_mission_title": "Select a Mission",
+    "select_mission_body": "Choose a mission from the dropdown above to view detailed response analytics for each question in that mission.",
+    "questions_count": "{{count}} q",
+    "visits_count": "{{completed}} / {{total}} visits"
+  },
+  "chart_labels": {
+    "planned": "Planned",
+    "completed": "Completed",
+    "allocated": "Allocated",
+    "used": "Used",
+    "yes": "Yes",
+    "no": "No",
+    "rating": "Rating"
+  },
+  "question_types": {
+    "yes_no": "yes no",
+    "rating": "rating",
+    "multiple_choice": "multiple choice",
+    "short_text": "short text"
+  },
+  "responses_detail": {
+    "average_rating": "Average Rating",
+    "text_responses_collected": "{{count}} text responses collected",
+    "sample_responses": "Sample responses:"
+  },
+  "insights": {
+    "title": "Mission Insights",
+    "description": "AI-generated observations for {{name}}",
+    "strong_performance": "Strong Performance",
+    "strong_performance_good": "This mission shows good completion rates with {{completed}} visits completed out of {{planned}} planned.",
+    "strong_performance_improving": "This mission shows improving completion rates with {{completed}} visits completed out of {{planned}} planned.",
+    "area_for_improvement": "Area for Improvement",
+    "area_for_improvement_desc": "Some yes/no questions show over 30% negative responses - review these for potential improvements."
+  }
+}

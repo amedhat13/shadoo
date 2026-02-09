@@ -1,0 +1,97 @@
+{
+  "title": "التقارير والتحليلات",
+  "description": "تحليل نتائج الزيارات وأداء المهام واستخدام الميزانية.",
+  "filters": {
+    "title": "الفلاتر",
+    "months": "الأشهر",
+    "branches": "الفروع",
+    "all_months": "جميع الأشهر",
+    "all_branches": "جميع الفروع",
+    "search_months": "بحث في الأشهر...",
+    "search_branches": "بحث في الفروع...",
+    "no_months": "لم يتم العثور على أشهر.",
+    "no_branches": "لم يتم العثور على فروع."
+  },
+  "metrics": {
+    "visit_completion": "إتمام الزيارات",
+    "visits_of_total": "{{completed}} من {{planned}} زيارة",
+    "budget_utilization": "استخدام الميزانية",
+    "budget_of_total": "{{used}} من {{allocated}} ج.م",
+    "active_missions": "المهام النشطة",
+    "completed_total": "{{count}} مكتملة إجمالاً",
+    "package_usage": "استخدام الباقة",
+    "visits_used_month": "الزيارات المستخدمة هذا الشهر"
+  },
+  "tabs": {
+    "visits": "الزيارات",
+    "budget": "الميزانية",
+    "performance": "الأداء",
+    "perf": "الأداء",
+    "responses": "الردود"
+  },
+  "visits_tab": {
+    "completion_over_time": "إتمام الزيارات عبر الوقت",
+    "completion_over_time_desc": "الزيارات المخططة مقابل المكتملة حسب الشهر",
+    "mission_status_dist": "توزيع حالة المهام",
+    "mission_status_dist_desc": "الحالة الحالية لجميع المهام",
+    "visits_by_branch": "الزيارات حسب الفرع",
+    "visits_by_branch_desc": "مقارنة الزيارات المخططة والمكتملة عبر الفروع"
+  },
+  "budget_tab": {
+    "allocation_vs_usage": "تخصيص الميزانية مقابل الاستخدام",
+    "allocation_vs_usage_desc": "تتبع كيفية استخدام ميزانية المشتريات بمرور الوقت",
+    "total_allocated": "إجمالي المخصص",
+    "across_all_missions": "عبر جميع المهام",
+    "total_used": "إجمالي المستخدم",
+    "spent_on_visits": "مصروف على الزيارات",
+    "available_balance": "الرصيد المتاح",
+    "in_wallet": "في المحفظة"
+  },
+  "performance_tab": {
+    "branch_ratings": "تقييمات الفروع",
+    "branch_ratings_desc": "متوسط تقييم رضا العملاء حسب الفرع",
+    "branch_details": "تفاصيل الفروع",
+    "branch_details_desc": "مقاييس الأداء حسب الموقع",
+    "visits": "الزيارات",
+    "completion": "الإتمام"
+  },
+  "responses_tab": {
+    "select_mission": "اختر مهمة",
+    "select_mission_desc": "اختر مهمة لعرض تحليلات الردود لأسئلتها المحددة",
+    "select_mission_placeholder": "اختر مهمة...",
+    "select_mission_prompt": "اختر مهمة لعرض الردود",
+    "select_mission_title": "اختر مهمة",
+    "select_mission_body": "اختر مهمة من القائمة المنسدلة أعلاه لعرض تحليلات الردود التفصيلية لكل سؤال في تلك المهمة.",
+    "questions_count": "{{count}} س",
+    "visits_count": "{{completed}} / {{total}} زيارة"
+  },
+  "chart_labels": {
+    "planned": "مخطط",
+    "completed": "مكتمل",
+    "allocated": "مخصص",
+    "used": "مستخدم",
+    "yes": "نعم",
+    "no": "لا",
+    "rating": "التقييم"
+  },
+  "question_types": {
+    "yes_no": "نعم / لا",
+    "rating": "تقييم",
+    "multiple_choice": "اختيار من متعدد",
+    "short_text": "نص قصير"
+  },
+  "responses_detail": {
+    "average_rating": "متوسط التقييم",
+    "text_responses_collected": "{{count}} رد نصي تم جمعه",
+    "sample_responses": "نماذج من الردود:"
+  },
+  "insights": {
+    "title": "رؤى المهمة",
+    "description": "ملاحظات مولدة بالذكاء الاصطناعي لـ {{name}}",
+    "strong_performance": "أداء قوي",
+    "strong_performance_good": "تُظهر هذه المهمة معدلات إتمام جيدة مع إكمال {{completed}} زيارة من أصل {{planned}} مخططة.",
+    "strong_performance_improving": "تُظهر هذه المهمة معدلات إتمام متحسنة مع إكمال {{completed}} زيارة من أصل {{planned}} مخططة.",
+    "area_for_improvement": "مجال للتحسين",
+    "area_for_improvement_desc": "بعض أسئلة نعم/لا تُظهر أكثر من 30% ردود سلبية - راجعها لإجراء تحسينات محتملة."
+  }
+}
