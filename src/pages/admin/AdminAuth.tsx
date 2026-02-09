@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { useDirectionalIcons } from '@/i18n/utils';
 import logo from '@/assets/shadoo-logo.png';
 
 // Fixed demo admin credentials
@@ -16,6 +18,9 @@ const DEMO_ADMIN_PASSWORD = 'Demo@Admin123!';
 
 export default function AdminAuthPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
+  const { t: tc } = useTranslation('common');
+  const { ArrowStart } = useDirectionalIcons();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -193,8 +198,8 @@ export default function AdminAuthPage() {
             className="gap-2"
             onClick={() => navigate('/')}
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back
+            <ArrowStart className="h-4 w-4" />
+            {tc('back')}
           </Button>
           <img src={logo} alt="Shadoo" className="h-8" />
           <div className="w-20" /> {/* Spacer for centering */}
@@ -208,13 +213,13 @@ export default function AdminAuthPage() {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center bg-warning/10 text-warning">
               <Shield className="h-7 w-7" />
             </div>
-            <CardTitle className="text-xl font-bold uppercase">Admin Portal</CardTitle>
+            <CardTitle className="text-xl font-bold uppercase">{t('admin_portal')}</CardTitle>
             <CardDescription>
-              Sign in with your administrator credentials
+              {t('admin_sign_in_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4 text-start">
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -224,7 +229,7 @@ export default function AdminAuthPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wide">
-                  Email
+                  {t('email')}
                 </Label>
                 <Input
                   id="email"
@@ -239,7 +244,7 @@ export default function AdminAuthPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wide">
-                  Password
+                  {t('password')}
                 </Label>
                 <Input
                   id="password"
@@ -259,22 +264,22 @@ export default function AdminAuthPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Signing in...
+                    <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                    {t('logging_in')}
                   </>
                 ) : (
-                  'Sign In'
+                  t('admin_sign_in_button')
                 )}
               </Button>
 
               {/* Demo credentials box */}
               <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
                 <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Demo Admin Credentials
+                  {t('demo_admin_credentials')}
                 </p>
                 <div className="space-y-1 font-mono text-sm">
-                  <p><span className="text-muted-foreground">Email:</span> {DEMO_ADMIN_EMAIL}</p>
-                  <p><span className="text-muted-foreground">Password:</span> {DEMO_ADMIN_PASSWORD}</p>
+                  <p><span className="text-muted-foreground">{t('email')}:</span> {DEMO_ADMIN_EMAIL}</p>
+                  <p><span className="text-muted-foreground">{t('password')}:</span> {DEMO_ADMIN_PASSWORD}</p>
                 </div>
                 <Button
                   type="button"
@@ -284,22 +289,20 @@ export default function AdminAuthPage() {
                   onClick={handleDemoLogin}
                   disabled={loading || creatingDemo}
                 >
-                  {creatingDemo ? (
+                {creatingDemo ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Signing in...
+                      <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                      {t('logging_in')}
                     </>
                   ) : (
-                    'Use Demo Account'
+                    t('use_demo_account')
                   )}
                 </Button>
               </div>
             </form>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
-              Admin accounts are created by super administrators.
-              <br />
-              Contact your system admin if you need access.
+              {t('admin_accounts_note')}
             </p>
           </CardContent>
         </Card>
