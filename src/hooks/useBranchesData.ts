@@ -7,7 +7,9 @@ interface DbBranch {
   id: string;
   user_id: string;
   name: string;
+  name_ar: string | null;
   address: string;
+  address_ar: string | null;
   city: string;
   district: string | null;
   google_maps_link: string;
@@ -23,7 +25,9 @@ function mapDbBranchToBranch(dbBranch: DbBranch): Branch {
   return {
     id: dbBranch.id,
     name: dbBranch.name,
+    name_ar: dbBranch.name_ar || undefined,
     address: dbBranch.address,
+    address_ar: dbBranch.address_ar || undefined,
     city: dbBranch.city,
     district: dbBranch.district || undefined,
     google_maps_link: dbBranch.google_maps_link,
@@ -65,7 +69,9 @@ export function useBranchesData() {
         .insert({
           user_id: user.id,
           name: data.name,
+          name_ar: data.name_ar || null,
           address: data.address,
+          address_ar: data.address_ar || null,
           city: data.city,
           district: data.district,
           google_maps_link: data.google_maps_link,
