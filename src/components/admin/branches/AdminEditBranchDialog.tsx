@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { BilingualInput } from '@/components/common/BilingualInput';
 import { Loader2 } from 'lucide-react';
 import { EGYPT_CITIES, getCityByName, getDistrictsByCity } from '@/lib/egypt-locations';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,9 @@ import { useTranslation } from 'react-i18next';
 interface Branch {
   id: string;
   name: string;
+  name_ar?: string | null;
   address: string;
+  address_ar?: string | null;
   city: string;
   district: string | null;
   google_maps_link: string;
@@ -43,7 +46,9 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
   const { t } = useTranslation('branches');
   const [formData, setFormData] = useState({
     name: '',
+    name_ar: '',
     address: '',
+    address_ar: '',
     city: '',
     district: '',
     google_maps_link: '',
@@ -56,7 +61,9 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
       const cityObj = getCityByName(branch.city);
       setFormData({
         name: branch.name,
+        name_ar: branch.name_ar || '',
         address: branch.address,
+        address_ar: branch.address_ar || '',
         city: cityObj?.id || '',
         district: branch.district || '',
         google_maps_link: branch.google_maps_link,
@@ -72,7 +79,9 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
         .from('branches')
         .update({
           name: data.name,
+          name_ar: data.name_ar || null,
           address: data.address,
+          address_ar: data.address_ar || null,
           city: city?.name || data.city,
           district: data.district || null,
           google_maps_link: data.google_maps_link,
@@ -111,32 +120,30 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-start">
           <DialogTitle>{t('form.edit_dialog_title')}</DialogTitle>
           <DialogDescription>{t('form.edit_dialog_desc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-start">
-          <div className="space-y-2">
-            <Label htmlFor="name">{t('form.branch_name')}<span className="text-destructive">*</span></Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-          </div>
+          <BilingualInput
+            label={t('form.branch_name')}
+            value={{ en: formData.name, ar: formData.name_ar }}
+            onChange={(val) => setFormData({ ...formData, name: val.en, name_ar: val.ar })}
+            placeholder={{ en: 'e.g., Cairo Downtown', ar: 'مثال: وسط القاهرة' }}
+            required
+          />
+          {errors.name && <p className="text-xs text-destructive -mt-2">{errors.name}</p>}
 
-          <div className="space-y-2">
-            <Label htmlFor="address">{t('form.address')}<span className="text-destructive">*</span></Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-            {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
-          </div>
+          <BilingualInput
+            label={t('form.address')}
+            value={{ en: formData.address, ar: formData.address_ar }}
+            onChange={(val) => setFormData({ ...formData, address: val.en, address_ar: val.ar })}
+            placeholder={{ en: 'e.g., 123 Main Street', ar: 'مثال: 123 الشارع الرئيسي' }}
+            required
+          />
+          {errors.address && <p className="text-xs text-destructive -mt-2">{errors.address}</p>}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

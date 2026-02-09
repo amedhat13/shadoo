@@ -23,7 +23,9 @@ export type BranchStatus = 'pending_verification' | 'verified' | 'rejected';
 export interface Branch {
   id: string;
   name: string;
+  name_ar?: string;
   address: string;
+  address_ar?: string;
   city: string;
   district?: string;
   google_maps_link: string;

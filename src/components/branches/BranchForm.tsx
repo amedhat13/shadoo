@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { BilingualInput } from '@/components/common/BilingualInput';
 import { MapPin, Link as LinkIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +34,9 @@ interface BranchFormProps {
 
 const initialFormState: BranchFormData = {
   name: '',
+  name_ar: '',
   address: '',
+  address_ar: '',
   city: '',
   district: '',
   google_maps_link: '',
@@ -51,7 +54,9 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
       setSelectedCityId(city?.id || '');
       setFormData({
         name: branch.name,
+        name_ar: branch.name_ar || '',
         address: branch.address,
+        address_ar: branch.address_ar || '',
         city: branch.city,
         district: branch.district || '',
         google_maps_link: branch.google_maps_link,
@@ -105,7 +110,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-start">
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
@@ -117,16 +122,14 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-start">
-          <div className="space-y-2">
-            <Label htmlFor="name">{t('form.branch_name')}<span className="text-destructive">*</span></Label>
-            <Input
-              id="name"
-              placeholder={t('form.branch_name_placeholder')}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-          </div>
+          <BilingualInput
+            label={t('form.branch_name')}
+            value={{ en: formData.name, ar: formData.name_ar || '' }}
+            onChange={(val) => setFormData({ ...formData, name: val.en, name_ar: val.ar })}
+            placeholder={{ en: t('form.branch_name_placeholder'), ar: 'مثال: وسط القاهرة' }}
+            required
+          />
+          {errors.name && <p className="text-xs text-destructive -mt-2">{errors.name}</p>}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -167,16 +170,14 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address">{t('form.address')}<span className="text-destructive">*</span></Label>
-            <Input
-              id="address"
-              placeholder={t('form.address_placeholder')}
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-            {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
-          </div>
+          <BilingualInput
+            label={t('form.address')}
+            value={{ en: formData.address, ar: formData.address_ar || '' }}
+            onChange={(val) => setFormData({ ...formData, address: val.en, address_ar: val.ar })}
+            placeholder={{ en: t('form.address_placeholder'), ar: 'مثال: 123 الشارع الرئيسي' }}
+            required
+          />
+          {errors.address && <p className="text-xs text-destructive -mt-2">{errors.address}</p>}
 
           <div className="space-y-2">
             <Label htmlFor="google_maps_link" className="flex items-center gap-2">

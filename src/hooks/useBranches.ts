@@ -60,7 +60,9 @@ const initialBranches: Branch[] = [
 
 export interface BranchFormData {
   name: string;
+  name_ar?: string;
   address: string;
+  address_ar?: string;
   city: string;
   district?: string;
   google_maps_link: string;
