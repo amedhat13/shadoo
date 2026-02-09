@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { FORM_STEPS } from '@/lib/constants';
 import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
@@ -18,6 +17,8 @@ import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { usePackage } from '@/hooks/usePackage';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { useDirectionalIcons } from '@/i18n/utils';
 
 const initialFormData: MissionFormData = {
   name: '',
@@ -36,10 +37,14 @@ const initialFormData: MissionFormData = {
   is_geo_tagged: false,
 };
 
+const STEP_KEYS = ['basics', 'agent_tier', 'questions', 'geo_settings', 'funding', 'review'] as const;
+
 export default function MissionCreatePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
+  const { t } = useTranslation('missions');
+  const { ArrowStart } = useDirectionalIcons();
   const { createMission, publishMission, getMission, branches } = useMissions();
   const { wallet, allocateBudget } = useWallet();
   const { visitsRemaining, consumeVisits, subscription } = usePackage();
@@ -67,20 +72,18 @@ export default function MissionCreatePage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Calculate totals based on number of branches
   const branchCount = formData.branch_ids.length || 1;
   const totalVisitsPerMission = formData.number_of_visits;
   const totalPurchaseBudgetPerMission = formData.number_of_visits * formData.purchase_budget_per_visit;
   const grandTotalBudget = totalPurchaseBudgetPerMission * branchCount;
   const grandTotalVisits = totalVisitsPerMission * branchCount;
-  
-  // For validation, we need to check if we can publish ALL missions
+
   const mockFormDataForValidation = {
     ...formData,
     number_of_visits: grandTotalVisits,
     purchase_budget_per_visit: grandTotalBudget / grandTotalVisits || 0,
   };
-  
+
   const { canPublish, reason } = canPublishMission(mockFormDataForValidation, subscription, wallet);
 
   const updateFormData = (updates: Partial<MissionFormData>) => {
@@ -89,17 +92,17 @@ export default function MissionCreatePage() {
 
   const isStepValid = (step: number): boolean => {
     switch (step) {
-      case 0: // Basics
+      case 0:
         return Boolean(formData.name && formData.branch_ids.length > 0);
-      case 1: // Agent Tier
+      case 1:
         return Boolean(formData.agent_tier);
-      case 2: // Questions
+      case 2:
         return formData.questions.length > 0 && formData.questions.every(q => q.text.trim() !== '');
-      case 3: // Geo Settings
-        return true; // Optional step
-      case 4: // Funding
+      case 3:
+        return true;
+      case 4:
         return formData.visit_schedules.length > 0;
-      case 5: // Review
+      case 5:
         return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
       default:
         return false;
@@ -107,7 +110,7 @@ export default function MissionCreatePage() {
   };
 
   const handleNext = () => {
-    if (currentStep < FORM_STEPS.length - 1) {
+    if (currentStep < STEP_KEYS.length - 1) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -121,12 +124,11 @@ export default function MissionCreatePage() {
   const handleSaveDraft = async () => {
     setIsSubmitting(true);
     try {
-      // Create a mission for each selected branch
       for (const branchId of formData.branch_ids) {
         const missionName = formData.branch_ids.length > 1
           ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
           : formData.name;
-          
+
         await createMission({
           name: missionName,
           branch_id: branchId,
@@ -139,16 +141,15 @@ export default function MissionCreatePage() {
         });
       }
       toast({
-        title: 'Draft saved',
+        title: t('draft_saved'),
         description: formData.branch_ids.length > 1
-          ? `${formData.branch_ids.length} missions have been saved as drafts.`
-          : 'Your mission has been saved as a draft.',
+          ? t('draft_saved_desc_multi', { count: formData.branch_ids.length })
+          : t('draft_saved_desc_single'),
       });
       navigate('/missions');
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to save mission. Please try again.',
+        title: t('save_error'),
         variant: 'destructive',
       });
     } finally {
@@ -161,12 +162,11 @@ export default function MissionCreatePage() {
 
     setIsSubmitting(true);
     try {
-      // Create and publish a mission for each selected branch
       for (const branchId of formData.branch_ids) {
         const missionName = formData.branch_ids.length > 1
           ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
           : formData.name;
-          
+
         const mission = await createMission({
           name: missionName,
           branch_id: branchId,
@@ -177,24 +177,25 @@ export default function MissionCreatePage() {
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
         });
-        
+
         await publishMission(mission.id);
       }
-      
+
       await allocateBudget(grandTotalBudget);
       await consumeVisits(grandTotalVisits);
-      
+
       toast({
-        title: formData.branch_ids.length > 1 ? 'Missions published!' : 'Mission published!',
+        title: formData.branch_ids.length > 1
+          ? t('publish_messages.missions_published')
+          : t('publish_messages.success'),
         description: formData.branch_ids.length > 1
-          ? `${formData.branch_ids.length} missions are now live. ${grandTotalBudget.toLocaleString()} EGP has been allocated.`
-          : `Your mission is now live. ${grandTotalBudget.toLocaleString()} EGP has been allocated.`,
+          ? t('publish_messages.missions_published_desc', { count: formData.branch_ids.length, amount: grandTotalBudget.toLocaleString() })
+          : t('publish_messages.mission_published_desc', { amount: grandTotalBudget.toLocaleString() }),
       });
       navigate('/missions');
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to publish mission. Please try again.',
+        title: t('publish_messages.error'),
         variant: 'destructive',
       });
     } finally {
@@ -205,34 +206,13 @@ export default function MissionCreatePage() {
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <StepBasics
-            data={formData}
-            onChange={updateFormData}
-            branches={branches}
-          />
-        );
+        return <StepBasics data={formData} onChange={updateFormData} branches={branches} />;
       case 1:
-        return (
-          <StepAgentTier
-            data={formData}
-            onChange={updateFormData}
-          />
-        );
+        return <StepAgentTier data={formData} onChange={updateFormData} />;
       case 2:
-        return (
-          <StepQuestions
-            data={formData}
-            onChange={updateFormData}
-          />
-        );
+        return <StepQuestions data={formData} onChange={updateFormData} />;
       case 3:
-        return (
-          <StepGeoSettings
-            data={formData}
-            onChange={updateFormData}
-          />
-        );
+        return <StepGeoSettings data={formData} onChange={updateFormData} />;
       case 4:
         return (
           <StepFunding
@@ -274,25 +254,22 @@ export default function MissionCreatePage() {
             onClick={() => navigate('/missions')}
             className="shrink-0"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowStart className="h-5 w-5" />
           </Button>
           <div className="min-w-0">
             <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight">
-              {isEditing ? 'Edit Mission' : 'Create Mission'}
+              {isEditing ? t('edit_mission') : t('create_title')}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground truncate">
-              {FORM_STEPS[currentStep].description}
+              {t(`steps.${STEP_KEYS[currentStep]}_desc`)}
             </p>
           </div>
         </div>
 
         {/* Progress Steps */}
         <div className="flex items-center gap-2 md:gap-0 pb-2 overflow-x-auto">
-          {FORM_STEPS.map((step, index) => (
-            <div
-              key={step.id}
-              className="flex items-center"
-            >
+          {STEP_KEYS.map((stepKey, index) => (
+            <div key={stepKey} className="flex items-center">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
@@ -314,22 +291,18 @@ export default function MissionCreatePage() {
                           : 'bg-muted text-muted-foreground'
                       )}
                     >
-                      {index < currentStep ? (
-                        <Check className="h-3 w-3" />
-                      ) : (
-                        index + 1
-                      )}
+                      {index < currentStep ? <Check className="h-3 w-3" /> : index + 1}
                     </div>
                     <span className="hidden xl:block text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
-                      {step.title}
+                      {t(`steps.${stepKey}`)}
                     </span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="xl:hidden">
-                  <p>{step.title}</p>
+                  <p>{t(`steps.${stepKey}`)}</p>
                 </TooltipContent>
               </Tooltip>
-              {index < FORM_STEPS.length - 1 && (
+              {index < STEP_KEYS.length - 1 && (
                 <div
                   className={cn(
                     'mx-2 md:mx-3 lg:mx-4 h-px w-4 md:w-8 lg:w-12',
@@ -357,7 +330,7 @@ export default function MissionCreatePage() {
               disabled={currentStep === 0}
               className="w-full sm:w-auto"
             >
-              BACK
+              {t('form.back')}
             </Button>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
@@ -366,14 +339,14 @@ export default function MissionCreatePage() {
                 disabled={!isStepValid(0) || isSubmitting}
                 className="w-full sm:w-auto"
               >
-                SAVE DRAFT
+                {t('form.save_draft')}
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!isStepValid(currentStep)}
                 className="w-full sm:w-auto"
               >
-                CONTINUE
+                {t('form.continue')}
               </Button>
             </div>
           </div>

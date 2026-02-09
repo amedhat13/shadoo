@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ClientSelector } from '@/components/admin/common/ClientSelector';
+import { useTranslation } from 'react-i18next';
 
 interface Branch {
   id: string;
@@ -41,6 +42,7 @@ interface AdminStepBasicsProps {
 
 export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation('missions');
 
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const allSelected = data.branch_ids.length === branches.length && branches.length > 0;
@@ -66,14 +68,14 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
   };
 
   const handleClientChange = (clientUserId: string) => {
-    onChange({ clientUserId, branch_ids: [] }); // Reset branches when client changes
+    onChange({ clientUserId, branch_ids: [] });
   };
 
   const getMissionsCountText = () => {
     const count = data.branch_ids.length;
     if (count === 0) return '';
-    if (count === 1) return '1 mission will be created';
-    return `${count} separate missions will be created (one per branch)`;
+    if (count === 1) return t('admin.missions_count_single');
+    return t('admin.missions_count_multi', { count });
   };
 
   return (
@@ -88,38 +90,38 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
 
       <div className="space-y-2">
         <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">
-          Mission Name<span className="text-destructive">*</span>
+          {t('admin.mission_name')}<span className="text-destructive">*</span>
         </Label>
         <Input
           id="name"
-          placeholder="Enter a descriptive name for this mission"
+          placeholder={t('admin.mission_name_placeholder')}
           value={data.name}
           onChange={(e) => onChange({ name: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
-          This name will be used as a base for all missions created.
+          {t('admin.mission_name_help')}
         </p>
       </div>
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">
-          Branches<span className="text-destructive">*</span>
+          {t('admin.branches')}<span className="text-destructive">*</span>
         </Label>
 
         {!data.clientUserId ? (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Select a client first</AlertTitle>
+            <AlertTitle>{t('admin.select_client_first')}</AlertTitle>
             <AlertDescription>
-              Choose a client above to see their available branches.
+              {t('admin.select_client_first_desc')}
             </AlertDescription>
           </Alert>
         ) : branches.length === 0 ? (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>No branches available</AlertTitle>
+            <AlertTitle>{t('admin.no_branches_for_client')}</AlertTitle>
             <AlertDescription>
-              This client has no verified branches. Verify their branches first.
+              {t('admin.no_branches_for_client_desc')}
             </AlertDescription>
           </Alert>
         ) : (
@@ -134,26 +136,26 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
                 >
                   <span className="text-muted-foreground">
                     {data.branch_ids.length === 0
-                      ? 'Select branches...'
-                      : `${data.branch_ids.length} branch${data.branch_ids.length > 1 ? 'es' : ''} selected`}
+                      ? t('admin.select_branches')
+                      : t('admin.branches_selected', { count: data.branch_ids.length })}
                   </span>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
-                  <CommandInput placeholder="Search branches..." />
+                  <CommandInput placeholder={t('admin.search_branches')} />
                   <CommandList>
-                    <CommandEmpty>No branches found.</CommandEmpty>
+                    <CommandEmpty>{t('admin.no_branches_found')}</CommandEmpty>
                     <CommandGroup>
                       <CommandItem
                         onSelect={() => (allSelected ? clearAll() : selectAll())}
                         className="font-semibold"
                       >
                         <Check
-                          className={cn('mr-2 h-4 w-4', allSelected ? 'opacity-100' : 'opacity-0')}
+                          className={cn('me-2 h-4 w-4', allSelected ? 'opacity-100' : 'opacity-0')}
                         />
-                        Select All Branches
+                        {t('admin.select_all_branches')}
                       </CommandItem>
                       {branches.map((branch) => (
                         <CommandItem
@@ -163,7 +165,7 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
                         >
                           <Check
                             className={cn(
-                              'mr-2 h-4 w-4',
+                              'me-2 h-4 w-4',
                               data.branch_ids.includes(branch.id) ? 'opacity-100' : 'opacity-0'
                             )}
                           />
@@ -182,12 +184,12 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
             {selectedBranches.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {selectedBranches.map((branch) => (
-                  <Badge key={branch.id} variant="secondary" className="gap-1 pr-1">
+                  <Badge key={branch.id} variant="secondary" className="gap-1 pe-1">
                     {branch.name}
                     <button
                       type="button"
                       onClick={() => removeBranch(branch.id)}
-                      className="ml-1 hover:bg-muted rounded-sm p-0.5"
+                      className="ms-1 hover:bg-muted rounded-sm p-0.5"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -199,14 +201,14 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
                     onClick={clearAll}
                     className="text-xs text-muted-foreground hover:text-foreground underline"
                   >
-                    Clear all
+                    {t('admin.clear_all')}
                   </button>
                 )}
               </div>
             )}
 
             <p className="text-xs text-muted-foreground">
-              Select one or more branches. A separate mission will be created for each selected branch.
+              {t('admin.branches_help')}
             </p>
 
             {data.branch_ids.length > 0 && (

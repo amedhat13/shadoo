@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { MissionFormData, VisitSchedule } from '@/types';
 import { VisitScheduleEditor } from '@/components/missions/form/VisitScheduleEditor';
+import { useTranslation } from 'react-i18next';
 
 interface AdminStepFundingProps {
   data: MissionFormData;
@@ -12,6 +13,7 @@ interface AdminStepFundingProps {
 }
 
 export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundingProps) {
+  const { t } = useTranslation('missions');
   const numberOfVisits = data.visit_schedules.length;
   const totalPurchaseBudgetPerMission = numberOfVisits * data.purchase_budget_per_visit;
   const grandTotalBudget = totalPurchaseBudgetPerMission * branchCount;
@@ -36,7 +38,7 @@ export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundi
       {/* Purchase Budget */}
       <div className="space-y-4">
         <Label className="text-xs font-bold uppercase tracking-wide">
-          Purchase Budget per Visit (EGP)
+          {t('admin.budget_per_visit_label')}
         </Label>
         <Input
           type="number"
@@ -47,7 +49,7 @@ export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundi
           className="text-lg font-semibold"
         />
         <p className="text-xs text-muted-foreground">
-          Amount given to agents for purchases during each visit.
+          {t('admin.budget_per_visit_help')}
         </p>
       </div>
 
@@ -56,30 +58,30 @@ export function AdminStepFunding({ data, onChange, branchCount }: AdminStepFundi
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium">
             <Info className="h-4 w-4 text-muted-foreground" />
-            Budget Summary
+            {t('admin.budget_summary')}
           </div>
           
           {branchCount > 1 && (
             <div className="text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Per Mission:</span>
-                <span>{totalPurchaseBudgetPerMission.toLocaleString()} EGP ({numberOfVisits} visits)</span>
+                <span className="text-muted-foreground">{t('funding.per_mission')}:</span>
+                <span>{totalPurchaseBudgetPerMission.toLocaleString()} EGP ({numberOfVisits} {t('visits')})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Number of Missions:</span>
-                <span>{branchCount} branches</span>
+                <span className="text-muted-foreground">{t('admin.number_of_missions')}:</span>
+                <span>{branchCount} {t('review.branches_label').toLowerCase()}</span>
               </div>
             </div>
           )}
           
           <div className="pt-2 border-t">
             <div className="flex justify-between text-lg font-bold">
-              <span>Total:</span>
+              <span>{t('review.total_purchase_budget')}:</span>
               <span>{grandTotalBudget.toLocaleString()} EGP</span>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Total Visits:</span>
-              <span>{grandTotalVisits} visits</span>
+              <span>{t('review.total_visits')}:</span>
+              <span>{grandTotalVisits} {t('visits')}</span>
             </div>
           </div>
         </CardContent>

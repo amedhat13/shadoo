@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,15 +17,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useClientBranches } from '@/hooks/useAdminData';
+import { useTranslation } from 'react-i18next';
+import { useDirectionalIcons } from '@/i18n/utils';
 
-const ADMIN_FORM_STEPS = [
-  { id: 'basics', title: 'Basics', description: 'Client, name and branches.' },
-  { id: 'agent-tier', title: 'Agent Tier', description: 'Select agent tier.' },
-  { id: 'questions', title: 'Questions', description: 'Build questionnaire.' },
-  { id: 'geo-settings', title: 'Geo Settings', description: 'Location verification.' },
-  { id: 'funding', title: 'Visits & Funding', description: 'Budget configuration.' },
-  { id: 'review', title: 'Review', description: 'Review and create.' },
-];
+const STEP_KEYS = ['basics', 'agent_tier', 'questions', 'geo_settings', 'funding', 'review'] as const;
 
 interface AdminMissionFormData extends MissionFormData {
   clientUserId: string;
@@ -52,6 +47,8 @@ const initialFormData: AdminMissionFormData = {
 export default function AdminMissionCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation('missions');
+  const { ArrowStart } = useDirectionalIcons();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<AdminMissionFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,7 +105,7 @@ export default function AdminMissionCreatePage() {
       case 2:
         return formData.questions.length > 0 && formData.questions.every((q) => q.text.trim() !== '');
       case 3:
-        return true; // Geo settings is optional
+        return true;
       case 4:
         return formData.visit_schedules.length > 0;
       case 5:
@@ -119,7 +116,7 @@ export default function AdminMissionCreatePage() {
   };
 
   const handleNext = () => {
-    if (currentStep < ADMIN_FORM_STEPS.length - 1) {
+    if (currentStep < STEP_KEYS.length - 1) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -156,12 +153,12 @@ export default function AdminMissionCreatePage() {
 
       toast.success(
         formData.branch_ids.length > 1
-          ? `${formData.branch_ids.length} missions created successfully`
-          : 'Mission created successfully'
+          ? t('admin.missions_created_multi', { count: formData.branch_ids.length })
+          : t('admin.mission_created')
       );
       navigate('/admin/missions');
     } catch (error) {
-      toast.error('Failed to create mission. Please try again.');
+      toast.error(t('save_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -170,13 +167,7 @@ export default function AdminMissionCreatePage() {
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <AdminStepBasics
-            data={formData}
-            onChange={updateFormData}
-            branches={clientBranches}
-          />
-        );
+        return <AdminStepBasics data={formData} onChange={updateFormData} branches={clientBranches} />;
       case 1:
         return <StepAgentTier data={formData} onChange={updateFormData} />;
       case 2:
@@ -216,22 +207,22 @@ export default function AdminMissionCreatePage() {
             onClick={() => navigate('/admin/missions')}
             className="shrink-0"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowStart className="h-5 w-5" />
           </Button>
           <div className="min-w-0">
             <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight">
-              Create Mission for Client
+              {t('admin.create_for_client')}
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground truncate">
-              {ADMIN_FORM_STEPS[currentStep].description}
+              {t(`steps.${STEP_KEYS[currentStep]}_desc`)}
             </p>
           </div>
         </div>
 
         {/* Progress Steps */}
         <div className="flex items-center gap-2 md:gap-0 pb-2 overflow-x-auto">
-          {ADMIN_FORM_STEPS.map((step, index) => (
-            <div key={step.id} className="flex items-center">
+          {STEP_KEYS.map((stepKey, index) => (
+            <div key={stepKey} className="flex items-center">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
@@ -256,15 +247,15 @@ export default function AdminMissionCreatePage() {
                       {index < currentStep ? <Check className="h-3 w-3" /> : index + 1}
                     </div>
                     <span className="hidden xl:block text-sm font-semibold uppercase tracking-wide whitespace-nowrap">
-                      {step.title}
+                      {t(`steps.${stepKey}`)}
                     </span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="xl:hidden">
-                  <p>{step.title}</p>
+                  <p>{t(`steps.${stepKey}`)}</p>
                 </TooltipContent>
               </Tooltip>
-              {index < ADMIN_FORM_STEPS.length - 1 && (
+              {index < STEP_KEYS.length - 1 && (
                 <div
                   className={cn(
                     'mx-2 md:mx-3 lg:mx-4 h-px w-4 md:w-8 lg:w-12',
@@ -290,14 +281,14 @@ export default function AdminMissionCreatePage() {
               disabled={currentStep === 0}
               className="w-full sm:w-auto"
             >
-              BACK
+              {t('form.back')}
             </Button>
             <Button
               onClick={handleNext}
               disabled={!isStepValid(currentStep)}
               className="w-full sm:w-auto"
             >
-              CONTINUE
+              {t('form.continue')}
             </Button>
           </div>
         )}

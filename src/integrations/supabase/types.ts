@@ -228,6 +228,7 @@ export type Database = {
       branches: {
         Row: {
           address: string
+          address_ar: string | null
           city: string
           created_at: string
           district: string | null
@@ -236,6 +237,7 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           name: string
+          name_ar: string | null
           rejection_reason: string | null
           status: string
           updated_at: string
@@ -243,6 +245,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          address_ar?: string | null
           city: string
           created_at?: string
           district?: string | null
@@ -251,6 +254,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name: string
+          name_ar?: string | null
           rejection_reason?: string | null
           status?: string
           updated_at?: string
@@ -258,6 +262,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          address_ar?: string | null
           city?: string
           created_at?: string
           district?: string | null
@@ -266,6 +271,7 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           name?: string
+          name_ar?: string | null
           rejection_reason?: string | null
           status?: string
           updated_at?: string
