@@ -187,6 +187,7 @@ export function useMissions() {
 
   const createMission = useCallback(async (data: {
     name: string;
+    name_ar?: string;
     branch_id: string;
     agent_tier?: AgentTier;
     questions: Question[];
@@ -208,6 +209,7 @@ export function useMissions() {
         const insertData = {
           user_id: user.id,
           name: data.name,
+          name_ar: data.name_ar || null,
           branch_id: data.branch_id,
           agent_tier: data.agent_tier || 'C',
           questions: JSON.parse(JSON.stringify(data.questions)),

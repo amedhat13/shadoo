@@ -24,6 +24,7 @@ import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoR
 import { QUESTION_TYPE_LABELS, QUESTION_TEMPLATES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { BilingualValue, ensureBilingual, getBilingualText } from '@/i18n/utils';
 
 interface StepQuestionsProps {
   data: MissionFormData;
@@ -34,12 +35,13 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const { t } = useTranslation('missions');
+  const { t: tc } = useTranslation('common');
 
   const addQuestion = () => {
     const newQuestion: Question = {
       id: `q-${Date.now()}`,
       type: 'short_text',
-      text: '',
+      text: { en: '', ar: '' },
       required: true,
     };
     onChange({ questions: [...data.questions, newQuestion] });
@@ -84,14 +86,14 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
     const newOption: QuestionOption = {
       id: `opt-${Date.now()}`,
-      text: '',
+      text: { en: '', ar: '' },
     };
     updateQuestion(questionId, {
       options: [...(question.options || []), newOption],
     });
   };
 
-  const updateOption = (questionId: string, optionId: string, text: string) => {
+  const updateOption = (questionId: string, optionId: string, text: string | BilingualValue) => {
     const question = data.questions.find((q) => q.id === questionId);
     if (!question?.options) return;
 
@@ -116,8 +118,8 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     
     if (type === 'multiple_choice') {
       updates.options = [
-        { id: `opt-${Date.now()}-1`, text: '' },
-        { id: `opt-${Date.now()}-2`, text: '' },
+        { id: `opt-${Date.now()}-1`, text: { en: '', ar: '' } },
+        { id: `opt-${Date.now()}-2`, text: { en: '', ar: '' } },
       ];
     } else {
       updates.options = undefined;
@@ -248,13 +250,28 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                     {index + 1}
                   </div>
                   <div className="flex-1 space-y-3">
-                    {/* Question Text */}
-                    <Input
-                      placeholder={t('questions_section.enter_question')}
-                      value={question.text}
-                      onChange={(e) => updateQuestion(question.id, { text: e.target.value })}
-                      onFocus={() => setEditingQuestionId(question.id)}
-                    />
+                    {/* Question Text - Bilingual */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2" onFocus={() => setEditingQuestionId(question.id)}>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('english')}</span>
+                        <Input
+                          placeholder={t('questions_section.enter_question')}
+                          value={ensureBilingual(question.text).en}
+                          onChange={(e) => updateQuestion(question.id, { text: { ...ensureBilingual(question.text), en: e.target.value } })}
+                          dir="ltr"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('arabic')}</span>
+                        <Input
+                          placeholder={t('questions_section.enter_question')}
+                          value={ensureBilingual(question.text).ar}
+                          onChange={(e) => updateQuestion(question.id, { text: { ...ensureBilingual(question.text), ar: e.target.value } })}
+                          dir="rtl"
+                          className="font-ar"
+                        />
+                      </div>
+                    </div>
 
                     <div className="flex items-center gap-4 flex-wrap">
                       {/* Question Type */}
@@ -297,17 +314,28 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
                     {/* Multiple Choice Options */}
                     {question.type === 'multiple_choice' && (
-                      <div className="space-y-2 pl-4 border-l-2 border-muted">
+                      <div className="space-y-3 ps-4 border-s-2 border-muted">
                         {question.options?.map((option) => (
-                          <div key={option.id} className="flex items-center gap-2">
-                            <Input
-                              placeholder={t('questions_section.option_text')}
-                              value={option.text}
-                              onChange={(e) =>
-                                updateOption(question.id, option.id, e.target.value)
-                              }
-                              className="flex-1"
-                            />
+                          <div key={option.id} className="flex items-start gap-2">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <Input
+                                placeholder={`${t('questions_section.option_text')} (EN)`}
+                                value={ensureBilingual(option.text).en}
+                                onChange={(e) =>
+                                  updateOption(question.id, option.id, { ...ensureBilingual(option.text), en: e.target.value })
+                                }
+                                dir="ltr"
+                              />
+                              <Input
+                                placeholder={`${t('questions_section.option_text')} (AR)`}
+                                value={ensureBilingual(option.text).ar}
+                                onChange={(e) =>
+                                  updateOption(question.id, option.id, { ...ensureBilingual(option.text), ar: e.target.value })
+                                }
+                                dir="rtl"
+                                className="font-ar"
+                              />
+                            </div>
                             <Button
                               type="button"
                               variant="ghost"

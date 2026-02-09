@@ -288,6 +288,7 @@ export type Database = {
           id: string
           is_geo_tagged: boolean
           name: string
+          name_ar: string | null
           number_of_visits: number
           photo_requirements: Json
           published_at: string | null
@@ -310,6 +311,7 @@ export type Database = {
           id?: string
           is_geo_tagged?: boolean
           name: string
+          name_ar?: string | null
           number_of_visits?: number
           photo_requirements?: Json
           published_at?: string | null
@@ -332,6 +334,7 @@ export type Database = {
           id?: string
           is_geo_tagged?: boolean
           name?: string
+          name_ar?: string | null
           number_of_visits?: number
           photo_requirements?: Json
           published_at?: string | null

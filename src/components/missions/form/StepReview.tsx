@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getBilingualText } from '@/i18n/utils';
 import { format, parseISO } from 'date-fns';
 import {
   Users,
@@ -158,7 +159,7 @@ export function StepReview({
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <span className="truncate block">{q.text || t('review.empty_question')}</span>
+                  <span className="truncate block">{getBilingualText(q.text) || t('review.empty_question')}</span>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-muted-foreground">({QUESTION_TYPE_LABELS[q.type]})</span>
                     {q.photoRequirement?.enabled && (

@@ -47,3 +47,22 @@ export function useDirectionalSide() {
 export function createBilingualValue(en: string = '', ar: string = ''): BilingualValue {
   return { en, ar };
 }
+
+/**
+ * Get the text content from a field that may be string or BilingualValue.
+ * For validation purposes, checks if any language has content.
+ */
+export function getBilingualText(value: string | BilingualValue | undefined): string {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value.en || value.ar || '';
+}
+
+/**
+ * Ensure a value is a BilingualValue object (convert plain strings).
+ */
+export function ensureBilingual(value: string | BilingualValue | undefined): BilingualValue {
+  if (!value) return { en: '', ar: '' };
+  if (typeof value === 'string') return { en: value, ar: '' };
+  return value;
+}

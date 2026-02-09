@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getBilingualText } from '@/i18n/utils';
 import { Check } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ import { useDirectionalIcons } from '@/i18n/utils';
 
 const initialFormData: MissionFormData = {
   name: '',
+  name_ar: '',
   branch_ids: [],
   agent_tier: 'C',
   questions: [],
@@ -97,7 +99,7 @@ export default function MissionCreatePage() {
       case 1:
         return Boolean(formData.agent_tier);
       case 2:
-        return formData.questions.length > 0 && formData.questions.every(q => q.text.trim() !== '');
+        return formData.questions.length > 0 && formData.questions.every(q => getBilingualText(q.text).trim() !== '');
       case 3:
         return true;
       case 4:
@@ -128,9 +130,13 @@ export default function MissionCreatePage() {
         const missionName = formData.branch_ids.length > 1
           ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
           : formData.name;
+        const missionNameAr = formData.branch_ids.length > 1
+          ? `${formData.name_ar || ''} - ${branches.find(b => b.id === branchId)?.name || branchId}`
+          : formData.name_ar;
 
         await createMission({
           name: missionName,
+          name_ar: missionNameAr,
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
@@ -166,9 +172,13 @@ export default function MissionCreatePage() {
         const missionName = formData.branch_ids.length > 1
           ? `${formData.name} - ${branches.find(b => b.id === branchId)?.name || branchId}`
           : formData.name;
+        const missionNameAr = formData.branch_ids.length > 1
+          ? `${formData.name_ar || ''} - ${branches.find(b => b.id === branchId)?.name || branchId}`
+          : formData.name_ar;
 
         const mission = await createMission({
           name: missionName,
+          name_ar: missionNameAr,
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
