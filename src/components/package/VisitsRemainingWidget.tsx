@@ -1,5 +1,6 @@
 import { CalendarCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface VisitsRemainingWidgetProps {
   visitsRemaining: number;
@@ -14,6 +15,7 @@ export function VisitsRemainingWidget({
   variant = 'header',
   className,
 }: VisitsRemainingWidgetProps) {
+  const { t } = useTranslation('dashboard');
   const percentage = (visitsRemaining / visitsTotal) * 100;
   const isLow = visitsRemaining <= 5;
   const isZero = visitsRemaining === 0;
@@ -30,7 +32,7 @@ export function VisitsRemainingWidget({
           <CalendarCheck className="h-4 w-4 text-background" />
         </div>
         <div className="leading-tight">
-          <div className="text-xs text-muted-foreground uppercase tracking-wide">Visits Left</div>
+          <div className="text-xs text-muted-foreground uppercase tracking-wide">{t('visits_left')}</div>
           <div
             className={cn(
               'text-sm font-black',
@@ -58,7 +60,7 @@ export function VisitsRemainingWidget({
         )}
       >
         <CalendarCheck className="h-3.5 w-3.5" />
-        <span>{visitsRemaining} visits left</span>
+        <span>{t('visits_left_count', { count: visitsRemaining })}</span>
       </div>
     );
   }
@@ -69,7 +71,7 @@ export function VisitsRemainingWidget({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
           <CalendarCheck className="h-4 w-4" />
-          Visits This Month
+          {t('visits_this_month')}
         </div>
         <div
           className={cn(
@@ -94,7 +96,7 @@ export function VisitsRemainingWidget({
 
       {isZero && (
         <p className="text-xs text-destructive">
-          You've used all visits this month. Upgrade your plan or wait until next month.
+          {t('visits_used_all')}
         </p>
       )}
     </div>
