@@ -40,7 +40,7 @@ export type QuestionType = 'multiple_choice' | 'rating' | 'short_text' | 'yes_no
 
 export interface QuestionOption {
   id: string;
-  text: string;
+  text: string | { en: string; ar: string };
 }
 
 export interface QuestionPhotoRequirement {
@@ -54,7 +54,7 @@ export interface QuestionPhotoRequirement {
 export interface Question {
   id: string;
   type: QuestionType;
-  text: string;
+  text: string | { en: string; ar: string };
   required: boolean;
   options?: QuestionOption[]; // For multiple_choice
   max_rating?: number; // For rating (default 5)
@@ -166,6 +166,7 @@ export interface PurchaseItem {
 export interface MissionFormData {
   // Step 1: Basics
   name: string;
+  name_ar?: string;
   branch_ids: string[]; // Changed to support multiple branches
   
   // Step 2: Agent Tier

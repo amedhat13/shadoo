@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { MissionFormData, Question, PhotoRequirements, VisitSchedule } from '@/types';
+import { getBilingualText } from '@/i18n/utils';
 import { AdminStepBasics } from '@/components/admin/missions/form/AdminStepBasics';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
@@ -24,11 +25,13 @@ const STEP_KEYS = ['basics', 'agent_tier', 'questions', 'geo_settings', 'funding
 
 interface AdminMissionFormData extends MissionFormData {
   clientUserId: string;
+  name_ar?: string;
 }
 
 const initialFormData: AdminMissionFormData = {
   clientUserId: '',
   name: '',
+  name_ar: '',
   branch_ids: [],
   agent_tier: 'C',
   questions: [],
@@ -59,6 +62,7 @@ export default function AdminMissionCreatePage() {
     mutationFn: async (data: {
       userId: string;
       name: string;
+      nameAr?: string;
       branchId: string;
       agentTier: string;
       questions: Question[];
@@ -73,6 +77,7 @@ export default function AdminMissionCreatePage() {
       const { error } = await supabase.from('missions').insert({
         user_id: data.userId,
         name: data.name,
+        name_ar: data.nameAr || null,
         branch_id: data.branchId,
         agent_tier: data.agentTier,
         questions: JSON.parse(JSON.stringify(data.questions)),
@@ -103,7 +108,7 @@ export default function AdminMissionCreatePage() {
       case 1:
         return Boolean(formData.agent_tier);
       case 2:
-        return formData.questions.length > 0 && formData.questions.every((q) => q.text.trim() !== '');
+        return formData.questions.length > 0 && formData.questions.every((q) => getBilingualText(q.text).trim() !== '');
       case 3:
         return true;
       case 4:
@@ -136,10 +141,15 @@ export default function AdminMissionCreatePage() {
           formData.branch_ids.length > 1
             ? `${formData.name} - ${branch?.name || branchId}`
             : formData.name;
+        const missionNameAr =
+          formData.branch_ids.length > 1
+            ? `${formData.name_ar || ''} - ${branch?.name || branchId}`
+            : formData.name_ar;
 
         await createMissionMutation.mutateAsync({
           userId: formData.clientUserId,
           name: missionName,
+          nameAr: missionNameAr,
           branchId,
           agentTier: formData.agent_tier,
           questions: formData.questions,

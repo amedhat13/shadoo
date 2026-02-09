@@ -1,5 +1,4 @@
 import { Check, ChevronsUpDown, X, AlertCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { ClientSelector } from '@/components/admin/common/ClientSelector';
 import { useTranslation } from 'react-i18next';
+import { BilingualInput } from '@/components/common/BilingualInput';
 
 interface Branch {
   id: string;
@@ -31,6 +31,7 @@ interface Branch {
 interface AdminMissionFormData {
   clientUserId: string;
   name: string;
+  name_ar?: string;
   branch_ids: string[];
 }
 
@@ -89,14 +90,13 @@ export function AdminStepBasics({ data, onChange, branches }: AdminStepBasicsPro
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">
-          {t('admin.mission_name')}<span className="text-destructive">*</span>
-        </Label>
-        <Input
+        <BilingualInput
+          label={t('admin.mission_name')}
+          value={{ en: data.name || '', ar: data.name_ar || '' }}
+          onChange={(val) => onChange({ name: val.en, name_ar: val.ar })}
+          placeholder={{ en: t('admin.mission_name_placeholder'), ar: t('admin.mission_name_placeholder') }}
+          required
           id="name"
-          placeholder={t('admin.mission_name_placeholder')}
-          value={data.name}
-          onChange={(e) => onChange({ name: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           {t('admin.mission_name_help')}

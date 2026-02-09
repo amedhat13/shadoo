@@ -234,7 +234,7 @@ export default function MissionDetailsPage() {
                     <div key={question.id} className="flex items-start gap-3 border border-border p-3">
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{index + 1}</div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{question.text}</p>
+                        <p className="text-sm font-medium">{typeof question.text === 'string' ? question.text : question.text.en || question.text.ar}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {QUESTION_TYPE_LABELS[question.type]}
                           {question.required && ` • ${tc('required')}`}

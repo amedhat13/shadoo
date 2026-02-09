@@ -1,6 +1,5 @@
 import { Check, ChevronsUpDown, X, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +21,7 @@ import { MissionFormData, Branch } from '@/types';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BilingualInput } from '@/components/common/BilingualInput';
 
 interface StepBasicsProps {
   data: MissionFormData;
@@ -66,14 +66,13 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wide">
-          {t('form.mission_name')}<span className="text-destructive">*</span>
-        </Label>
-        <Input
+        <BilingualInput
+          label={t('form.mission_name')}
+          value={{ en: data.name || '', ar: data.name_ar || '' }}
+          onChange={(val) => onChange({ name: val.en, name_ar: val.ar })}
+          placeholder={{ en: t('form.mission_name_placeholder'), ar: t('form.mission_name_placeholder') }}
+          required
           id="name"
-          placeholder={t('form.mission_name_placeholder')}
-          value={data.name}
-          onChange={(e) => onChange({ name: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           {t('form.mission_name_help')}

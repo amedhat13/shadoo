@@ -136,7 +136,7 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
               <div className="space-y-1 mt-2">
                 {data.questions.slice(0, 3).map((q: Question, i: number) => (
                   <div key={q.id} className="text-xs text-muted-foreground truncate">
-                    {i + 1}. {q.text}
+                    {i + 1}. {typeof q.text === 'string' ? q.text : q.text.en || q.text.ar}
                   </div>
                 ))}
                 {data.questions.length > 3 && (
