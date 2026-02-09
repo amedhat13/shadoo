@@ -336,7 +336,7 @@ export default function AdminBranchesPage() {
                             <TableHead>Client</TableHead>
                             <TableHead>City</TableHead>
                             <TableHead>Submitted</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-end">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -353,7 +353,7 @@ export default function AdminBranchesPage() {
                               <TableCell className="text-muted-foreground">
                                 {new Date(branch.created_at).toLocaleDateString()}
                               </TableCell>
-                              <TableCell className="text-right">
+                              <TableCell className="text-end">
                                 <div className="flex justify-end gap-2">
                                   <Button 
                                     variant="outline" 
@@ -424,7 +424,7 @@ export default function AdminBranchesPage() {
                             <TableHead>Client</TableHead>
                             <TableHead>City</TableHead>
                             <TableHead>Address</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-end">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -434,7 +434,7 @@ export default function AdminBranchesPage() {
                               <TableCell className="text-muted-foreground">{branch.clientName}</TableCell>
                               <TableCell>{branch.city}</TableCell>
                               <TableCell className="text-muted-foreground">{branch.address}</TableCell>
-                              <TableCell className="text-right">
+                              <TableCell className="text-end">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon" className="h-8 w-8">

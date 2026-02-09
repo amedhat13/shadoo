@@ -29,6 +29,9 @@
   "delete_confirmation": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
   "delete_confirmation_missions": "ستتأثر أي مهام مرتبطة بهذا الفرع.",
   "cancel": "إلغاء",
+  "saving": "جاري الحفظ...",
+  "update_branch": "تحديث الفرع",
+  "status": "الحالة",
   "stats": {
     "total": "الإجمالي",
     "verified": "موثق",

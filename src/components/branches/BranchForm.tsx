@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MapPin, Link as LinkIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BranchFormProps {
   open: boolean;
@@ -39,13 +40,13 @@ const initialFormState: BranchFormData = {
 };
 
 export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: BranchFormProps) {
+  const { t } = useTranslation('branches');
   const [formData, setFormData] = useState<BranchFormData>(initialFormState);
   const [errors, setErrors] = useState<Partial<BranchFormData>>({});
   const [selectedCityId, setSelectedCityId] = useState<string>('');
 
   useEffect(() => {
     if (branch) {
-      // Find city ID from name
       const city = getCityByName(branch.city);
       setSelectedCityId(city?.id || '');
       setFormData({
@@ -68,7 +69,7 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
     setFormData({ 
       ...formData, 
       city: city?.name || '', 
-      district: '' // Reset district when city changes
+      district: ''
     });
   };
 
@@ -81,19 +82,13 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
   const validate = (): boolean => {
     const newErrors: Partial<BranchFormData> = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Branch name is required.';
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required.';
-    }
-    if (!formData.city.trim()) {
-      newErrors.city = 'City is required.';
-    }
+    if (!formData.name.trim()) newErrors.name = t('validation.name_required');
+    if (!formData.address.trim()) newErrors.address = t('validation.address_required');
+    if (!formData.city.trim()) newErrors.city = t('validation.city_required');
     if (!formData.google_maps_link.trim()) {
-      newErrors.google_maps_link = 'Google Maps link is required.';
+      newErrors.google_maps_link = t('validation.maps_required');
     } else if (!formData.google_maps_link.includes('google.com/maps') && !formData.google_maps_link.includes('maps.google.com') && !formData.google_maps_link.includes('goo.gl/maps')) {
-      newErrors.google_maps_link = 'Please enter a valid Google Maps link.';
+      newErrors.google_maps_link = t('validation.maps_invalid');
     }
 
     setErrors(newErrors);
@@ -110,25 +105,23 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="text-start">
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            {branch ? 'Edit Branch' : 'Add New Branch'}
+            {branch ? t('form.edit_dialog_title') : t('form.add_dialog_title')}
           </DialogTitle>
           <DialogDescription>
-            {branch 
-              ? 'Update branch details. Changes will require re-verification by Shadoo admin.'
-              : 'Add a new branch location. It will be verified by Shadoo admin before it can be used in missions.'}
+            {branch ? t('form.edit_dialog_desc') : t('form.add_dialog_desc')}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-start">
           <div className="space-y-2">
-            <Label htmlFor="name">Branch Name<span className="text-destructive">*</span></Label>
+            <Label htmlFor="name">{t('form.branch_name')}<span className="text-destructive">*</span></Label>
             <Input
               id="name"
-              placeholder="e.g., Cairo Downtown"
+              placeholder={t('form.branch_name_placeholder')}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
@@ -137,10 +130,10 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="city">City<span className="text-destructive">*</span></Label>
+              <Label htmlFor="city">{t('form.city')}<span className="text-destructive">*</span></Label>
               <Select value={selectedCityId} onValueChange={handleCityChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select city" />
+                  <SelectValue placeholder={t('form.city_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {EGYPT_CITIES.map((city) => (
@@ -154,14 +147,14 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="district">District</Label>
+              <Label htmlFor="district">{t('form.district')}</Label>
               <Select 
                 value={formData.district || ''} 
                 onValueChange={handleDistrictChange}
                 disabled={!selectedCityId}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={selectedCityId ? "Select district" : "Select city first"} />
+                  <SelectValue placeholder={selectedCityId ? t('form.district_placeholder') : t('form.district_placeholder_no_city')} />
                 </SelectTrigger>
                 <SelectContent>
                   {districts.map((district) => (
@@ -175,10 +168,10 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address<span className="text-destructive">*</span></Label>
+            <Label htmlFor="address">{t('form.address')}<span className="text-destructive">*</span></Label>
             <Input
               id="address"
-              placeholder="e.g., 123 Main Street"
+              placeholder={t('form.address_placeholder')}
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             />
@@ -188,26 +181,26 @@ export function BranchForm({ open, onOpenChange, branch, onSubmit, isLoading }: 
           <div className="space-y-2">
             <Label htmlFor="google_maps_link" className="flex items-center gap-2">
               <LinkIcon className="h-3 w-3" />
-              Google Maps Link<span className="text-destructive">*</span>
+              {t('form.google_maps_link')}<span className="text-destructive">*</span>
             </Label>
             <Input
               id="google_maps_link"
-              placeholder="https://maps.google.com/..."
+              placeholder={t('form.google_maps_placeholder')}
               value={formData.google_maps_link}
               onChange={(e) => setFormData({ ...formData, google_maps_link: e.target.value })}
             />
             {errors.google_maps_link && <p className="text-xs text-destructive">{errors.google_maps_link}</p>}
             <p className="text-xs text-muted-foreground">
-              Open Google Maps, find your location, and copy the share link.
+              {t('form.google_maps_help')}
             </p>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : branch ? 'Update Branch' : 'Add Branch'}
+              {isLoading ? t('saving') : branch ? t('form.update_branch') : t('add_branch')}
             </Button>
           </DialogFooter>
         </form>

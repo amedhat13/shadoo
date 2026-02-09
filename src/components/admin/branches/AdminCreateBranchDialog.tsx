@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { EGYPT_CITIES, getDistrictsByCity, getCityByName } from '@/lib/egypt-locations';
+import { EGYPT_CITIES, getDistrictsByCity } from '@/lib/egypt-locations';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { MapPin, Link as LinkIcon, Plus, Loader2 } from 'lucide-react';
 import { ClientSelector } from '@/components/admin/common/ClientSelector';
+import { useTranslation } from 'react-i18next';
 
 interface AdminBranchFormData {
   clientUserId: string;
@@ -35,6 +36,7 @@ interface AdminBranchFormData {
 }
 
 export function AdminCreateBranchDialog() {
+  const { t } = useTranslation('branches');
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<AdminBranchFormData>({
     clientUserId: '',
@@ -50,7 +52,6 @@ export function AdminCreateBranchDialog() {
 
   const createBranchMutation = useMutation({
     mutationFn: async (data: AdminBranchFormData) => {
-      // Extract coordinates from link
       const coords = extractCoordsFromLink(data.google_maps_link);
       
       const { error } = await supabase
@@ -64,13 +65,13 @@ export function AdminCreateBranchDialog() {
           google_maps_link: data.google_maps_link,
           latitude: coords?.lat || null,
           longitude: coords?.lng || null,
-          status: 'verified', // Admin-created branches are pre-verified
+          status: 'verified',
         });
       
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Branch created successfully');
+      toast.success(t('toast.added'));
       queryClient.invalidateQueries({ queryKey: ['admin-branches'] });
       handleClose();
     },
@@ -81,14 +82,7 @@ export function AdminCreateBranchDialog() {
 
   const handleClose = () => {
     setOpen(false);
-    setFormData({
-      clientUserId: '',
-      name: '',
-      address: '',
-      city: '',
-      district: '',
-      google_maps_link: '',
-    });
+    setFormData({ clientUserId: '', name: '', address: '', city: '', district: '', google_maps_link: '' });
     setSelectedCityId('');
     setErrors({});
   };
@@ -96,36 +90,22 @@ export function AdminCreateBranchDialog() {
   const handleCityChange = (cityId: string) => {
     const city = EGYPT_CITIES.find(c => c.id === cityId);
     setSelectedCityId(cityId);
-    setFormData({ 
-      ...formData, 
-      city: city?.name || '', 
-      district: ''
-    });
+    setFormData({ ...formData, city: city?.name || '', district: '' });
   };
 
   const districts = selectedCityId ? getDistrictsByCity(selectedCityId) : [];
 
   const validate = (): boolean => {
     const newErrors: Partial<AdminBranchFormData> = {};
-    
-    if (!formData.clientUserId) {
-      newErrors.clientUserId = 'Client is required.';
-    }
-    if (!formData.name.trim()) {
-      newErrors.name = 'Branch name is required.';
-    }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required.';
-    }
-    if (!formData.city.trim()) {
-      newErrors.city = 'City is required.';
-    }
+    if (!formData.clientUserId) newErrors.clientUserId = t('validation.client_required', 'Client is required.');
+    if (!formData.name.trim()) newErrors.name = t('validation.name_required');
+    if (!formData.address.trim()) newErrors.address = t('validation.address_required');
+    if (!formData.city.trim()) newErrors.city = t('validation.city_required');
     if (!formData.google_maps_link.trim()) {
-      newErrors.google_maps_link = 'Google Maps link is required.';
+      newErrors.google_maps_link = t('validation.maps_required');
     } else if (!formData.google_maps_link.includes('google.com/maps') && !formData.google_maps_link.includes('maps.google.com') && !formData.google_maps_link.includes('goo.gl/maps')) {
-      newErrors.google_maps_link = 'Please enter a valid Google Maps link.';
+      newErrors.google_maps_link = t('validation.maps_invalid');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -141,21 +121,21 @@ export function AdminCreateBranchDialog() {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Create Branch
+          {t('add_branch')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="text-start">
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Create Branch for Client
+            {t('form.add_dialog_title')}
           </DialogTitle>
           <DialogDescription>
-            Create a new branch for a client. It will be automatically verified.
+            {t('form.add_dialog_desc')}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-start">
           <div className="space-y-2">
             <ClientSelector
               value={formData.clientUserId}
@@ -166,10 +146,10 @@ export function AdminCreateBranchDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Branch Name<span className="text-destructive">*</span></Label>
+            <Label htmlFor="name">{t('form.branch_name')}<span className="text-destructive">*</span></Label>
             <Input
               id="name"
-              placeholder="e.g., Cairo Downtown"
+              placeholder={t('form.branch_name_placeholder')}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
@@ -178,10 +158,10 @@ export function AdminCreateBranchDialog() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="city">City<span className="text-destructive">*</span></Label>
+              <Label htmlFor="city">{t('form.city')}<span className="text-destructive">*</span></Label>
               <Select value={selectedCityId} onValueChange={handleCityChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select city" />
+                  <SelectValue placeholder={t('form.city_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {EGYPT_CITIES.map((city) => (
@@ -195,14 +175,14 @@ export function AdminCreateBranchDialog() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="district">District</Label>
+              <Label htmlFor="district">{t('form.district')}</Label>
               <Select 
                 value={formData.district || ''} 
                 onValueChange={(value) => setFormData({ ...formData, district: value })}
                 disabled={!selectedCityId}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={selectedCityId ? "Select district" : "Select city first"} />
+                  <SelectValue placeholder={selectedCityId ? t('form.district_placeholder') : t('form.district_placeholder_no_city')} />
                 </SelectTrigger>
                 <SelectContent>
                   {districts.map((district) => (
@@ -216,10 +196,10 @@ export function AdminCreateBranchDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address<span className="text-destructive">*</span></Label>
+            <Label htmlFor="address">{t('form.address')}<span className="text-destructive">*</span></Label>
             <Input
               id="address"
-              placeholder="e.g., 123 Main Street"
+              placeholder={t('form.address_placeholder')}
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             />
@@ -229,11 +209,11 @@ export function AdminCreateBranchDialog() {
           <div className="space-y-2">
             <Label htmlFor="google_maps_link" className="flex items-center gap-2">
               <LinkIcon className="h-3 w-3" />
-              Google Maps Link<span className="text-destructive">*</span>
+              {t('form.google_maps_link')}<span className="text-destructive">*</span>
             </Label>
             <Input
               id="google_maps_link"
-              placeholder="https://maps.google.com/..."
+              placeholder={t('form.google_maps_placeholder')}
               value={formData.google_maps_link}
               onChange={(e) => setFormData({ ...formData, google_maps_link: e.target.value })}
             />
@@ -242,11 +222,11 @@ export function AdminCreateBranchDialog() {
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={handleClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={createBranchMutation.isPending}>
-              {createBranchMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Branch
+              {createBranchMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {t('add_branch')}
             </Button>
           </DialogFooter>
         </form>
@@ -258,13 +238,9 @@ export function AdminCreateBranchDialog() {
 function extractCoordsFromLink(link: string): { lat: number; lng: number } | null {
   try {
     const qMatch = link.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (qMatch) {
-      return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
-    }
+    if (qMatch) return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
     const atMatch = link.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-    if (atMatch) {
-      return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
-    }
+    if (atMatch) return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
     return null;
   } catch {
     return null;

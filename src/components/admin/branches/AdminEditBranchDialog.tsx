@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { EGYPT_CITIES, getCityByName, getDistrictsByCity } from '@/lib/egypt-locations';
+import { useTranslation } from 'react-i18next';
 
 interface Branch {
   id: string;
@@ -39,6 +40,7 @@ interface AdminEditBranchDialogProps {
 }
 
 export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditBranchDialogProps) {
+  const { t } = useTranslation('branches');
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -65,9 +67,7 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
   const updateBranchMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       if (!branch) throw new Error('No branch selected');
-      
       const city = EGYPT_CITIES.find(c => c.id === data.city);
-      
       const { error } = await supabase
         .from('branches')
         .update({
@@ -79,11 +79,10 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
           updated_at: new Date().toISOString(),
         })
         .eq('id', branch.id);
-
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Branch updated successfully');
+      toast.success(t('toast.updated'));
       queryClient.invalidateQueries({ queryKey: ['admin-branches'] });
       onOpenChange(false);
     },
@@ -94,10 +93,10 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (!formData.city) newErrors.city = 'City is required';
-    if (!formData.google_maps_link.trim()) newErrors.google_maps_link = 'Google Maps link is required';
+    if (!formData.name.trim()) newErrors.name = t('validation.name_required');
+    if (!formData.address.trim()) newErrors.address = t('validation.address_required');
+    if (!formData.city) newErrors.city = t('validation.city_required');
+    if (!formData.google_maps_link.trim()) newErrors.google_maps_link = t('validation.maps_required');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -112,17 +111,15 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Branch</DialogTitle>
-          <DialogDescription>
-            Update branch information.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="text-start">
+          <DialogTitle>{t('form.edit_dialog_title')}</DialogTitle>
+          <DialogDescription>{t('form.edit_dialog_desc')}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-start">
           <div className="space-y-2">
-            <Label htmlFor="name">Branch Name<span className="text-destructive">*</span></Label>
+            <Label htmlFor="name">{t('form.branch_name')}<span className="text-destructive">*</span></Label>
             <Input
               id="name"
               value={formData.name}
@@ -132,7 +129,7 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Address<span className="text-destructive">*</span></Label>
+            <Label htmlFor="address">{t('form.address')}<span className="text-destructive">*</span></Label>
             <Input
               id="address"
               value={formData.address}
@@ -143,13 +140,13 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>City<span className="text-destructive">*</span></Label>
+              <Label>{t('form.city')}<span className="text-destructive">*</span></Label>
               <Select
                 value={formData.city}
                 onValueChange={(value) => setFormData({ ...formData, city: value, district: '' })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select city" />
+                  <SelectValue placeholder={t('form.city_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {EGYPT_CITIES.map((city) => (
@@ -163,14 +160,14 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
             </div>
 
             <div className="space-y-2">
-              <Label>District</Label>
+              <Label>{t('form.district')}</Label>
               <Select
                 value={formData.district}
                 onValueChange={(value) => setFormData({ ...formData, district: value })}
                 disabled={!formData.city}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select district" />
+                  <SelectValue placeholder={t('form.district_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {districts.map((district) => (
@@ -184,7 +181,7 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="maps">Google Maps Link<span className="text-destructive">*</span></Label>
+            <Label htmlFor="maps">{t('form.google_maps_link')}<span className="text-destructive">*</span></Label>
             <Input
               id="maps"
               value={formData.google_maps_link}
@@ -195,11 +192,11 @@ export function AdminEditBranchDialog({ branch, open, onOpenChange }: AdminEditB
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={updateBranchMutation.isPending}>
-              {updateBranchMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {updateBranchMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {t('form.update_branch')}
             </Button>
           </DialogFooter>
         </form>
