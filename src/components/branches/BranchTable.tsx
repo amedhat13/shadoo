@@ -152,9 +152,9 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap }: BranchT
               <TableHead>{t('address')}</TableHead>
               <TableHead>{t('city')}</TableHead>
               <TableHead>{t('district')}</TableHead>
-              <TableHead>{t('status')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('status')}</TableHead>
               <TableHead>{t('google_maps')}</TableHead>
-              <TableHead className={isRTL ? "text-start" : "text-end"}>{t('actions')}</TableHead>
+              <TableHead>{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -191,8 +191,8 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap }: BranchT
                     {t('view')} <ExternalLink className="h-3 w-3" />
                   </a>
                 </TableCell>
-                <TableCell className={isRTL ? "text-start" : "text-end"}>
-                  <div className={`flex items-center gap-2 ${isRTL ? "justify-start" : "justify-end"}`}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
