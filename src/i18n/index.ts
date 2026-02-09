@@ -13,6 +13,7 @@ import settingsEN from './locales/en/settings.json';
 import authEN from './locales/en/auth.json';
 import landingEN from './locales/en/landing.json';
 import adminEN from './locales/en/admin.json';
+import reportsEN from './locales/en/reports.json';
 
 // AR translations
 import commonAR from './locales/ar/common.json';
@@ -25,6 +26,7 @@ import settingsAR from './locales/ar/settings.json';
 import authAR from './locales/ar/auth.json';
 import landingAR from './locales/ar/landing.json';
 import adminAR from './locales/ar/admin.json';
+import reportsAR from './locales/ar/reports.json';
 
 i18n
   .use(LanguageDetector)
@@ -42,6 +44,7 @@ i18n
         auth: authEN,
         landing: landingEN,
         admin: adminEN,
+        reports: reportsEN,
       },
       ar: {
         common: commonAR,
@@ -54,12 +57,13 @@ i18n
         auth: authAR,
         landing: landingAR,
         admin: adminAR,
+        reports: reportsAR,
       },
     },
     lng: 'en',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'nav', 'dashboard', 'missions', 'branches', 'wallet', 'settings', 'auth', 'landing', 'admin'],
+    ns: ['common', 'nav', 'dashboard', 'missions', 'branches', 'wallet', 'settings', 'auth', 'landing', 'admin', 'reports'],
     interpolation: {
       escapeValue: false,
     },

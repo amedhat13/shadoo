@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,8 @@ import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { usePackage } from '@/hooks/usePackage';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { useLanguage } from '@/i18n/LanguageProvider';
+import { getLocalizedValue } from '@/i18n/utils';
 import {
   ChartContainer,
   ChartTooltip,
@@ -111,9 +114,7 @@ const allBudgetData = [
   { month: 'Feb', branch: 'Giza Plaza', allocated: 5000, used: 1700 },
 ];
 
-// Generate mock response data per mission based on their actual questions
 const generateMockResponses = (missionId: string, questions: any[]) => {
-  // Seed random based on mission ID for consistent mock data
   const seed = missionId.charCodeAt(missionId.length - 1);
   
   return questions.map((q, index) => {
@@ -163,7 +164,6 @@ const generateMockResponses = (missionId: string, questions: any[]) => {
         options: optionResults,
       };
     } else {
-      // short_text - show sample responses
       return {
         questionId: q.id,
         question: q.text,
@@ -183,30 +183,31 @@ const generateMockResponses = (missionId: string, questions: any[]) => {
 const MONTHS = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
 const BRANCHES = ['Cairo Downtown', 'Alexandria Mall', 'Giza Plaza'];
 
-const chartConfig = {
-  planned: { label: 'Planned', color: CHART_COLORS.orange },
-  completed: { label: 'Completed', color: CHART_COLORS.green },
-  allocated: { label: 'Allocated', color: CHART_COLORS.amber },
-  used: { label: 'Used', color: CHART_COLORS.emerald },
-  yes: { label: 'Yes', color: CHART_COLORS.green },
-  no: { label: 'No', color: CHART_COLORS.red },
-  rating: { label: 'Rating', color: CHART_COLORS.orange },
-  'Cairo Downtown': { label: 'Cairo Downtown', color: CHART_COLORS.orange },
-  'Alexandria Mall': { label: 'Alexandria Mall', color: CHART_COLORS.green },
-  'Giza Plaza': { label: 'Giza Plaza', color: CHART_COLORS.amber },
-};
-
 export default function ReportsPage() {
+  const { t } = useTranslation('reports');
+  const { t: tCommon } = useTranslation('common');
+  const { language } = useLanguage();
   const { missions } = useMissions();
   const { wallet } = useWallet();
   const { subscription } = usePackage();
   
-  // Filters - now support multiple selections
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [selectedMissionId, setSelectedMissionId] = useState<string>('all');
 
-  // Get selected mission and its responses
+  const chartConfig = {
+    planned: { label: t('chart_labels.planned'), color: CHART_COLORS.orange },
+    completed: { label: t('chart_labels.completed'), color: CHART_COLORS.green },
+    allocated: { label: t('chart_labels.allocated'), color: CHART_COLORS.amber },
+    used: { label: t('chart_labels.used'), color: CHART_COLORS.emerald },
+    yes: { label: t('chart_labels.yes'), color: CHART_COLORS.green },
+    no: { label: t('chart_labels.no'), color: CHART_COLORS.red },
+    rating: { label: t('chart_labels.rating'), color: CHART_COLORS.orange },
+    'Cairo Downtown': { label: 'Cairo Downtown', color: CHART_COLORS.orange },
+    'Alexandria Mall': { label: 'Alexandria Mall', color: CHART_COLORS.green },
+    'Giza Plaza': { label: 'Giza Plaza', color: CHART_COLORS.amber },
+  };
+
   const selectedMission = useMemo(() => {
     if (selectedMissionId === 'all') return null;
     return missions.find(m => m.id === selectedMissionId);
@@ -217,30 +218,20 @@ export default function ReportsPage() {
     return generateMockResponses(selectedMission.id, selectedMission.questions);
   }, [selectedMission]);
 
-  // Filter data based on selections (now supports multiple)
   const filteredVisitData = useMemo(() => {
     let data = allVisitData;
-    if (selectedMonths.length > 0) {
-      data = data.filter(d => selectedMonths.includes(d.month));
-    }
-    if (selectedBranches.length > 0) {
-      data = data.filter(d => selectedBranches.includes(d.branch));
-    }
+    if (selectedMonths.length > 0) data = data.filter(d => selectedMonths.includes(d.month));
+    if (selectedBranches.length > 0) data = data.filter(d => selectedBranches.includes(d.branch));
     return data;
   }, [selectedMonths, selectedBranches]);
 
   const filteredBudgetData = useMemo(() => {
     let data = allBudgetData;
-    if (selectedMonths.length > 0) {
-      data = data.filter(d => selectedMonths.includes(d.month));
-    }
-    if (selectedBranches.length > 0) {
-      data = data.filter(d => selectedBranches.includes(d.branch));
-    }
+    if (selectedMonths.length > 0) data = data.filter(d => selectedMonths.includes(d.month));
+    if (selectedBranches.length > 0) data = data.filter(d => selectedBranches.includes(d.branch));
     return data;
   }, [selectedMonths, selectedBranches]);
 
-  // Aggregate data for charts
   const visitsByMonth = useMemo(() => {
     const months = selectedMonths.length === 0 ? MONTHS : selectedMonths;
     return months.map(month => {
@@ -280,23 +271,20 @@ export default function ReportsPage() {
     });
   }, [filteredBudgetData, selectedMonths]);
 
-  // Mission status pie chart data
   const missionStatusData = [
-    { name: 'Completed', value: missions.filter(m => m.status === 'completed').length, color: CHART_COLORS.green },
-    { name: 'Published', value: missions.filter(m => m.status === 'published').length, color: CHART_COLORS.orange },
-    { name: 'Paused', value: missions.filter(m => m.status === 'paused').length, color: CHART_COLORS.amber },
-    { name: 'Draft', value: missions.filter(m => m.status === 'draft').length, color: CHART_COLORS.sky },
+    { name: tCommon('statuses.completed'), value: missions.filter(m => m.status === 'completed').length, color: CHART_COLORS.green },
+    { name: tCommon('statuses.published'), value: missions.filter(m => m.status === 'published').length, color: CHART_COLORS.orange },
+    { name: tCommon('statuses.paused'), value: missions.filter(m => m.status === 'paused').length, color: CHART_COLORS.amber },
+    { name: tCommon('statuses.draft'), value: missions.filter(m => m.status === 'draft').length, color: CHART_COLORS.sky },
   ].filter(d => d.value > 0);
 
-  // Radial chart for branch performance
   const branchRadialData = visitsByBranch.map((branch, index) => ({
     name: branch.name,
-    value: parseFloat(branch.rating as string) * 20, // Convert to percentage
+    value: parseFloat(branch.rating as string) * 20,
     rating: branch.rating,
     fill: [CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.amber][index],
   }));
 
-  // Calculate key metrics from filtered data
   const totalVisitsPlanned = filteredVisitData.reduce((sum, d) => sum + d.planned, 0);
   const totalVisitsCompleted = filteredVisitData.reduce((sum, d) => sum + d.completed, 0);
   const completionRate = totalVisitsPlanned > 0 ? Math.round((totalVisitsCompleted / totalVisitsPlanned) * 100) : 0;
@@ -308,12 +296,14 @@ export default function ReportsPage() {
   const activeMissions = missions.filter(m => m.status === 'published').length;
   const completedMissions = missions.filter(m => m.status === 'completed').length;
 
+  const borderSide = language === 'ar' ? 'border-r-4' : 'border-l-4';
+
   return (
     <DashboardLayout>
       <div className="space-y-4 md:space-y-6">
         <PageHeader
-          title="Reports & Analytics"
-          description="Analyze visit outcomes, mission performance, and budget utilization."
+          title={t('title')}
+          description={t('description')}
         />
 
         {/* Filters */}
@@ -321,7 +311,7 @@ export default function ReportsPage() {
           <CardHeader className="pb-3 p-4 md:p-6">
             <CardTitle className="text-base flex items-center gap-2">
               <Filter className="h-4 w-4" />
-              Filters
+              {t('filters.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
@@ -329,29 +319,29 @@ export default function ReportsPage() {
               <div className="space-y-2 flex-1 sm:flex-none sm:min-w-[200px]">
                 <Label className="flex items-center gap-1 text-sm">
                   <Calendar className="h-3 w-3" />
-                  Months
+                  {t('filters.months')}
                 </Label>
                 <MultiSelect
                   options={MONTHS.map(month => ({ value: month, label: `${month} 2025` }))}
                   selected={selectedMonths}
                   onChange={setSelectedMonths}
-                  placeholder="All Months"
-                  searchPlaceholder="Search months..."
-                  emptyMessage="No months found."
+                  placeholder={t('filters.all_months')}
+                  searchPlaceholder={t('filters.search_months')}
+                  emptyMessage={t('filters.no_months')}
                 />
               </div>
               <div className="space-y-2 flex-1 sm:flex-none sm:min-w-[220px]">
                 <Label className="flex items-center gap-1 text-sm">
                   <MapPin className="h-3 w-3" />
-                  Branches
+                  {t('filters.branches')}
                 </Label>
                 <MultiSelect
                   options={BRANCHES.map(branch => ({ value: branch, label: branch }))}
                   selected={selectedBranches}
                   onChange={setSelectedBranches}
-                  placeholder="All Branches"
-                  searchPlaceholder="Search branches..."
-                  emptyMessage="No branches found."
+                  placeholder={t('filters.all_branches')}
+                  searchPlaceholder={t('filters.search_branches')}
+                  emptyMessage={t('filters.no_branches')}
                 />
               </div>
             </div>
@@ -360,15 +350,15 @@ export default function ReportsPage() {
 
         {/* Key Metrics Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          <Card className="border-l-4 border-l-orange-500">
+          <Card className={`${borderSide} border-orange-500`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Visit Completion</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('metrics.visit_completion')}</CardTitle>
               <Target className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{completionRate}%</div>
               <p className="text-xs text-muted-foreground">
-                {totalVisitsCompleted} of {totalVisitsPlanned} visits
+                {t('metrics.visits_of_total', { completed: totalVisitsCompleted, planned: totalVisitsPlanned })}
               </p>
               <div className="mt-2 h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div 
@@ -379,15 +369,15 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-green-500">
+          <Card className={`${borderSide} border-green-500`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Budget Utilization</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('metrics.budget_utilization')}</CardTitle>
               <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{budgetUtilization}%</div>
               <p className="text-xs text-muted-foreground">
-                {totalBudgetUsed.toLocaleString()} of {totalBudgetAllocated.toLocaleString()} EGP
+                {t('metrics.budget_of_total', { used: totalBudgetUsed.toLocaleString(), allocated: totalBudgetAllocated.toLocaleString() })}
               </p>
               <div className="mt-2 h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div 
@@ -398,22 +388,22 @@ export default function ReportsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-amber-500">
+          <Card className={`${borderSide} border-amber-500`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Active Missions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('metrics.active_missions')}</CardTitle>
               <Activity className="h-4 w-4 text-amber-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeMissions}</div>
               <p className="text-xs text-muted-foreground">
-                {completedMissions} completed total
+                {t('metrics.completed_total', { count: completedMissions })}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-l-4 border-l-sky-500">
+          <Card className={`${borderSide} border-sky-500`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Package Usage</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('metrics.package_usage')}</CardTitle>
               <Users className="h-4 w-4 text-sky-500" />
             </CardHeader>
             <CardContent>
@@ -421,7 +411,7 @@ export default function ReportsPage() {
                 {subscription.visits_used_this_month}/{subscription.package.visits_per_month}
               </div>
               <p className="text-xs text-muted-foreground">
-                Visits used this month
+                {t('metrics.visits_used_month')}
               </p>
             </CardContent>
           </Card>
@@ -432,20 +422,20 @@ export default function ReportsPage() {
           <TabsList className="bg-muted/50 w-full flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="visits" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Visits</span>
+              <span className="hidden xs:inline">{t('tabs.visits')}</span>
             </TabsTrigger>
             <TabsTrigger value="budget" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-green-500 data-[state=active]:text-white">
               <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Budget</span>
+              <span className="hidden xs:inline">{t('tabs.budget')}</span>
             </TabsTrigger>
             <TabsTrigger value="performance" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-amber-500 data-[state=active]:text-white">
               <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline sm:hidden">Perf</span>
-              <span className="hidden sm:inline">Performance</span>
+              <span className="hidden xs:inline sm:hidden">{t('tabs.perf')}</span>
+              <span className="hidden sm:inline">{t('tabs.performance')}</span>
             </TabsTrigger>
             <TabsTrigger value="responses" className="flex items-center gap-1.5 text-xs sm:text-sm data-[state=active]:bg-sky-500 data-[state=active]:text-white">
               <PieChartIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Responses</span>
+              <span className="hidden xs:inline">{t('tabs.responses')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -456,9 +446,9 @@ export default function ReportsPage() {
                 <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-orange-500" />
-                    Visit Completion Over Time
+                    {t('visits_tab.completion_over_time')}
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Planned vs completed visits by month</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">{t('visits_tab.completion_over_time_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                   <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
@@ -468,18 +458,8 @@ export default function ReportsPage() {
                       <YAxis className="text-xs" tick={{ fontSize: 10 }} width={30} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
-                      <Bar 
-                        dataKey="planned" 
-                        fill={CHART_COLORS.orange} 
-                        radius={[4, 4, 0, 0]} 
-                        name="Planned"
-                      />
-                      <Bar 
-                        dataKey="completed" 
-                        fill={CHART_COLORS.green} 
-                        radius={[4, 4, 0, 0]} 
-                        name="Completed"
-                      />
+                      <Bar dataKey="planned" fill={CHART_COLORS.orange} radius={[4, 4, 0, 0]} name={t('chart_labels.planned')} />
+                      <Bar dataKey="completed" fill={CHART_COLORS.green} radius={[4, 4, 0, 0]} name={t('chart_labels.completed')} />
                     </BarChart>
                   </ChartContainer>
                 </CardContent>
@@ -489,9 +469,9 @@ export default function ReportsPage() {
                 <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-green-500" />
-                    Mission Status Distribution
+                    {t('visits_tab.mission_status_dist')}
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Current status of all missions</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">{t('visits_tab.mission_status_dist_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                   <ChartContainer config={chartConfig} className="h-[250px] sm:h-[300px] w-full">
@@ -518,11 +498,10 @@ export default function ReportsPage() {
               </Card>
             </div>
 
-            {/* Branch comparison */}
             <Card>
               <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
-                <CardTitle className="text-sm sm:text-base">Visits by Branch</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Comparison of planned vs completed visits across branches</CardDescription>
+                <CardTitle className="text-sm sm:text-base">{t('visits_tab.visits_by_branch')}</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">{t('visits_tab.visits_by_branch_desc')}</CardDescription>
               </CardHeader>
               <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                 <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full">
@@ -532,8 +511,8 @@ export default function ReportsPage() {
                     <YAxis dataKey="name" type="category" width={80} className="text-xs" tick={{ fontSize: 9 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
-                    <Bar dataKey="planned" fill={CHART_COLORS.orangeLight} radius={[0, 4, 4, 0]} name="Planned" />
-                    <Bar dataKey="completed" fill={CHART_COLORS.greenLight} radius={[0, 4, 4, 0]} name="Completed" />
+                    <Bar dataKey="planned" fill={CHART_COLORS.orangeLight} radius={[0, 4, 4, 0]} name={t('chart_labels.planned')} />
+                    <Bar dataKey="completed" fill={CHART_COLORS.greenLight} radius={[0, 4, 4, 0]} name={t('chart_labels.completed')} />
                   </BarChart>
                 </ChartContainer>
               </CardContent>
@@ -546,9 +525,9 @@ export default function ReportsPage() {
               <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                   <div className="h-3 w-3 rounded-full bg-amber-500" />
-                  Budget Allocation vs Usage
+                  {t('budget_tab.allocation_vs_usage')}
                 </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Track how your purchase budget is being utilized over time</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">{t('budget_tab.allocation_vs_usage_desc')}</CardDescription>
               </CardHeader>
               <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                 <ChartContainer config={chartConfig} className="h-[250px] sm:h-[350px] w-full">
@@ -568,24 +547,8 @@ export default function ReportsPage() {
                     <YAxis className="text-xs" tick={{ fontSize: 10 }} width={35} tickFormatter={(value) => `${value/1000}k`} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
-                    <Area
-                      type="monotone"
-                      dataKey="allocated"
-                      stroke={CHART_COLORS.amber}
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorAllocated)"
-                      name="Allocated"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="used"
-                      stroke={CHART_COLORS.emerald}
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorUsed)"
-                      name="Used"
-                    />
+                    <Area type="monotone" dataKey="allocated" stroke={CHART_COLORS.amber} strokeWidth={2} fillOpacity={1} fill="url(#colorAllocated)" name={t('chart_labels.allocated')} />
+                    <Area type="monotone" dataKey="used" stroke={CHART_COLORS.emerald} strokeWidth={2} fillOpacity={1} fill="url(#colorUsed)" name={t('chart_labels.used')} />
                   </AreaChart>
                 </ChartContainer>
               </CardContent>
@@ -594,29 +557,29 @@ export default function ReportsPage() {
             <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-3">
               <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10">
                 <CardHeader className="pb-2 p-4">
-                  <CardTitle className="text-xs sm:text-sm text-amber-700 dark:text-amber-300">Total Allocated</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm text-amber-700 dark:text-amber-300">{t('budget_tab.total_allocated')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-amber-800 dark:text-amber-200">{totalBudgetAllocated.toLocaleString()} EGP</div>
-                  <p className="text-xs text-amber-600 dark:text-amber-400">Across all missions</p>
+                  <div className="text-xl sm:text-2xl font-bold text-amber-800 dark:text-amber-200">{totalBudgetAllocated.toLocaleString()} {tCommon('currency_code')}</div>
+                  <p className="text-xs text-amber-600 dark:text-amber-400">{t('budget_tab.across_all_missions')}</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10">
                 <CardHeader className="pb-2 p-4">
-                  <CardTitle className="text-xs sm:text-sm text-green-700 dark:text-green-300">Total Used</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm text-green-700 dark:text-green-300">{t('budget_tab.total_used')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-green-800 dark:text-green-200">{totalBudgetUsed.toLocaleString()} EGP</div>
-                  <p className="text-xs text-green-600 dark:text-green-400">Spent on visits</p>
+                  <div className="text-xl sm:text-2xl font-bold text-green-800 dark:text-green-200">{totalBudgetUsed.toLocaleString()} {tCommon('currency_code')}</div>
+                  <p className="text-xs text-green-600 dark:text-green-400">{t('budget_tab.spent_on_visits')}</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-sky-50 to-sky-100/50 dark:from-sky-950/20 dark:to-sky-900/10">
                 <CardHeader className="pb-2 p-4">
-                  <CardTitle className="text-xs sm:text-sm text-sky-700 dark:text-sky-300">Available Balance</CardTitle>
+                  <CardTitle className="text-xs sm:text-sm text-sky-700 dark:text-sky-300">{t('budget_tab.available_balance')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-sky-800 dark:text-sky-200">{wallet.available_balance.toLocaleString()} EGP</div>
-                  <p className="text-xs text-sky-600 dark:text-sky-400">In wallet</p>
+                  <div className="text-xl sm:text-2xl font-bold text-sky-800 dark:text-sky-200">{wallet.available_balance.toLocaleString()} {tCommon('currency_code')}</div>
+                  <p className="text-xs text-sky-600 dark:text-sky-400">{t('budget_tab.in_wallet')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -629,9 +592,9 @@ export default function ReportsPage() {
                 <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                     <div className="h-3 w-3 rounded-full bg-orange-500" />
-                    Branch Ratings
+                    {t('performance_tab.branch_ratings')}
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Average customer satisfaction rating by branch</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">{t('performance_tab.branch_ratings_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                   <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full">
@@ -675,8 +638,8 @@ export default function ReportsPage() {
 
               <Card>
                 <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
-                  <CardTitle className="text-sm sm:text-base">Branch Details</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">Performance metrics by location</CardDescription>
+                  <CardTitle className="text-sm sm:text-base">{t('performance_tab.branch_details')}</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">{t('performance_tab.branch_details_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 md:p-6 pt-2 md:pt-2 space-y-3">
                   {visitsByBranch.map((branch, index) => {
@@ -696,21 +659,18 @@ export default function ReportsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                           <div>
-                            <span className="text-muted-foreground">Visits</span>
+                            <span className="text-muted-foreground">{t('performance_tab.visits')}</span>
                             <p className="font-medium">{branch.completed}/{branch.planned}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Completion</span>
+                            <span className="text-muted-foreground">{t('performance_tab.completion')}</span>
                             <p className="font-medium">{completion}%</p>
                           </div>
                         </div>
                         <div className="mt-2 h-2 w-full bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full rounded-full transition-all"
-                            style={{ 
-                              width: `${completion}%`,
-                              backgroundColor: colors[index],
-                            }}
+                            style={{ width: `${completion}%`, backgroundColor: colors[index] }}
                           />
                         </div>
                       </div>
@@ -723,38 +683,39 @@ export default function ReportsPage() {
 
           {/* Responses Tab */}
           <TabsContent value="responses" className="space-y-4">
-            {/* Mission Selector */}
             <Card>
               <CardHeader className="pb-3 p-4 md:p-6">
                 <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <ClipboardList className="h-4 w-4" />
-                  Select Mission
+                  {t('responses_tab.select_mission')}
                 </CardTitle>
                 <CardDescription className="text-xs sm:text-sm">
-                  Choose a mission to view response analytics for its specific questions
+                  {t('responses_tab.select_mission_desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
                 <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a mission..." />
+                    <SelectValue placeholder={t('responses_tab.select_mission_placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
-                      <span className="text-muted-foreground">Select a mission to view responses</span>
+                      <span className="text-muted-foreground">{t('responses_tab.select_mission_prompt')}</span>
                     </SelectItem>
                     {missions.map(mission => (
                       <SelectItem key={mission.id} value={mission.id}>
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                          <span className="truncate max-w-[150px] sm:max-w-none">{mission.name}</span>
+                          <span className="truncate max-w-[150px] sm:max-w-none">
+                            {getLocalizedValue(mission.name_ar ? { en: mission.name, ar: mission.name_ar } : mission.name, language)}
+                          </span>
                           <Badge variant="outline" className="text-[10px] sm:text-xs">
-                            {mission.questions.length} q
+                            {t('responses_tab.questions_count', { count: mission.questions.length })}
                           </Badge>
                           <Badge 
                             variant={mission.status === 'published' ? 'default' : 'secondary'}
                             className="text-[10px] sm:text-xs"
                           >
-                            {mission.status}
+                            {tCommon(`statuses.${mission.status}`)}
                           </Badge>
                         </div>
                       </SelectItem>
@@ -764,39 +725,36 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            {/* No mission selected state */}
             {!selectedMission && (
               <Card className="border-dashed">
                 <CardContent className="py-12 text-center">
                   <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Select a Mission</h3>
+                  <h3 className="text-lg font-medium mb-2">{t('responses_tab.select_mission_title')}</h3>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                    Choose a mission from the dropdown above to view detailed response analytics 
-                    for each question in that mission.
+                    {t('responses_tab.select_mission_body')}
                   </p>
                 </CardContent>
               </Card>
             )}
 
-            {/* Mission responses */}
             {selectedMission && missionResponses && (
               <>
-                {/* Mission Summary Card */}
                 <Card className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border-orange-200 dark:border-orange-800">
                   <CardHeader className="pb-2 p-4 md:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg">{selectedMission.name}</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">
+                        {getLocalizedValue(selectedMission.name_ar ? { en: selectedMission.name, ar: selectedMission.name_ar } : selectedMission.name, language)}
+                      </CardTitle>
                       <Badge variant="outline" className="w-fit text-xs">
-                        {selectedMission.visits_completed} / {selectedMission.number_of_visits} visits
+                        {t('responses_tab.visits_count', { completed: selectedMission.visits_completed, total: selectedMission.number_of_visits })}
                       </Badge>
                     </div>
                     <CardDescription className="text-xs sm:text-sm">
-                      {selectedMission.branch?.name} • {selectedMission.questions.length} questions
+                      {selectedMission.branch?.name} • {t('responses_tab.questions_count', { count: selectedMission.questions.length })}
                     </CardDescription>
                   </CardHeader>
                 </Card>
 
-                {/* Question Response Cards */}
                 <div className="grid gap-3 md:gap-4">
                   {missionResponses.map((response, index) => (
                     <Card key={response.questionId}>
@@ -809,47 +767,41 @@ export default function ReportsPage() {
                             >
                               {index + 1}
                             </div>
-                            <CardTitle className="text-sm sm:text-base">{response.question}</CardTitle>
+                            <CardTitle className="text-sm sm:text-base">
+                              {typeof response.question === 'object' ? getLocalizedValue(response.question, language) : response.question}
+                            </CardTitle>
                           </div>
                           <Badge variant="secondary" className="text-[10px] sm:text-xs w-fit">
-                            {response.type.replace('_', ' ')}
+                            {t(`question_types.${response.type}`)}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
-                        {/* Yes/No Question */}
                         {response.type === 'yes_no' && (
                           <div className="space-y-3">
                             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                               <div className="flex-1">
                                 <div className="flex justify-between text-xs sm:text-sm mb-1">
-                                  <span className="text-green-600 font-medium">Yes</span>
+                                  <span className="text-green-600 font-medium">{t('chart_labels.yes')}</span>
                                   <span className="font-bold">{response.yes}%</span>
                                 </div>
                                 <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-green-500 rounded-full transition-all"
-                                    style={{ width: `${response.yes}%` }}
-                                  />
+                                  <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${response.yes}%` }} />
                                 </div>
                               </div>
                               <div className="flex-1">
                                 <div className="flex justify-between text-xs sm:text-sm mb-1">
-                                  <span className="text-red-600 font-medium">No</span>
+                                  <span className="text-red-600 font-medium">{t('chart_labels.no')}</span>
                                   <span className="font-bold">{response.no}%</span>
                                 </div>
                                 <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-red-500 rounded-full transition-all"
-                                    style={{ width: `${response.no}%` }}
-                                  />
+                                  <div className="h-full bg-red-500 rounded-full transition-all" style={{ width: `${response.no}%` }} />
                                 </div>
                               </div>
                             </div>
                           </div>
                         )}
 
-                        {/* Rating Question */}
                         {response.type === 'rating' && (
                           <div className="space-y-4">
                             <div className="flex items-center gap-4">
@@ -858,17 +810,14 @@ export default function ReportsPage() {
                                 <span className="text-3xl font-bold">{response.avgRating}</span>
                                 <span className="text-muted-foreground">/ {response.maxRating}</span>
                               </div>
-                              <span className="text-sm text-muted-foreground">Average Rating</span>
+                              <span className="text-sm text-muted-foreground">{t('responses_detail.average_rating')}</span>
                             </div>
                             <div className="space-y-2">
                               {response.distribution?.map((d: any) => (
                                 <div key={d.rating} className="flex items-center gap-2">
-                                  <span className="w-8 text-sm text-right">{d.rating}★</span>
+                                  <span className="w-8 text-sm text-end">{d.rating}★</span>
                                   <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-amber-400 rounded-full"
-                                      style={{ width: `${(d.count / 75) * 100}%` }}
-                                    />
+                                    <div className="h-full bg-amber-400 rounded-full" style={{ width: `${(d.count / 75) * 100}%` }} />
                                   </div>
                                   <span className="w-8 text-xs text-muted-foreground">{d.count}</span>
                                 </div>
@@ -877,24 +826,17 @@ export default function ReportsPage() {
                           </div>
                         )}
 
-                        {/* Multiple Choice Question */}
                         {response.type === 'multiple_choice' && (
                           <div className="space-y-3">
                             {response.options?.map((opt: any, optIndex: number) => (
                               <div key={optIndex} className="flex items-center gap-3">
                                 <div className="flex-1">
                                   <div className="flex justify-between text-sm mb-1">
-                                    <span>{opt.option}</span>
+                                    <span>{typeof opt.option === 'object' ? getLocalizedValue(opt.option, language) : opt.option}</span>
                                     <span className="font-medium">{opt.count}%</span>
                                   </div>
                                   <div className="h-3 bg-muted rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full rounded-full transition-all"
-                                      style={{ 
-                                        width: `${opt.count}%`,
-                                        backgroundColor: opt.color,
-                                      }}
-                                    />
+                                    <div className="h-full rounded-full transition-all" style={{ width: `${opt.count}%`, backgroundColor: opt.color }} />
                                   </div>
                                 </div>
                               </div>
@@ -902,20 +844,16 @@ export default function ReportsPage() {
                           </div>
                         )}
 
-                        {/* Short Text Question */}
                         {response.type === 'short_text' && (
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <MessageSquare className="h-4 w-4" />
-                              <span>{response.totalResponses} text responses collected</span>
+                              <span>{t('responses_detail.text_responses_collected', { count: response.totalResponses })}</span>
                             </div>
                             <div className="space-y-2">
-                              <p className="text-sm font-medium">Sample responses:</p>
+                              <p className="text-sm font-medium">{t('responses_detail.sample_responses')}</p>
                               {response.samples?.map((sample: string, sampleIndex: number) => (
-                                <div 
-                                  key={sampleIndex}
-                                  className="p-2 bg-muted/50 rounded-md text-sm italic"
-                                >
+                                <div key={sampleIndex} className="p-2 bg-muted/50 rounded-md text-sm italic">
                                   "{sample}"
                                 </div>
                               ))}
@@ -927,21 +865,22 @@ export default function ReportsPage() {
                   ))}
                 </div>
 
-                {/* Key Insights for this mission */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Mission Insights</CardTitle>
-                    <CardDescription>AI-generated observations for {selectedMission.name}</CardDescription>
+                    <CardTitle>{t('insights.title')}</CardTitle>
+                    <CardDescription>{t('insights.description', { name: getLocalizedValue(selectedMission.name_ar ? { en: selectedMission.name, ar: selectedMission.name_ar } : selectedMission.name, language) })}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10 rounded-lg border border-green-200 dark:border-green-800">
                         <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                         <div>
-                          <p className="font-medium text-green-800 dark:text-green-200">Strong Performance</p>
+                          <p className="font-medium text-green-800 dark:text-green-200">{t('insights.strong_performance')}</p>
                           <p className="text-sm text-green-700 dark:text-green-300">
-                            This mission shows {selectedMission.visits_completed > selectedMission.number_of_visits / 2 ? 'good' : 'improving'} completion rates 
-                            with {selectedMission.visits_completed} visits completed out of {selectedMission.number_of_visits} planned.
+                            {selectedMission.visits_completed > selectedMission.number_of_visits / 2 
+                              ? t('insights.strong_performance_good', { completed: selectedMission.visits_completed, planned: selectedMission.number_of_visits })
+                              : t('insights.strong_performance_improving', { completed: selectedMission.visits_completed, planned: selectedMission.number_of_visits })
+                            }
                           </p>
                         </div>
                       </div>
@@ -949,9 +888,9 @@ export default function ReportsPage() {
                         <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800">
                           <Clock className="h-5 w-5 text-amber-600 mt-0.5" />
                           <div>
-                            <p className="font-medium text-amber-800 dark:text-amber-200">Area for Improvement</p>
+                            <p className="font-medium text-amber-800 dark:text-amber-200">{t('insights.area_for_improvement')}</p>
                             <p className="text-sm text-amber-700 dark:text-amber-300">
-                              Some yes/no questions show over 30% negative responses - review these for potential improvements.
+                              {t('insights.area_for_improvement_desc')}
                             </p>
                           </div>
                         </div>

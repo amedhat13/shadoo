@@ -95,6 +95,7 @@ export type MissionStatus = 'draft' | 'published' | 'paused' | 'completed' | 'ar
 export interface Mission {
   id: string;
   name: string;
+  name_ar?: string;
   branch_id: string;
   branch?: Branch;
   status: MissionStatus;
