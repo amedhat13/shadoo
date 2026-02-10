@@ -94,7 +94,7 @@ export default function MissionDetailsPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(CURRENCY.locale)} ${tc('currency_code')}`;
   };
 
   const budgetRemaining = mission.total_purchase_budget - mission.budget_used;

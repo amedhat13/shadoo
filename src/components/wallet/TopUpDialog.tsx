@@ -31,6 +31,7 @@ export function TopUpDialog({ onTopUp, trigger }: TopUpDialogProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const { t } = useTranslation('wallet');
+  const { t: tc } = useTranslation('common');
   const { isRTL } = useLanguage();
 
   const amount = selectedAmount || Number(customAmount) || 0;
@@ -125,7 +126,7 @@ export function TopUpDialog({ onTopUp, trigger }: TopUpDialogProps) {
                         {formatNumber(preset)}
                       </span>
                       <span className="ms-1 text-sm text-muted-foreground">
-                        {CURRENCY.symbol}
+                        {tc('currency_code')}
                       </span>
                     </button>
                   ))}
@@ -148,11 +149,11 @@ export function TopUpDialog({ onTopUp, trigger }: TopUpDialogProps) {
                     className="pe-12"
                   />
                   <span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    {CURRENCY.symbol}
+                    {tc('currency_code')}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {t('minimum_amount', { amount: `100 ${CURRENCY.symbol}` })}
+                  {t('minimum_amount', { amount: `100 ${tc('currency_code')}` })}
                 </p>
               </div>
 
@@ -162,7 +163,7 @@ export function TopUpDialog({ onTopUp, trigger }: TopUpDialogProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{t('amount_to_add')}</span>
                     <span className="text-xl font-black">
-                      {formatNumber(amount)} {CURRENCY.symbol}
+                      {formatNumber(amount)} {tc('currency_code')}
                     </span>
                   </div>
                 </div>
@@ -197,7 +198,7 @@ export function TopUpDialog({ onTopUp, trigger }: TopUpDialogProps) {
             </div>
             <h3 className="mt-4 text-lg font-bold">{t('payment_successful')}</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              {t('amount_added_to_wallet', { amount: `${formatNumber(amount)} ${CURRENCY.symbol}` })}
+              {t('amount_added_to_wallet', { amount: `${formatNumber(amount)} ${tc('currency_code')}` })}
             </p>
           </div>
         )}

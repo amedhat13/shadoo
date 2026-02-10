@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export interface CompletedVisit {
   id: string;
@@ -52,8 +53,9 @@ export function CompletedVisitsDialog({
     });
   };
 
+  const { t: tc } = useTranslation('common');
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(CURRENCY.locale)} ${tc('currency_code')}`;
   };
 
   return (

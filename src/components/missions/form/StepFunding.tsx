@@ -61,8 +61,9 @@ export function StepFunding({
     navigate('/wallet');
   };
 
+  const { t: tc } = useTranslation('common');
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(CURRENCY.locale)} ${tc('currency_code')}`;
   };
 
   return (

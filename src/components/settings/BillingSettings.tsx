@@ -7,6 +7,7 @@ import { SubscriptionPlans } from './SubscriptionPlans';
 import { useSubscription } from '@/hooks/useSubscription';
 import { CURRENCY } from '@/lib/constants';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   Tooltip,
   TooltipContent,
@@ -34,6 +35,8 @@ const STATUS_CONFIG = {
 
 export function BillingSettings() {
   const { plans, currentPlanId, currentPlan, isLoading, selectPlan } = useSubscription();
+  const { t: tc } = useTranslation('common');
+  const currencyLabel = tc('currency_code');
 
   const handleSelectPlan = async (planId: string) => {
     await selectPlan(planId);
@@ -77,7 +80,7 @@ export function BillingSettings() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-black">
-                  {currentPlan.price.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
+                  {currentPlan.price.toLocaleString(CURRENCY.locale)} {currencyLabel}
                 </div>
                 <div className="text-sm text-muted-foreground">per month</div>
               </div>
@@ -159,7 +162,7 @@ export function BillingSettings() {
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="font-medium">
-                      {invoice.amount.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
+                      {invoice.amount.toLocaleString(CURRENCY.locale)} {currencyLabel}
                     </span>
                     <Tooltip>
                       <TooltipTrigger asChild>
