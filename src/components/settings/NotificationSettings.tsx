@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface NotificationPrefs {
   email_mission_updates: boolean;
@@ -30,6 +31,7 @@ const defaultPrefs: NotificationPrefs = {
 export function NotificationSettings() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(defaultPrefs);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation('settings');
 
   const updatePref = (key: keyof NotificationPrefs, value: boolean) => {
     setPrefs({ ...prefs, [key]: value });
@@ -39,7 +41,7 @@ export function NotificationSettings() {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
     setIsLoading(false);
-    toast.success('Notification preferences saved');
+    toast.success(t('notifications.preferences_saved'));
   };
 
   return (
@@ -49,53 +51,33 @@ export function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Email Notifications
+            {t('notifications.email_title')}
           </CardTitle>
-          <CardDescription>
-            Choose what updates you receive via email.
-          </CardDescription>
+          <CardDescription>{t('notifications.email_description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="email-mission" className="font-medium">Mission Updates</Label>
-              <p className="text-sm text-muted-foreground">
-                Get notified when mission status changes.
-              </p>
+              <Label htmlFor="email-mission" className="font-medium">{t('notifications.mission_updates')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.mission_updates_description')}</p>
             </div>
-            <Switch
-              id="email-mission"
-              checked={prefs.email_mission_updates}
-              onCheckedChange={(v) => updatePref('email_mission_updates', v)}
-            />
+            <Switch id="email-mission" checked={prefs.email_mission_updates} onCheckedChange={(v) => updatePref('email_mission_updates', v)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="email-visit" className="font-medium">Visit Completed</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive email when an agent completes a visit.
-              </p>
+              <Label htmlFor="email-visit" className="font-medium">{t('notifications.visit_completed')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.visit_completed_email_description')}</p>
             </div>
-            <Switch
-              id="email-visit"
-              checked={prefs.email_visit_completed}
-              onCheckedChange={(v) => updatePref('email_visit_completed', v)}
-            />
+            <Switch id="email-visit" checked={prefs.email_visit_completed} onCheckedChange={(v) => updatePref('email_visit_completed', v)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="email-digest" className="font-medium">Weekly Digest</Label>
-              <p className="text-sm text-muted-foreground">
-                Summary of all activity sent every Monday.
-              </p>
+              <Label htmlFor="email-digest" className="font-medium">{t('notifications.weekly_digest')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.weekly_digest_description')}</p>
             </div>
-            <Switch
-              id="email-digest"
-              checked={prefs.email_weekly_digest}
-              onCheckedChange={(v) => updatePref('email_weekly_digest', v)}
-            />
+            <Switch id="email-digest" checked={prefs.email_weekly_digest} onCheckedChange={(v) => updatePref('email_weekly_digest', v)} />
           </div>
         </CardContent>
       </Card>
@@ -105,53 +87,33 @@ export function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Push Notifications
+            {t('notifications.push_title')}
           </CardTitle>
-          <CardDescription>
-            Real-time alerts in your browser or mobile app.
-          </CardDescription>
+          <CardDescription>{t('notifications.push_description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="push-mission" className="font-medium">Mission Updates</Label>
-              <p className="text-sm text-muted-foreground">
-                Instant notifications for mission changes.
-              </p>
+              <Label htmlFor="push-mission" className="font-medium">{t('notifications.mission_updates')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.push_mission_description')}</p>
             </div>
-            <Switch
-              id="push-mission"
-              checked={prefs.push_mission_updates}
-              onCheckedChange={(v) => updatePref('push_mission_updates', v)}
-            />
+            <Switch id="push-mission" checked={prefs.push_mission_updates} onCheckedChange={(v) => updatePref('push_mission_updates', v)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="push-visit" className="font-medium">Visit Completed</Label>
-              <p className="text-sm text-muted-foreground">
-                Get notified when visits are submitted.
-              </p>
+              <Label htmlFor="push-visit" className="font-medium">{t('notifications.visit_completed')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.push_visit_description')}</p>
             </div>
-            <Switch
-              id="push-visit"
-              checked={prefs.push_visit_completed}
-              onCheckedChange={(v) => updatePref('push_visit_completed', v)}
-            />
+            <Switch id="push-visit" checked={prefs.push_visit_completed} onCheckedChange={(v) => updatePref('push_visit_completed', v)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="push-wallet" className="font-medium">Wallet Alerts</Label>
-              <p className="text-sm text-muted-foreground">
-                Low balance and transaction notifications.
-              </p>
+              <Label htmlFor="push-wallet" className="font-medium">{t('notifications.wallet_alerts')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.wallet_alerts_description')}</p>
             </div>
-            <Switch
-              id="push-wallet"
-              checked={prefs.push_wallet_alerts}
-              onCheckedChange={(v) => updatePref('push_wallet_alerts', v)}
-            />
+            <Switch id="push-wallet" checked={prefs.push_wallet_alerts} onCheckedChange={(v) => updatePref('push_wallet_alerts', v)} />
           </div>
         </CardContent>
       </Card>
@@ -161,33 +123,25 @@ export function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="h-5 w-5" />
-            SMS Notifications
+            {t('notifications.sms_title')}
           </CardTitle>
-          <CardDescription>
-            Text messages for critical alerts only.
-          </CardDescription>
+          <CardDescription>{t('notifications.sms_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="sms-critical" className="font-medium">Critical Alerts</Label>
-              <p className="text-sm text-muted-foreground">
-                Security issues, payment failures, and urgent matters.
-              </p>
+              <Label htmlFor="sms-critical" className="font-medium">{t('notifications.critical_alerts')}</Label>
+              <p className="text-sm text-muted-foreground">{t('notifications.critical_alerts_description')}</p>
             </div>
-            <Switch
-              id="sms-critical"
-              checked={prefs.sms_critical_alerts}
-              onCheckedChange={(v) => updatePref('sms_critical_alerts', v)}
-            />
+            <Switch id="sms-critical" checked={prefs.sms_critical_alerts} onCheckedChange={(v) => updatePref('sms_critical_alerts', v)} />
           </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save Preferences
+          {isLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+          {t('notifications.save_preferences')}
         </Button>
       </div>
     </div>
