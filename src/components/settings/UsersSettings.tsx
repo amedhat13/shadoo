@@ -7,33 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  Tooltip, TooltipContent, TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface TeamMember {
   id: string;
@@ -45,37 +31,10 @@ interface TeamMember {
 }
 
 const mockTeam: TeamMember[] = [
-  {
-    id: '1',
-    name: 'Ahmed Hassan',
-    email: 'ahmed@shadoo.com',
-    role: 'admin',
-    status: 'active',
-    joined_at: '2024-01-15',
-  },
-  {
-    id: '2',
-    name: 'Sara Mohamed',
-    email: 'sara@shadoo.com',
-    role: 'manager',
-    status: 'active',
-    joined_at: '2024-02-20',
-  },
-  {
-    id: '3',
-    name: 'Omar Ali',
-    email: 'omar@shadoo.com',
-    role: 'viewer',
-    status: 'pending',
-    joined_at: '2024-03-10',
-  },
+  { id: '1', name: 'Ahmed Hassan', email: 'ahmed@shadoo.com', role: 'admin', status: 'active', joined_at: '2024-01-15' },
+  { id: '2', name: 'Sara Mohamed', email: 'sara@shadoo.com', role: 'manager', status: 'active', joined_at: '2024-02-20' },
+  { id: '3', name: 'Omar Ali', email: 'omar@shadoo.com', role: 'viewer', status: 'pending', joined_at: '2024-03-10' },
 ];
-
-const ROLE_CONFIG = {
-  admin: { label: 'Admin', description: 'Full access to all features and settings.', variant: 'default' as const },
-  manager: { label: 'Manager', description: 'Can create and manage missions.', variant: 'secondary' as const },
-  viewer: { label: 'Viewer', description: 'Read-only access to view data.', variant: 'outline' as const },
-};
 
 export function UsersSettings() {
   const [team, setTeam] = useState<TeamMember[]>(mockTeam);
@@ -83,13 +42,18 @@ export function UsersSettings() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'admin' | 'manager' | 'viewer'>('viewer');
   const [isInviting, setIsInviting] = useState(false);
+  const { t } = useTranslation('settings');
+
+  const ROLE_CONFIG = {
+    admin: { label: t('users.roles.admin'), description: t('users.roles.admin_description'), variant: 'default' as const },
+    manager: { label: t('users.roles.manager'), description: t('users.roles.manager_description'), variant: 'secondary' as const },
+    viewer: { label: t('users.roles.viewer'), description: t('users.roles.viewer_description'), variant: 'outline' as const },
+  };
 
   const handleInvite = async () => {
     if (!inviteEmail) return;
-    
     setIsInviting(true);
     await new Promise((r) => setTimeout(r, 1000));
-    
     const newMember: TeamMember = {
       id: `new-${Date.now()}`,
       name: inviteEmail.split('@')[0],
@@ -98,23 +62,22 @@ export function UsersSettings() {
       status: 'pending',
       joined_at: new Date().toISOString(),
     };
-    
     setTeam([...team, newMember]);
     setInviteEmail('');
     setInviteRole('viewer');
     setInviteOpen(false);
     setIsInviting(false);
-    toast.success('Invitation sent successfully');
+    toast.success(t('users.invitation_sent'));
   };
 
   const handleRemove = (id: string) => {
     setTeam(team.filter((m) => m.id !== id));
-    toast.success('Team member removed');
+    toast.success(t('users.member_removed'));
   };
 
   const handleRoleChange = (id: string, newRole: 'admin' | 'manager' | 'viewer') => {
     setTeam(team.map((m) => (m.id === id ? { ...m, role: newRole } : m)));
-    toast.success('Role updated');
+    toast.success(t('users.role_updated'));
   };
 
   return (
@@ -124,53 +87,49 @@ export function UsersSettings() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Team Members
+              {t('users.team_title')}
             </CardTitle>
-            <CardDescription>
-              Manage who has access to your organization.
-            </CardDescription>
+            <CardDescription>{t('users.team_description')}</CardDescription>
           </div>
           <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Invite User
+                {t('users.invite_user')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Invite Team Member</DialogTitle>
-                <DialogDescription>
-                  Send an invitation to join your organization.
-                </DialogDescription>
+                <DialogTitle>{t('users.invite_title')}</DialogTitle>
+                <DialogDescription>{t('users.invite_description')}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="invite-email">Email Address</Label>
+                  <Label htmlFor="invite-email">{t('users.email_address')}</Label>
                   <Input
                     id="invite-email"
                     type="email"
-                    placeholder="colleague@company.com"
+                    placeholder={t('users.email_placeholder')}
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="invite-role">Role</Label>
+                  <Label htmlFor="invite-role">{t('users.role')}</Label>
                   <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as typeof inviteRole)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin - Full access</SelectItem>
-                      <SelectItem value="manager">Manager - Can manage missions</SelectItem>
-                      <SelectItem value="viewer">Viewer - Read-only access</SelectItem>
+                      <SelectItem value="admin">{t('users.admin_full')}</SelectItem>
+                      <SelectItem value="manager">{t('users.manager_missions')}</SelectItem>
+                      <SelectItem value="viewer">{t('users.viewer_readonly')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <Button onClick={handleInvite} disabled={!inviteEmail || isInviting} className="w-full">
-                  {isInviting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Send Invitation
+                  {isInviting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                  {t('users.send_invitation')}
                 </Button>
               </div>
             </DialogContent>
@@ -180,23 +139,12 @@ export function UsersSettings() {
           <div className="divide-y divide-border">
             {team.map((member) => {
               const roleConfig = ROLE_CONFIG[member.role];
-              const initials = member.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2);
-
+              const initials = member.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
               return (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                >
+                <div key={member.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10 border border-border">
-                      <AvatarFallback className="bg-muted text-foreground text-sm font-medium">
-                        {initials}
-                      </AvatarFallback>
+                      <AvatarFallback className="bg-muted text-foreground text-sm font-medium">{initials}</AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
@@ -204,11 +152,9 @@ export function UsersSettings() {
                         {member.status === 'pending' && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Badge variant="outline" className="text-xs cursor-help">Pending</Badge>
+                              <Badge variant="outline" className="text-xs cursor-help">{t('users.pending')}</Badge>
                             </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Invitation sent, awaiting acceptance.</p>
-                            </TooltipContent>
+                            <TooltipContent><p>{t('users.pending_tooltip')}</p></TooltipContent>
                           </Tooltip>
                         )}
                       </div>
@@ -218,42 +164,30 @@ export function UsersSettings() {
                       </div>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Badge variant={roleConfig.variant} className="cursor-help">{roleConfig.label}</Badge>
                       </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{roleConfig.description}</p>
-                      </TooltipContent>
+                      <TooltipContent><p>{roleConfig.description}</p></TooltipContent>
                     </Tooltip>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleRoleChange(member.id, 'admin')}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          Make Admin
+                          <Shield className="me-2 h-4 w-4" />{t('users.make_admin')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleRoleChange(member.id, 'manager')}>
-                          <Users className="mr-2 h-4 w-4" />
-                          Make Manager
+                          <Users className="me-2 h-4 w-4" />{t('users.make_manager')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleRoleChange(member.id, 'viewer')}>
-                          <Users className="mr-2 h-4 w-4" />
-                          Make Viewer
+                          <Users className="me-2 h-4 w-4" />{t('users.make_viewer')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleRemove(member.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Remove
+                        <DropdownMenuItem onClick={() => handleRemove(member.id)} className="text-destructive focus:text-destructive">
+                          <Trash2 className="me-2 h-4 w-4" />{t('users.remove')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

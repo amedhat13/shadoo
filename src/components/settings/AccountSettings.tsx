@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface AccountData {
   full_name: string;
@@ -16,7 +17,6 @@ interface AccountData {
   avatar_url?: string;
 }
 
-// Mock data - will be replaced with real data
 const mockAccount: AccountData = {
   full_name: 'Ahmed Hassan',
   email: 'ahmed@shadoo.com',
@@ -29,19 +29,20 @@ export function AccountSettings() {
   const [account, setAccount] = useState<AccountData>(mockAccount);
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const { t } = useTranslation('settings');
 
   const handleSaveProfile = async () => {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
     setIsLoading(false);
-    toast.success('Profile updated successfully');
+    toast.success(t('account.profile_updated'));
   };
 
   const handleChangePassword = async () => {
     setIsPasswordLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
     setIsPasswordLoading(false);
-    toast.success('Password reset email sent');
+    toast.success(t('account.password_reset_sent'));
   };
 
   const initials = account.full_name
@@ -58,10 +59,10 @@ export function AccountSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Profile Information
+            {t('account.profile_title')}
           </CardTitle>
           <CardDescription>
-            Update your personal details and contact information.
+            {t('account.profile_description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -76,10 +77,10 @@ export function AccountSettings() {
             <div>
               <Button variant="outline" size="sm" className="gap-2">
                 <Camera className="h-4 w-4" />
-                Change Photo
+                {t('account.change_photo')}
               </Button>
               <p className="mt-1 text-xs text-muted-foreground">
-                JPG, PNG or GIF. Max 2MB.
+                {t('account.photo_hint')}
               </p>
             </div>
           </div>
@@ -91,34 +92,34 @@ export function AccountSettings() {
             <div className="space-y-2">
               <Label htmlFor="full_name" className="flex items-center gap-2">
                 <User className="h-3.5 w-3.5 text-muted-foreground" />
-                Full Name
+                {t('account.full_name')}
               </Label>
               <Input
                 id="full_name"
                 value={account.full_name}
                 onChange={(e) => setAccount({ ...account, full_name: e.target.value })}
-                placeholder="Enter your full name"
+                placeholder={t('account.full_name_placeholder')}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                Email Address
+                {t('account.email_address')}
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={account.email}
                 onChange={(e) => setAccount({ ...account, email: e.target.value })}
-                placeholder="Enter your email"
+                placeholder={t('account.email_placeholder')}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                Phone Number
+                {t('account.phone_number')}
               </Label>
               <Input
                 id="phone"
@@ -131,21 +132,21 @@ export function AccountSettings() {
             <div className="space-y-2">
               <Label htmlFor="company_name" className="flex items-center gap-2">
                 <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                Company Name
+                {t('account.company_name')}
               </Label>
               <Input
                 id="company_name"
                 value={account.company_name}
                 onChange={(e) => setAccount({ ...account, company_name: e.target.value })}
-                placeholder="Your company name"
+                placeholder={t('account.company_placeholder')}
               />
             </div>
           </div>
 
           <div className="flex justify-end">
             <Button onClick={handleSaveProfile} disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {isLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {t('account.save_changes')}
             </Button>
           </div>
         </CardContent>
@@ -154,20 +155,20 @@ export function AccountSettings() {
       {/* Password */}
       <Card className="border border-border">
         <CardHeader>
-          <CardTitle>Password</CardTitle>
+          <CardTitle>{t('account.password_title')}</CardTitle>
           <CardDescription>
-            Change your password or request a password reset.
+            {t('account.password_description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium">Current Password</p>
+              <p className="text-sm font-medium">{t('account.current_password')}</p>
               <p className="text-sm text-muted-foreground">••••••••••••</p>
             </div>
             <Button variant="outline" onClick={handleChangePassword} disabled={isPasswordLoading}>
-              {isPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Change Password
+              {isPasswordLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {t('account.change_password')}
             </Button>
           </div>
         </CardContent>

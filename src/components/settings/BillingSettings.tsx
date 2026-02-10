@@ -8,6 +8,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { CURRENCY } from '@/lib/constants';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import {
   Tooltip,
   TooltipContent,
@@ -27,25 +28,21 @@ const mockInvoices: Invoice[] = [
   { id: 'INV-003', date: '2024-01-01', amount: 5999, status: 'paid' },
 ];
 
-const STATUS_CONFIG = {
-  paid: { label: 'Paid', description: 'Payment completed successfully.', variant: 'default' as const },
-  pending: { label: 'Pending', description: 'Payment is being processed.', variant: 'secondary' as const },
-  failed: { label: 'Failed', description: 'Payment failed. Please retry.', variant: 'destructive' as const },
-};
-
 export function BillingSettings() {
   const { plans, currentPlanId, currentPlan, isLoading, selectPlan } = useSubscription();
+  const { t } = useTranslation('settings');
   const { t: tc } = useTranslation('common');
+  const { isRTL } = useLanguage();
   const currencyLabel = tc('currency_code');
 
   const handleSelectPlan = async (planId: string) => {
     await selectPlan(planId);
     const plan = plans.find((p) => p.id === planId);
-    toast.success(`Switched to ${plan?.name} plan`);
+    toast.success(t('billing.switched_plan', { name: plan?.name }));
   };
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-EG', {
+    return new Date(dateStr).toLocaleDateString(isRTL ? 'ar-EG' : 'en-EG', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -64,31 +61,31 @@ export function BillingSettings() {
                   <CreditCard className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <div className="text-sm text-muted-foreground">Current Plan</div>
+                  <div className="text-sm text-muted-foreground">{t('billing.current_plan')}</div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold">{currentPlan.name}</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge className="cursor-help">{currentPlan.visits_per_month} visits/month</Badge>
+                        <Badge className="cursor-help">{t('billing.visits_per_month', { count: currentPlan.visits_per_month })}</Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Monthly visit allowance included in your plan.</p>
+                        <p>{t('billing.visits_tooltip')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className={isRTL ? "text-start" : "text-end"}>
                 <div className="text-2xl font-black">
-                  {currentPlan.price.toLocaleString(CURRENCY.locale)} {currencyLabel}
+                  {currentPlan.price.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} {currencyLabel}
                 </div>
-                <div className="text-sm text-muted-foreground">per month</div>
+                <div className="text-sm text-muted-foreground">{t('billing.per_month')}</div>
               </div>
             </div>
             <Separator className="my-4" />
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              Next billing date: March 1, 2024
+              {t('billing.next_billing', { date: 'March 1, 2024' })}
             </div>
           </CardContent>
         </Card>
@@ -96,7 +93,7 @@ export function BillingSettings() {
 
       {/* Subscription Plans */}
       <div>
-        <h3 className="mb-4 text-lg font-bold">Available Plans</h3>
+        <h3 className="mb-4 text-lg font-bold">{t('billing.available_plans')}</h3>
         <SubscriptionPlans
           plans={plans}
           currentPlanId={currentPlanId}
@@ -110,11 +107,9 @@ export function BillingSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Payment Method
+            {t('billing.payment_method_title')}
           </CardTitle>
-          <CardDescription>
-            Manage your payment information.
-          </CardDescription>
+          <CardDescription>{t('billing.payment_method_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -124,10 +119,10 @@ export function BillingSettings() {
               </div>
               <div>
                 <p className="font-medium">•••• •••• •••• 4242</p>
-                <p className="text-sm text-muted-foreground">Expires 12/25</p>
+                <p className="text-sm text-muted-foreground">{t('billing.expires', { date: '12/25' })}</p>
               </div>
             </div>
-            <Button variant="outline">Update</Button>
+            <Button variant="outline">{t('billing.update')}</Button>
           </div>
         </CardContent>
       </Card>
@@ -137,39 +132,37 @@ export function BillingSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5" />
-            Billing History
+            {t('billing.billing_history_title')}
           </CardTitle>
-          <CardDescription>
-            Download past invoices and receipts.
-          </CardDescription>
+          <CardDescription>{t('billing.billing_history_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="divide-y divide-border">
             {mockInvoices.map((invoice) => {
-              const statusConfig = STATUS_CONFIG[invoice.status];
+              const statusKey = invoice.status;
               return (
-                <div
-                  key={invoice.id}
-                  className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-                >
+                <div key={invoice.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-4">
                     <div>
                       <p className="font-medium">{invoice.id}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(invoice.date)}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{formatDate(invoice.date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="font-medium">
-                      {invoice.amount.toLocaleString(CURRENCY.locale)} {currencyLabel}
+                      {invoice.amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} {currencyLabel}
                     </span>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge variant={statusConfig.variant} className="cursor-help">{statusConfig.label}</Badge>
+                        <Badge
+                          variant={statusKey === 'paid' ? 'default' : statusKey === 'pending' ? 'secondary' : 'destructive'}
+                          className="cursor-help"
+                        >
+                          {t(`billing.statuses.${statusKey}`)}
+                        </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{statusConfig.description}</p>
+                        <p>{t(`billing.statuses.${statusKey}_description`)}</p>
                       </TooltipContent>
                     </Tooltip>
                     <Button variant="ghost" size="icon" className="h-8 w-8">

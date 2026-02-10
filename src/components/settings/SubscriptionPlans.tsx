@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CURRENCY } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 export interface SubscriptionPlan {
   id: string;
@@ -35,8 +36,11 @@ export function SubscriptionPlans({
   onSelectPlan,
   isLoading,
 }: SubscriptionPlansProps) {
+  const { t } = useTranslation('settings');
   const { t: tc } = useTranslation('common');
+  const { isRTL } = useLanguage();
   const currencyLabel = tc('currency_code');
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {plans.map((plan) => {
@@ -53,8 +57,8 @@ export function SubscriptionPlans({
             )}
           >
             {plan.is_popular && (
-              <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                Most Popular
+              <Badge className="absolute -top-2.5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2">
+                {t('billing.most_popular')}
               </Badge>
             )}
 
@@ -65,9 +69,7 @@ export function SubscriptionPlans({
                 </div>
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
               </div>
-              <CardDescription className="text-xs">
-                {plan.description}
-              </CardDescription>
+              <CardDescription className="text-xs">{plan.description}</CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4">
@@ -75,14 +77,14 @@ export function SubscriptionPlans({
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-black">
-                    {plan.price.toLocaleString(CURRENCY.locale)}
+                    {plan.price.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {currencyLabel}/month
+                    {currencyLabel}/{t('billing.per_month').replace(/^per\s/, '')}
                   </span>
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {plan.visits_per_month} visits included
+                  {t('billing.visits_included', { count: plan.visits_per_month })}
                 </div>
               </div>
 
@@ -103,7 +105,7 @@ export function SubscriptionPlans({
                 disabled={isCurrent || isLoading}
                 onClick={() => onSelectPlan(plan.id)}
               >
-                {isCurrent ? 'Current Plan' : 'Select Plan'}
+                {isCurrent ? t('billing.current_plan_button') : t('billing.select_plan')}
               </Button>
             </CardContent>
           </Card>
