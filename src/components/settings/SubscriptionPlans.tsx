@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { CURRENCY } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export interface SubscriptionPlan {
   id: string;
@@ -34,6 +35,8 @@ export function SubscriptionPlans({
   onSelectPlan,
   isLoading,
 }: SubscriptionPlansProps) {
+  const { t: tc } = useTranslation('common');
+  const currencyLabel = tc('currency_code');
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {plans.map((plan) => {
@@ -75,7 +78,7 @@ export function SubscriptionPlans({
                     {plan.price.toLocaleString(CURRENCY.locale)}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {CURRENCY.symbol}/month
+                    {currencyLabel}/month
                   </span>
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">

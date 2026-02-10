@@ -37,11 +37,13 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { t } = useTranslation('missions');
+  const { t: tc } = useTranslation('common');
   const { ChevronEnd } = useDirectionalIcons();
   const { isRTL } = useLanguage();
 
+  const currencyLabel = tc('currency_code');
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${currencyLabel}`;
   };
 
   // Mobile: Card-based layout

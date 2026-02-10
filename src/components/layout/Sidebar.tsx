@@ -41,6 +41,7 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
 }) {
   const location = useLocation();
   const { t } = useTranslation('nav');
+  const { t: tc } = useTranslation('common');
   const { ChevronStart, ChevronEnd } = useDirectionalIcons();
 
   return (
@@ -122,10 +123,10 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
               <span>{t('wallet_balance')}</span>
             </div>
             <div className="mt-1 text-xl font-black text-success">
-              15,000 EGP
+              15,000 {tc('currency_code')}
             </div>
             <div className="mt-0.5 text-xs text-sidebar-muted">
-              {t('on_hold', { amount: '2,500 EGP' })}
+              {t('on_hold', { amount: `2,500 ${tc('currency_code')}` })}
             </div>
           </div>
         </div>

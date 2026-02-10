@@ -21,8 +21,10 @@ export function WalletCard({
   const { t } = useTranslation('wallet');
   const { isRTL } = useLanguage();
   
+  const { t: tc } = useTranslation('common');
+  const currencyLabel = tc('currency_code');
   const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${CURRENCY.symbol}`;
+    return `${amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} ${currencyLabel}`;
   };
 
   const totalBalance = availableBalance + allocatedToMissions;

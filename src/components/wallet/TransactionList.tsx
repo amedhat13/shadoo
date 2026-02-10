@@ -19,6 +19,7 @@ interface TransactionListProps {
 
 export function TransactionList({ transactions }: TransactionListProps) {
   const { t } = useTranslation('wallet');
+  const { t: tc } = useTranslation('common');
   const { isRTL } = useLanguage();
 
   const TYPE_CONFIG = {
@@ -83,7 +84,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               </div>
             </div>
             <div className={cn('text-sm font-bold', isPositive ? 'text-success' : 'text-foreground')}>
-              {isPositive ? '+' : '-'}{tx.amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} {CURRENCY.symbol}
+              {isPositive ? '+' : '-'}{tx.amount.toLocaleString(isRTL ? 'ar-EG' : CURRENCY.locale)} {tc('currency_code')}
             </div>
           </div>
         );

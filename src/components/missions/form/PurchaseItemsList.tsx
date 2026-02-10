@@ -18,6 +18,7 @@ interface PurchaseItemsListProps {
 
 export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
   const { t } = useTranslation('missions');
+  const { t: tc } = useTranslation('common');
 
   const addItem = () => {
     const newItem: PurchaseItem = {
@@ -87,7 +88,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
                 className="pr-12"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
-                {CURRENCY.symbol}
+                {tc('currency_code')}
               </span>
             </div>
             <Button
@@ -107,7 +108,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
       <div className="flex items-center justify-between text-sm pt-2 border-t border-border">
         <span className="text-muted-foreground">{t('funding.total_budget_per_visit')}</span>
         <span className="font-bold">
-          {totalBudget.toLocaleString(CURRENCY.locale)} {CURRENCY.symbol}
+          {totalBudget.toLocaleString(CURRENCY.locale)} {tc('currency_code')}
         </span>
       </div>
 
