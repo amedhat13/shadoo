@@ -1,9 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+  ChartContainer, ChartTooltip, ChartTooltipContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 
@@ -13,6 +12,7 @@ interface GeographicTabProps {
 }
 
 export function GeographicTab({ geographicData, branchStatusDist }: GeographicTabProps) {
+  const { t } = useTranslation('admin');
   const chartData = geographicData.slice(0, 10);
 
   return (
@@ -20,15 +20,15 @@ export function GeographicTab({ geographicData, branchStatusDist }: GeographicTa
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Branches by City</CardTitle>
-            <CardDescription>Distribution of branches, missions, and visits across cities</CardDescription>
+            <CardTitle className="text-base font-bold uppercase">{t('reports.geographic.branches_by_city')}</CardTitle>
+            <CardDescription>{t('reports.geographic.branches_by_city_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             {chartData.length > 0 ? (
               <ChartContainer config={{
-                branches: { label: 'Branches', color: '#F97316' },
-                missions: { label: 'Missions', color: '#0EA5E9' },
-                visits: { label: 'Visits', color: '#22C55E' },
+                branches: { label: t('reports.geographic.chart_branches'), color: '#F97316' },
+                missions: { label: t('reports.geographic.chart_missions'), color: '#0EA5E9' },
+                visits: { label: t('reports.geographic.chart_visits'), color: '#22C55E' },
               }} className="h-[300px] w-full">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -40,54 +40,43 @@ export function GeographicTab({ geographicData, branchStatusDist }: GeographicTa
                   <Bar dataKey="visits" fill="#22C55E" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">No branch data yet</div>
-            )}
+            ) : <div className="h-[300px] flex items-center justify-center text-muted-foreground">{t('reports.geographic.no_branch_data')}</div>}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Branch Verification Status</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.branch_verification')}</CardTitle></CardHeader>
           <CardContent>
             {branchStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[300px] w-full">
                 <PieChart>
                   <Pie data={branchStatusDist} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {branchStatusDist.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    {branchStatusDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">No branches yet</div>
-            )}
+            ) : <div className="h-[300px] flex items-center justify-center text-muted-foreground">{t('reports.geographic.no_branches')}</div>}
           </CardContent>
         </Card>
       </div>
 
-      {/* City Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-bold uppercase">City Breakdown</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.city_breakdown')}</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>City</TableHead>
-                  <TableHead className="text-center">Branches</TableHead>
-                  <TableHead className="text-center">Missions</TableHead>
-                  <TableHead className="text-center">Visits</TableHead>
+                  <TableHead>{t('reports.geographic.col_city')}</TableHead>
+                  <TableHead className="text-center">{t('reports.geographic.col_branches')}</TableHead>
+                  <TableHead className="text-center">{t('reports.geographic.col_missions')}</TableHead>
+                  <TableHead className="text-center">{t('reports.geographic.col_visits')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {geographicData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">No geographic data yet</TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t('reports.geographic.no_geographic_data')}</TableCell></TableRow>
                 ) : geographicData.map(row => (
                   <TableRow key={row.city}>
                     <TableCell className="font-medium">{row.city}</TableCell>

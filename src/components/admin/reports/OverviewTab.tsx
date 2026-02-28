@@ -1,9 +1,9 @@
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatCard } from '@/components/admin/common/StatCard';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+  ChartContainer, ChartTooltip, ChartTooltipContent,
 } from '@/components/ui/chart';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -14,19 +14,10 @@ import { Users, ClipboardList, UserCheck, MapPin, DollarSign, TrendingUp, Eye, C
 interface OverviewTabProps {
   data: {
     overview: {
-      totalClients: number;
-      totalMissions: number;
-      totalAgents: number;
-      totalBranches: number;
-      totalVisits: number;
-      activeMissions: number;
-      completedVisits: number;
-      pendingVisits: number;
-      totalRevenue: number;
-      totalBudgetAllocated: number;
-      totalBudgetUsed: number;
-      activeAgents: number;
-      pendingAgents: number;
+      totalClients: number; totalMissions: number; totalAgents: number; totalBranches: number;
+      totalVisits: number; activeMissions: number; completedVisits: number; pendingVisits: number;
+      totalRevenue: number; totalBudgetAllocated: number; totalBudgetUsed: number;
+      activeAgents: number; pendingAgents: number;
     };
     missionStatusDist: { name: string; value: number; color: string }[];
     visitStatusDist: { name: string; value: number; color: string }[];
@@ -37,38 +28,49 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ data }: OverviewTabProps) {
+  const { t } = useTranslation('admin');
+  const { t: tCommon } = useTranslation('common');
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+  const currencyCode = tCommon('currency_code');
   const { overview, missionStatusDist, visitStatusDist, visitTrends, revenueTrends, subscriptionDist } = data;
 
   const completionRate = overview.totalVisits > 0
     ? Math.round((overview.completedVisits / overview.totalVisits) * 100) : 0;
+  const budgetUtil = overview.totalBudgetAllocated > 0
+    ? Math.round((overview.totalBudgetUsed / overview.totalBudgetAllocated) * 100) : 0;
+
+  const fmt = (n: number) => n.toLocaleString(isRTL ? 'ar-EG' : 'en');
 
   return (
     <div className="space-y-6">
-      {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Clients" value={overview.totalClients} icon={Users} href="/admin/clients" />
-        <StatCard title="Total Missions" value={overview.totalMissions} icon={ClipboardList} description={`${overview.activeMissions} active`} href="/admin/missions" />
-        <StatCard title="Active Agents" value={overview.activeAgents} icon={UserCheck} description={`${overview.pendingAgents} pending approval`} href="/admin/agents" />
-        <StatCard title="Total Branches" value={overview.totalBranches} icon={MapPin} href="/admin/branches" />
+        <StatCard title={t('reports.overview.total_clients')} value={overview.totalClients} icon={Users} href="/admin/clients" />
+        <StatCard title={t('reports.overview.total_missions')} value={overview.totalMissions} icon={ClipboardList} description={t('reports.overview.active_label', { count: overview.activeMissions })} href="/admin/missions" />
+        <StatCard title={t('reports.overview.active_agents')} value={overview.activeAgents} icon={UserCheck} description={t('reports.overview.pending_approval', { count: overview.pendingAgents })} href="/admin/agents" />
+        <StatCard title={t('reports.overview.total_branches')} value={overview.totalBranches} icon={MapPin} href="/admin/branches" />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Visits" value={overview.totalVisits} icon={Eye} description={`${completionRate}% approved`} href="/admin/visits" />
-        <StatCard title="Pending Reviews" value={overview.pendingVisits} icon={Clock} variant="warning" href="/admin/visits" />
-        <StatCard title="Total Revenue" value={`${overview.totalRevenue.toLocaleString()} EGP`} icon={DollarSign} variant="success" />
-        <StatCard title="Budget Utilization" value={overview.totalBudgetAllocated > 0 ? `${Math.round((overview.totalBudgetUsed / overview.totalBudgetAllocated) * 100)}%` : '0%'} icon={TrendingUp} description={`${overview.totalBudgetUsed.toLocaleString()} / ${overview.totalBudgetAllocated.toLocaleString()} EGP`} />
+        <StatCard title={t('reports.overview.total_visits')} value={overview.totalVisits} icon={Eye} description={t('reports.overview.approved_pct', { pct: completionRate })} href="/admin/visits" />
+        <StatCard title={t('reports.overview.pending_reviews')} value={overview.pendingVisits} icon={Clock} variant="warning" href="/admin/visits" />
+        <StatCard title={t('reports.overview.total_revenue')} value={`${fmt(overview.totalRevenue)} ${currencyCode}`} icon={DollarSign} variant="success" />
+        <StatCard title={t('reports.overview.budget_utilization')} value={`${budgetUtil}%`} icon={TrendingUp} description={`${fmt(overview.totalBudgetUsed)} / ${fmt(overview.totalBudgetAllocated)} ${currencyCode}`} />
       </div>
 
-      {/* Charts Row 1 */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Visit Trends</CardTitle>
-            <CardDescription>Monthly visit volume and outcomes</CardDescription>
+            <CardTitle className="text-base font-bold uppercase">{t('reports.overview.visit_trends')}</CardTitle>
+            <CardDescription>{t('reports.overview.visit_trends_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             {visitTrends.length > 0 ? (
-              <ChartContainer config={{ approved: { label: 'Approved', color: '#22C55E' }, rejected: { label: 'Rejected', color: '#EF4444' }, submitted: { label: 'Submitted', color: '#F97316' } }} className="h-[280px] w-full">
+              <ChartContainer config={{
+                approved: { label: t('reports.overview.chart_approved'), color: '#22C55E' },
+                rejected: { label: t('reports.overview.chart_rejected'), color: '#EF4444' },
+                submitted: { label: t('reports.overview.chart_submitted'), color: '#F97316' },
+              }} className="h-[280px] w-full">
                 <AreaChart data={visitTrends}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" fontSize={12} />
@@ -80,19 +82,22 @@ export function OverviewTab({ data }: OverviewTabProps) {
                 </AreaChart>
               </ChartContainer>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-muted-foreground">No visit data yet</div>
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground">{t('reports.overview.no_visit_data')}</div>
             )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Revenue Trends</CardTitle>
-            <CardDescription>Monthly top-ups and mission spending</CardDescription>
+            <CardTitle className="text-base font-bold uppercase">{t('reports.overview.revenue_trends')}</CardTitle>
+            <CardDescription>{t('reports.overview.revenue_trends_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             {revenueTrends.length > 0 ? (
-              <ChartContainer config={{ topups: { label: 'Top-ups', color: '#22C55E' }, spend: { label: 'Spend', color: '#F97316' } }} className="h-[280px] w-full">
+              <ChartContainer config={{
+                topups: { label: t('reports.overview.chart_topups'), color: '#22C55E' },
+                spend: { label: t('reports.overview.chart_spend'), color: '#F97316' },
+              }} className="h-[280px] w-full">
                 <BarChart data={revenueTrends}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" fontSize={12} />
@@ -103,77 +108,56 @@ export function OverviewTab({ data }: OverviewTabProps) {
                 </BarChart>
               </ChartContainer>
             ) : (
-              <div className="h-[280px] flex items-center justify-center text-muted-foreground">No transaction data yet</div>
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground">{t('reports.overview.no_transaction_data')}</div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Row 2 - Pie Charts */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Mission Status</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.mission_status')}</CardTitle></CardHeader>
           <CardContent>
             {missionStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
                   <Pie data={missionStatusDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {missionStatusDist.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
+                    {missionStatusDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-muted-foreground">No missions yet</div>
-            )}
+            ) : <div className="h-[220px] flex items-center justify-center text-muted-foreground">{t('reports.overview.no_missions')}</div>}
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Visit Status</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.visit_status')}</CardTitle></CardHeader>
           <CardContent>
             {visitStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
                   <Pie data={visitStatusDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {visitStatusDist.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
+                    {visitStatusDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-muted-foreground">No visits yet</div>
-            )}
+            ) : <div className="h-[220px] flex items-center justify-center text-muted-foreground">{t('reports.overview.no_visits')}</div>}
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Subscriptions</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.subscriptions')}</CardTitle></CardHeader>
           <CardContent>
             {subscriptionDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
                   <Pie data={subscriptionDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {subscriptionDist.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
+                    {subscriptionDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-muted-foreground">No subscriptions yet</div>
-            )}
+            ) : <div className="h-[220px] flex items-center justify-center text-muted-foreground">{t('reports.overview.no_subscriptions')}</div>}
           </CardContent>
         </Card>
       </div>

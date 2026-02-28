@@ -1,28 +1,20 @@
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+  ChartContainer, ChartTooltip, ChartTooltipContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { Star } from 'lucide-react';
 
 interface AgentPerformanceTabProps {
   agents: {
-    id: string;
-    name: string;
-    tier: string;
-    status: string;
-    completedVisits: number;
-    totalEarnings: number;
-    rating: number;
-    totalVisits: number;
-    approvedVisits: number;
-    rejectedVisits: number;
-    completionRate: number;
+    id: string; name: string; tier: string; status: string;
+    completedVisits: number; totalEarnings: number; rating: number;
+    totalVisits: number; approvedVisits: number; rejectedVisits: number; completionRate: number;
   }[];
   tierDist: { name: string; value: number; color: string }[];
   statusDist: { name: string; value: number; color: string }[];
@@ -33,78 +25,71 @@ const tierColors: Record<string, string> = {
   B: 'bg-sky-500/10 text-sky-700 border-sky-500/20',
   C: 'bg-gray-500/10 text-gray-700 border-gray-500/20',
 };
-
 const statusColors: Record<string, string> = {
-  active: 'bg-green-500/10 text-green-700 border-green-500/20',
-  pending: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
-  suspended: 'bg-red-500/10 text-red-700 border-red-500/20',
+  active: 'bg-success/10 text-success border-success/20',
+  pending: 'bg-warning/10 text-warning border-warning/20',
+  suspended: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 
 export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerformanceTabProps) {
+  const { t } = useTranslation('admin');
+  const { t: tCommon } = useTranslation('common');
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+  const currencyCode = tCommon('currency_code');
+
   const topAgents = agents.filter(a => a.status === 'active').slice(0, 10);
   const chartData = topAgents.slice(0, 8).map(a => ({
     name: a.name.length > 12 ? a.name.slice(0, 12) + '…' : a.name,
     approved: a.approvedVisits,
     rejected: a.rejectedVisits,
-    rating: a.rating,
   }));
 
   return (
     <div className="space-y-6">
-      {/* Distribution Charts */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Agent Tier Distribution</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.tier_distribution')}</CardTitle></CardHeader>
           <CardContent>
             {tierDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
                   <Pie data={tierDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {tierDist.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    {tierDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-muted-foreground">No agents yet</div>
-            )}
+            ) : <div className="h-[220px] flex items-center justify-center text-muted-foreground">{t('reports.agents.no_agents')}</div>}
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">Agent Status Distribution</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.status_distribution')}</CardTitle></CardHeader>
           <CardContent>
             {statusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
                   <Pie data={statusDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                    {statusDist.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    {statusDist.map((e, i) => <Cell key={i} fill={e.color} />)}
                   </Pie>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </PieChart>
               </ChartContainer>
-            ) : (
-              <div className="h-[220px] flex items-center justify-center text-muted-foreground">No agents yet</div>
-            )}
+            ) : <div className="h-[220px] flex items-center justify-center text-muted-foreground">{t('reports.agents.no_agents')}</div>}
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Agents Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-bold uppercase">Top Agent Performance</CardTitle>
-          <CardDescription>Approved vs rejected visits for top active agents</CardDescription>
+          <CardTitle className="text-base font-bold uppercase">{t('reports.agents.top_performance')}</CardTitle>
+          <CardDescription>{t('reports.agents.top_performance_desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {chartData.length > 0 ? (
             <ChartContainer config={{
-              approved: { label: 'Approved', color: '#22C55E' },
-              rejected: { label: 'Rejected', color: '#EF4444' },
+              approved: { label: t('reports.agents.chart_approved'), color: '#22C55E' },
+              rejected: { label: t('reports.agents.chart_rejected'), color: '#EF4444' },
             }} className="h-[300px] w-full">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -115,36 +100,29 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
                 <Bar dataKey="rejected" fill="#EF4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">No active agents yet</div>
-          )}
+          ) : <div className="h-[300px] flex items-center justify-center text-muted-foreground">{t('reports.agents.no_active')}</div>}
         </CardContent>
       </Card>
 
-      {/* Agent Table */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-bold uppercase">Agent Details</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.details')}</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Agent</TableHead>
-                  <TableHead className="text-center">Tier</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-center">Visits</TableHead>
-                  <TableHead className="text-center">Completion</TableHead>
-                  <TableHead className="text-center">Rating</TableHead>
-                  <TableHead className="text-end">Earnings</TableHead>
+                  <TableHead>{t('reports.agents.col_agent')}</TableHead>
+                  <TableHead className="text-center">{t('reports.agents.col_tier')}</TableHead>
+                  <TableHead className="text-center">{t('reports.agents.col_status')}</TableHead>
+                  <TableHead className="text-center">{t('reports.agents.col_visits')}</TableHead>
+                  <TableHead className="text-center">{t('reports.agents.col_completion')}</TableHead>
+                  <TableHead className="text-center">{t('reports.agents.col_rating')}</TableHead>
+                  <TableHead className="text-end">{t('reports.agents.col_earnings')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {agents.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">No agents found</TableCell>
-                  </TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">{t('reports.agents.no_agents')}</TableCell></TableRow>
                 ) : agents.slice(0, 15).map(agent => (
                   <TableRow key={agent.id}>
                     <TableCell className="font-medium">{agent.name}</TableCell>
@@ -169,7 +147,7 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
                         </span>
                       ) : '—'}
                     </TableCell>
-                    <TableCell className="text-end">{agent.totalEarnings.toLocaleString()} EGP</TableCell>
+                    <TableCell className="text-end">{agent.totalEarnings.toLocaleString(isRTL ? 'ar-EG' : 'en')} {currencyCode}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
