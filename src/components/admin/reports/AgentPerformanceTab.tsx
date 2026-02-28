@@ -34,8 +34,7 @@ const statusColors: Record<string, string> = {
 export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerformanceTabProps) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation('common');
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
+  const { isRTL } = useLanguage();
   const currencyCode = tCommon('currency_code');
 
   const topAgents = agents.filter(a => a.status === 'active').slice(0, 10);
@@ -49,8 +48,8 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.tier_distribution')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.agents.tier_distribution')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {tierDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
@@ -64,8 +63,8 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.status_distribution')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.agents.status_distribution')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {statusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
@@ -81,11 +80,11 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="text-start">
           <CardTitle className="text-base font-bold uppercase">{t('reports.agents.top_performance')}</CardTitle>
           <CardDescription>{t('reports.agents.top_performance_desc')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent dir="ltr">
           {chartData.length > 0 ? (
             <ChartContainer config={{
               approved: { label: t('reports.agents.chart_approved'), color: '#22C55E' },
@@ -105,13 +104,13 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.agents.details')}</CardTitle></CardHeader>
+        <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.agents.details')}</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('reports.agents.col_agent')}</TableHead>
+                  <TableHead className="text-start">{t('reports.agents.col_agent')}</TableHead>
                   <TableHead className="text-center">{t('reports.agents.col_tier')}</TableHead>
                   <TableHead className="text-center">{t('reports.agents.col_status')}</TableHead>
                   <TableHead className="text-center">{t('reports.agents.col_visits')}</TableHead>
@@ -125,7 +124,7 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
                   <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">{t('reports.agents.no_agents')}</TableCell></TableRow>
                 ) : agents.slice(0, 15).map(agent => (
                   <TableRow key={agent.id}>
-                    <TableCell className="font-medium">{agent.name}</TableCell>
+                    <TableCell className="font-medium text-start">{agent.name}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className={tierColors[agent.tier] || ''}>{agent.tier}</Badge>
                     </TableCell>
@@ -134,7 +133,7 @@ export function AgentPerformanceTab({ agents, tierDist, statusDist }: AgentPerfo
                     </TableCell>
                     <TableCell className="text-center">{agent.approvedVisits} / {agent.totalVisits}</TableCell>
                     <TableCell className="text-center">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
                         <Progress value={agent.completionRate} className="h-2 w-16" />
                         <span className="text-xs">{agent.completionRate}%</span>
                       </div>

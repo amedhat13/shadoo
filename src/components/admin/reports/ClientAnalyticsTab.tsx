@@ -4,16 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+  ChartContainer, ChartTooltip, ChartTooltipContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { ArrowLeft, BarChart3, Users } from 'lucide-react';
+import { ArrowLeft, BarChart3 } from 'lucide-react';
 import { ClientReportView } from './ClientReportView';
+import { cn } from '@/lib/utils';
 
 interface ClientData {
   id: string;
@@ -36,8 +34,7 @@ interface ClientAnalyticsTabProps {
 export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation('common');
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
+  const { isRTL } = useLanguage();
   const currencyCode = tCommon('currency_code');
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
@@ -46,7 +43,7 @@ export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
     return (
       <div className="space-y-4">
         <Button variant="ghost" size="sm" className="gap-2" onClick={() => setSelectedClient(null)}>
-          <ArrowLeft className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+          <ArrowLeft className={cn("h-4 w-4", isRTL && "rotate-180")} />
           {t('reports.back_to_all_clients')}
         </Button>
         <ClientReportView clientId={selectedClient.id} clientName={selectedClient.name} />
@@ -64,13 +61,12 @@ export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Top Clients Chart */}
       <Card>
-        <CardHeader>
+        <CardHeader className="text-start">
           <CardTitle className="text-base font-bold uppercase">{t('reports.top_clients_activity')}</CardTitle>
           <CardDescription>{t('reports.top_clients_desc')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent dir="ltr">
           {chartData.length > 0 ? (
             <ChartContainer config={{
               missions: { label: t('reports.chart_missions'), color: '#F97316' },
@@ -93,9 +89,8 @@ export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
         </CardContent>
       </Card>
 
-      {/* Client Table */}
       <Card>
-        <CardHeader>
+        <CardHeader className="text-start">
           <CardTitle className="text-base font-bold uppercase">{t('reports.client_breakdown')}</CardTitle>
           <CardDescription>{t('reports.client_breakdown_desc')}</CardDescription>
         </CardHeader>
@@ -104,7 +99,7 @@ export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('reports.col_client')}</TableHead>
+                  <TableHead className="text-start">{t('reports.col_client')}</TableHead>
                   <TableHead className="text-center">{t('reports.col_missions')}</TableHead>
                   <TableHead className="text-center">{t('reports.col_branches')}</TableHead>
                   <TableHead className="text-center">{t('reports.col_visits')}</TableHead>
@@ -122,7 +117,7 @@ export function ClientAnalyticsTab({ data }: ClientAnalyticsTabProps) {
                   </TableRow>
                 ) : topClients.map(client => (
                   <TableRow key={client.id}>
-                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell className="font-medium text-start">{client.name}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant="secondary">{client.missions}</Badge>
                     </TableCell>

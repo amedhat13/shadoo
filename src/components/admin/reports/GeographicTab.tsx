@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
@@ -13,17 +14,18 @@ interface GeographicTabProps {
 
 export function GeographicTab({ geographicData, branchStatusDist }: GeographicTabProps) {
   const { t } = useTranslation('admin');
+  const { isRTL } = useLanguage();
   const chartData = geographicData.slice(0, 10);
 
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="text-start">
             <CardTitle className="text-base font-bold uppercase">{t('reports.geographic.branches_by_city')}</CardTitle>
             <CardDescription>{t('reports.geographic.branches_by_city_desc')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent dir="ltr">
             {chartData.length > 0 ? (
               <ChartContainer config={{
                 branches: { label: t('reports.geographic.chart_branches'), color: '#F97316' },
@@ -45,8 +47,8 @@ export function GeographicTab({ geographicData, branchStatusDist }: GeographicTa
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.branch_verification')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.branch_verification')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {branchStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[300px] w-full">
                 <PieChart>
@@ -62,13 +64,13 @@ export function GeographicTab({ geographicData, branchStatusDist }: GeographicTa
       </div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.city_breakdown')}</CardTitle></CardHeader>
+        <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.geographic.city_breakdown')}</CardTitle></CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('reports.geographic.col_city')}</TableHead>
+                  <TableHead className="text-start">{t('reports.geographic.col_city')}</TableHead>
                   <TableHead className="text-center">{t('reports.geographic.col_branches')}</TableHead>
                   <TableHead className="text-center">{t('reports.geographic.col_missions')}</TableHead>
                   <TableHead className="text-center">{t('reports.geographic.col_visits')}</TableHead>
@@ -79,7 +81,7 @@ export function GeographicTab({ geographicData, branchStatusDist }: GeographicTa
                   <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t('reports.geographic.no_geographic_data')}</TableCell></TableRow>
                 ) : geographicData.map(row => (
                   <TableRow key={row.city}>
-                    <TableCell className="font-medium">{row.city}</TableCell>
+                    <TableCell className="font-medium text-start">{row.city}</TableCell>
                     <TableCell className="text-center">{row.branches}</TableCell>
                     <TableCell className="text-center">{row.missions}</TableCell>
                     <TableCell className="text-center">{row.visits}</TableCell>

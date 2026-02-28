@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { LucideIcon, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface StatCardProps {
   title: string;
@@ -19,6 +20,7 @@ interface StatCardProps {
 
 export function StatCard({ title, value, description, icon: Icon, trend, variant = 'default', href, onClick }: StatCardProps) {
   const navigate = useNavigate();
+  const { isRTL } = useLanguage();
 
   const variantStyles = {
     default: 'bg-card',
@@ -55,7 +57,7 @@ export function StatCard({ title, value, description, icon: Icon, trend, variant
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
+          <div className="space-y-1 flex-1 text-start">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {title}
             </p>
@@ -79,7 +81,7 @@ export function StatCard({ title, value, description, icon: Icon, trend, variant
               </div>
             )}
             {isClickable && (
-              <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className={cn("h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity", isRTL && "rotate-180")} />
             )}
           </div>
         </div>
