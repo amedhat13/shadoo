@@ -30,8 +30,7 @@ interface OverviewTabProps {
 export function OverviewTab({ data }: OverviewTabProps) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation('common');
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
+  const { language, isRTL } = useLanguage();
   const currencyCode = tCommon('currency_code');
   const { overview, missionStatusDist, visitStatusDist, visitTrends, revenueTrends, subscriptionDist } = data;
 
@@ -60,11 +59,11 @@ export function OverviewTab({ data }: OverviewTabProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="text-start">
             <CardTitle className="text-base font-bold uppercase">{t('reports.overview.visit_trends')}</CardTitle>
             <CardDescription>{t('reports.overview.visit_trends_desc')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent dir="ltr">
             {visitTrends.length > 0 ? (
               <ChartContainer config={{
                 approved: { label: t('reports.overview.chart_approved'), color: '#22C55E' },
@@ -88,11 +87,11 @@ export function OverviewTab({ data }: OverviewTabProps) {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="text-start">
             <CardTitle className="text-base font-bold uppercase">{t('reports.overview.revenue_trends')}</CardTitle>
             <CardDescription>{t('reports.overview.revenue_trends_desc')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent dir="ltr">
             {revenueTrends.length > 0 ? (
               <ChartContainer config={{
                 topups: { label: t('reports.overview.chart_topups'), color: '#22C55E' },
@@ -116,8 +115,8 @@ export function OverviewTab({ data }: OverviewTabProps) {
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.mission_status')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.overview.mission_status')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {missionStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
@@ -131,8 +130,8 @@ export function OverviewTab({ data }: OverviewTabProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.visit_status')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.overview.visit_status')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {visitStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>
@@ -146,8 +145,8 @@ export function OverviewTab({ data }: OverviewTabProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.overview.subscriptions')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.overview.subscriptions')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {subscriptionDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[220px] w-full">
                 <PieChart>

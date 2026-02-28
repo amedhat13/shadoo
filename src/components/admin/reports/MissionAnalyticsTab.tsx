@@ -22,8 +22,7 @@ interface MissionAnalyticsTabProps {
 export function MissionAnalyticsTab({ data }: MissionAnalyticsTabProps) {
   const { t } = useTranslation('admin');
   const { t: tCommon } = useTranslation('common');
-  const { language } = useLanguage();
-  const isRTL = language === 'ar';
+  const { isRTL } = useLanguage();
   const currencyCode = tCommon('currency_code');
   const { overview, missionStatusDist, visitTrends } = data;
 
@@ -44,8 +43,8 @@ export function MissionAnalyticsTab({ data }: MissionAnalyticsTabProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle className="text-base font-bold uppercase">{t('reports.missions_tab.mission_status_dist')}</CardTitle></CardHeader>
-          <CardContent>
+          <CardHeader className="text-start"><CardTitle className="text-base font-bold uppercase">{t('reports.missions_tab.mission_status_dist')}</CardTitle></CardHeader>
+          <CardContent dir="ltr">
             {missionStatusDist.length > 0 ? (
               <ChartContainer config={{}} className="h-[280px] w-full">
                 <PieChart>
@@ -60,11 +59,11 @@ export function MissionAnalyticsTab({ data }: MissionAnalyticsTabProps) {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="text-start">
             <CardTitle className="text-base font-bold uppercase">{t('reports.missions_tab.visit_outcomes')}</CardTitle>
             <CardDescription>{t('reports.missions_tab.visit_outcomes_desc')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent dir="ltr">
             {visitTrends.length > 0 ? (
               <ChartContainer config={{
                 approved: { label: t('reports.overview.chart_approved'), color: '#22C55E' },
