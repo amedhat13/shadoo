@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { AdminPageHeader } from '@/components/admin/common/AdminPageHeader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,40 +12,41 @@ import { MissionAnalyticsTab } from '@/components/admin/reports/MissionAnalytics
 import { GeographicTab } from '@/components/admin/reports/GeographicTab';
 
 export default function AdminReportsPage() {
+  const { t } = useTranslation('admin');
   const { data, isLoading } = useAdminReportsData();
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <AdminPageHeader
-          title="Reports & Analytics"
-          description="Platform-wide insights across clients, agents, missions, and branches."
+          title={t('reports.title')}
+          description={t('reports.description')}
         />
 
         {isLoading || !data ? (
-          <LoadingState message="Loading reports..." />
+          <LoadingState message={t('reports.loading')} />
         ) : (
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList className="flex-wrap">
               <TabsTrigger value="overview" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
-                Overview
+                {t('reports.tab_overview')}
               </TabsTrigger>
               <TabsTrigger value="clients" className="gap-2">
                 <Users className="h-4 w-4" />
-                Clients
+                {t('reports.tab_clients')}
               </TabsTrigger>
               <TabsTrigger value="agents" className="gap-2">
                 <UserCheck className="h-4 w-4" />
-                Agents
+                {t('reports.tab_agents')}
               </TabsTrigger>
               <TabsTrigger value="missions" className="gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Missions
+                {t('reports.tab_missions')}
               </TabsTrigger>
               <TabsTrigger value="geographic" className="gap-2">
                 <MapPin className="h-4 w-4" />
-                Geographic
+                {t('reports.tab_geographic')}
               </TabsTrigger>
             </TabsList>
 
