@@ -279,6 +279,77 @@ export type Database = {
         }
         Relationships: []
       }
+      cities: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          name_ar: string | null
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          name_ar?: string | null
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          name_ar?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      districts: {
+        Row: {
+          city_id: string
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          name_ar: string | null
+          sort_order: number
+        }
+        Insert: {
+          city_id: string
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          name_ar?: string | null
+          sort_order?: number
+        }
+        Update: {
+          city_id?: string
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          name_ar?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           agent_tier: string
@@ -358,6 +429,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_templates: {
+        Row: {
+          body: string
+          body_ar: string | null
+          channel: string
+          created_at: string
+          description: string | null
+          description_ar: string | null
+          id: string
+          is_active: boolean
+          name: string
+          name_ar: string | null
+          subject: string
+          subject_ar: string | null
+          template_key: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          body?: string
+          body_ar?: string | null
+          channel?: string
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          name_ar?: string | null
+          subject?: string
+          subject_ar?: string | null
+          template_key: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          body?: string
+          body_ar?: string | null
+          channel?: string
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          name_ar?: string | null
+          subject?: string
+          subject_ar?: string | null
+          template_key?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -539,6 +664,33 @@ export type Database = {
           price?: number
           sort_order?: number
           visits_per_month?: number
+        }
+        Relationships: []
+      }
+      system_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          description: string | null
+          id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          config_key: string
+          config_value?: Json
+          description?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          description?: string | null
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
