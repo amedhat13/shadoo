@@ -1,82 +1,98 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { AdminPageHeader } from '@/components/admin/common/AdminPageHeader';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { FileQuestion, Plus, Edit2, Eye, Copy, Trash2 } from 'lucide-react';
-
-const mockTemplates = [
-  { id: '1', name: 'NPS Score Template', category: 'NPS', questions: 3, usage: 45, public: true },
-  { id: '2', name: 'Customer Satisfaction (CSAT)', category: 'CSAT', questions: 5, usage: 67, public: true },
-  { id: '3', name: 'Store Cleanliness Check', category: 'Custom', questions: 8, usage: 23, public: true },
-  { id: '4', name: 'Staff Behavior Assessment', category: 'Custom', questions: 10, usage: 34, public: true },
-  { id: '5', name: 'Product Availability Audit', category: 'Custom', questions: 6, usage: 18, public: true },
-];
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { FileQuestion, Plus, Edit2, Trash2 } from 'lucide-react';
+import { useQuestionTemplates, QuestionTemplate } from '@/hooks/useQuestionTemplates';
+import { TemplateFormDialog } from '@/components/admin/templates/TemplateFormDialog';
+import { LoadingState } from '@/components/common/LoadingState';
 
 export default function AdminTemplatesPage() {
+  const { t, i18n } = useTranslation('admin');
+  const isRTL = i18n.dir() === 'rtl';
+  const {
+    templates, isLoading, categoryStats,
+    createTemplate, updateTemplate, deleteTemplate,
+    isCreating, isUpdating, isDeleting,
+  } = useQuestionTemplates();
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<QuestionTemplate | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const openCreate = () => {
+    setEditingTemplate(null);
+    setFormOpen(true);
+  };
+
+  const openEdit = (tpl: QuestionTemplate) => {
+    setEditingTemplate(tpl);
+    setFormOpen(true);
+  };
+
+  const handleSave = async (data: any) => {
+    if (editingTemplate) {
+      await updateTemplate({ id: editingTemplate.id, ...data });
+    } else {
+      await createTemplate(data);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    await deleteTemplate(deleteId);
+    setDeleteId(null);
+  };
+
+  const getName = (tpl: QuestionTemplate) => isRTL && tpl.name_ar ? tpl.name_ar : tpl.name;
+
+  if (isLoading) return <AdminLayout><LoadingState /></AdminLayout>;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <AdminPageHeader
-          title="Question Templates"
-          description="Manage pre-built question templates for client missions."
+          title={t('templates.title')}
+          description={t('templates.description')}
           actions={
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={openCreate}>
               <Plus className="h-4 w-4" />
-              Create Template
+              {t('templates.create_template')}
             </Button>
           }
         />
 
         {/* Category Cards */}
         <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">NPS Templates</p>
-                  <p className="text-2xl font-black">2</p>
+          {['NPS', 'CSAT', 'Custom'].map(cat => (
+            <Card key={cat}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-start">
+                    <p className="text-xs font-semibold uppercase text-muted-foreground">{cat}</p>
+                    <p className="text-2xl font-black">{categoryStats[cat] || 0}</p>
+                  </div>
+                  <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
                 </div>
-                <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">CSAT Templates</p>
-                  <p className="text-2xl font-black">3</p>
-                </div>
-                <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Custom Templates</p>
-                  <p className="text-2xl font-black">12</p>
-                </div>
-                <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">Total Usage</p>
-                  <p className="text-2xl font-black">187</p>
+                <div className="text-start">
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">{t('templates.total_templates')}</p>
+                  <p className="text-2xl font-black">{templates.length}</p>
                 </div>
                 <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
               </div>
@@ -86,58 +102,81 @@ export default function AdminTemplatesPage() {
 
         {/* Templates Table */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-bold uppercase">All Templates</CardTitle>
+          <CardHeader className="text-start">
+            <CardTitle className="text-base font-bold uppercase">{t('templates.all_templates')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Template Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Questions</TableHead>
-                  <TableHead>Usage</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockTemplates.map((template) => (
-                  <TableRow key={template.id}>
-                    <TableCell className="font-medium">{template.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{template.category}</Badge>
-                    </TableCell>
-                    <TableCell>{template.questions} questions</TableCell>
-                    <TableCell>{template.usage} missions</TableCell>
-                    <TableCell>
-                      <Badge variant={template.public ? 'default' : 'secondary'}>
-                        {template.public ? 'Public' : 'Private'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            {templates.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">{t('templates.no_templates')}</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-start">{t('templates.template_name')}</TableHead>
+                    <TableHead className="text-start">{t('templates.category')}</TableHead>
+                    <TableHead className="text-start">{t('templates.questions')}</TableHead>
+                    <TableHead className="text-start">{t('templates.status')}</TableHead>
+                    <TableHead className="text-end">{t('templates.actions')}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {templates.map(tpl => (
+                    <TableRow key={tpl.id}>
+                      <TableCell className="font-medium text-start">{getName(tpl)}</TableCell>
+                      <TableCell className="text-start">
+                        <Badge variant="outline">{tpl.category || 'Custom'}</Badge>
+                      </TableCell>
+                      <TableCell className="text-start">
+                        {t('templates.question_count', { count: tpl.questions?.length || 0 })}
+                      </TableCell>
+                      <TableCell className="text-start">
+                        <Badge variant={tpl.is_public ? 'default' : 'secondary'}>
+                          {tpl.is_public ? t('templates.public') : t('templates.private')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-end">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(tpl)}>
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(tpl.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Create/Edit Dialog */}
+      <TemplateFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        template={editingTemplate}
+        onSave={handleSave}
+        isSaving={isCreating || isUpdating}
+      />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={o => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('templates.delete_template')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('templates.delete_confirm')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('config.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('templates.delete_template')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
