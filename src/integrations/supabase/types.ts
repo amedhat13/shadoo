@@ -595,9 +595,11 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          description_ar: string | null
           id: string
           is_public: boolean | null
           name: string
+          name_ar: string | null
           questions: Json
           updated_at: string | null
         }
@@ -606,9 +608,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          description_ar?: string | null
           id?: string
           is_public?: boolean | null
           name: string
+          name_ar?: string | null
           questions?: Json
           updated_at?: string | null
         }
@@ -617,9 +621,11 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          description_ar?: string | null
           id?: string
           is_public?: boolean | null
           name?: string
+          name_ar?: string | null
           questions?: Json
           updated_at?: string | null
         }
