@@ -564,5 +564,30 @@
     "total_templates": "Total Templates",
     "total_usage": "Total Usage",
     "missions": "missions"
+  },
+  "plans": {
+    "title": "Subscription Plans",
+    "description": "Configure pricing plans and features.",
+    "create_plan": "Create Plan",
+    "edit_plan": "Edit Plan",
+    "plan_name": "Plan Name",
+    "plan_description": "Description",
+    "price": "Price",
+    "visits_per_month": "Visits / Month",
+    "currency": "Currency",
+    "billing_period": "Billing Period",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "active": "Active",
+    "archived": "Archived",
+    "features": "Features",
+    "feature_placeholder": "Add a feature...",
+    "subscribers": "Subscribers",
+    "all_plans": "All Plans",
+    "no_plans": "No plans yet. Create your first plan.",
+    "active_plans": "Active Plans",
+    "total_subscribers": "Total Subscribers",
+    "mrr": "MRR",
+    "avg_plan_value": "Avg. Plan Value"
   }
 }
