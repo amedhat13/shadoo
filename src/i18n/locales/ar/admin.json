@@ -564,5 +564,30 @@
     "total_templates": "إجمالي القوالب",
     "total_usage": "إجمالي الاستخدام",
     "missions": "مهام"
+  },
+  "plans": {
+    "title": "خطط الاشتراك",
+    "description": "تكوين خطط التسعير والميزات.",
+    "create_plan": "إنشاء خطة",
+    "edit_plan": "تعديل الخطة",
+    "plan_name": "اسم الخطة",
+    "plan_description": "الوصف",
+    "price": "السعر",
+    "visits_per_month": "الزيارات / شهر",
+    "currency": "العملة",
+    "billing_period": "فترة الفوترة",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "active": "نشط",
+    "archived": "مؤرشف",
+    "features": "الميزات",
+    "feature_placeholder": "أضف ميزة...",
+    "subscribers": "المشتركون",
+    "all_plans": "جميع الخطط",
+    "no_plans": "لا توجد خطط بعد. أنشئ أول خطة.",
+    "active_plans": "الخطط النشطة",
+    "total_subscribers": "إجمالي المشتركين",
+    "mrr": "الإيراد الشهري",
+    "avg_plan_value": "متوسط قيمة الخطة"
   }
 }

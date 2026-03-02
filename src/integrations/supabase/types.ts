@@ -637,10 +637,12 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
+          description_ar: string | null
           features: Json | null
           id: string
           is_active: boolean
           name: string
+          name_ar: string | null
           price: number
           sort_order: number
           visits_per_month: number
@@ -650,10 +652,12 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          description_ar?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean
           name: string
+          name_ar?: string | null
           price: number
           sort_order?: number
           visits_per_month: number
@@ -663,10 +667,12 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          description_ar?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean
           name?: string
+          name_ar?: string | null
           price?: number
           sort_order?: number
           visits_per_month?: number
