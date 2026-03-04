@@ -66,7 +66,7 @@ These use the Supabase JS SDK directly from the frontend. RLS policies enforce a
 | `/wallet-topup-initiate` | POST | Create PayMob payment intention | 🔲 TODO |
 | `/wallet-topup-callback` | POST | PayMob webhook → credit wallet | 🔲 TODO |
 | `/wallet-topup-verify` | GET | Check payment status | 🔲 TODO |
-| `/export-report` | POST | Generate CSV/Excel for mission data | 🔲 TODO |
+| `/export-report` | POST | Generate CSV/Excel for mission data | ✅ Done (client-side via xlsx) |
 | `/team-invite` | POST | Send invitation email to org member | 🔲 TODO |
 
 #### 2. Admin ↔ Backend

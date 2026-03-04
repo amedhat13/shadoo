@@ -291,7 +291,13 @@ START → Client or Admin needs insights
   2. Filter by: date range, branches, missions
   3. View dashboards: visit trends, budget usage, completion rates
   4. Drill into mission-level response data
-  5. Export to CSV/Excel
+  5. Export to Excel (multi-sheet .xlsx)
+     → Sheet 1: Summary (key metrics — completion %, budget utilization, active missions)
+     → Sheet 2: Visits (month × branch breakdown with planned/completed/rating)
+     → Sheet 3: Budget (month × branch allocation vs usage)
+     → Sheet 4: Branch Performance (aggregated per-branch stats)
+     → Sheet 5: Mission Status (distribution counts)
+     → All headers bilingual (EN/AR) based on active language
 
 [Admin Portal]
   1. Navigate to Reports & Analytics
@@ -301,7 +307,7 @@ START → Client or Admin needs insights
   5. Geographic Distribution: branches and missions by city
   6. Mission Analytics: creation and completion trends
   7. Financial Reports: revenue, payouts, MRR
-  8. Export any report
+  8. Export any report (TODO: same Excel format as client)
 
 END → Stakeholder has actionable insights
 ```

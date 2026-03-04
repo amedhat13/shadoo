@@ -76,7 +76,7 @@ Shadoo is a B2B SaaS mystery shopping platform connecting **organizations** (cli
 2. **Visit approved/rejected** → if rejected, agent can resubmit or lose payout
 3. **Client views results** → sees completed visit data, photos, answers in dashboard
 4. **Reports generated** → analytics by branch, time period, question responses
-5. **Export** → CSV/Excel download of mission data
+5. **Export** → Multi-sheet Excel download (summary, visits, budget, branch performance, mission status) with bilingual headers
 
 ### Phase 6: Financial Settlement
 
