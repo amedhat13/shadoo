@@ -93,5 +93,23 @@
     "strong_performance_improving": "تُظهر هذه المهمة معدلات إتمام متحسنة مع إكمال {{completed}} زيارة من أصل {{planned}} مخططة.",
     "area_for_improvement": "مجال للتحسين",
     "area_for_improvement_desc": "بعض أسئلة نعم/لا تُظهر أكثر من 30% ردود سلبية - راجعها لإجراء تحسينات محتملة."
+  },
+  "export": {
+    "button": "تصدير إلى إكسل",
+    "sheet_summary": "ملخص",
+    "sheet_visits": "الزيارات",
+    "sheet_budget": "الميزانية",
+    "sheet_performance": "أداء الفروع",
+    "sheet_mission_status": "حالة المهام",
+    "metric": "المقياس",
+    "value": "القيمة",
+    "completed_missions": "المهام المكتملة",
+    "total_planned": "إجمالي الزيارات المخططة",
+    "total_completed": "إجمالي الزيارات المكتملة",
+    "month": "الشهر",
+    "branch": "الفرع",
+    "completion_rate": "نسبة الإتمام",
+    "status": "الحالة",
+    "count": "العدد"
   }
 }
