@@ -73,7 +73,7 @@
 | C46 | Budget analytics | ✅ Done (UI) |
 | C47 | Branch performance comparison | ✅ Done (UI) |
 | C48 | Date range filtering | ✅ Done (UI) |
-| C49 | CSV/Excel export | 🔲 TODO |
+| C49 | Excel export (multi-sheet: summary, visits, budget, performance, status) | ✅ Done |
 
 ### Settings
 | # | Feature | Status |
@@ -264,7 +264,7 @@
 
 | Portal | Done | UI Only | TODO | Total |
 |--------|------|---------|------|-------|
-| Client | 28 | 24 | 4 | 56 |
+| Client | 29 | 24 | 3 | 56 |
 | Admin | 30 | 27 | 6 | 63 |
 | Mobile | 0 | 0 | 23 | 23 |
-| **Total** | **58** | **51** | **33** | **142** |
+| **Total** | **59** | **51** | **32** | **142** |
