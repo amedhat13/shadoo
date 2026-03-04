@@ -62,7 +62,7 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
   const { ChevronStart, ChevronEnd } = useDirectionalIcons();
 
   return (
-    <div className="flex h-full flex-col bg-background border-e border-border text-start">
+    <div className="flex h-full flex-col bg-background border-e border-border" dir="auto">
       {/* Logo & Toggle */}
       <div className="flex h-16 items-center justify-between border-b border-border px-3">
         {!collapsed && (
