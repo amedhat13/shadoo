@@ -93,5 +93,23 @@
     "strong_performance_improving": "This mission shows improving completion rates with {{completed}} visits completed out of {{planned}} planned.",
     "area_for_improvement": "Area for Improvement",
     "area_for_improvement_desc": "Some yes/no questions show over 30% negative responses - review these for potential improvements."
+  },
+  "export": {
+    "button": "Export to Excel",
+    "sheet_summary": "Summary",
+    "sheet_visits": "Visits",
+    "sheet_budget": "Budget",
+    "sheet_performance": "Branch Performance",
+    "sheet_mission_status": "Mission Status",
+    "metric": "Metric",
+    "value": "Value",
+    "completed_missions": "Completed Missions",
+    "total_planned": "Total Planned Visits",
+    "total_completed": "Total Completed Visits",
+    "month": "Month",
+    "branch": "Branch",
+    "completion_rate": "Completion Rate",
+    "status": "Status",
+    "count": "Count"
   }
 }

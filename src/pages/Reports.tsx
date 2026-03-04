@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useMissions } from '@/hooks/useMissions';
 import { useWallet } from '@/hooks/useWallet';
 import { usePackage } from '@/hooks/usePackage';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { getLocalizedValue } from '@/i18n/utils';
+import { exportReportsToExcel } from '@/lib/exportReports';
 import {
   ChartContainer,
   ChartTooltip,
@@ -50,6 +52,7 @@ import {
   ClipboardList,
   Star,
   MessageSquare,
+  Download,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -296,6 +299,58 @@ export default function ReportsPage() {
   const activeMissions = missions.filter(m => m.status === 'published').length;
   const completedMissions = missions.filter(m => m.status === 'completed').length;
 
+  const handleExport = useCallback(() => {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    exportReportsToExcel({
+      visitData: filteredVisitData,
+      budgetData: filteredBudgetData,
+      visitsByBranch,
+      missionStatusData,
+      keyMetrics: {
+        visitCompletion: completionRate,
+        totalVisitsPlanned,
+        totalVisitsCompleted,
+        budgetUtilization,
+        totalBudgetAllocated,
+        totalBudgetUsed,
+        activeMissions,
+        completedMissions,
+        packageUsed: subscription.visits_used_this_month,
+        packageTotal: subscription.package.visits_per_month,
+      },
+      labels: {
+        sheetSummary: t('export.sheet_summary'),
+        sheetVisits: t('export.sheet_visits'),
+        sheetBudget: t('export.sheet_budget'),
+        sheetPerformance: t('export.sheet_performance'),
+        sheetMissionStatus: t('export.sheet_mission_status'),
+        metric: t('export.metric'),
+        value: t('export.value'),
+        visitCompletion: t('metrics.visit_completion'),
+        budgetUtilization: t('metrics.budget_utilization'),
+        activeMissions: t('metrics.active_missions'),
+        completedMissions: t('export.completed_missions'),
+        packageUsage: t('metrics.package_usage'),
+        totalPlanned: t('export.total_planned'),
+        totalCompleted: t('export.total_completed'),
+        totalAllocated: t('budget_tab.total_allocated'),
+        totalUsed: t('budget_tab.total_used'),
+        month: t('export.month'),
+        branch: t('export.branch'),
+        planned: t('chart_labels.planned'),
+        completed: t('chart_labels.completed'),
+        rating: t('chart_labels.rating'),
+        allocated: t('chart_labels.allocated'),
+        used: t('chart_labels.used'),
+        completionRate: t('export.completion_rate'),
+        status: t('export.status'),
+        count: t('export.count'),
+        currency: tCommon('currency_code'),
+      },
+    }, `Shadoo-Reports-${dateStr}.xlsx`);
+  }, [filteredVisitData, filteredBudgetData, visitsByBranch, missionStatusData, completionRate, totalVisitsPlanned, totalVisitsCompleted, budgetUtilization, totalBudgetAllocated, totalBudgetUsed, activeMissions, completedMissions, subscription, t, tCommon]);
+
   const borderSide = language === 'ar' ? 'border-r-4' : 'border-l-4';
 
   return (
@@ -304,6 +359,12 @@ export default function ReportsPage() {
         <PageHeader
           title={t('title')}
           description={t('description')}
+          actions={
+            <Button onClick={handleExport} variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              {t('export.button')}
+            </Button>
+          }
         />
 
         {/* Filters */}
