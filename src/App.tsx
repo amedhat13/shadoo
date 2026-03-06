@@ -42,6 +42,7 @@ import AdminReportsPage from "./pages/admin/AdminReports";
 import AdminConfigPage from "./pages/admin/AdminConfig";
 import AdminAuditPage from "./pages/admin/AdminAudit";
 import AdminAdminsPage from "./pages/admin/AdminAdmins";
+import AdminSalesRequestsPage from "./pages/admin/AdminSalesRequests";
 
 const queryClient = new QueryClient();
 
@@ -263,6 +264,14 @@ const App = () => (
               element={
                 <AdminProtectedRoute>
                   <AdminAuditPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/sales-requests"
+              element={
+                <AdminProtectedRoute>
+                  <AdminSalesRequestsPage />
                 </AdminProtectedRoute>
               }
             />

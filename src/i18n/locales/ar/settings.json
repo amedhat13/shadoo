@@ -47,14 +47,7 @@
     "revoke": "إلغاء",
     "current": "الحالي",
     "session_revoked": "تم إلغاء الجلسة.",
-    "all_sessions_revoked": "تم إلغاء جميع الجلسات الأخرى.",
-    "danger_zone_title": "منطقة الخطر",
-    "danger_zone_description": "إجراءات لا يمكن التراجع عنها تؤثر على حسابك.",
-    "delete_account": "حذف الحساب",
-    "delete_account_description": "حذف حسابك وجميع بياناتك نهائياً.",
-    "delete_confirm_title": "هل أنت متأكد تماماً؟",
-    "delete_confirm_description": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حسابك نهائياً وإزالة جميع بياناتك من خوادمنا.",
-    "delete_disabled_demo": "حذف الحساب معطّل في الوضع التجريبي."
+    "all_sessions_revoked": "تم إلغاء جميع الجلسات الأخرى."
   },
   "notifications": {
     "email_title": "إشعارات البريد الإلكتروني",
@@ -71,10 +64,6 @@
     "push_visit_description": "إشعار عند تقديم الزيارات.",
     "wallet_alerts": "تنبيهات المحفظة",
     "wallet_alerts_description": "إشعارات الرصيد المنخفض والمعاملات.",
-    "sms_title": "إشعارات الرسائل النصية",
-    "sms_description": "رسائل نصية للتنبيهات الحرجة فقط.",
-    "critical_alerts": "التنبيهات الحرجة",
-    "critical_alerts_description": "مشاكل الأمان وإخفاقات الدفع والأمور العاجلة.",
     "save_preferences": "حفظ التفضيلات",
     "preferences_saved": "تم حفظ تفضيلات الإشعارات."
   },
@@ -117,6 +106,7 @@
     "visits_tooltip": "حصة الزيارات الشهرية المضمنة في خطتك.",
     "per_month": "شهرياً",
     "next_billing": "تاريخ الفاتورة القادمة: {{date}}",
+    "auto_renews": "يتجدد تلقائياً في",
     "available_plans": "الخطط المتاحة",
     "payment_method_title": "طريقة الدفع",
     "payment_method_description": "إدارة معلومات الدفع الخاصة بك.",
@@ -136,6 +126,42 @@
       "pending_description": "جاري معالجة الدفع.",
       "failed": "فشلت",
       "failed_description": "فشل الدفع. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "sales": {
+    "change_plan": "تغيير خطتك",
+    "current_plan": "الخطة الحالية",
+    "request_call": "طلب مكالمة مبيعات",
+    "request_call_desc": "سيتواصل معك فريق المبيعات لمناقشة تغييرات اشتراكك.",
+    "request_type": "نوع الطلب",
+    "select_type": "اختر نوع الطلب",
+    "types": {
+      "upgrade": "ترقية إلى خطة أعلى",
+      "add_visits": "إضافة المزيد من الزيارات",
+      "add_users": "إضافة المزيد من المستخدمين",
+      "change_billing": "تغيير دورة الفوترة",
+      "cancel": "إلغاء الاشتراك",
+      "other": "أخرى"
+    },
+    "preferred_time": "الوقت المفضل للمكالمة",
+    "select_time": "اختر الوقت المفضل",
+    "times": {
+      "morning": "صباحاً (9 ص - 12 م)",
+      "afternoon": "ظهراً (12 م - 3 م)",
+      "evening": "مساءً (3 م - 6 م)",
+      "any_time": "أي وقت"
+    },
+    "phone": "رقم الهاتف",
+    "notes": "ملاحظات إضافية",
+    "submit": "إرسال الطلب",
+    "request_submitted": "تم إرسال الطلب بنجاح. سيتواصل معك فريق المبيعات قريباً.",
+    "your_requests": "طلباتك",
+    "view_all": "عرض جميع الطلبات",
+    "statuses": {
+      "pending": "قيد الانتظار",
+      "contacted": "تم التواصل",
+      "resolved": "تم الحل",
+      "cancelled": "ملغى"
     }
   }
 }
