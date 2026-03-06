@@ -1,5 +1,5 @@
 import { Branch } from '@/types';
-import {
+import { Badge } from '@/components/ui/badge';
   Table,
   TableBody,
   TableCell,
