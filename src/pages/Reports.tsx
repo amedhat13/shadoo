@@ -1,3 +1,4 @@
+// TODO: Remove mock data import and set USE_MOCK_DATA = false when real data is available
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -28,6 +29,8 @@ import {
   ReportVisit,
 } from '@/hooks/useClientReports';
 import { exportReportsToExcel } from '@/lib/exportReports';
+import { USE_MOCK_DATA, MOCK_MISSIONS, getMockVisits, MOCK_BRANCHES, filterMockData } from '@/lib/mockReportsData';
+import { ReportsFilterBar, ReportFilters } from '@/components/reports/ReportsFilterBar';
 import {
   ChartContainer,
   ChartTooltip,
@@ -40,7 +43,7 @@ import {
 } from 'recharts';
 import {
   TrendingUp, Target, DollarSign, BarChart3, Activity, Download, 
-  CheckCircle, Clock, Building2, FileQuestion, Wallet,
+  CheckCircle, Clock, Building2, FileQuestion, Wallet, AlertTriangle,
 } from 'lucide-react';
 
 const COLORS = ['#F97316', '#22C55E', '#F59E0B', '#06B6D4', '#A855F7', '#EF4444', '#6366F1', '#14B8A6'];
@@ -56,8 +59,23 @@ export default function ReportsPage() {
   const { t: tc } = useTranslation('common');
   const { t: tm } = useTranslation('missions');
   const { language } = useLanguage();
-  const { missions, visits, branches, isLoading } = useClientReports();
+  const realData = useClientReports();
   const [selectedMissionId, setSelectedMissionId] = useState<string>('all');
+  const [filters, setFilters] = useState<ReportFilters>({ dateFrom: null, dateTo: null, branchIds: [] });
+
+  // Use mock or real data
+  const rawMissions = USE_MOCK_DATA ? (MOCK_MISSIONS as unknown as ReportMission[]) : realData.missions;
+  const rawVisits = USE_MOCK_DATA ? (getMockVisits() as unknown as ReportVisit[]) : realData.visits;
+  const branches = USE_MOCK_DATA ? (MOCK_BRANCHES as any[]) : realData.branches;
+  const isLoading = USE_MOCK_DATA ? false : realData.isLoading;
+
+  // Apply global filters
+  const { visits: filteredAllVisits, missions: filteredAllMissions } = useMemo(() => {
+    return filterMockData(rawVisits, rawMissions, filters.dateFrom, filters.dateTo, filters.branchIds.length > 0 ? filters.branchIds : null);
+  }, [rawVisits, rawMissions, filters]);
+
+  const missions = filteredAllMissions as ReportMission[];
+  const visits = filteredAllVisits as ReportVisit[];
 
   const selectedMission = useMemo(() => {
     if (selectedMissionId === 'all') return null;
@@ -208,6 +226,16 @@ export default function ReportsPage() {
           }
         />
 
+        {/* Demo Data Banner */}
+        {USE_MOCK_DATA && (
+          <Card className="border-amber-300 bg-amber-50 dark:bg-amber-950/20">
+            <CardContent className="p-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <p className="text-sm text-amber-700 dark:text-amber-400">{t('demo_banner', { defaultValue: 'You are viewing demo data. Real analytics will appear once missions are completed.' })}</p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Mission Selector */}
         <Card>
           <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -231,6 +259,9 @@ export default function ReportsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Global Filters */}
+        <ReportsFilterBar filters={filters} onFiltersChange={setFilters} branches={branches} language={language} />
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
