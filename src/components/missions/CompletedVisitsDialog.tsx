@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Clock, User, MapPin, Camera, MessageSquare, X, ChevronRight, EyeOff } from 'lucide-react';
+import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 export interface CompletedVisit {
   id: string;
@@ -26,6 +28,9 @@ export interface CompletedVisit {
     answer: string | number | boolean;
   }[];
   rating?: number;
+  client_rating?: number;
+  client_feedback?: string;
+  rated_at?: string;
 }
 
 interface CompletedVisitsDialogProps {
@@ -33,6 +38,47 @@ interface CompletedVisitsDialogProps {
   onOpenChange: (open: boolean) => void;
   visits: CompletedVisit[];
   missionName: string;
+  onRateVisit?: (visitId: string, rating: number, feedback?: string) => Promise<void>;
+}
+
+function StarRating({ 
+  value, 
+  onChange, 
+  readonly = false 
+}: { 
+  value: number; 
+  onChange?: (v: number) => void; 
+  readonly?: boolean;
+}) {
+  const [hover, setHover] = useState(0);
+  
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          disabled={readonly}
+          className={cn(
+            'transition-colors',
+            readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
+          )}
+          onClick={() => onChange?.(star)}
+          onMouseEnter={() => !readonly && setHover(star)}
+          onMouseLeave={() => !readonly && setHover(0)}
+        >
+          <Star
+            className={cn(
+              'h-5 w-5 transition-colors',
+              (hover || value) >= star
+                ? 'fill-amber-400 text-amber-400'
+                : 'text-muted-foreground/30'
+            )}
+          />
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function CompletedVisitsDialog({
@@ -40,8 +86,12 @@ export function CompletedVisitsDialog({
   onOpenChange,
   visits,
   missionName,
+  onRateVisit,
 }: CompletedVisitsDialogProps) {
   const [selectedVisit, setSelectedVisit] = useState<CompletedVisit | null>(null);
+  const [pendingRating, setPendingRating] = useState(0);
+  const [pendingFeedback, setPendingFeedback] = useState('');
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const { t } = useTranslation('missions');
   const { t: tc } = useTranslation('common');
 
@@ -57,6 +107,25 @@ export function CompletedVisitsDialog({
 
   const formatCurrency = (amount: number) => {
     return `${amount.toLocaleString(CURRENCY.locale)} ${tc('currency_code')}`;
+  };
+
+  const handleSubmitRating = async () => {
+    if (!selectedVisit || !pendingRating || !onRateVisit) return;
+    setIsSubmittingRating(true);
+    try {
+      await onRateVisit(selectedVisit.id, pendingRating, pendingFeedback || undefined);
+      // Update local state
+      selectedVisit.client_rating = pendingRating;
+      selectedVisit.client_feedback = pendingFeedback;
+      selectedVisit.rated_at = new Date().toISOString();
+      setPendingRating(0);
+      setPendingFeedback('');
+      toast.success(t('rating.submitted_success'));
+    } catch {
+      toast.error(t('rating.submit_error'));
+    } finally {
+      setIsSubmittingRating(false);
+    }
   };
 
   return (
@@ -77,7 +146,11 @@ export function CompletedVisitsDialog({
                 {visits.map((visit, index) => (
                   <button
                     key={visit.id}
-                    onClick={() => setSelectedVisit(visit)}
+                    onClick={() => {
+                      setSelectedVisit(visit);
+                      setPendingRating(0);
+                      setPendingFeedback('');
+                    }}
                     className={cn(
                       'w-full text-left p-3 transition-colors hover:bg-muted/50',
                       selectedVisit?.id === visit.id && 'bg-muted'
@@ -93,6 +166,12 @@ export function CompletedVisitsDialog({
                           <p className="text-xs text-muted-foreground">
                             {formatDate(visit.completed_at)}
                           </p>
+                          {visit.client_rating && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              <span className="text-xs text-muted-foreground">{visit.client_rating}/5</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -108,7 +187,7 @@ export function CompletedVisitsDialog({
             {selectedVisit ? (
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
-                  {/* Header - agent name hidden */}
+                  {/* Header */}
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-bold text-lg">{t('details.mystery_shopper')}</h3>
@@ -122,6 +201,56 @@ export function CompletedVisitsDialog({
                   </div>
 
                   <Separator />
+
+                  {/* Rating Section */}
+                  <div className="border border-border rounded-md p-4 space-y-3">
+                    <h4 className="font-bold text-sm uppercase tracking-wide flex items-center gap-2">
+                      <Star className="h-4 w-4" />
+                      {t('rating.rate_visit')}
+                    </h4>
+                    
+                    {selectedVisit.client_rating ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <StarRating value={selectedVisit.client_rating} readonly />
+                          <span className="text-sm text-muted-foreground">
+                            {t('rating.rated_x', { rating: selectedVisit.client_rating })}
+                          </span>
+                        </div>
+                        {selectedVisit.client_feedback && (
+                          <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
+                            {selectedVisit.client_feedback}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <StarRating value={pendingRating} onChange={setPendingRating} />
+                        {pendingRating > 0 && (
+                          <>
+                            <Textarea
+                              value={pendingFeedback}
+                              onChange={(e) => setPendingFeedback(e.target.value.slice(0, 200))}
+                              placeholder={t('rating.feedback_placeholder')}
+                              className="resize-none h-20"
+                              maxLength={200}
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">{pendingFeedback.length}/200</span>
+                              <Button 
+                                size="sm" 
+                                onClick={handleSubmitRating} 
+                                disabled={isSubmittingRating}
+                              >
+                                {isSubmittingRating && <Loader2 className="me-2 h-3 w-3 animate-spin" />}
+                                {t('rating.submit')}
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Answers */}
                   <div>
