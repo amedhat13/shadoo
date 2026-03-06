@@ -82,6 +82,36 @@ export default function ReportsPage() {
   const methodology = selectedMission?.methodology || 'custom';
   const showMethodologyTab = methodology !== 'custom' && methodology !== null && selectedMission !== null;
 
+  // Overview metrics
+  const overviewMetrics = useMemo(() => {
+    const totalPlanned = relevantMissions.reduce((s, m) => s + m.number_of_visits, 0);
+    const totalCompleted = relevantMissions.reduce((s, m) => s + m.visits_completed, 0);
+    const completionRate = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : 0;
+
+    const totalAllocated = relevantMissions.reduce((s, m) => s + m.total_purchase_budget, 0);
+    const totalUsed = relevantMissions.reduce((s, m) => s + m.budget_used, 0);
+    const budgetEfficiency = totalAllocated > 0 ? Math.round((totalUsed / totalAllocated) * 100) : 0;
+
+    const activeMissions = missions.filter(m => m.status === 'published').length;
+    const verifiedBranches = branches.filter(b => b.status === 'verified').length;
+
+    // Avg response time
+    const responseTimes = completedVisits
+      .filter(v => v.started_at && v.submitted_at)
+      .map(v => (new Date(v.submitted_at!).getTime() - new Date(v.started_at!).getTime()) / (1000 * 60 * 60));
+    const avgResponseTime = responseTimes.length > 0
+      ? Math.round(responseTimes.reduce((s, t) => s + t, 0) / responseTimes.length * 10) / 10
+      : 0;
+
+    // Primary score
+    let primaryScore: { score: number; label: string; maxScore: number; benchmark?: string; color?: string } = { score: 0, label: 'Score', maxScore: 10 };
+    if (selectedMission) {
+      primaryScore = getPrimaryScore(methodology, selectedMission.questions || [], completedVisits);
+    }
+
+    return { totalPlanned, totalCompleted, completionRate, totalAllocated, totalUsed, budgetEfficiency, activeMissions, verifiedBranches, avgResponseTime, primaryScore };
+  }, [relevantMissions, completedVisits, missions, branches, selectedMission, methodology]);
+
   const handleExport = useCallback(() => {
     const currency = tc('currency_code') || 'EGP';
     const branchData = branches.filter(b => b.status === 'verified').map(branch => {
@@ -152,36 +182,6 @@ export default function ReportsPage() {
       },
     }, `shadoo-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }, [relevantMissions, missions, branches, overviewMetrics, t, tc]);
-
-  // Overview metrics
-  const overviewMetrics = useMemo(() => {
-    const totalPlanned = relevantMissions.reduce((s, m) => s + m.number_of_visits, 0);
-    const totalCompleted = relevantMissions.reduce((s, m) => s + m.visits_completed, 0);
-    const completionRate = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : 0;
-
-    const totalAllocated = relevantMissions.reduce((s, m) => s + m.total_purchase_budget, 0);
-    const totalUsed = relevantMissions.reduce((s, m) => s + m.budget_used, 0);
-    const budgetEfficiency = totalAllocated > 0 ? Math.round((totalUsed / totalAllocated) * 100) : 0;
-
-    const activeMissions = missions.filter(m => m.status === 'published').length;
-    const verifiedBranches = branches.filter(b => b.status === 'verified').length;
-
-    // Avg response time
-    const responseTimes = completedVisits
-      .filter(v => v.started_at && v.submitted_at)
-      .map(v => (new Date(v.submitted_at!).getTime() - new Date(v.started_at!).getTime()) / (1000 * 60 * 60));
-    const avgResponseTime = responseTimes.length > 0
-      ? Math.round(responseTimes.reduce((s, t) => s + t, 0) / responseTimes.length * 10) / 10
-      : 0;
-
-    // Primary score
-    let primaryScore: { score: number; label: string; maxScore: number; benchmark?: string; color?: string } = { score: 0, label: 'Score', maxScore: 10 };
-    if (selectedMission) {
-      primaryScore = getPrimaryScore(methodology, selectedMission.questions || [], completedVisits);
-    }
-
-    return { totalPlanned, totalCompleted, completionRate, totalAllocated, totalUsed, budgetEfficiency, activeMissions, verifiedBranches, avgResponseTime, primaryScore };
-  }, [relevantMissions, completedVisits, missions, branches, selectedMission, methodology]);
 
   // Mission status distribution
   const missionStatusDist = useMemo(() => {
