@@ -270,6 +270,8 @@ export default function BranchesPage() {
                     onEdit={handleEdit}
                     onDelete={handleDeleteBranch}
                     onViewOnMap={handleViewOnMap}
+                    isDemo={true}
+                    demoBranchIds={['demo-branch-1', 'demo-branch-2', 'demo-branch-3', 'demo-branch-4']}
                   />
                 )}
               </CardContent>

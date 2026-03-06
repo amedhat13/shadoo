@@ -1,12 +1,11 @@
-import { CreditCard, Receipt, Download, Calendar } from 'lucide-react';
+import { CreditCard, Receipt, Download, Calendar, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { SubscriptionPlans } from './SubscriptionPlans';
 import { useSubscription } from '@/hooks/useSubscription';
+import { SalesCallDialog } from './SalesCallDialog';
 import { CURRENCY } from '@/lib/constants';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import {
@@ -29,17 +28,11 @@ const mockInvoices: Invoice[] = [
 ];
 
 export function BillingSettings() {
-  const { plans, currentPlanId, currentPlan, isLoading, selectPlan } = useSubscription();
+  const { plans, currentPlanId, currentPlan, isLoading } = useSubscription();
   const { t } = useTranslation('settings');
   const { t: tc } = useTranslation('common');
   const { isRTL } = useLanguage();
   const currencyLabel = tc('currency_code');
-
-  const handleSelectPlan = async (planId: string) => {
-    await selectPlan(planId);
-    const plan = plans.find((p) => p.id === planId);
-    toast.success(t('billing.switched_plan', { name: plan?.name }));
-  };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(isRTL ? 'ar-EG' : 'en-EG', {
@@ -84,23 +77,15 @@ export function BillingSettings() {
             </div>
             <Separator className="my-4" />
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              {t('billing.next_billing', { date: 'March 1, 2024' })}
+              <RefreshCw className="h-4 w-4" />
+              {t('billing.auto_renews', { defaultValue: 'Auto-renews on' })} March 1, 2024
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Subscription Plans */}
-      <div>
-        <h3 className="mb-4 text-lg font-bold">{t('billing.available_plans')}</h3>
-        <SubscriptionPlans
-          plans={plans}
-          currentPlanId={currentPlanId}
-          onSelectPlan={handleSelectPlan}
-          isLoading={isLoading}
-        />
-      </div>
+      {/* Change Plan / Request Sales Call */}
+      <SalesCallDialog />
 
       {/* Payment Method */}
       <Card className="border border-border">
