@@ -144,6 +144,7 @@ export default function MissionCreatePage() {
           visit_schedules: formData.visit_schedules,
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
+          methodology: formData.methodology || 'custom',
         });
       }
       toast({
