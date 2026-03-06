@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Building2, ClipboardList, ClipboardCheck,
   UserCheck, Award, FileQuestion, CreditCard, DollarSign, Wallet,
-  BarChart3, Settings, ScrollText, ShieldCheck, Menu,
+  BarChart3, Settings, ScrollText, ShieldCheck, Menu, Phone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
