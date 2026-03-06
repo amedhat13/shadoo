@@ -50,7 +50,7 @@ export interface QuestionPhotoRequirement {
   triggerCondition?: 'low_rating' | 'negative_answer';
   ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
   samplePhotoUrl?: string;
-  instructions?: string;
+  instructions?: string | { en: string; ar: string };
 }
 
 export interface Question {
@@ -66,7 +66,7 @@ export interface Question {
 // Photo Requirements (general/legacy)
 export interface PhotoRequirements {
   required_count: number;
-  instructions?: string;
+  instructions?: string | { en: string; ar: string };
 }
 
 // Agent Tiers

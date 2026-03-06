@@ -1,16 +1,18 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, ClipboardList, Wallet } from 'lucide-react';
+import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VisitsRemainingWidget } from '@/components/package/VisitsRemainingWidget';
-import { WalletCard } from '@/components/wallet/WalletCard';
 import { useMissions } from '@/hooks/useMissions';
 import { usePackage } from '@/hooks/usePackage';
-import { useWallet } from '@/hooks/useWallet';
+import { useBranches } from '@/hooks/useBranches';
 import { useToast } from '@/hooks/use-toast';
 import { useDirectionalIcons } from '@/i18n/utils';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -18,15 +20,29 @@ const ClientDashboard = () => {
   const { t } = useTranslation('dashboard');
   const { t: tc } = useTranslation('common');
   const { t: tm } = useTranslation('missions');
+  const { t: tb } = useTranslation('branches');
   const { ArrowEnd } = useDirectionalIcons();
+  const { isRTL } = useLanguage();
   const { missions } = useMissions();
-  const { visitsRemaining, visitsTotal, package: pkg } = usePackage();
-  const { wallet } = useWallet();
+  const { visitsRemaining, visitsTotal, visitsUsed, subscription } = usePackage();
+  const { branches } = useBranches();
 
   const canCreateMission = visitsRemaining > 0;
 
   const activeMissions = missions.filter((m) => m.status === 'published').length;
   const completedVisits = missions.reduce((sum, m) => sum + m.visits_completed, 0);
+
+  // Branch stats
+  const totalBranches = branches.length;
+  const verifiedBranches = branches.filter((b) => b.status === 'verified').length;
+  const pendingBranches = branches.filter((b) => b.status === 'pending_verification').length;
+  const rejectedBranches = branches.filter((b) => b.status === 'rejected').length;
+
+  // Subscription period end
+  const periodEnd = subscription.current_period_end;
+  const formattedPeriodEnd = periodEnd
+    ? format(new Date(periodEnd), 'MMM d, yyyy', { locale: isRTL ? ar : undefined })
+    : null;
 
   const handleCreateClick = () => {
     if (!canCreateMission) {
@@ -57,13 +73,21 @@ const ClientDashboard = () => {
 
         {/* Key Metrics Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Subscription / Visits Card */}
           <Card className="border border-border">
             <CardContent className="pt-6">
               <VisitsRemainingWidget visitsRemaining={visitsRemaining} visitsTotal={visitsTotal} variant="card" />
-              <p className="text-xs text-muted-foreground mt-3">{t('package_label', { name: pkg.name })}</p>
+              {formattedPeriodEnd ? (
+                <p className="text-xs text-muted-foreground mt-3">
+                  {t('visits_used_label', { used: visitsUsed, total: visitsTotal })} · {t('renews_on', { date: formattedPeriodEnd })}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-3">{t('no_active_subscription')}</p>
+              )}
             </CardContent>
           </Card>
 
+          {/* Active Missions Card */}
           <Card className="border border-border">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
@@ -77,8 +101,35 @@ const ClientDashboard = () => {
             </CardContent>
           </Card>
 
+          {/* Branches Info Card (replaces wallet card) */}
           <Card className="border border-border sm:col-span-2 lg:col-span-1">
-            <WalletCard availableBalance={wallet.available_balance} allocatedToMissions={wallet.allocated_to_missions} compact />
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+                <Building2 className="h-4 w-4" />
+                {t('branches_info')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl md:text-4xl font-black">{totalBranches}</div>
+              <div className="flex items-center gap-3 mt-2 flex-wrap">
+                <span className="flex items-center gap-1 text-xs">
+                  <CheckCircle2 className="h-3 w-3 text-success" />
+                  <span className="text-success font-semibold">{verifiedBranches}</span> {tb('stats.verified')}
+                </span>
+                <span className="flex items-center gap-1 text-xs">
+                  <Clock className="h-3 w-3 text-primary" />
+                  <span className="text-primary font-semibold">{pendingBranches}</span> {tb('stats.pending')}
+                </span>
+                <span className="flex items-center gap-1 text-xs">
+                  <XCircle className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive font-semibold">{rejectedBranches}</span> {tb('stats.rejected')}
+                </span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/branches')} className="mt-2 gap-1 p-0 h-auto text-xs text-primary">
+                {t('view_all_branches')}
+                <ArrowEnd className="h-3 w-3" />
+              </Button>
+            </CardContent>
           </Card>
         </div>
 
@@ -99,15 +150,15 @@ const ClientDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => navigate('/wallet')}>
+          <Card className="border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => navigate('/branches')}>
             <CardContent className="p-4 md:pt-6 flex items-center justify-between">
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center bg-success text-success-foreground shrink-0">
-                  <Wallet className="h-5 w-5 md:h-6 md:w-6" />
+                  <Building2 className="h-5 w-5 md:h-6 md:w-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold uppercase tracking-wide text-sm md:text-base">{t('wallet_funding')}</h3>
-                  <p className="text-xs md:text-sm text-muted-foreground">{t('view_balance')}</p>
+                  <h3 className="font-bold uppercase tracking-wide text-sm md:text-base">{t('manage_branches')}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground">{t('view_branch_status')}</p>
                 </div>
               </div>
               <ArrowEnd className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -144,7 +195,7 @@ const ClientDashboard = () => {
                         : mission.status === 'draft' ? 'bg-muted text-muted-foreground'
                         : 'bg-primary/10 text-primary'
                     }`}>
-                      {tm(`status.${mission.status}`)}
+                      {tm(`statuses.${mission.status}`)}
                     </div>
                   </div>
                 ))}

@@ -44,16 +44,18 @@
 | C25 | Questionnaire builder (bilingual) | ✅ Done |
 | C26 | Question types: text, multiple choice, yes/no, rating | ✅ Done |
 | C27 | Load from question templates | ✅ Done (UI) |
-| C28 | Photo requirements configuration | ✅ Done |
+| C28 | Photo requirements configuration (bilingual instructions) | ✅ Done |
 | C29 | Purchase items + budget per visit | ✅ Done |
-| C30 | Visit scheduling (date, time, duration) | ✅ Done |
+| C30 | Visit scheduling (date, time, duration) with AM/PM format | ✅ Done |
 | C31 | Geo-tagging toggle | ✅ Done |
 | C32 | Budget calculation & review | ✅ Done |
 | C33 | Mission publishing (with validation) | ✅ Done (UI) |
-| C34 | Mission status management (pause/resume/archive) | ✅ Done (UI) |
-| C35 | Mission details view | ✅ Done |
-| C36 | Completed visits dialog | ✅ Done (UI) |
+| C34 | Mission status management (pause/resume/archive) with in-progress block | ✅ Done (UI) |
+| C35 | Mission details view (with In Progress tab) | ✅ Done |
+| C36 | Completed visits dialog (agent identity hidden) | ✅ Done (UI) |
 | C37 | Mission filtering (status, search) | ✅ Done |
+| C37b | 2-hour minimum lead time validation | ✅ Done |
+| C37c | Urgent mission auto-flagging (within 24hrs) | ✅ Done |
 
 ### Wallet & Billing
 | # | Feature | Status |

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Plus, Trash2, Calendar, Clock, Timer, Copy } from 'lucide-react';
-import { format, addDays, parseISO } from 'date-fns';
+import { Plus, Trash2, Calendar, Clock, Timer, Copy, AlertCircle } from 'lucide-react';
+import { format, addDays, parseISO, isBefore, addHours, differenceInHours } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn } from '@/lib/utils';
 import { VisitSchedule } from '@/types';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface VisitScheduleEditorProps {
   schedules: VisitSchedule[];
@@ -28,9 +29,54 @@ const DURATION_OPTIONS = [
   { value: 240, label: '4 hours' },
 ];
 
+// Generate 12-hour time options
+const TIME_OPTIONS_12H: { value: string; label_en: string; label_ar: string }[] = [];
+for (let h = 0; h < 24; h++) {
+  for (const m of [0, 30]) {
+    const h24 = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    const period_en = h < 12 ? 'AM' : 'PM';
+    const period_ar = h < 12 ? 'ص' : 'م';
+    const label_en = `${h12}:${String(m).padStart(2, '0')} ${period_en}`;
+    const label_ar = `${h12}:${String(m).padStart(2, '0')} ${period_ar}`;
+    TIME_OPTIONS_12H.push({ value: h24, label_en, label_ar });
+  }
+}
+
+function formatTime12h(time24: string, isRTL: boolean): string {
+  const [hStr, mStr] = time24.split(':');
+  const h = parseInt(hStr);
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const period = isRTL ? (h < 12 ? 'ص' : 'م') : (h < 12 ? 'AM' : 'PM');
+  return `${h12}:${mStr} ${period}`;
+}
+
+function getScheduleDateTime(schedule: VisitSchedule): Date {
+  const [hours, minutes] = schedule.time.split(':').map(Number);
+  const date = parseISO(schedule.date);
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function isWithinMinLeadTime(schedule: VisitSchedule): boolean {
+  const scheduleTime = getScheduleDateTime(schedule);
+  const minTime = addHours(new Date(), 2);
+  return isBefore(scheduleTime, minTime);
+}
+
+function isUrgent(schedule: VisitSchedule): boolean {
+  const scheduleTime = getScheduleDateTime(schedule);
+  const hoursFromNow = differenceInHours(scheduleTime, new Date());
+  return hoursFromNow >= 2 && hoursFromNow < 24;
+}
+
 export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: VisitScheduleEditorProps) {
   const [bulkCount, setBulkCount] = useState(5);
   const { t } = useTranslation('missions');
+  const { isRTL } = useLanguage();
+
+  const hasInvalidSchedules = schedules.some(isWithinMinLeadTime);
+  const hasUrgentSchedules = schedules.some(isUrgent);
 
   const addSchedule = () => {
     if (schedules.length >= maxVisits) return;
@@ -139,6 +185,22 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
         </div>
       </div>
 
+      {/* 2-hour lead time validation error */}
+      {hasInvalidSchedules && (
+        <div className="flex items-start gap-2 border border-destructive/30 bg-destructive/5 p-3">
+          <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive font-medium">{t('funding.min_lead_time_error')}</p>
+        </div>
+      )}
+
+      {/* Urgent mission warning */}
+      {hasUrgentSchedules && !hasInvalidSchedules && (
+        <div className="flex items-start gap-2 border border-orange-400/30 bg-orange-50 dark:bg-orange-950/20 p-3">
+          <AlertCircle className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-orange-700 dark:text-orange-400 font-medium">{t('funding.urgent_mission_warning')}</p>
+        </div>
+      )}
+
       {schedules.length === 0 ? (
         <div className="border border-dashed border-border p-6 text-center">
           <Calendar className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
@@ -156,103 +218,130 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
         </div>
       ) : (
         <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-          {schedules.map((schedule, index) => (
-            <div
-              key={schedule.id}
-              className="flex items-center gap-2 p-3 border border-border bg-card"
-            >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">
-                {index + 1}
-              </span>
+          {schedules.map((schedule, index) => {
+            const invalid = isWithinMinLeadTime(schedule);
+            const urgent = !invalid && isUrgent(schedule);
+            return (
+              <div
+                key={schedule.id}
+                className={cn(
+                  "flex items-center gap-2 p-3 border bg-card",
+                  invalid ? "border-destructive/50 bg-destructive/5" : urgent ? "border-orange-400/50 bg-orange-50/50 dark:bg-orange-950/10" : "border-border"
+                )}
+              >
+                <span className={cn(
+                  "flex h-6 w-6 shrink-0 items-center justify-center text-xs font-bold",
+                  invalid ? "bg-destructive/20 text-destructive" : urgent ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" : "bg-muted"
+                )}>
+                  {index + 1}
+                </span>
 
-              {/* Date Picker */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      'w-[130px] justify-start text-left font-normal',
-                      !schedule.date && 'text-muted-foreground'
-                    )}
+                {/* Date Picker */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        'w-[130px] justify-start text-left font-normal',
+                        !schedule.date && 'text-muted-foreground',
+                        invalid && 'border-destructive/50'
+                      )}
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      {schedule.date
+                        ? format(parseISO(schedule.date), 'MMM d, yyyy')
+                        : t('funding.pick_date')}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={schedule.date ? parseISO(schedule.date) : undefined}
+                      onSelect={(date) =>
+                        date && updateSchedule(schedule.id, { date: format(date, 'yyyy-MM-dd') })
+                      }
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {/* Time Select (AM/PM) */}
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Select
+                    value={schedule.time}
+                    onValueChange={(value) => updateSchedule(schedule.id, { time: value })}
                   >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    {schedule.date
-                      ? format(parseISO(schedule.date), 'MMM d, yyyy')
-                      : t('funding.pick_date')}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={schedule.date ? parseISO(schedule.date) : undefined}
-                    onSelect={(date) =>
-                      date && updateSchedule(schedule.id, { date: format(date, 'yyyy-MM-dd') })
+                    <SelectTrigger className={cn("w-[120px] h-8", invalid && 'border-destructive/50')}>
+                      <SelectValue>{formatTime12h(schedule.time, isRTL)}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[200px]">
+                      {TIME_OPTIONS_12H.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {isRTL ? opt.label_ar : opt.label_en}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Duration Select */}
+                <div className="flex items-center gap-1">
+                  <Timer className="h-4 w-4 text-muted-foreground" />
+                  <Select
+                    value={String(schedule.duration)}
+                    onValueChange={(value) =>
+                      updateSchedule(schedule.id, { duration: parseInt(value) })
                     }
-                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+                  >
+                    <SelectTrigger className="w-[100px] h-8">
+                      <SelectValue>{formatDuration(schedule.duration)}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DURATION_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={String(opt.value)}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Time Input */}
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="time"
-                  value={schedule.time}
-                  onChange={(e) => updateSchedule(schedule.id, { time: e.target.value })}
-                  className="w-[100px] h-8"
-                />
-              </div>
+                {/* Urgent badge */}
+                {urgent && (
+                  <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 shrink-0">
+                    {t('funding.urgent')}
+                  </span>
+                )}
 
-              {/* Duration Select */}
-              <div className="flex items-center gap-1">
-                <Timer className="h-4 w-4 text-muted-foreground" />
-                <Select
-                  value={String(schedule.duration)}
-                  onValueChange={(value) =>
-                    updateSchedule(schedule.id, { duration: parseInt(value) })
-                  }
-                >
-                  <SelectTrigger className="w-[100px] h-8">
-                    <SelectValue>{formatDuration(schedule.duration)}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DURATION_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={String(opt.value)}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {/* Actions */}
+                <div className="flex items-center gap-1 ml-auto">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => duplicateSchedule(schedule)}
+                    disabled={schedules.length >= maxVisits}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    onClick={() => removeSchedule(schedule.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-1 ml-auto">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => duplicateSchedule(schedule)}
-                  disabled={schedules.length >= maxVisits}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-destructive hover:text-destructive"
-                  onClick={() => removeSchedule(schedule.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -261,4 +350,14 @@ export function VisitScheduleEditor({ schedules, onChange, maxVisits = 100 }: Vi
       </p>
     </div>
   );
+}
+
+/** Check if any schedule violates the 2-hour lead time rule */
+export function hasInvalidLeadTime(schedules: VisitSchedule[]): boolean {
+  return schedules.some(isWithinMinLeadTime);
+}
+
+/** Check if any schedule is within 24 hours (urgent) */
+export function hasUrgentSchedules(schedules: VisitSchedule[]): boolean {
+  return schedules.some(isUrgent) && !schedules.some(isWithinMinLeadTime);
 }
