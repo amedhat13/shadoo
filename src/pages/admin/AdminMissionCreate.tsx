@@ -71,6 +71,7 @@ export default function AdminMissionCreatePage() {
       visitSchedules: VisitSchedule[];
       purchaseBudgetPerVisit: number;
       isGeoTagged: boolean;
+      methodology?: string;
     }) => {
       const totalBudget = data.numberOfVisits * data.purchaseBudgetPerVisit;
 
@@ -87,6 +88,7 @@ export default function AdminMissionCreatePage() {
         purchase_budget_per_visit: data.purchaseBudgetPerVisit,
         total_purchase_budget: totalBudget,
         is_geo_tagged: data.isGeoTagged,
+        methodology: data.methodology || 'custom',
         status: 'draft',
       });
 
@@ -158,6 +160,7 @@ export default function AdminMissionCreatePage() {
           visitSchedules: formData.visit_schedules,
           purchaseBudgetPerVisit: formData.purchase_budget_per_visit,
           isGeoTagged: formData.is_geo_tagged ?? false,
+          methodology: formData.methodology || 'custom',
         });
       }
 

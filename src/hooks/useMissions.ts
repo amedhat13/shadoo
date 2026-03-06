@@ -197,6 +197,7 @@ export function useMissions() {
     purchase_budget_per_visit: number;
     purchase_item_name?: string;
     is_geo_tagged?: boolean;
+    methodology?: string;
   }): Promise<Mission> => {
     setIsLoading(true);
     try {
@@ -220,6 +221,7 @@ export function useMissions() {
           purchase_item_name: data.purchase_item_name,
           total_purchase_budget: totalBudget,
           is_geo_tagged: data.is_geo_tagged ?? false,
+          methodology: data.methodology || 'custom',
         };
 
         const { data: mission, error } = await supabase

@@ -563,7 +563,11 @@
     "add_option": "Add Option",
     "total_templates": "Total Templates",
     "total_usage": "Total Usage",
-    "missions": "missions"
+    "missions": "missions",
+    "system": "System",
+    "methodology": "Methodology",
+    "all_categories": "All Categories",
+    "search_templates": "Search templates..."
   },
   "plans": {
     "title": "Subscription Plans",
