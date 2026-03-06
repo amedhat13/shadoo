@@ -47,14 +47,7 @@
     "revoke": "Revoke",
     "current": "Current",
     "session_revoked": "Session revoked.",
-    "all_sessions_revoked": "All other sessions revoked.",
-    "danger_zone_title": "Danger Zone",
-    "danger_zone_description": "Irreversible actions that affect your account.",
-    "delete_account": "Delete Account",
-    "delete_account_description": "Permanently delete your account and all data.",
-    "delete_confirm_title": "Are you absolutely sure?",
-    "delete_confirm_description": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
-    "delete_disabled_demo": "Account deletion is disabled in demo mode."
+    "all_sessions_revoked": "All other sessions revoked."
   },
   "notifications": {
     "email_title": "Email Notifications",
@@ -71,10 +64,6 @@
     "push_visit_description": "Get notified when visits are submitted.",
     "wallet_alerts": "Wallet Alerts",
     "wallet_alerts_description": "Low balance and transaction notifications.",
-    "sms_title": "SMS Notifications",
-    "sms_description": "Text messages for critical alerts only.",
-    "critical_alerts": "Critical Alerts",
-    "critical_alerts_description": "Security issues, payment failures, and urgent matters.",
     "save_preferences": "Save Preferences",
     "preferences_saved": "Notification preferences saved."
   },
@@ -117,6 +106,7 @@
     "visits_tooltip": "Monthly visit allowance included in your plan.",
     "per_month": "per month",
     "next_billing": "Next billing date: {{date}}",
+    "auto_renews": "Auto-renews on",
     "available_plans": "Available Plans",
     "payment_method_title": "Payment Method",
     "payment_method_description": "Manage your payment information.",
@@ -136,6 +126,42 @@
       "pending_description": "Payment is being processed.",
       "failed": "Failed",
       "failed_description": "Payment failed. Please retry."
+    }
+  },
+  "sales": {
+    "change_plan": "Change Your Plan",
+    "current_plan": "Current Plan",
+    "request_call": "Request Sales Call",
+    "request_call_desc": "Our sales team will contact you to discuss your subscription changes.",
+    "request_type": "Request Type",
+    "select_type": "Select request type",
+    "types": {
+      "upgrade": "Upgrade to a higher plan",
+      "add_visits": "Add more visits",
+      "add_users": "Add more users",
+      "change_billing": "Change billing cycle",
+      "cancel": "Cancel subscription",
+      "other": "Other"
+    },
+    "preferred_time": "Preferred Call Time",
+    "select_time": "Select preferred time",
+    "times": {
+      "morning": "Morning (9 AM - 12 PM)",
+      "afternoon": "Afternoon (12 PM - 3 PM)",
+      "evening": "Evening (3 PM - 6 PM)",
+      "any_time": "Any time"
+    },
+    "phone": "Phone Number",
+    "notes": "Additional Notes",
+    "submit": "Submit Request",
+    "request_submitted": "Request submitted successfully. Our sales team will contact you soon.",
+    "your_requests": "Your Requests",
+    "view_all": "View All Requests",
+    "statuses": {
+      "pending": "Pending",
+      "contacted": "Contacted",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
     }
   }
 }

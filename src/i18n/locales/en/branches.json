@@ -8,6 +8,8 @@
   "all_cities": "All Cities",
   "all_statuses": "All Statuses",
   "clear": "Clear",
+  "demo_branch": "Demo",
+  "demo_branch_protected": "This branch is protected and cannot be deleted",
   "no_branches": "No branches yet",
   "no_branches_description": "Add your first branch to organize missions by location.",
   "no_branches_found": "No branches found",

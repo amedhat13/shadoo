@@ -30,6 +30,7 @@
       "templates": "TEMPLATES",
       "plans": "PLANS",
       "finances": "FINANCES",
+      "sales_requests": "SALES REQUESTS",
       "reports": "REPORTS",
       "config": "CONFIGURATION",
       "audit": "AUDIT LOGS",

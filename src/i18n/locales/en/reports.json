@@ -19,6 +19,8 @@
   "response_time_analytics": "Response Time Analytics",
   "rejection_rate": "Visit Rejection Rate",
   "no_data": "No data available",
+  "demo_banner": "You are viewing demo data. Real analytics will appear once missions are completed.",
+  "demo_data": "Demo Data",
   "filters": {
     "title": "Filters",
     "months": "Months",
@@ -28,7 +30,20 @@
     "search_months": "Search months...",
     "search_branches": "Search branches...",
     "no_months": "No months found.",
-    "no_branches": "No branches found."
+    "no_branches": "No branches found.",
+    "this_month": "This Month",
+    "last_month": "Last Month",
+    "last_3_months": "Last 3 Months",
+    "last_6_months": "Last 6 Months",
+    "this_year": "This Year",
+    "all_time": "All Time",
+    "custom_range": "Custom Range",
+    "from": "From",
+    "to": "To",
+    "branches_selected": "branches selected",
+    "clear_all": "Clear All Filters",
+    "no_data_filters": "No data for selected filters",
+    "try_adjusting": "Try adjusting your date range or branch selection"
   },
   "metrics": {
     "visit_completion": "Visit Completion",

@@ -8,6 +8,8 @@
   "all_cities": "جميع المدن",
   "all_statuses": "جميع الحالات",
   "clear": "مسح",
+  "demo_branch": "تجريبي",
+  "demo_branch_protected": "هذا الفرع محمي ولا يمكن حذفه",
   "no_branches": "لا توجد فروع بعد",
   "no_branches_description": "أضف أول فرع لتنظيم المهام حسب الموقع.",
   "no_branches_found": "لم يتم العثور على فروع",

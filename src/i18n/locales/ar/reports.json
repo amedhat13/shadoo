@@ -19,6 +19,8 @@
   "response_time_analytics": "تحليلات وقت الاستجابة",
   "rejection_rate": "نسبة رفض الزيارات",
   "no_data": "لا توجد بيانات متاحة",
+  "demo_banner": "أنت تشاهد بيانات تجريبية. ستظهر التحليلات الحقيقية عند اكتمال المهمات.",
+  "demo_data": "بيانات تجريبية",
   "filters": {
     "title": "الفلاتر",
     "months": "الأشهر",
@@ -28,7 +30,20 @@
     "search_months": "بحث في الأشهر...",
     "search_branches": "بحث في الفروع...",
     "no_months": "لم يتم العثور على أشهر.",
-    "no_branches": "لم يتم العثور على فروع."
+    "no_branches": "لم يتم العثور على فروع.",
+    "this_month": "هذا الشهر",
+    "last_month": "الشهر الماضي",
+    "last_3_months": "آخر 3 أشهر",
+    "last_6_months": "آخر 6 أشهر",
+    "this_year": "هذا العام",
+    "all_time": "كل الفترات",
+    "custom_range": "نطاق مخصص",
+    "from": "من",
+    "to": "إلى",
+    "branches_selected": "فروع محددة",
+    "clear_all": "مسح جميع الفلاتر",
+    "no_data_filters": "لا توجد بيانات للفلاتر المحددة",
+    "try_adjusting": "حاول تعديل نطاق التاريخ أو اختيار الفروع"
   },
   "metrics": {
     "visit_completion": "إتمام الزيارات",
