@@ -188,6 +188,9 @@ export interface MissionFormData {
   
   // Geo Settings
   is_geo_tagged?: boolean;
+  
+  // Methodology (from template)
+  methodology?: string;
 }
 
 // Computed values helper
