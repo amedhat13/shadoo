@@ -2,48 +2,35 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
-  Plus,
-  Trash2,
-  GripVertical,
-  Save,
-  Loader2,
-  FileText,
-  Type,
-  List,
-  ToggleLeft,
-  Hash,
+  Plus, Trash2, GripVertical, Save, Loader2,
+  FileText, Type, List, ToggleLeft, Hash,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+type BilingualString = string | { en: string; ar: string };
 
 export interface QuestionField {
   id: string;
   type: 'text' | 'textarea' | 'select' | 'multiselect' | 'boolean' | 'number';
-  label: string;
-  placeholder?: string;
+  label: BilingualString;
+  placeholder?: BilingualString;
   required: boolean;
-  options?: string[]; // For select/multiselect
-  helpText?: string;
+  options?: (string | { en: string; ar: string })[];
+  helpText?: BilingualString;
 }
 
 interface AgentQuestionnaireEditorProps {
@@ -71,10 +58,27 @@ const questionTypeLabels: Record<string, string> = {
   number: 'Number',
 };
 
-export function AgentQuestionnaireEditor({
-  open,
-  onOpenChange,
-}: AgentQuestionnaireEditorProps) {
+function getEn(val: BilingualString | undefined): string {
+  if (!val) return '';
+  return typeof val === 'string' ? val : val.en || '';
+}
+function getAr(val: BilingualString | undefined): string {
+  if (!val) return '';
+  return typeof val === 'string' ? '' : val.ar || '';
+}
+function makeBilingual(en: string, ar: string): BilingualString {
+  return { en, ar };
+}
+
+function getOptionEn(opt: string | { en: string; ar: string }): string {
+  return typeof opt === 'string' ? opt : opt.en || '';
+}
+function getOptionAr(opt: string | { en: string; ar: string }): string {
+  return typeof opt === 'string' ? '' : opt.ar || '';
+}
+
+export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionnaireEditorProps) {
+  const { t } = useTranslation('admin');
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -82,11 +86,8 @@ export function AgentQuestionnaireEditor({
   const [questions, setQuestions] = useState<QuestionField[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  // Load existing questionnaire
   useEffect(() => {
-    if (open) {
-      loadQuestionnaire();
-    }
+    if (open) loadQuestionnaire();
   }, [open]);
 
   const loadQuestionnaire = async () => {
@@ -100,7 +101,7 @@ export function AgentQuestionnaireEditor({
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading questionnaire:', error);
-        toast.error('Failed to load questionnaire');
+        toast.error(t('questionnaire.load_error', 'Failed to load questionnaire'));
       }
 
       if (data) {
@@ -112,7 +113,6 @@ export function AgentQuestionnaireEditor({
           setQuestions(getDefaultQuestions());
         }
       } else {
-        // Create default questionnaire
         setQuestions(getDefaultQuestions());
       }
     } catch (err) {
@@ -126,35 +126,53 @@ export function AgentQuestionnaireEditor({
     {
       id: crypto.randomUUID(),
       type: 'textarea',
-      label: 'Tell us about your experience with mystery shopping or similar work',
-      placeholder: 'Describe any relevant experience...',
+      label: { en: 'Tell us about your experience with mystery shopping or similar work', ar: 'أخبرنا عن خبرتك في التسوق الخفي أو العمل المشابه' },
+      placeholder: { en: 'Describe any relevant experience...', ar: 'صف أي خبرة ذات صلة...' },
       required: true,
     },
     {
       id: crypto.randomUUID(),
       type: 'select',
-      label: 'Which city are you based in?',
+      label: { en: 'Which city are you based in?', ar: 'في أي مدينة تقيم؟' },
       required: true,
-      options: ['Cairo', 'Alexandria', 'Giza', 'Other'],
+      options: [
+        { en: 'Cairo', ar: 'القاهرة' },
+        { en: 'Alexandria', ar: 'الإسكندرية' },
+        { en: 'Giza', ar: 'الجيزة' },
+        { en: 'Riyadh', ar: 'الرياض' },
+        { en: 'Jeddah', ar: 'جدة' },
+        { en: 'Dammam', ar: 'الدمام' },
+        { en: 'Other', ar: 'أخرى' },
+      ],
     },
     {
       id: crypto.randomUUID(),
       type: 'select',
-      label: 'What is your preferred mode of transportation?',
+      label: { en: 'What is your preferred mode of transportation?', ar: 'ما هي وسيلة النقل المفضلة لديك؟' },
       required: true,
-      options: ['Car', 'Motorcycle', 'Public Transport', 'Walking'],
+      options: [
+        { en: 'Car', ar: 'سيارة' },
+        { en: 'Motorcycle', ar: 'دراجة نارية' },
+        { en: 'Public Transport', ar: 'مواصلات عامة' },
+        { en: 'Walking', ar: 'مشي' },
+      ],
     },
     {
       id: crypto.randomUUID(),
       type: 'multiselect',
-      label: 'What times are you typically available?',
+      label: { en: 'What times are you typically available?', ar: 'ما هي الأوقات التي تكون فيها متاحاً عادةً؟' },
       required: true,
-      options: ['Morning (8AM-12PM)', 'Afternoon (12PM-5PM)', 'Evening (5PM-9PM)', 'Weekend'],
+      options: [
+        { en: 'Morning (8AM-12PM)', ar: 'صباحاً (8ص-12م)' },
+        { en: 'Afternoon (12PM-5PM)', ar: 'ظهراً (12م-5م)' },
+        { en: 'Evening (5PM-9PM)', ar: 'مساءً (5م-9م)' },
+        { en: 'Weekend', ar: 'نهاية الأسبوع' },
+      ],
     },
     {
       id: crypto.randomUUID(),
       type: 'boolean',
-      label: 'Do you have a smartphone with a good camera?',
+      label: { en: 'Do you have a smartphone with a good camera?', ar: 'هل لديك هاتف ذكي بكاميرا جيدة؟' },
       required: true,
     },
   ];
@@ -163,7 +181,7 @@ export function AgentQuestionnaireEditor({
     const newQuestion: QuestionField = {
       id: crypto.randomUUID(),
       type: 'text',
-      label: '',
+      label: { en: '', ar: '' },
       required: false,
     };
     setQuestions([...questions, newQuestion]);
@@ -178,77 +196,92 @@ export function AgentQuestionnaireEditor({
 
   const handleDeleteQuestion = (index: number) => {
     setQuestions(questions.filter((_, i) => i !== index));
-    if (editingIndex === index) {
-      setEditingIndex(null);
-    }
+    if (editingIndex === index) setEditingIndex(null);
   };
 
   const handleMoveQuestion = (index: number, direction: 'up' | 'down') => {
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= questions.length) return;
-
     const updated = [...questions];
     [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
     setQuestions(updated);
   };
 
+  const handleUpdateOption = (qIndex: number, optIndex: number, lang: 'en' | 'ar', value: string) => {
+    const q = questions[qIndex];
+    if (!q.options) return;
+    const newOptions = [...q.options];
+    const opt = newOptions[optIndex];
+    if (typeof opt === 'string') {
+      newOptions[optIndex] = lang === 'en' ? { en: value, ar: '' } : { en: opt, ar: value };
+    } else {
+      newOptions[optIndex] = { ...opt, [lang]: value };
+    }
+    handleUpdateQuestion(qIndex, { options: newOptions });
+  };
+
+  const handleAddOption = (qIndex: number) => {
+    const q = questions[qIndex];
+    const newOptions = [...(q.options || []), { en: '', ar: '' }];
+    handleUpdateQuestion(qIndex, { options: newOptions });
+  };
+
+  const handleRemoveOption = (qIndex: number, optIndex: number) => {
+    const q = questions[qIndex];
+    if (!q.options) return;
+    handleUpdateQuestion(qIndex, { options: q.options.filter((_, i) => i !== optIndex) });
+  };
+
   const handleSave = async () => {
-    // Validate
-    const invalidQuestions = questions.filter((q) => !q.label.trim());
+    const invalidQuestions = questions.filter(q => !getEn(q.label).trim());
     if (invalidQuestions.length > 0) {
-      toast.error('All questions must have a label');
+      toast.error(t('questionnaire.label_required', 'All questions must have an English label'));
       return;
     }
 
     setSaving(true);
     try {
       const questionsJson = JSON.parse(JSON.stringify(questions));
-      
       if (templateId) {
-        // Update existing
         const { error } = await supabase
           .from('question_templates')
-          .update({
-            questions: questionsJson,
-            updated_at: new Date().toISOString(),
-          })
+          .update({ questions: questionsJson, updated_at: new Date().toISOString() })
           .eq('id', templateId);
-
         if (error) throw error;
       } else {
-        // Create new
         const { error } = await supabase.from('question_templates').insert({
           name: TEMPLATE_NAME,
           description: 'Questions for agent registration and verification',
+          description_ar: 'أسئلة تسجيل الوكيل والتحقق',
           category: 'agent',
           is_public: false,
           questions: questionsJson,
         });
-
         if (error) throw error;
       }
 
-      toast.success('Questionnaire saved successfully');
+      toast.success(t('questionnaire.saved', 'Questionnaire saved successfully'));
       queryClient.invalidateQueries({ queryKey: ['question_templates'] });
       onOpenChange(false);
     } catch (err) {
       console.error('Error saving:', err);
-      toast.error('Failed to save questionnaire');
+      toast.error(t('questionnaire.save_error', 'Failed to save questionnaire'));
     } finally {
       setSaving(false);
     }
   };
 
+  const displayLabel = (q: QuestionField) => getEn(q.label) || getAr(q.label) || t('questionnaire.untitled', 'Untitled question');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold uppercase">
-            Agent Registration Questionnaire
+            {t('questionnaire.title', 'Agent Registration Questionnaire')}
           </DialogTitle>
           <DialogDescription>
-            Configure the questions agents must answer when registering. These answers help you
-            evaluate and approve agent applications.
+            {t('questionnaire.description', 'Configure bilingual questions agents must answer when registering.')}
           </DialogDescription>
         </DialogHeader>
 
@@ -259,146 +292,140 @@ export function AgentQuestionnaireEditor({
         ) : (
           <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {questions.map((question, index) => (
-              <Card
-                key={question.id}
-                className={`transition-all ${
-                  editingIndex === index ? 'ring-2 ring-primary' : ''
-                }`}
-              >
+              <Card key={question.id} className={`transition-all ${editingIndex === index ? 'ring-2 ring-primary' : ''}`}>
                 <CardContent className="p-4">
                   {editingIndex === index ? (
-                    // Edit mode
                     <div className="space-y-4">
                       <div className="flex items-start gap-2">
                         <GripVertical className="h-5 w-5 text-muted-foreground mt-2 cursor-move" />
                         <div className="flex-1 space-y-4">
-                          <div className="space-y-2">
-                            <Label>Question Label</Label>
-                            <Input
-                              value={question.label}
-                              onChange={(e) =>
-                                handleUpdateQuestion(index, { label: e.target.value })
-                              }
-                              placeholder="Enter your question..."
-                            />
+                          {/* Bilingual Label */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.label_en', 'Label (English)')}</Label>
+                              <Input
+                                value={getEn(question.label)}
+                                onChange={(e) => handleUpdateQuestion(index, { label: makeBilingual(e.target.value, getAr(question.label)) })}
+                                placeholder="Enter question in English..."
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.label_ar', 'Label (Arabic)')}</Label>
+                              <Input
+                                dir="rtl"
+                                className="text-end"
+                                value={getAr(question.label)}
+                                onChange={(e) => handleUpdateQuestion(index, { label: makeBilingual(getEn(question.label), e.target.value) })}
+                                placeholder="أدخل السؤال بالعربية..."
+                              />
+                            </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Question Type</Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.type', 'Question Type')}</Label>
                               <Select
                                 value={question.type}
                                 onValueChange={(value: QuestionField['type']) =>
                                   handleUpdateQuestion(index, {
                                     type: value,
-                                    options:
-                                      value === 'select' || value === 'multiselect'
-                                        ? question.options || ['Option 1', 'Option 2']
-                                        : undefined,
+                                    options: (value === 'select' || value === 'multiselect')
+                                      ? question.options || [{ en: 'Option 1', ar: 'خيار 1' }, { en: 'Option 2', ar: 'خيار 2' }]
+                                      : undefined,
                                   })
                                 }
                               >
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                   {Object.entries(questionTypeLabels).map(([key, label]) => (
                                     <SelectItem key={key} value={key}>
-                                      <div className="flex items-center gap-2">
-                                        {questionTypeIcons[key]}
-                                        {label}
-                                      </div>
+                                      <div className="flex items-center gap-2">{questionTypeIcons[key]}{label}</div>
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
-
-                            <div className="space-y-2">
-                              <Label>Placeholder (optional)</Label>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.placeholder_en', 'Placeholder (EN)')}</Label>
                               <Input
-                                value={question.placeholder || ''}
-                                onChange={(e) =>
-                                  handleUpdateQuestion(index, { placeholder: e.target.value })
-                                }
+                                value={getEn(question.placeholder)}
+                                onChange={(e) => handleUpdateQuestion(index, { placeholder: makeBilingual(e.target.value, getAr(question.placeholder)) })}
                                 placeholder="Placeholder text..."
                               />
                             </div>
                           </div>
 
+                          {/* Bilingual Options */}
                           {(question.type === 'select' || question.type === 'multiselect') && (
                             <div className="space-y-2">
-                              <Label>Options (one per line)</Label>
-                              <Textarea
-                                value={question.options?.join('\n') || ''}
-                                onChange={(e) =>
-                                  handleUpdateQuestion(index, {
-                                    options: e.target.value.split('\n').filter((o) => o.trim()),
-                                  })
-                                }
-                                placeholder="Option 1&#10;Option 2&#10;Option 3"
-                                rows={4}
-                              />
+                              <Label className="text-xs">{t('questionnaire.options', 'Options')}</Label>
+                              <div className="space-y-2">
+                                {(question.options || []).map((opt, optIdx) => (
+                                  <div key={optIdx} className="flex items-center gap-2">
+                                    <Input
+                                      className="flex-1"
+                                      value={getOptionEn(opt)}
+                                      onChange={(e) => handleUpdateOption(index, optIdx, 'en', e.target.value)}
+                                      placeholder={`Option ${optIdx + 1} (EN)`}
+                                    />
+                                    <Input
+                                      className="flex-1 text-end"
+                                      dir="rtl"
+                                      value={getOptionAr(opt)}
+                                      onChange={(e) => handleUpdateOption(index, optIdx, 'ar', e.target.value)}
+                                      placeholder={`خيار ${optIdx + 1} (AR)`}
+                                    />
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => handleRemoveOption(index, optIdx)}>
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button variant="outline" size="sm" onClick={() => handleAddOption(index)}>
+                                  <Plus className="h-3.5 w-3.5 mr-1" />{t('questionnaire.add_option', 'Add Option')}
+                                </Button>
+                              </div>
                             </div>
                           )}
 
-                          <div className="space-y-2">
-                            <Label>Help Text (optional)</Label>
-                            <Input
-                              value={question.helpText || ''}
-                              onChange={(e) =>
-                                handleUpdateQuestion(index, { helpText: e.target.value })
-                              }
-                              placeholder="Additional guidance for this question..."
-                            />
+                          {/* Help Text (bilingual) */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.help_en', 'Help Text (EN)')}</Label>
+                              <Input
+                                value={getEn(question.helpText)}
+                                onChange={(e) => handleUpdateQuestion(index, { helpText: makeBilingual(e.target.value, getAr(question.helpText)) })}
+                                placeholder="Additional guidance..."
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">{t('questionnaire.help_ar', 'Help Text (AR)')}</Label>
+                              <Input
+                                dir="rtl" className="text-end"
+                                value={getAr(question.helpText)}
+                                onChange={(e) => handleUpdateQuestion(index, { helpText: makeBilingual(getEn(question.helpText), e.target.value) })}
+                                placeholder="توجيه إضافي..."
+                              />
+                            </div>
                           </div>
 
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Switch
-                                checked={question.required}
-                                onCheckedChange={(checked) =>
-                                  handleUpdateQuestion(index, { required: checked })
-                                }
-                              />
-                              <Label className="cursor-pointer">Required</Label>
+                              <Switch checked={question.required} onCheckedChange={(checked) => handleUpdateQuestion(index, { required: checked })} />
+                              <Label className="cursor-pointer">{t('questionnaire.required', 'Required')}</Label>
                             </div>
-
                             <div className="flex items-center gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleMoveQuestion(index, 'up')}
-                                disabled={index === 0}
-                              >
-                                ↑
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleMoveQuestion(index, 'down')}
-                                disabled={index === questions.length - 1}
-                              >
-                                ↓
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => handleDeleteQuestion(index)}
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => handleMoveQuestion(index, 'up')} disabled={index === 0}>↑</Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleMoveQuestion(index, 'down')} disabled={index === questions.length - 1}>↓</Button>
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDeleteQuestion(index)}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
-                              <Button size="sm" onClick={() => setEditingIndex(null)}>
-                                Done
-                              </Button>
+                              <Button size="sm" onClick={() => setEditingIndex(null)}>{t('questionnaire.done', 'Done')}</Button>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    // View mode
                     <div
                       className="flex items-center gap-3 cursor-pointer hover:bg-muted/50 -m-4 p-4 rounded-lg transition-colors"
                       onClick={() => setEditingIndex(index)}
@@ -406,19 +433,14 @@ export function AgentQuestionnaireEditor({
                       <GripVertical className="h-5 w-5 text-muted-foreground cursor-move" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium truncate">{question.label || 'Untitled question'}</span>
-                          {question.required && (
-                            <Badge variant="outline" className="text-xs">
-                              Required
-                            </Badge>
-                          )}
+                          <span className="font-medium truncate">{displayLabel(question)}</span>
+                          {question.required && <Badge variant="outline" className="text-xs">{t('questionnaire.required', 'Required')}</Badge>}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                           {questionTypeIcons[question.type]}
                           <span>{questionTypeLabels[question.type]}</span>
-                          {question.options && (
-                            <span className="text-xs">• {question.options.length} options</span>
-                          )}
+                          {question.options && <span className="text-xs">• {question.options.length} options</span>}
+                          {getAr(question.label) && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">AR ✓</Badge>}
                         </div>
                       </div>
                     </div>
@@ -427,32 +449,20 @@ export function AgentQuestionnaireEditor({
               </Card>
             ))}
 
-            <Button
-              variant="outline"
-              className="w-full border-dashed"
-              onClick={handleAddQuestion}
-            >
+            <Button variant="outline" className="w-full border-dashed" onClick={handleAddQuestion}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Question
+              {t('questionnaire.add_question', 'Add Question')}
             </Button>
           </div>
         )}
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('questionnaire.cancel', 'Cancel')}</Button>
           <Button onClick={handleSave} disabled={saving || loading}>
             {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
-              </>
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t('questionnaire.saving', 'Saving...')}</>
             ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save Questionnaire
-              </>
+              <><Save className="h-4 w-4 mr-2" />{t('questionnaire.save', 'Save Questionnaire')}</>
             )}
           </Button>
         </div>
