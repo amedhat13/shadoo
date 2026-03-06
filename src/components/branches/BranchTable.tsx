@@ -171,7 +171,14 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap, isDemo = 
           <TableBody>
             {branches.map((branch) => (
               <TableRow key={branch.id}>
-                <TableCell className="font-medium">{branch.name}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    {branch.name}
+                    {isDemoBranch(branch.id) && (
+                      <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-700">{t('demo_branch', { defaultValue: 'Demo' })}</Badge>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="text-muted-foreground">{branch.address}</TableCell>
                 <TableCell>{branch.city}</TableCell>
                 <TableCell className="text-muted-foreground">{branch.district || '-'}</TableCell>
@@ -220,30 +227,32 @@ export function BranchTable({ branches, onEdit, onDelete, onViewOnMap, isDemo = 
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" title={t('delete')}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{t('delete_branch')}</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {t('delete_confirmation', { name: branch.name })} {t('delete_confirmation_missions')}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => onDelete(branch.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            {t('delete')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {!isDemoBranch(branch.id) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" title={t('delete')}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('delete_branch')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('delete_confirmation', { name: branch.name })} {t('delete_confirmation_missions')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => onDelete(branch.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {t('delete')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
