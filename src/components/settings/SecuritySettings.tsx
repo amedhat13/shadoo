@@ -145,44 +145,6 @@ export function SecuritySettings() {
         </CardContent>
       </Card>
 
-      {/* Danger Zone */}
-      <Card className="border border-destructive/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <AlertTriangle className="h-5 w-5" />
-            {t('security.danger_zone_title')}
-          </CardTitle>
-          <CardDescription>{t('security.danger_zone_description')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">{t('security.delete_account')}</p>
-              <p className="text-sm text-muted-foreground">{t('security.delete_account_description')}</p>
-            </div>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">{t('security.delete_account')}</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t('security.delete_confirm_title')}</AlertDialogTitle>
-                  <AlertDialogDescription>{t('security.delete_confirm_description')}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={() => toast.error(t('security.delete_disabled_demo'))}
-                  >
-                    {t('security.delete_account')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
