@@ -190,7 +190,9 @@ export function StepReview({
           </p>
           {data.photo_requirements.instructions && (
             <p className="text-muted-foreground text-xs">
-              {data.photo_requirements.instructions}
+              {typeof data.photo_requirements.instructions === 'object'
+                ? data.photo_requirements.instructions.en || data.photo_requirements.instructions.ar
+                : data.photo_requirements.instructions}
             </p>
           )}
           {questionsWithPhotoReq.length > 0 && (

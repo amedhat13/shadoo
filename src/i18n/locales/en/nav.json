@@ -6,6 +6,7 @@
   "reports": "REPORTS",
   "settings": "SETTINGS",
   "wallet_balance": "Wallet Balance",
+  "in_mission_balance": "In-Mission Balance",
   "on_hold": "{{amount}} on hold",
   "admin": {
     "badge": "Admin",

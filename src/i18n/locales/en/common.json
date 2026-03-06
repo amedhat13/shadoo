@@ -40,6 +40,8 @@
   "sign_out": "Sign out",
   "user": "User",
   "currency_code": "EGP",
+  "ok": "OK",
+  "visits": "visits",
   "copyright": "© {{year}} Shadoo. All rights reserved.",
   "statuses": {
     "draft": "Draft",

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Clock, User, MapPin, Camera, MessageSquare, X, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Clock, User, MapPin, Camera, MessageSquare, X, ChevronRight, EyeOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -42,6 +42,8 @@ export function CompletedVisitsDialog({
   missionName,
 }: CompletedVisitsDialogProps) {
   const [selectedVisit, setSelectedVisit] = useState<CompletedVisit | null>(null);
+  const { t } = useTranslation('missions');
+  const { t: tc } = useTranslation('common');
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-EG', {
@@ -53,7 +55,6 @@ export function CompletedVisitsDialog({
     });
   };
 
-  const { t: tc } = useTranslation('common');
   const formatCurrency = (amount: number) => {
     return `${amount.toLocaleString(CURRENCY.locale)} ${tc('currency_code')}`;
   };
@@ -64,7 +65,7 @@ export function CompletedVisitsDialog({
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-success" />
-            Completed Visits - {missionName}
+            {t('details.completed_visits_title')} - {missionName}
           </DialogTitle>
         </DialogHeader>
 
@@ -73,7 +74,7 @@ export function CompletedVisitsDialog({
           <div className="w-1/3 border-r border-border">
             <ScrollArea className="h-full">
               <div className="p-2">
-                {visits.map((visit) => (
+                {visits.map((visit, index) => (
                   <button
                     key={visit.id}
                     onClick={() => setSelectedVisit(visit)}
@@ -85,10 +86,10 @@ export function CompletedVisitsDialog({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center bg-success/10">
-                          <User className="h-4 w-4 text-success" />
+                          <EyeOff className="h-4 w-4 text-success" />
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{visit.agent_name}</p>
+                          <p className="font-medium text-sm">{t('details.mystery_shopper')} #{index + 1}</p>
                           <p className="text-xs text-muted-foreground">
                             {formatDate(visit.completed_at)}
                           </p>
@@ -107,12 +108,12 @@ export function CompletedVisitsDialog({
             {selectedVisit ? (
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
-                  {/* Header */}
+                  {/* Header - agent name hidden */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-lg">{selectedVisit.agent_name}</h3>
+                      <h3 className="font-bold text-lg">{t('details.mystery_shopper')}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Completed {formatDate(selectedVisit.completed_at)}
+                        {t('details.completed_on')} {formatDate(selectedVisit.completed_at)}
                       </p>
                     </div>
                     <Badge variant="default" className="bg-success">
@@ -126,7 +127,7 @@ export function CompletedVisitsDialog({
                   <div>
                     <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4" />
-                      Answers
+                      {t('details.answers')}
                     </h4>
                     <div className="space-y-3">
                       {selectedVisit.answers.map((answer, idx) => (
@@ -137,7 +138,7 @@ export function CompletedVisitsDialog({
                           </p>
                           <div className="bg-muted/50 p-2 text-sm">
                             {typeof answer.answer === 'boolean'
-                              ? answer.answer ? 'Yes' : 'No'
+                              ? answer.answer ? tc('yes') : tc('no')
                               : String(answer.answer)}
                           </div>
                         </div>
@@ -150,7 +151,7 @@ export function CompletedVisitsDialog({
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
-                        Photos ({selectedVisit.photos.length})
+                        {t('details.photos_label')} ({selectedVisit.photos.length})
                       </h4>
                       <div className="grid grid-cols-3 gap-2">
                         {selectedVisit.photos.map((photo, idx) => (
@@ -170,7 +171,7 @@ export function CompletedVisitsDialog({
               <div className="h-full flex items-center justify-center text-muted-foreground">
                 <div className="text-center">
                   <CheckCircle2 className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p>Select a visit to view details</p>
+                  <p>{t('details.select_visit')}</p>
                 </div>
               </div>
             )}

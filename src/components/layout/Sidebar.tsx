@@ -120,7 +120,7 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
           <div className="border border-sidebar-border p-3">
             <div className="flex items-center gap-2 text-xs text-sidebar-muted uppercase tracking-wide">
               <Wallet className="h-3.5 w-3.5" />
-              <span>{t('wallet_balance')}</span>
+              <span>{t('in_mission_balance')}</span>
             </div>
             <div className="mt-1 text-xl font-black text-success">
               15,000 {tc('currency_code')}

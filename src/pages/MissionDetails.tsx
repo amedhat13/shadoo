@@ -11,10 +11,21 @@ import {
   CheckCircle2,
   Clock,
   Target,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { MissionStatusBadge } from '@/components/missions/MissionStatusBadge';
 import { WalletCard } from '@/components/wallet/WalletCard';
 import { CompletedVisitsDialog, CompletedVisit } from '@/components/missions/CompletedVisitsDialog';
@@ -26,11 +37,11 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDirectionalIcons } from '@/i18n/utils';
 
-// Mock completed visits data
+// Mock completed visits data - agent names hidden from client
 const mockCompletedVisits: CompletedVisit[] = [
   {
     id: 'visit-1',
-    agent_name: 'Mohamed Ali',
+    agent_name: 'Mystery Shopper',
     completed_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     purchase_amount: 150,
     photos: ['photo1.jpg', 'photo2.jpg'],
@@ -42,7 +53,7 @@ const mockCompletedVisits: CompletedVisit[] = [
   },
   {
     id: 'visit-2',
-    agent_name: 'Sara Ahmed',
+    agent_name: 'Mystery Shopper',
     completed_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     purchase_amount: 200,
     photos: ['photo3.jpg', 'photo4.jpg', 'photo5.jpg'],
@@ -54,7 +65,7 @@ const mockCompletedVisits: CompletedVisit[] = [
   },
   {
     id: 'visit-3',
-    agent_name: 'Omar Hassan',
+    agent_name: 'Mystery Shopper',
     completed_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     purchase_amount: 175,
     photos: ['photo6.jpg', 'photo7.jpg'],
@@ -66,6 +77,9 @@ const mockCompletedVisits: CompletedVisit[] = [
   },
 ];
 
+// Mock in-progress visits
+const mockInProgressVisits = 2;
+
 export default function MissionDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -73,6 +87,7 @@ export default function MissionDetailsPage() {
   const { getMission, updateMissionStatus } = useMissions();
   const { wallet } = useWallet();
   const [showCompletedVisits, setShowCompletedVisits] = useState(false);
+  const [showPauseBlockDialog, setShowPauseBlockDialog] = useState(false);
   const { t } = useTranslation('missions');
   const { t: tc } = useTranslation('common');
   const { ArrowStart } = useDirectionalIcons();
@@ -101,6 +116,11 @@ export default function MissionDetailsPage() {
   const visitsRemaining = mission.number_of_visits - mission.visits_completed - mission.visits_pending;
 
   const handlePause = async () => {
+    // Block pause if in-progress visits exist
+    if (mockInProgressVisits > 0) {
+      setShowPauseBlockDialog(true);
+      return;
+    }
     await updateMissionStatus(mission.id, 'paused');
     toast({ title: t('actions.mission_paused'), description: t('actions.mission_paused_desc', { name: mission.name }) });
   };
@@ -164,9 +184,9 @@ export default function MissionDetailsPage() {
           </div>
         </div>
 
-        {/* Performance Stats Cards */}
+        {/* Performance Stats Cards - now 4 cards with In Progress */}
         {isActiveMission && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <button onClick={() => setShowCompletedVisits(true)} className="text-start transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
               <Card className="border-2 border-success/30 bg-success/5 hover:border-success/50 transition-colors h-full">
                 <CardContent className="p-6">
@@ -179,6 +199,19 @@ export default function MissionDetailsPage() {
                 </CardContent>
               </Card>
             </button>
+
+            {/* In Progress Card */}
+            <Card className="border border-amber-400/30 bg-amber-50/50 dark:bg-amber-950/10">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-1">
+                  <Loader2 className="h-5 w-5" />
+                  <span className="text-xs uppercase tracking-wide font-bold">{t('details.in_progress_label')}</span>
+                </div>
+                <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{mockInProgressVisits}</div>
+                <p className="text-xs text-muted-foreground mt-1">{t('details.currently_executing')}</p>
+              </CardContent>
+            </Card>
+
             <Card className="border border-primary/30 bg-primary/5">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 text-primary mb-1">
@@ -262,7 +295,11 @@ export default function MissionDetailsPage() {
                   </div>
                 </div>
                 {mission.photo_requirements.instructions && (
-                  <p className="mt-3 text-sm text-muted-foreground">{mission.photo_requirements.instructions}</p>
+                  <p className="mt-3 text-sm text-muted-foreground">{
+                    typeof mission.photo_requirements.instructions === 'object'
+                      ? (mission.photo_requirements.instructions as any).en || (mission.photo_requirements.instructions as any).ar
+                      : mission.photo_requirements.instructions
+                  }</p>
                 )}
               </CardContent>
             </Card>
@@ -323,6 +360,24 @@ export default function MissionDetailsPage() {
       </div>
 
       <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={mockCompletedVisits} missionName={mission.name} />
+
+      {/* Pause Block Dialog */}
+      <AlertDialog open={showPauseBlockDialog} onOpenChange={setShowPauseBlockDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              {t('actions.cannot_pause_title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('actions.cannot_pause_desc', { count: mockInProgressVisits })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>{tc('ok')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

@@ -40,6 +40,8 @@
   "sign_out": "تسجيل الخروج",
   "user": "مستخدم",
   "currency_code": "ج.م",
+  "ok": "حسناً",
+  "visits": "زيارات",
   "copyright": "© {{year}} شادو. جميع الحقوق محفوظة.",
   "statuses": {
     "draft": "مسودة",

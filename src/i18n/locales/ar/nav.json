@@ -6,6 +6,7 @@
   "reports": "التقارير",
   "settings": "الإعدادات",
   "wallet_balance": "رصيد المحفظة",
+  "in_mission_balance": "رصيد المهمات",
   "on_hold": "{{amount}} محجوز",
   "admin": {
     "badge": "مدير",

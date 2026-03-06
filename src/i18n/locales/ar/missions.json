@@ -166,7 +166,10 @@
     "add_first_visit": "إضافة أول زيارة",
     "no_visits_scheduled": "لم يتم جدولة زيارات بعد.",
     "pick_date": "اختر تاريخ",
-    "schedule_help": "يجب أن يكون لكل زيارة تاريخ ووقت ومدة متوقعة."
+    "schedule_help": "يجب أن يكون لكل زيارة تاريخ ووقت ومدة متوقعة. بحد أدنى ساعتين من الآن.",
+    "min_lead_time_error": "يجب أن يكون وقت الزيارة بعد ساعتين على الأقل من الآن. يرجى تعديل الزيارات المحددة.",
+    "urgent_mission_warning": "هذه المهمة تحتوي على زيارات خلال 24 ساعة وسيتم تصنيفها كعاجلة.",
+    "urgent": "عاجل"
   },
   "review": {
     "mission_details": "تفاصيل المهمة",
@@ -236,7 +239,15 @@
     "pending_label": "قيد الانتظار",
     "awaiting_submission": "بانتظار تقديم الوكيل",
     "remaining_label": "المتبقية",
-    "available_for_agents": "متاحة للوكلاء"
+    "available_for_agents": "متاحة للوكلاء",
+    "in_progress_label": "قيد التنفيذ",
+    "currently_executing": "يتم تنفيذها حالياً",
+    "mystery_shopper": "المتسوق السري",
+    "completed_visits_title": "الزيارات المكتملة",
+    "completed_on": "اكتملت",
+    "answers": "الإجابات",
+    "photos_label": "الصور",
+    "select_visit": "اختر زيارة لعرض التفاصيل"
   },
   "actions": {
     "pause": "إيقاف",
@@ -250,7 +261,9 @@
     "mission_archived": "تمت أرشفة المهمة",
     "mission_archived_desc": "تمت أرشفة \"{{name}}\".",
     "mission_duplicated": "تم تكرار المهمة",
-    "mission_duplicated_desc": "تم إنشاء \"{{name}}\" كمسودة. راجع وانشر عند الجاهزية."
+    "mission_duplicated_desc": "تم إنشاء \"{{name}}\" كمسودة. راجع وانشر عند الجاهزية.",
+    "cannot_pause_title": "لا يمكن إيقاف المهمة",
+    "cannot_pause_desc": "هذه المهمة لديها {{count}} زيارة/زيارات قيد التنفيذ حالياً. يرجى الانتظار حتى اكتمالها قبل إيقاف المهمة."
   },
   "publish_messages": {
     "confirmation": "نشر هذه المهمة سيخصص {{amount}} ج.م من محفظتك لتمويل المشتريات عبر {{visits}} زيارة.",

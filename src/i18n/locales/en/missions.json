@@ -166,7 +166,10 @@
     "add_first_visit": "Add First Visit",
     "no_visits_scheduled": "No visits scheduled yet.",
     "pick_date": "Pick date",
-    "schedule_help": "Each visit must have a scheduled date, time, and expected duration."
+    "schedule_help": "Each visit must have a scheduled date, time, and expected duration. Minimum 2 hours from now.",
+    "min_lead_time_error": "Visit time must be at least 2 hours from now. Please adjust the highlighted visits.",
+    "urgent_mission_warning": "This mission has visits within 24 hours and will be flagged as Urgent.",
+    "urgent": "Urgent"
   },
   "review": {
     "mission_details": "Mission Details",
@@ -236,7 +239,15 @@
     "pending_label": "Pending",
     "awaiting_submission": "Awaiting agent submission",
     "remaining_label": "Remaining",
-    "available_for_agents": "Available for agents"
+    "available_for_agents": "Available for agents",
+    "in_progress_label": "In Progress",
+    "currently_executing": "Currently being executed",
+    "mystery_shopper": "Mystery Shopper",
+    "completed_visits_title": "Completed Visits",
+    "completed_on": "Completed",
+    "answers": "Answers",
+    "photos_label": "Photos",
+    "select_visit": "Select a visit to view details"
   },
   "actions": {
     "pause": "PAUSE",
@@ -250,7 +261,9 @@
     "mission_archived": "Mission archived",
     "mission_archived_desc": "\"{{name}}\" has been archived.",
     "mission_duplicated": "Mission duplicated",
-    "mission_duplicated_desc": "\"{{name}}\" created as a draft. Review and publish when ready."
+    "mission_duplicated_desc": "\"{{name}}\" created as a draft. Review and publish when ready.",
+    "cannot_pause_title": "Cannot Pause Mission",
+    "cannot_pause_desc": "This mission has {{count}} visit(s) currently in progress. Please wait for them to be completed before pausing."
   },
   "publish_messages": {
     "confirmation": "Publishing this mission will allocate {{amount}} from your wallet to fund purchases across {{visits}} visits.",
