@@ -27,6 +27,7 @@ import {
   ReportMission,
   ReportVisit,
 } from '@/hooks/useClientReports';
+import { exportReportsToExcel } from '@/lib/exportReports';
 import {
   ChartContainer,
   ChartTooltip,
@@ -80,6 +81,77 @@ export default function ReportsPage() {
 
   const methodology = selectedMission?.methodology || 'custom';
   const showMethodologyTab = methodology !== 'custom' && methodology !== null && selectedMission !== null;
+
+  const handleExport = useCallback(() => {
+    const currency = tc('currency_code') || 'EGP';
+    const branchData = branches.filter(b => b.status === 'verified').map(branch => {
+      const branchMissions = relevantMissions.filter(m => m.branch_id === branch.id);
+      const totalVisits = branchMissions.reduce((s, m) => s + m.number_of_visits, 0);
+      const completed = branchMissions.reduce((s, m) => s + m.visits_completed, 0);
+      return { name: branch.name, planned: totalVisits, completed, rating: '-' as string | number };
+    });
+    const statusCounts: Record<string, number> = {};
+    missions.forEach(m => { statusCounts[m.status] = (statusCounts[m.status] || 0) + 1; });
+
+    exportReportsToExcel({
+      visitData: relevantMissions.map(m => ({
+        month: new Date(m.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }),
+        branch: m.branch?.name || '-',
+        planned: m.number_of_visits,
+        completed: m.visits_completed,
+        rating: 0,
+      })),
+      budgetData: relevantMissions.map(m => ({
+        month: new Date(m.created_at).toLocaleDateString('en', { month: 'short', year: 'numeric' }),
+        branch: m.branch?.name || '-',
+        allocated: m.total_purchase_budget,
+        used: m.budget_used,
+      })),
+      visitsByBranch: branchData,
+      missionStatusData: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
+      keyMetrics: {
+        visitCompletion: overviewMetrics.completionRate,
+        totalVisitsPlanned: overviewMetrics.totalPlanned,
+        totalVisitsCompleted: overviewMetrics.totalCompleted,
+        budgetUtilization: overviewMetrics.budgetEfficiency,
+        totalBudgetAllocated: overviewMetrics.totalAllocated,
+        totalBudgetUsed: overviewMetrics.totalUsed,
+        activeMissions: overviewMetrics.activeMissions,
+        completedMissions: missions.filter(m => m.status === 'completed').length,
+        packageUsed: 0,
+        packageTotal: 0,
+      },
+      labels: {
+        sheetSummary: t('export.sheet_summary'),
+        sheetVisits: t('export.sheet_visits'),
+        sheetBudget: t('export.sheet_budget'),
+        sheetPerformance: t('export.sheet_performance'),
+        sheetMissionStatus: t('export.sheet_mission_status'),
+        metric: t('export.metric'),
+        value: t('export.value'),
+        visitCompletion: t('metrics.visit_completion'),
+        budgetUtilization: t('metrics.budget_utilization'),
+        activeMissions: t('metrics.active_missions'),
+        completedMissions: t('export.completed_missions'),
+        packageUsage: t('metrics.package_usage'),
+        totalPlanned: t('export.total_planned'),
+        totalCompleted: t('export.total_completed'),
+        totalAllocated: t('budget_tab.total_allocated'),
+        totalUsed: t('budget_tab.total_used'),
+        month: t('export.month'),
+        branch: t('export.branch'),
+        planned: t('chart_labels.planned'),
+        completed: t('chart_labels.completed'),
+        rating: t('chart_labels.rating'),
+        allocated: t('chart_labels.allocated'),
+        used: t('chart_labels.used'),
+        completionRate: t('export.completion_rate'),
+        status: t('export.status'),
+        count: t('export.count'),
+        currency,
+      },
+    }, `shadoo-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }, [relevantMissions, missions, branches, overviewMetrics, t, tc]);
 
   // Overview metrics
   const overviewMetrics = useMemo(() => {
