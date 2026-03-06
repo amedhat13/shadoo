@@ -78,14 +78,14 @@ export function useApproveAgent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ agentId, tier }: { agentId: string; tier: string }) => {
+    mutationFn: async ({ agentId, tiers }: { agentId: string; tiers: string[] }) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       const { error } = await supabase
         .from('agents')
         .update({
           status: 'active',
-          tier,
+          tier: tiers.join(','),
           verified_at: new Date().toISOString(),
           verified_by: user?.id,
         })
@@ -108,12 +108,18 @@ export function useRejectAgent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ agentId, reason }: { agentId: string; reason?: string }) => {
+    mutationFn: async ({ agentId, reason, category }: { agentId: string; reason: string; category?: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from('agents')
         .update({
           status: 'rejected',
-        })
+          rejection_reason: reason,
+          rejection_category: category || null,
+          rejected_at: new Date().toISOString(),
+          rejected_by: user?.id,
+        } as any)
         .eq('id', agentId);
 
       if (error) throw error;
@@ -133,10 +139,10 @@ export function useUpdateAgentTier() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ agentId, tier }: { agentId: string; tier: string }) => {
+    mutationFn: async ({ agentId, tiers }: { agentId: string; tiers: string[] }) => {
       const { error } = await supabase
         .from('agents')
-        .update({ tier })
+        .update({ tier: tiers.join(',') })
         .eq('id', agentId);
 
       if (error) throw error;
@@ -144,12 +150,18 @@ export function useUpdateAgentTier() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agents'] });
       queryClient.invalidateQueries({ queryKey: ['agent-stats'] });
-      toast.success('Agent tier updated');
+      toast.success('Agent tiers updated');
     },
     onError: (error) => {
-      toast.error('Failed to update tier: ' + error.message);
+      toast.error('Failed to update tiers: ' + error.message);
     },
   });
+}
+
+// Helper to parse tier string into array
+export function parseTiers(tier: string | null): string[] {
+  if (!tier) return ['C'];
+  return tier.split(',').filter(Boolean);
 }
 
 export function useSuspendAgent() {
