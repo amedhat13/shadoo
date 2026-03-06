@@ -217,8 +217,10 @@ export default function MissionCreatePage() {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 0:
-        return <StepBasics data={formData} onChange={updateFormData} branches={branches} />;
+      case 0: {
+        const verifiedBranches = branches.filter(b => b.status === 'verified');
+        return <StepBasics data={formData} onChange={updateFormData} branches={verifiedBranches} />;
+      }
       case 1:
         return <StepAgentTier data={formData} onChange={updateFormData} />;
       case 2:

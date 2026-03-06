@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2 } from 'lucide-react';
+import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2, Info, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog';
@@ -21,6 +22,8 @@ import {
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
+const MAX_USERS = 2;
+
 interface TeamMember {
   id: string;
   name: string;
@@ -33,7 +36,6 @@ interface TeamMember {
 const mockTeam: TeamMember[] = [
   { id: '1', name: 'Ahmed Hassan', email: 'ahmed@shadoo.com', role: 'admin', status: 'active', joined_at: '2024-01-15' },
   { id: '2', name: 'Sara Mohamed', email: 'sara@shadoo.com', role: 'manager', status: 'active', joined_at: '2024-02-20' },
-  { id: '3', name: 'Omar Ali', email: 'omar@shadoo.com', role: 'viewer', status: 'pending', joined_at: '2024-03-10' },
 ];
 
 export function UsersSettings() {
@@ -44,6 +46,8 @@ export function UsersSettings() {
   const [isInviting, setIsInviting] = useState(false);
   const { t } = useTranslation('settings');
 
+  const isAtLimit = team.length >= MAX_USERS;
+
   const ROLE_CONFIG = {
     admin: { label: t('users.roles.admin'), description: t('users.roles.admin_description'), variant: 'default' as const },
     manager: { label: t('users.roles.manager'), description: t('users.roles.manager_description'), variant: 'secondary' as const },
@@ -51,7 +55,7 @@ export function UsersSettings() {
   };
 
   const handleInvite = async () => {
-    if (!inviteEmail) return;
+    if (!inviteEmail || isAtLimit) return;
     setIsInviting(true);
     await new Promise((r) => setTimeout(r, 1000));
     const newMember: TeamMember = {
@@ -82,6 +86,21 @@ export function UsersSettings() {
 
   return (
     <div className="space-y-6">
+      {isAtLimit && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span>{t('users.limit_reached')}</span>
+            <Button variant="outline" size="sm" className="gap-1 w-fit" asChild>
+              <a href="mailto:support@shadoo.com">
+                <MessageSquare className="h-3 w-3" />
+                {t('users.contact_support')}
+              </a>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card className="border border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
@@ -91,49 +110,51 @@ export function UsersSettings() {
             </CardTitle>
             <CardDescription>{t('users.team_description')}</CardDescription>
           </div>
-          <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                {t('users.invite_user')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t('users.invite_title')}</DialogTitle>
-                <DialogDescription>{t('users.invite_description')}</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="invite-email">{t('users.email_address')}</Label>
-                  <Input
-                    id="invite-email"
-                    type="email"
-                    placeholder={t('users.email_placeholder')}
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="invite-role">{t('users.role')}</Label>
-                  <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as typeof inviteRole)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">{t('users.admin_full')}</SelectItem>
-                      <SelectItem value="manager">{t('users.manager_missions')}</SelectItem>
-                      <SelectItem value="viewer">{t('users.viewer_readonly')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleInvite} disabled={!inviteEmail || isInviting} className="w-full">
-                  {isInviting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-                  {t('users.send_invitation')}
+          {!isAtLimit && (
+            <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  {t('users.invite_user')}
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t('users.invite_title')}</DialogTitle>
+                  <DialogDescription>{t('users.invite_description')}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="invite-email">{t('users.email_address')}</Label>
+                    <Input
+                      id="invite-email"
+                      type="email"
+                      placeholder={t('users.email_placeholder')}
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="invite-role">{t('users.role')}</Label>
+                    <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as typeof inviteRole)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">{t('users.admin_full')}</SelectItem>
+                        <SelectItem value="manager">{t('users.manager_missions')}</SelectItem>
+                        <SelectItem value="viewer">{t('users.viewer_readonly')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleInvite} disabled={!inviteEmail || isInviting} className="w-full">
+                    {isInviting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                    {t('users.send_invitation')}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </CardHeader>
         <CardContent>
           <div className="divide-y divide-border">
