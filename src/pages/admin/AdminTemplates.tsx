@@ -5,6 +5,8 @@ import { AdminPageHeader } from '@/components/admin/common/AdminPageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -12,8 +14,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { FileQuestion, Plus, Edit2, Trash2 } from 'lucide-react';
-import { useQuestionTemplates, QuestionTemplate } from '@/hooks/useQuestionTemplates';
+import { FileQuestion, Plus, Edit2, Trash2, Shield, Search } from 'lucide-react';
+import { useQuestionTemplates, QuestionTemplate, METHODOLOGY_CATEGORIES } from '@/hooks/useQuestionTemplates';
 import { TemplateFormDialog } from '@/components/admin/templates/TemplateFormDialog';
 import { LoadingState } from '@/components/common/LoadingState';
 
@@ -29,6 +31,8 @@ export default function AdminTemplatesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<QuestionTemplate | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const openCreate = () => {
     setEditingTemplate(null);
@@ -55,6 +59,16 @@ export default function AdminTemplatesPage() {
   };
 
   const getName = (tpl: QuestionTemplate) => isRTL && tpl.name_ar ? tpl.name_ar : tpl.name;
+  const isSystemTemplate = (tpl: QuestionTemplate) => tpl.created_by === null;
+
+  const filteredTemplates = templates.filter(tpl => {
+    if (filterCategory !== 'all' && (tpl.category || 'Custom') !== filterCategory) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return tpl.name.toLowerCase().includes(q) || (tpl.name_ar || '').includes(q);
+    }
+    return true;
+  });
 
   if (isLoading) return <AdminLayout><LoadingState /></AdminLayout>;
 
@@ -73,31 +87,55 @@ export default function AdminTemplatesPage() {
         />
 
         {/* Category Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
-          {['NPS', 'CSAT', 'Custom'].map(cat => (
-            <Card key={cat}>
-              <CardContent className="p-4">
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+          {METHODOLOGY_CATEGORIES.map(cat => (
+            <Card key={cat} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setFilterCategory(cat === filterCategory ? 'all' : cat)}>
+              <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                   <div className="text-start">
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">{cat}</p>
-                    <p className="text-2xl font-black">{categoryStats[cat] || 0}</p>
+                    <p className="text-[10px] font-semibold uppercase text-muted-foreground truncate">{cat}</p>
+                    <p className="text-xl font-black">{categoryStats[cat] || 0}</p>
                   </div>
-                  <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
+                  <FileQuestion className="h-6 w-6 text-muted-foreground/40 shrink-0" />
                 </div>
               </CardContent>
             </Card>
           ))}
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="text-start">
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">{t('templates.total_templates')}</p>
-                  <p className="text-2xl font-black">{templates.length}</p>
+                  <p className="text-[10px] font-semibold uppercase text-muted-foreground">{t('templates.total_templates')}</p>
+                  <p className="text-xl font-black">{templates.length}</p>
                 </div>
-                <FileQuestion className="h-8 w-8 text-muted-foreground/50" />
+                <FileQuestion className="h-6 w-6 text-muted-foreground/40" />
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('templates.search_templates')}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="ps-9"
+            />
+          </div>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder={t('templates.all_categories')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('templates.all_categories')}</SelectItem>
+              {METHODOLOGY_CATEGORIES.map(c => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Templates Table */}
@@ -106,7 +144,7 @@ export default function AdminTemplatesPage() {
             <CardTitle className="text-base font-bold uppercase">{t('templates.all_templates')}</CardTitle>
           </CardHeader>
           <CardContent>
-            {templates.length === 0 ? (
+            {filteredTemplates.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">{t('templates.no_templates')}</p>
             ) : (
               <Table>
@@ -114,17 +152,31 @@ export default function AdminTemplatesPage() {
                   <TableRow>
                     <TableHead className="text-start">{t('templates.template_name')}</TableHead>
                     <TableHead className="text-start">{t('templates.category')}</TableHead>
+                    <TableHead className="text-start">{t('templates.methodology')}</TableHead>
                     <TableHead className="text-start">{t('templates.questions')}</TableHead>
                     <TableHead className="text-start">{t('templates.status')}</TableHead>
                     <TableHead className="text-end">{t('templates.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {templates.map(tpl => (
+                  {filteredTemplates.map(tpl => (
                     <TableRow key={tpl.id}>
-                      <TableCell className="font-medium text-start">{getName(tpl)}</TableCell>
+                      <TableCell className="font-medium text-start">
+                        <div className="flex items-center gap-2">
+                          {getName(tpl)}
+                          {isSystemTemplate(tpl) && (
+                            <Badge variant="outline" className="gap-1 text-[10px]">
+                              <Shield className="h-3 w-3" />
+                              {t('templates.system')}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-start">
                         <Badge variant="outline">{tpl.category || 'Custom'}</Badge>
+                      </TableCell>
+                      <TableCell className="text-start">
+                        <span className="text-xs text-muted-foreground">{tpl.methodology || '—'}</span>
                       </TableCell>
                       <TableCell className="text-start">
                         {t('templates.question_count', { count: tpl.questions?.length || 0 })}

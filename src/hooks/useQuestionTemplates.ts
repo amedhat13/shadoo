@@ -10,6 +10,7 @@ export interface QuestionTemplate {
   description: string | null;
   description_ar: string | null;
   category: string | null;
+  methodology: string | null;
   questions: Question[];
   is_public: boolean;
   created_by: string | null;
@@ -23,9 +24,40 @@ interface CreateTemplateInput {
   description?: string;
   description_ar?: string;
   category?: string;
+  methodology?: string;
   questions: Question[];
   is_public?: boolean;
 }
+
+export const METHODOLOGY_CATEGORIES = [
+  'NPS', 'CSAT', 'CES', 'Overall Score',
+  'Top 2 Box', 'Top Box', 'Menu Try-Out', 'Buy & Try',
+  'Delivery CX', 'Call Center CX', 'App/Digital CX', 'In-Store CX',
+  'Custom'
+] as const;
+
+export const METHODOLOGY_KEYS: Record<string, string> = {
+  'NPS': 'nps',
+  'CSAT': 'csat',
+  'CES': 'ces',
+  'Overall Score': 'overall_score',
+  'Top 2 Box': 'top_2_box',
+  'Top Box': 'top_box',
+  'Menu Try-Out': 'menu_tryout',
+  'Buy & Try': 'buy_and_try',
+  'Delivery CX': 'delivery_cx',
+  'Call Center CX': 'call_center_cx',
+  'App/Digital CX': 'app_digital_cx',
+  'In-Store CX': 'in_store_cx',
+  'Custom': 'custom',
+};
+
+export const TEMPLATE_GROUPS = {
+  core: { key: 'core_cx_methodologies', categories: ['NPS', 'CSAT', 'CES', 'Overall Score', 'Top 2 Box', 'Top Box'] },
+  product: { key: 'product_intelligence', categories: ['Menu Try-Out', 'Buy & Try'] },
+  channel: { key: 'channel_specific_cx', categories: ['Delivery CX', 'Call Center CX', 'App/Digital CX', 'In-Store CX'] },
+  custom: { key: 'custom', categories: ['Custom'] },
+};
 
 export function useQuestionTemplates() {
   const queryClient = useQueryClient();
@@ -43,6 +75,7 @@ export function useQuestionTemplates() {
         ...d,
         questions: (d.questions || []) as Question[],
         is_public: d.is_public ?? true,
+        methodology: d.methodology || null,
       })) as QuestionTemplate[];
     },
   });
@@ -59,7 +92,7 @@ export function useQuestionTemplates() {
         questions: input.questions as any,
         is_public: input.is_public ?? true,
         created_by: user?.id || null,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -77,6 +110,7 @@ export function useQuestionTemplates() {
       if (data.description !== undefined) payload.description = data.description || null;
       if (data.description_ar !== undefined) payload.description_ar = data.description_ar || null;
       if (data.category !== undefined) payload.category = data.category || null;
+      if (data.methodology !== undefined) payload.methodology = data.methodology || null;
       if (data.questions !== undefined) payload.questions = data.questions as any;
       if (data.is_public !== undefined) payload.is_public = data.is_public;
       const { error } = await supabase.from('question_templates').update(payload).eq('id', id);
