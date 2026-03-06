@@ -1,0 +1,4 @@
+
+ALTER TABLE public.question_templates DROP CONSTRAINT question_templates_category_check;
+ALTER TABLE public.question_templates ADD CONSTRAINT question_templates_category_check 
+  CHECK (category = ANY (ARRAY['NPS','CSAT','CES','Overall Score','Top 2 Box','Top Box','Menu Try-Out','Buy & Try','Delivery CX','Call Center CX','App/Digital CX','In-Store CX','Custom']));

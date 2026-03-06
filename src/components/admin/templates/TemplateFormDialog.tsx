@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2 } from 'lucide-react';
 import { Question, QuestionType, QuestionOption } from '@/types';
-import { QuestionTemplate } from '@/hooks/useQuestionTemplates';
+import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
 import { ensureBilingual } from '@/i18n/utils';
 
 interface TemplateFormDialogProps {
@@ -23,13 +23,12 @@ interface TemplateFormDialogProps {
     description?: string;
     description_ar?: string;
     category?: string;
+    methodology?: string;
     questions: Question[];
     is_public?: boolean;
   }) => Promise<void>;
   isSaving: boolean;
 }
-
-const CATEGORIES = ['NPS', 'CSAT', 'Custom'];
 
 export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSaving }: TemplateFormDialogProps) {
   const { t } = useTranslation('admin');
@@ -40,6 +39,7 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
   const [description, setDescription] = useState('');
   const [descriptionAr, setDescriptionAr] = useState('');
   const [category, setCategory] = useState('Custom');
+  const [methodology, setMethodology] = useState('custom');
   const [isPublic, setIsPublic] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
 
@@ -50,6 +50,7 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
       setDescription(template.description || '');
       setDescriptionAr(template.description_ar || '');
       setCategory(template.category || 'Custom');
+      setMethodology(template.methodology || 'custom');
       setIsPublic(template.is_public);
       setQuestions(template.questions || []);
     } else {
@@ -58,10 +59,16 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
       setDescription('');
       setDescriptionAr('');
       setCategory('Custom');
+      setMethodology('custom');
       setIsPublic(true);
       setQuestions([]);
     }
   }, [template, open]);
+
+  const handleCategoryChange = (cat: string) => {
+    setCategory(cat);
+    setMethodology(METHODOLOGY_KEYS[cat] || 'custom');
+  };
 
   const addQuestion = () => {
     setQuestions(prev => [...prev, {
@@ -127,6 +134,7 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
       description,
       description_ar: descriptionAr,
       category,
+      methodology,
       questions,
       is_public: isPublic,
     });
@@ -175,22 +183,35 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
             </div>
           </div>
 
-          {/* Category & Public */}
-          <div className="flex items-center gap-4 flex-wrap">
+          {/* Category, Methodology & Public */}
+          <div className="flex items-end gap-4 flex-wrap">
             <div className="space-y-1">
               <Label className="text-xs font-bold uppercase tracking-wide">{t('templates.category')}</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-[160px]">
+              <Select value={category} onValueChange={handleCategoryChange}>
+                <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map(c => (
+                  {METHODOLOGY_CATEGORIES.map(c => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-2 pt-5">
+            <div className="space-y-1">
+              <Label className="text-xs font-bold uppercase tracking-wide">{t('templates.methodology')}</Label>
+              <Select value={methodology} onValueChange={setMethodology}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(METHODOLOGY_KEYS).map(m => (
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2 pb-1">
               <Switch checked={isPublic} onCheckedChange={setIsPublic} />
               <Label className="text-sm">{t('templates.public')}</Label>
             </div>
@@ -262,6 +283,7 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
                             <SelectTrigger className="w-[70px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="7">7</SelectItem>
                               <SelectItem value="10">10</SelectItem>
                             </SelectContent>
                           </Select>

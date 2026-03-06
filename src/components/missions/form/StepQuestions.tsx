@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload } from 'lucide-react';
+import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload, X, Shield, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,11 +20,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement } from '@/types';
-import { QUESTION_TYPE_LABELS, QUESTION_TEMPLATES } from '@/lib/constants';
+import { QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { BilingualValue, ensureBilingual, getBilingualText } from '@/i18n/utils';
+import { BilingualValue, ensureBilingual, getBilingualText, getLocalizedValue } from '@/i18n/utils';
+import { useQuestionTemplates, QuestionTemplate, TEMPLATE_GROUPS } from '@/hooks/useQuestionTemplates';
+import { LoadingState } from '@/components/common/LoadingState';
 
 interface StepQuestionsProps {
   data: MissionFormData;
@@ -34,8 +37,12 @@ interface StepQuestionsProps {
 export function StepQuestions({ data, onChange }: StepQuestionsProps) {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
-  const { t } = useTranslation('missions');
+  const [templateSearch, setTemplateSearch] = useState('');
+  const { t, i18n } = useTranslation('missions');
   const { t: tc } = useTranslation('common');
+  const lang = i18n.language;
+
+  const { templates: dbTemplates, isLoading: templatesLoading } = useQuestionTemplates();
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -48,10 +55,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     setEditingQuestionId(newQuestion.id);
   };
 
-  const applyTemplate = (templateId: string) => {
-    const template = QUESTION_TEMPLATES.find((t) => t.id === templateId);
-    if (!template) return;
-
+  const applyTemplate = (template: QuestionTemplate) => {
     const newQuestions: Question[] = template.questions.map((q, index) => ({
       ...q,
       id: `q-${Date.now()}-${index}`,
@@ -61,8 +65,15 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
       })),
     }));
 
-    onChange({ questions: [...data.questions, ...newQuestions] });
+    onChange({
+      questions: [...data.questions, ...newQuestions],
+      methodology: template.methodology || 'custom',
+    });
     setTemplateDialogOpen(false);
+  };
+
+  const clearMethodology = () => {
+    onChange({ methodology: 'custom' });
   };
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
@@ -162,8 +173,53 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     return type === 'rating' || type === 'yes_no';
   };
 
+  // Group templates for display
+  const getGroupedTemplates = () => {
+    const filtered = dbTemplates.filter(tpl => {
+      if (!templateSearch) return true;
+      const q = templateSearch.toLowerCase();
+      return tpl.name.toLowerCase().includes(q) || (tpl.name_ar || '').includes(q);
+    });
+
+    const groups: { key: string; label: string; templates: QuestionTemplate[] }[] = [];
+    
+    for (const [, group] of Object.entries(TEMPLATE_GROUPS)) {
+      const groupTemplates = filtered.filter(t => group.categories.includes(t.category || 'Custom'));
+      if (groupTemplates.length > 0) {
+        groups.push({ key: group.key, label: t(`questions_section.group_${group.key}`, { defaultValue: group.key }), templates: groupTemplates });
+      }
+    }
+
+    return groups;
+  };
+
+  const getTemplateName = (tpl: QuestionTemplate) => {
+    if (lang === 'ar' && tpl.name_ar) return tpl.name_ar;
+    return tpl.name;
+  };
+
+  const getTemplateDesc = (tpl: QuestionTemplate) => {
+    if (lang === 'ar' && tpl.description_ar) return tpl.description_ar;
+    return tpl.description || '';
+  };
+
   return (
     <div className="space-y-6">
+      {/* Methodology Badge */}
+      {data.methodology && data.methodology !== 'custom' && (
+        <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20">
+          <Badge variant="default" className="gap-1">
+            <Shield className="h-3 w-3" />
+            {t('questions_section.using_template')}{' '}
+            {dbTemplates.find(t => t.methodology === data.methodology)?.name || data.methodology}
+          </Badge>
+          <Button type="button" variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={clearMethodology}>
+            <X className="h-3 w-3 me-1" />
+            {t('questions_section.clear_template')}
+          </Button>
+        </div>
+      )}
+
       {/* Template Selection */}
       <div className="border border-dashed border-border p-4">
         <div className="flex items-center justify-between">
@@ -189,26 +245,62 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                   {t('questions_section.templates_dialog_desc')}
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-3 py-4 max-h-[60vh] overflow-y-auto">
-                {QUESTION_TEMPLATES.map((template) => (
-                  <button
-                    key={template.id}
-                    type="button"
-                    onClick={() => applyTemplate(template.id)}
-                    className="flex items-start gap-4 border border-border p-4 text-left hover:border-primary hover:bg-primary/5 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <h4 className="font-bold">{template.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {template.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {t('questions_section.question_count', { count: template.questions.length })}
-                      </p>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('questions_section.search_templates')}
+                  value={templateSearch}
+                  onChange={e => setTemplateSearch(e.target.value)}
+                  className="ps-9"
+                />
+              </div>
+
+              <div className="max-h-[60vh] overflow-y-auto space-y-6 py-2">
+                {templatesLoading ? (
+                  <LoadingState />
+                ) : (
+                  getGroupedTemplates().map(group => (
+                    <div key={group.key}>
+                      <h4 className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
+                        {group.label}
+                      </h4>
+                      <div className="grid gap-2">
+                        {group.templates.map(template => (
+                          <button
+                            key={template.id}
+                            type="button"
+                            onClick={() => applyTemplate(template)}
+                            className="flex items-start gap-4 border border-border p-3 text-left hover:border-primary hover:bg-primary/5 transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-bold text-sm">{getTemplateName(template)}</h4>
+                                {template.created_by === null && (
+                                  <Badge variant="outline" className="gap-1 text-[10px]">
+                                    <Shield className="h-3 w-3" />
+                                    {t('questions_section.system_template')}
+                                  </Badge>
+                                )}
+                                <Badge variant="secondary" className="text-[10px]">
+                                  {template.category}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {getTemplateDesc(template)}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                {t('questions_section.question_count', { count: template.questions.length })}
+                              </p>
+                            </div>
+                            <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <Plus className="h-5 w-5 text-muted-foreground" />
-                  </button>
-                ))}
+                  ))
+                )}
               </div>
             </DialogContent>
           </Dialog>
@@ -305,6 +397,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="7">7</SelectItem>
                               <SelectItem value="10">10</SelectItem>
                             </SelectContent>
                           </Select>
