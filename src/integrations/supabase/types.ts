@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           agent_id: string | null
           amount: number
+          auto_generated: boolean | null
+          duration_minutes: number | null
           id: string
           method: string
           payment_details: Json | null
@@ -26,11 +28,15 @@ export type Database = {
           rejection_reason: string | null
           requested_at: string | null
           status: string | null
+          tier_code: string | null
           transaction_reference: string | null
+          visit_id: string | null
         }
         Insert: {
           agent_id?: string | null
           amount: number
+          auto_generated?: boolean | null
+          duration_minutes?: number | null
           id?: string
           method: string
           payment_details?: Json | null
@@ -39,11 +45,15 @@ export type Database = {
           rejection_reason?: string | null
           requested_at?: string | null
           status?: string | null
+          tier_code?: string | null
           transaction_reference?: string | null
+          visit_id?: string | null
         }
         Update: {
           agent_id?: string | null
           amount?: number
+          auto_generated?: boolean | null
+          duration_minutes?: number | null
           id?: string
           method?: string
           payment_details?: Json | null
@@ -52,7 +62,9 @@ export type Database = {
           rejection_reason?: string | null
           requested_at?: string | null
           status?: string | null
+          tier_code?: string | null
           transaction_reference?: string | null
+          visit_id?: string | null
         }
         Relationships: [
           {
@@ -60,6 +72,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_payouts_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
             referencedColumns: ["id"]
           },
         ]
@@ -124,16 +143,23 @@ export type Database = {
         Row: {
           available_balance: number | null
           bank_details: Json | null
+          can_resubmit: boolean | null
           completed_visits: number | null
           created_at: string | null
           email: string
           full_name: string
           id: string
+          latitude: number | null
+          longitude: number | null
           mobile_wallet: string | null
           national_id: string | null
           phone: string
           questionnaire_answers: Json | null
           rating_avg: number | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_category: string | null
+          rejection_reason: string | null
           status: string | null
           tier: string | null
           total_earnings: number | null
@@ -146,16 +172,23 @@ export type Database = {
         Insert: {
           available_balance?: number | null
           bank_details?: Json | null
+          can_resubmit?: boolean | null
           completed_visits?: number | null
           created_at?: string | null
           email: string
           full_name: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           mobile_wallet?: string | null
           national_id?: string | null
           phone: string
           questionnaire_answers?: Json | null
           rating_avg?: number | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_category?: string | null
+          rejection_reason?: string | null
           status?: string | null
           tier?: string | null
           total_earnings?: number | null
@@ -168,16 +201,23 @@ export type Database = {
         Update: {
           available_balance?: number | null
           bank_details?: Json | null
+          can_resubmit?: boolean | null
           completed_visits?: number | null
           created_at?: string | null
           email?: string
           full_name?: string
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           mobile_wallet?: string | null
           national_id?: string | null
           phone?: string
           questionnaire_answers?: Json | null
           rating_avg?: number | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_category?: string | null
+          rejection_reason?: string | null
           status?: string | null
           tier?: string | null
           total_earnings?: number | null
@@ -831,6 +871,39 @@ export type Database = {
           },
         ]
       }
+      visit_duration_pricing: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean | null
+          price: number
+          tier_code: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          duration_minutes: number
+          id?: string
+          is_active?: boolean | null
+          price: number
+          tier_code: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean | null
+          price?: number
+          tier_code?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       visits: {
         Row: {
           agent_id: string | null
@@ -839,7 +912,9 @@ export type Database = {
           client_rating: number | null
           created_at: string | null
           id: string
+          is_requeued: boolean | null
           mission_id: string | null
+          parent_visit_id: string | null
           photos: string[] | null
           purchase_amount: number | null
           rated_at: string | null
@@ -862,7 +937,9 @@ export type Database = {
           client_rating?: number | null
           created_at?: string | null
           id?: string
+          is_requeued?: boolean | null
           mission_id?: string | null
+          parent_visit_id?: string | null
           photos?: string[] | null
           purchase_amount?: number | null
           rated_at?: string | null
@@ -885,7 +962,9 @@ export type Database = {
           client_rating?: number | null
           created_at?: string | null
           id?: string
+          is_requeued?: boolean | null
           mission_id?: string | null
+          parent_visit_id?: string | null
           photos?: string[] | null
           purchase_amount?: number | null
           rated_at?: string | null
@@ -914,6 +993,13 @@ export type Database = {
             columns: ["mission_id"]
             isOneToOne: false
             referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_parent_visit_id_fkey"
+            columns: ["parent_visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
             referencedColumns: ["id"]
           },
         ]
