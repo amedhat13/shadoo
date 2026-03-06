@@ -107,7 +107,9 @@
       "manager_description": "Can create and manage missions.",
       "viewer": "Viewer",
       "viewer_description": "Read-only access to view data."
-    }
+    },
+    "limit_reached": "Your account is limited to 2 users. To add more team members, please contact our support team as additional users are a paid feature.",
+    "contact_support": "Contact Support"
   },
   "billing": {
     "current_plan": "Current Plan",

@@ -103,7 +103,7 @@ export default function ReportsPage() {
       : 0;
 
     // Primary score
-    let primaryScore = { score: 0, label: 'Score', maxScore: 10, benchmark: '', color: '' };
+    let primaryScore: { score: number; label: string; maxScore: number; benchmark?: string; color?: string } = { score: 0, label: 'Score', maxScore: 10 };
     if (selectedMission) {
       primaryScore = getPrimaryScore(methodology, selectedMission.questions || [], completedVisits);
     }

@@ -70,6 +70,8 @@
     "clear_all": "Clear all",
     "no_branches_available": "No branches available",
     "no_branches_available_desc": "You need to create branches before creating a mission.",
+    "no_verified_branches": "No verified branches available",
+    "no_verified_branches_desc": "Please add and verify your branches first.",
     "go_to_branches": "Go to Branches",
     "branches_help": "Select one or more branches. A separate mission will be created for each selected branch.",
     "missions_count_single": "1 mission will be created",
@@ -256,6 +258,17 @@
     "answers": "Answers",
     "photos_label": "Photos",
     "select_visit": "Select a visit to view details"
+  },
+  "rating": {
+    "rate_visit": "Rate this visit",
+    "submit": "Submit Rating",
+    "feedback_placeholder": "Your feedback (optional)",
+    "submitted_success": "Rating submitted successfully",
+    "submit_error": "Failed to submit rating",
+    "rated_x": "You rated this visit {{rating}}/5",
+    "client_rating": "Client Rating",
+    "client_feedback": "Client Feedback",
+    "not_rated": "Not yet rated"
   },
   "actions": {
     "pause": "PAUSE",
