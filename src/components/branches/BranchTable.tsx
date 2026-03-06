@@ -38,9 +38,12 @@ interface BranchTableProps {
   onEdit: (branch: Branch) => void;
   onDelete: (id: string) => void;
   onViewOnMap: (branch: Branch) => void;
+  isDemo?: boolean;
+  demoBranchIds?: string[];
 }
 
-export function BranchTable({ branches, onEdit, onDelete, onViewOnMap }: BranchTableProps) {
+export function BranchTable({ branches, onEdit, onDelete, onViewOnMap, isDemo = false, demoBranchIds = [] }: BranchTableProps) {
+  const isDemoBranch = (branchId: string) => isDemo && demoBranchIds.includes(branchId);
   const isMobile = useIsMobile();
   const { t } = useTranslation('branches');
   const { ChevronEnd } = useDirectionalIcons();
