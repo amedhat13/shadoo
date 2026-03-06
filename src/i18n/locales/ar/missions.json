@@ -70,6 +70,8 @@
     "clear_all": "مسح الكل",
     "no_branches_available": "لا توجد فروع متاحة",
     "no_branches_available_desc": "تحتاج إلى إنشاء فروع قبل إنشاء مهمة.",
+    "no_verified_branches": "لا توجد فروع موثقة متاحة",
+    "no_verified_branches_desc": "يرجى إضافة فروعك والتحقق منها أولاً.",
     "go_to_branches": "الذهاب إلى الفروع",
     "branches_help": "اختر فرعاً واحداً أو أكثر. سيتم إنشاء مهمة منفصلة لكل فرع مختار.",
     "missions_count_single": "سيتم إنشاء مهمة واحدة",
@@ -256,6 +258,17 @@
     "answers": "الإجابات",
     "photos_label": "الصور",
     "select_visit": "اختر زيارة لعرض التفاصيل"
+  },
+  "rating": {
+    "rate_visit": "قيّم هذه الزيارة",
+    "submit": "إرسال التقييم",
+    "feedback_placeholder": "ملاحظاتك (اختياري)",
+    "submitted_success": "تم إرسال التقييم بنجاح",
+    "submit_error": "فشل إرسال التقييم",
+    "rated_x": "قيّمت هذه الزيارة {{rating}}/5",
+    "client_rating": "تقييم العميل",
+    "client_feedback": "ملاحظات العميل",
+    "not_rated": "لم يتم التقييم بعد"
   },
   "actions": {
     "pause": "إيقاف",
