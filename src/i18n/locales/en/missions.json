@@ -127,7 +127,15 @@
     "short_text": "Short Text",
     "multiple_choice": "Multiple Choice",
     "yes_no": "Yes / No",
-    "rating": "Rating"
+    "rating": "Rating",
+    "system_template": "System Template",
+    "using_template": "Using template:",
+    "clear_template": "Clear template",
+    "search_templates": "Search templates...",
+    "group_core_cx_methodologies": "Core CX Methodologies",
+    "group_product_intelligence": "Product Intelligence",
+    "group_channel_specific_cx": "Channel-Specific CX",
+    "group_custom": "Custom"
   },
   "agent_tiers": {
     "title": "Select Agent Tier",
