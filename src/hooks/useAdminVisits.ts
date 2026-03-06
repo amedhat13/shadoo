@@ -142,10 +142,10 @@ export function useApproveVisit() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get the visit to find the mission
+      // Get the visit with agent and mission info
       const { data: visit, error: visitError } = await supabase
         .from('visits')
-        .select('mission_id')
+        .select('mission_id, agent_id, scheduled_duration, agent:agents(id, tier, full_name)')
         .eq('id', visitId)
         .single();
 
@@ -163,7 +163,7 @@ export function useApproveVisit() {
 
       if (updateError) throw updateError;
 
-      // Increment visits_completed on the mission manually
+      // Increment visits_completed on the mission
       const { data: mission } = await supabase
         .from('missions')
         .select('visits_completed, visits_pending')
@@ -179,12 +179,69 @@ export function useApproveVisit() {
           })
           .eq('id', visit.mission_id);
       }
+
+      // Auto-payout: look up price and create payout
+      if (visit.agent_id && visit.scheduled_duration) {
+        const agentData = visit.agent as any;
+        const tierStr = agentData?.tier || 'C';
+        // Use highest tier for pricing
+        const tiers = tierStr.split(',').filter(Boolean);
+        const tierPriority = ['A', 'B', 'C'];
+        const bestTier = tiers.sort((a: string, b: string) => tierPriority.indexOf(a) - tierPriority.indexOf(b))[0] || 'C';
+
+        // Look up price
+        const { data: priceData } = await supabase
+          .from('visit_duration_pricing' as any)
+          .select('price')
+          .eq('tier_code', bestTier)
+          .eq('duration_minutes', visit.scheduled_duration)
+          .eq('is_active', true)
+          .single();
+
+        if (priceData) {
+          const amount = Number((priceData as any).price);
+          // Create auto-payout
+          await supabase.from('agent_payouts').insert({
+            agent_id: visit.agent_id,
+            amount,
+            method: 'auto',
+            status: 'pending',
+            visit_id: visitId,
+            auto_generated: true,
+            duration_minutes: visit.scheduled_duration,
+            tier_code: bestTier,
+          } as any);
+
+          // Update agent balance
+          const { data: agent } = await supabase
+            .from('agents')
+            .select('available_balance')
+            .eq('id', visit.agent_id)
+            .single();
+
+          if (agent) {
+            await supabase
+              .from('agents')
+              .update({ available_balance: (Number(agent.available_balance) || 0) + amount })
+              .eq('id', visit.agent_id);
+          }
+
+          return { agentName: agentData?.full_name, amount, tier: bestTier };
+        }
+      }
+
+      return null;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-visits'] });
       queryClient.invalidateQueries({ queryKey: ['admin-visit-stats'] });
       queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
-      toast.success('Visit approved successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-payouts'] });
+      if (result) {
+        toast.success(`Visit approved — Payout of ${result.amount} SAR queued for ${result.agentName}`);
+      } else {
+        toast.success('Visit approved successfully');
+      }
     },
     onError: (error) => {
       toast.error('Failed to approve visit: ' + error.message);
@@ -200,7 +257,16 @@ export function useRejectVisit() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Update visit status to rejected
+      // Get the visit to clone
+      const { data: visit, error: fetchErr } = await supabase
+        .from('visits')
+        .select('*')
+        .eq('id', visitId)
+        .single();
+
+      if (fetchErr) throw fetchErr;
+
+      // Mark as rejected
       const { error } = await supabase
         .from('visits')
         .update({
@@ -213,13 +279,47 @@ export function useRejectVisit() {
 
       if (error) throw error;
 
-      // Note: The visit slot is now available for another agent to pick up
-      // The mission's visits_pending should remain as-is or be adjusted by the agent app
+      // Create a new pending visit (re-queue)
+      const { error: insertErr } = await supabase.from('visits').insert({
+        mission_id: visit.mission_id,
+        schedule_id: visit.schedule_id,
+        scheduled_date: visit.scheduled_date,
+        scheduled_time: visit.scheduled_time,
+        scheduled_duration: visit.scheduled_duration,
+        status: 'pending',
+        is_requeued: true,
+        parent_visit_id: visitId,
+      } as any);
+
+      if (insertErr) throw insertErr;
+
+      // Increment visits_pending on mission
+      if (visit.mission_id) {
+        const { data: mission } = await supabase
+          .from('missions')
+          .select('visits_pending')
+          .eq('id', visit.mission_id)
+          .single();
+
+        if (mission) {
+          await supabase
+            .from('missions')
+            .update({ visits_pending: (mission.visits_pending || 0) + 1 })
+            .eq('id', visit.mission_id);
+        }
+      }
+
+      // Cancel any existing payout for this visit
+      await supabase
+        .from('agent_payouts')
+        .update({ status: 'cancelled', rejection_reason: 'Visit rejected' } as any)
+        .eq('visit_id', visitId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-visits'] });
       queryClient.invalidateQueries({ queryKey: ['admin-visit-stats'] });
-      toast.success('Visit rejected - available for reassignment');
+      queryClient.invalidateQueries({ queryKey: ['admin-payouts'] });
+      toast.success('Visit rejected — re-queued for another agent');
     },
     onError: (error) => {
       toast.error('Failed to reject visit: ' + error.message);

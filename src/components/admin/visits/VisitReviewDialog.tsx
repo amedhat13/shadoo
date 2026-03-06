@@ -286,6 +286,10 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                   <CardTitle className="text-sm font-semibold">Rejection Reason</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <div className="p-3 bg-muted/50 rounded-md text-sm text-muted-foreground border">
+                    <p>This visit will be reset and made available for another agent. The current agent will not receive payment.</p>
+                    <p className="mt-1 text-xs" dir="rtl">سيتم إعادة تعيين هذه الزيارة وإتاحتها لوكيل آخر. لن يحصل الوكيل الحالي على الدفع.</p>
+                  </div>
                   <Textarea
                     placeholder="Please provide a reason for rejection..."
                     value={rejectionReason}
