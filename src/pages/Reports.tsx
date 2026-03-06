@@ -37,7 +37,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, Tooltip as RechartsTooltip,
   LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer,
 } from 'recharts';
@@ -808,7 +808,7 @@ function BranchPerformanceTab({ missions, visits, branches, language }: { missio
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" fontSize={10} />
                   <YAxis type="category" dataKey="name" fontSize={10} width={100} tick={{ width: 90 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <RechartsTooltip />
                   <Bar dataKey="totalVisits" fill={COLORS[0]} name={t('chart_labels.planned') || 'Planned'} />
                   <Bar dataKey="completedVisits" fill={COLORS[1]} name={t('chart_labels.completed') || 'Completed'} />
                 </BarChart>
@@ -828,7 +828,7 @@ function BranchPerformanceTab({ missions, visits, branches, language }: { missio
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" domain={[0, 100]} fontSize={10} />
                   <YAxis type="category" dataKey="name" fontSize={10} width={100} tick={{ width: 90 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <RechartsTooltip />
                   <Bar dataKey="completionRate" name={t('completion_rate') || 'Completion %'}>
                     {[...branchData].sort((a, b) => b.completionRate - a.completionRate).slice(0, 10).map((b, i) => (
                       <Cell key={i} fill={b.completionRate >= 80 ? '#22C55E' : b.completionRate >= 50 ? '#F59E0B' : '#EF4444'} />
@@ -851,7 +851,7 @@ function BranchPerformanceTab({ missions, visits, branches, language }: { missio
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" fontSize={10} />
                   <YAxis type="category" dataKey="name" fontSize={10} width={100} tick={{ width: 90 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <RechartsTooltip />
                   <Bar dataKey="budgetAllocated" fill={COLORS[3]} name={t('chart_labels.allocated') || 'Allocated'} />
                   <Bar dataKey="budgetUsed" fill={COLORS[0]} name={t('chart_labels.used') || 'Used'} />
                 </BarChart>
@@ -871,7 +871,7 @@ function BranchPerformanceTab({ missions, visits, branches, language }: { missio
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" fontSize={10} />
                   <YAxis type="category" dataKey="name" fontSize={10} width={100} tick={{ width: 90 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <RechartsTooltip />
                   <Bar dataKey="avgResponseTime" name={t('avg_response_time') || 'Avg Time (h)'}>
                     {branchData.filter(b => b.avgResponseTime > 0).sort((a, b) => a.avgResponseTime - b.avgResponseTime).slice(0, 10).map((b, i) => (
                       <Cell key={i} fill={b.avgResponseTime <= 2 ? '#22C55E' : b.avgResponseTime <= 5 ? '#F59E0B' : '#EF4444'} />
