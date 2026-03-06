@@ -358,6 +358,7 @@ export type Database = {
           created_at: string
           id: string
           is_geo_tagged: boolean
+          methodology: string | null
           name: string
           name_ar: string | null
           number_of_visits: number
@@ -381,6 +382,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_geo_tagged?: boolean
+          methodology?: string | null
           name: string
           name_ar?: string | null
           number_of_visits?: number
@@ -404,6 +406,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_geo_tagged?: boolean
+          methodology?: string | null
           name?: string
           name_ar?: string | null
           number_of_visits?: number
@@ -598,6 +601,7 @@ export type Database = {
           description_ar: string | null
           id: string
           is_public: boolean | null
+          methodology: string | null
           name: string
           name_ar: string | null
           questions: Json
@@ -611,6 +615,7 @@ export type Database = {
           description_ar?: string | null
           id?: string
           is_public?: boolean | null
+          methodology?: string | null
           name: string
           name_ar?: string | null
           questions?: Json
@@ -624,6 +629,7 @@ export type Database = {
           description_ar?: string | null
           id?: string
           is_public?: boolean | null
+          methodology?: string | null
           name?: string
           name_ar?: string | null
           questions?: Json
