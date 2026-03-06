@@ -94,7 +94,7 @@ export default function AdminTiersPage() {
                   {/* Visit Pricing Table */}
                   <div className="pt-2 border-t space-y-2">
                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                      {t('tiers.visit_pricing', { defaultValue: 'Visit Pricing (SAR)' })}
+                      {t('tiers.visit_pricing', { defaultValue: 'Visit Pricing (EGP)' })}
                     </Label>
                     {isLoading ? (
                       <div className="py-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
@@ -112,7 +112,7 @@ export default function AdminTiersPage() {
                               </div>
                             ) : (
                               <div className="flex items-center gap-1">
-                                <span className="font-bold">{p.price} SAR</span>
+                                <span className="font-bold">{p.price} EGP</span>
                                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setEditingId(p.id); setEditValue(String(p.price)); }}>
                                   <Edit2 className="h-3 w-3" />
                                 </Button>
@@ -126,7 +126,7 @@ export default function AdminTiersPage() {
                         {/* Add new duration */}
                         <div className="flex items-center gap-1 pt-2">
                           <Input className="w-16 h-7 text-xs" placeholder="min" value={newDuration[tier.code] || ''} onChange={e => setNewDuration(d => ({ ...d, [tier.code]: e.target.value }))} type="number" />
-                          <Input className="w-16 h-7 text-xs" placeholder="SAR" value={newPrice[tier.code] || ''} onChange={e => setNewPrice(p => ({ ...p, [tier.code]: e.target.value }))} type="number" />
+                          <Input className="w-16 h-7 text-xs" placeholder="EGP" value={newPrice[tier.code] || ''} onChange={e => setNewPrice(p => ({ ...p, [tier.code]: e.target.value }))} type="number" />
                           <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleAddDuration(tier.code)}>
                             <Plus className="h-3 w-3" />
                           </Button>

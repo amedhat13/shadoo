@@ -60,8 +60,8 @@ export default function AdminPayoutsPage() {
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-4">
-          <StatCard title="Pending Payouts" value={statsLoading ? '...' : String(stats?.totalPending || 0)} variant="warning" icon={Clock} description={`${(stats?.pendingAmount || 0).toLocaleString()} SAR`} />
-          <StatCard title="Completed" value={statsLoading ? '...' : String(stats?.totalCompleted || 0)} variant="success" icon={CheckCircle} description={`${(stats?.completedAmount || 0).toLocaleString()} SAR`} />
+          <StatCard title="Pending Payouts" value={statsLoading ? '...' : String(stats?.totalPending || 0)} variant="warning" icon={Clock} description={`${(stats?.pendingAmount || 0).toLocaleString()} EGP`} />
+          <StatCard title="Completed" value={statsLoading ? '...' : String(stats?.totalCompleted || 0)} variant="success" icon={CheckCircle} description={`${(stats?.completedAmount || 0).toLocaleString()} EGP`} />
           <StatCard title="Rejected" value={statsLoading ? '...' : String(stats?.totalRejected || 0)} variant="destructive" icon={XCircle} />
           <StatCard title="Total" value={statsLoading ? '...' : String(stats?.total || 0)} icon={Wallet} />
         </div>
@@ -109,7 +109,7 @@ export default function AdminPayoutsPage() {
                         <TableCell><Badge variant="outline">{payout.method}</Badge></TableCell>
                         <TableCell>{payout.duration_minutes ? `${payout.duration_minutes} min` : '—'}</TableCell>
                         <TableCell>{payout.tier_code || '—'}</TableCell>
-                        <TableCell className="text-right font-bold">{Number(payout.amount).toLocaleString()} SAR</TableCell>
+                        <TableCell className="text-right font-bold">{Number(payout.amount).toLocaleString()} EGP</TableCell>
                         <TableCell>
                           {payout.auto_generated ? (
                             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 gap-1">

@@ -238,7 +238,7 @@ export function useApproveVisit() {
       queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
       queryClient.invalidateQueries({ queryKey: ['admin-payouts'] });
       if (result) {
-        toast.success(`Visit approved — Payout of ${result.amount} SAR queued for ${result.agentName}`);
+        toast.success(`Visit approved — Payout of ${result.amount} EGP queued for ${result.agentName}`);
       } else {
         toast.success('Visit approved successfully');
       }
