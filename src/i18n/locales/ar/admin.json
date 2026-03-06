@@ -563,7 +563,11 @@
     "add_option": "إضافة خيار",
     "total_templates": "إجمالي القوالب",
     "total_usage": "إجمالي الاستخدام",
-    "missions": "مهام"
+    "missions": "مهام",
+    "system": "النظام",
+    "methodology": "المنهجية",
+    "all_categories": "جميع الفئات",
+    "search_templates": "البحث في القوالب..."
   },
   "plans": {
     "title": "خطط الاشتراك",
