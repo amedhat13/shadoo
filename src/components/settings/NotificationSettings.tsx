@@ -15,7 +15,6 @@ interface NotificationPrefs {
   push_mission_updates: boolean;
   push_visit_completed: boolean;
   push_wallet_alerts: boolean;
-  sms_critical_alerts: boolean;
 }
 
 const defaultPrefs: NotificationPrefs = {
@@ -25,7 +24,6 @@ const defaultPrefs: NotificationPrefs = {
   push_mission_updates: true,
   push_visit_completed: false,
   push_wallet_alerts: true,
-  sms_critical_alerts: false,
 };
 
 export function NotificationSettings() {
@@ -114,26 +112,6 @@ export function NotificationSettings() {
               <p className="text-sm text-muted-foreground">{t('notifications.wallet_alerts_description')}</p>
             </div>
             <Switch id="push-wallet" checked={prefs.push_wallet_alerts} onCheckedChange={(v) => updatePref('push_wallet_alerts', v)} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* SMS Notifications */}
-      <Card className="border border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5" />
-            {t('notifications.sms_title')}
-          </CardTitle>
-          <CardDescription>{t('notifications.sms_description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="sms-critical" className="font-medium">{t('notifications.critical_alerts')}</Label>
-              <p className="text-sm text-muted-foreground">{t('notifications.critical_alerts_description')}</p>
-            </div>
-            <Switch id="sms-critical" checked={prefs.sms_critical_alerts} onCheckedChange={(v) => updatePref('sms_critical_alerts', v)} />
           </div>
         </CardContent>
       </Card>

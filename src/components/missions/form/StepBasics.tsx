@@ -87,9 +87,9 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
         {branches.length === 0 ? (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>{t('form.no_branches_available')}</AlertTitle>
+            <AlertTitle>{t('form.no_verified_branches')}</AlertTitle>
             <AlertDescription>
-              {t('form.no_branches_available_desc')}{' '}
+              {t('form.no_verified_branches_desc')}{' '}
               <Link to="/branches" className="underline font-medium text-primary hover:text-primary/80">
                 {t('form.go_to_branches')}
               </Link>

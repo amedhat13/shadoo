@@ -787,11 +787,14 @@ export type Database = {
         Row: {
           agent_id: string | null
           answers: Json | null
+          client_feedback: string | null
+          client_rating: number | null
           created_at: string | null
           id: string
           mission_id: string | null
           photos: string[] | null
           purchase_amount: number | null
+          rated_at: string | null
           receipt_photo: string | null
           rejection_reason: string | null
           reviewed_at: string | null
@@ -807,11 +810,14 @@ export type Database = {
         Insert: {
           agent_id?: string | null
           answers?: Json | null
+          client_feedback?: string | null
+          client_rating?: number | null
           created_at?: string | null
           id?: string
           mission_id?: string | null
           photos?: string[] | null
           purchase_amount?: number | null
+          rated_at?: string | null
           receipt_photo?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
@@ -827,11 +833,14 @@ export type Database = {
         Update: {
           agent_id?: string | null
           answers?: Json | null
+          client_feedback?: string | null
+          client_rating?: number | null
           created_at?: string | null
           id?: string
           mission_id?: string | null
           photos?: string[] | null
           purchase_amount?: number | null
+          rated_at?: string | null
           receipt_photo?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
