@@ -560,6 +560,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_demo: boolean
           logo_url: string | null
           must_change_password: boolean
           phone: string | null
@@ -572,6 +573,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_demo?: boolean
           logo_url?: string | null
           must_change_password?: boolean
           phone?: string | null
@@ -584,6 +586,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_demo?: boolean
           logo_url?: string | null
           must_change_password?: boolean
           phone?: string | null
@@ -634,6 +637,51 @@ export type Database = {
           name_ar?: string | null
           questions?: Json
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sales_call_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          current_plan: string | null
+          id: string
+          notes: string | null
+          phone_number: string | null
+          preferred_time: string | null
+          request_type: string
+          resolved_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          preferred_time?: string | null
+          request_type: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          preferred_time?: string | null
+          request_type?: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
