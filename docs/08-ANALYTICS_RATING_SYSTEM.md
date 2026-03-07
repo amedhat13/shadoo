@@ -18,7 +18,7 @@ All data is fetched via `useClientReports()` hook from Supabase:
 1. **Overview** — Key metric cards + high-level charts (always visible)
 2. **Methodology Dashboard** — Curated analytics per methodology (hidden for "custom")
 3. **Question Analytics** — Generic per-question breakdown (always visible)
-4. **Branch Performance** — Branch comparison with real aggregated data
+4. **Branch CX Comparison** — Mission/branch selectors, CX methodology score comparison per branch (bar charts with avg reference line), question-level breakdown per branch, sortable ranking table, and operational summary cards. Supports "All Missions" (grouped by methodology) and specific mission selection. Requires min 2 branches selected. Mock data includes `branch_id` on visits for demo mode.
 5. **Budget & Operations** — Budget utilization, response times, rejection rates
 
 ### Methodology Formulas
