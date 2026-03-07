@@ -144,5 +144,23 @@
     "completion_rate": "نسبة الإتمام",
     "status": "الحالة",
     "count": "العدد"
+  },
+  "branch_comparison": {
+    "select_mission": "اختر المهمة",
+    "all_missions": "جميع المهام",
+    "select_branches": "اختر الفروع",
+    "select_all": "تحديد الكل",
+    "branches_selected": "{{count}} من {{total}} فرع محدد",
+    "min_branches": "اختر فرعين على الأقل للمقارنة",
+    "score_comparison": "مقارنة درجات تجربة العميل",
+    "question_breakdown": "مقارنة على مستوى الأسئلة",
+    "overall_average": "المتوسط العام",
+    "no_data": "لا توجد بيانات",
+    "rank": "الترتيب",
+    "primary_score": "الدرجة الأساسية",
+    "above_average": "فوق المتوسط",
+    "below_average": "تحت المتوسط",
+    "ranking": "ترتيب الفروع",
+    "empty_state": "أنشئ مهام وعيّنها للفروع لبدء المقارنة"
   }
 }

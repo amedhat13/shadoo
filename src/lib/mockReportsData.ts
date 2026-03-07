@@ -426,11 +426,12 @@ export function getMockVisits() {
   const visits: any[] = [];
   // NPS visits across all branches
   DEMO_BRANCHES.forEach(b => visits.push(...genNPSAnswers(20, b.id)));
-  // CSAT visits for branches 1 & 2
-  visits.push(...genCSATAnswers(30, 'demo-branch-1'));
-  visits.push(...genCSATAnswers(25, 'demo-branch-2'));
-  // Menu tryout for branch 4
-  visits.push(...genMenuTryoutAnswers(42, 'demo-branch-4'));
+  // CSAT visits across all branches
+  DEMO_BRANCHES.forEach(b => visits.push(...genCSATAnswers(15, b.id)));
+  // Menu tryout across branches 1, 3, 4
+  visits.push(...genMenuTryoutAnswers(15, 'demo-branch-1'));
+  visits.push(...genMenuTryoutAnswers(12, 'demo-branch-3'));
+  visits.push(...genMenuTryoutAnswers(15, 'demo-branch-4'));
   // Delivery across all
   DEMO_BRANCHES.forEach(b => visits.push(...genDeliveryAnswers(12, b.id)));
   // App digital
@@ -440,8 +441,10 @@ export function getMockVisits() {
 
   // Add some rejected visits for realism
   for (let i = 0; i < 8; i++) {
+    const branchId = pick(DEMO_BRANCHES).id;
     visits.push({
       id: `mock-rejected-${i}`, mission_id: pick(MOCK_MISSIONS).id,
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'rejected',
       answers: [], purchase_amount: 0,
       started_at: new Date(2026, randInt(0, 5), randInt(1, 28)).toISOString(),

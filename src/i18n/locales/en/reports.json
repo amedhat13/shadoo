@@ -144,5 +144,23 @@
     "completion_rate": "Completion Rate",
     "status": "Status",
     "count": "Count"
+  },
+  "branch_comparison": {
+    "select_mission": "Select Mission",
+    "all_missions": "All Missions",
+    "select_branches": "Select Branches",
+    "select_all": "Select All",
+    "branches_selected": "{{count}} of {{total}} branches selected",
+    "min_branches": "Select at least 2 branches to compare",
+    "score_comparison": "CX Score Comparison",
+    "question_breakdown": "Question-Level Comparison",
+    "overall_average": "Overall Average",
+    "no_data": "No data",
+    "rank": "Rank",
+    "primary_score": "Primary Score",
+    "above_average": "Above Average",
+    "below_average": "Below Average",
+    "ranking": "Branch Ranking",
+    "empty_state": "Create missions and assign them to branches to start comparing"
   }
 }
