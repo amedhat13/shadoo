@@ -706,9 +706,7 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
   );
 }
 
-function BranchPerformanceTab({ missions, visits, branches, language }: { missions: ReportMission[]; visits: ReportVisit[]; branches: any[]; language: string }) {
-  const { t } = useTranslation('reports');
-  const verifiedBranches = branches.filter(b => b.status === 'verified');
+
 
   const branchData = useMemo(() => verifiedBranches.map(branch => {
     const branchMissions = missions.filter(m => m.branch_id === branch.id);
