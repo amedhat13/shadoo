@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+# Shadoo — Mystery Shopping Platform
 
-## Project info
+A B2B SaaS mystery shopping platform connecting organizations with field agents who conduct undercover store visits to evaluate service quality, compliance, and customer experience.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Country**: Egypt | **Currency**: EGP | **Languages**: English + Arabic (RTL)
 
-## How can I edit this code?
+## Architecture
 
-There are several ways of editing your application.
+| Interface | Tech | Status |
+|-----------|------|--------|
+| Client Portal | React + Vite + Supabase | UI Complete |
+| Admin Dashboard | Same codebase (`/admin/*` routes) | UI Complete |
+| Agent Mobile App | Separate project (React Native / Flutter) | Not started |
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Frontend**: React 18, TypeScript, Vite 5, Tailwind CSS, shadcn/ui (Radix)
+- **State**: TanStack React Query
+- **Forms**: React Hook Form + Zod validation
+- **i18n**: i18next (English + Arabic with RTL)
+- **Charts**: Recharts
+- **Backend**: Supabase (PostgreSQL, Auth, Edge Functions, Storage, Realtime)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Quick Start
 
-**Use your preferred IDE**
+```bash
+# 1. Install dependencies
+npm install
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# 2. Copy environment variables
+cp .env.example .env
+# Fill in your Supabase credentials
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Start dev server (http://localhost:8080)
 npm run dev
+
+# 4. Build for production
+npm run build
+
+# 5. Run tests
+npm test
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+src/
+├── components/         # React components (admin/, auth/, missions/, etc.)
+├── hooks/              # 25+ custom hooks (data fetching, business logic)
+├── pages/              # Route pages (client + admin)
+├── i18n/locales/       # Translation files (en/ + ar/)
+├── integrations/       # Supabase client & auto-generated types
+├── lib/                # Constants, utilities, mock data
+├── types/              # TypeScript type definitions
+└── test/               # Test setup
 
-**Use GitHub Codespaces**
+supabase/
+├── migrations/         # 21 database migration files
+└── functions/          # Edge functions (create-client)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+docs/                   # 11 comprehensive documentation files
+```
 
-## What technologies are used for this project?
+## Key Documentation
 
-This project is built with:
+| File | Description |
+|------|-------------|
+| `HANDOFF.md` | Full developer handoff guide |
+| `TASK_LIST.md` | Prioritized task list for development |
+| `.claude/CLAUDE.md` | Claude Code project rules and conventions |
+| `docs/BACKEND_GUIDE_FOR_CLAUDE_CODE.md` | Backend development guide (37KB) |
+| `docs/01-PROJECT_OVERVIEW.md` | Platform overview and flows |
+| `docs/03-BACKEND_DATABASE_HIERARCHY.md` | Database schema reference |
+| `docs/05-FEATURES_LIST.md` | Feature status checklist |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Scripts
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+npm run dev          # Dev server (port 8080)
+npm run build        # Production build
+npm run lint         # ESLint
+npm test             # Run tests (Vitest)
+npm run test:watch   # Test watch mode
+```
