@@ -45,6 +45,7 @@ import {
   TrendingUp, Target, DollarSign, BarChart3, Activity, Download, 
   CheckCircle, Clock, Building2, FileQuestion, Wallet, AlertTriangle,
 } from 'lucide-react';
+import { BranchComparisonTab } from '@/components/reports/BranchComparisonTab';
 
 const COLORS = ['#F97316', '#22C55E', '#F59E0B', '#06B6D4', '#A855F7', '#EF4444', '#6366F1', '#14B8A6'];
 const METHODOLOGY_LABELS: Record<string, string> = {
@@ -417,9 +418,10 @@ export default function ReportsPage() {
 
           {/* Branch Performance Tab */}
           <TabsContent value="branches">
-            <BranchPerformanceTab
-              missions={relevantMissions}
+            <BranchComparisonTab
+              missions={missions}
               visits={completedVisits}
+              allVisits={visits}
               branches={branches}
               language={language}
             />
