@@ -2,10 +2,10 @@
 export const USE_MOCK_DATA = true;
 
 const DEMO_BRANCHES = [
-  { id: 'demo-branch-1', name: 'Al Olaya Branch', name_ar: 'فرع العليا', city: 'Riyadh', status: 'verified' },
-  { id: 'demo-branch-2', name: 'Tahlia Street Branch', name_ar: 'فرع شارع التحلية', city: 'Jeddah', status: 'verified' },
-  { id: 'demo-branch-3', name: 'King Fahd Road Branch', name_ar: 'فرع طريق الملك فهد', city: 'Dammam', status: 'verified' },
-  { id: 'demo-branch-4', name: 'Granada Mall Branch', name_ar: 'فرع غرناطة مول', city: 'Riyadh', status: 'verified' },
+  { id: 'demo-branch-1', name: 'Nasr City Branch', name_ar: 'فرع مدينة نصر', city: 'Cairo', status: 'verified' },
+  { id: 'demo-branch-2', name: 'Smouha Branch', name_ar: 'فرع سموحة', city: 'Alexandria', status: 'verified' },
+  { id: 'demo-branch-3', name: 'Maadi Branch', name_ar: 'فرع المعادي', city: 'Cairo', status: 'verified' },
+  { id: 'demo-branch-4', name: '6th October Branch', name_ar: 'فرع السادس من أكتوبر', city: 'Giza', status: 'verified' },
 ];
 
 // Helper to generate question IDs
