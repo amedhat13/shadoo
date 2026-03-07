@@ -22,6 +22,7 @@ import {
   CheckCircle, Clock, Building2, FileQuestion, Wallet,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { BranchComparisonTab } from '@/components/reports/BranchComparisonTab';
 import { useQuery } from '@tanstack/react-query';
 import {
   useClientReports,
@@ -370,10 +371,11 @@ export function ClientReportView({ clientId, clientName }: ClientReportViewProps
 
         {/* Branch Performance Tab */}
         <TabsContent value="branches">
-          <BranchPerformanceTab
+          <BranchComparisonTab
             missions={relevantMissions}
             visits={completedVisits}
             branches={branches}
+            allVisits={completedVisits}
             language={language}
           />
         </TabsContent>
@@ -646,72 +648,6 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
   );
 }
 
-function BranchPerformanceTab({ missions, visits, branches, language }: { missions: ReportMission[]; visits: ReportVisit[]; branches: any[]; language: string }) {
-  const { t } = useTranslation('reports');
-  const verifiedBranches = branches.filter((b: any) => b.status === 'verified');
-
-  const branchData = verifiedBranches.map((branch: any) => {
-    const branchMissions = missions.filter(m => m.branch_id === branch.id);
-    const totalVisits = branchMissions.reduce((s, m) => s + m.number_of_visits, 0);
-    const completedVisits = branchMissions.reduce((s, m) => s + m.visits_completed, 0);
-    const completionRate = totalVisits > 0 ? Math.round((completedVisits / totalVisits) * 100) : 0;
-    const budgetUsed = branchMissions.reduce((s, m) => s + m.budget_used, 0);
-
-    const branchVisits = visits.filter(v => branchMissions.some(m => m.id === v.mission_id));
-    const responseTimes = branchVisits
-      .filter(v => v.started_at && v.submitted_at)
-      .map(v => (new Date(v.submitted_at!).getTime() - new Date(v.started_at!).getTime()) / (1000 * 60 * 60));
-    const avgResponseTime = responseTimes.length > 0
-      ? Math.round(responseTimes.reduce((s, t) => s + t, 0) / responseTimes.length * 10) / 10 : 0;
-
-    return {
-      name: language === 'ar' && branch.name_ar ? branch.name_ar : branch.name,
-      city: branch.city, totalVisits, completedVisits, completionRate, budgetUsed, avgResponseTime,
-    };
-  });
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm">{t('performance_tab.branch_details')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {branchData.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No verified branches with mission data.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-start p-2 font-medium">Branch</th>
-                  <th className="text-start p-2 font-medium">City</th>
-                  <th className="text-end p-2 font-medium">Visits</th>
-                  <th className="text-end p-2 font-medium">Completed</th>
-                  <th className="text-end p-2 font-medium">Rate</th>
-                  <th className="text-end p-2 font-medium">Avg Time</th>
-                  <th className="text-end p-2 font-medium">Budget Used</th>
-                </tr>
-              </thead>
-              <tbody>
-                {branchData.map((b, i) => (
-                  <tr key={i} className="border-b last:border-0">
-                    <td className="p-2 font-medium">{b.name}</td>
-                    <td className="p-2 text-muted-foreground">{b.city}</td>
-                    <td className="p-2 text-end">{b.totalVisits}</td>
-                    <td className="p-2 text-end">{b.completedVisits}</td>
-                    <td className="p-2 text-end">{b.completionRate}%</td>
-                    <td className="p-2 text-end">{b.avgResponseTime}h</td>
-                    <td className="p-2 text-end">{b.budgetUsed.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 function BudgetTab({ missions, visits }: { missions: ReportMission[]; visits: ReportVisit[] }) {
   const { t } = useTranslation('reports');
