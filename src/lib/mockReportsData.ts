@@ -163,6 +163,7 @@ function genNPSAnswers(count: number, branchId: string) {
     visits.push({
       id: `mock-nps-visit-${branchId}-${i}`,
       mission_id: 'mock-mission-1',
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`,
       status: 'approved',
       answers: [
@@ -206,6 +207,7 @@ function genCSATAnswers(count: number, branchId: string) {
 
     visits.push({
       id: `mock-csat-visit-${branchId}-${i}`, mission_id: 'mock-mission-2',
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'approved',
       answers: [
         { question_id: qid('csat', 1), value: mainRating },
@@ -239,6 +241,7 @@ function genMenuTryoutAnswers(count: number, branchId: string) {
 
     visits.push({
       id: `mock-menu-visit-${branchId}-${i}`, mission_id: 'mock-mission-3',
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'approved',
       answers: [
         { question_id: qid('menu', 1), value: pi },
@@ -280,6 +283,7 @@ function genDeliveryAnswers(count: number, branchId: string) {
 
     visits.push({
       id: `mock-del-visit-${branchId}-${i}`, mission_id: 'mock-mission-4',
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'approved',
       answers: [
         { question_id: qid('del', 1), value: randInt(3, 5) },
@@ -310,6 +314,7 @@ function genAppDigitalAnswers(count: number) {
     const completed = Math.random() < 0.85;
     visits.push({
       id: `mock-app-visit-${i}`, mission_id: 'mock-mission-5',
+      branch_id: pick(DEMO_BRANCHES).id,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'approved',
       answers: [
         { question_id: qid('app', 1), value: randInt(3, 7) },
@@ -335,6 +340,7 @@ function genInStoreAnswers(count: number, branchId: string) {
   for (let i = 0; i < count; i++) {
     visits.push({
       id: `mock-store-visit-${branchId}-${i}`, mission_id: 'mock-mission-6',
+      branch_id: branchId,
       agent_id: `mock-agent-${randInt(1, 5)}`, status: 'approved',
       answers: [
         { question_id: qid('store', 1), value: randInt(6, 10) },
