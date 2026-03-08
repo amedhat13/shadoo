@@ -8,8 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2 } from 'lucide-react';
-import { Question, QuestionType, QuestionOption } from '@/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, Trash2, Paperclip } from 'lucide-react';
+import { Question, QuestionType, QuestionOption, AttachmentConfig } from '@/types';
+import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
+import { ensureBilingual } from '@/i18n/utils';
 import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
 import { ensureBilingual } from '@/i18n/utils';
 
