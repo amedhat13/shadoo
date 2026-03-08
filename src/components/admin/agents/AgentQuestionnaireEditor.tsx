@@ -24,14 +24,21 @@ import { useTranslation } from 'react-i18next';
 
 type BilingualString = string | { en: string; ar: string };
 
+export interface AttachmentFieldConfig {
+  allowed_types?: string[]; // e.g. ['image', 'pdf', 'document']
+  max_files?: number;
+  instructions?: BilingualString;
+}
+
 export interface QuestionField {
   id: string;
-  type: 'text' | 'textarea' | 'select' | 'multiselect' | 'boolean' | 'number';
+  type: 'text' | 'textarea' | 'select' | 'multiselect' | 'boolean' | 'number' | 'attachment';
   label: BilingualString;
   placeholder?: BilingualString;
   required: boolean;
   options?: (string | { en: string; ar: string })[];
   helpText?: BilingualString;
+  attachment_config?: AttachmentFieldConfig;
 }
 
 interface AgentQuestionnaireEditorProps {
