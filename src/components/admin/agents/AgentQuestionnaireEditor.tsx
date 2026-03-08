@@ -17,8 +17,9 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   Plus, Trash2, GripVertical, Save, Loader2,
-  FileText, Type, List, ToggleLeft, Hash,
+  FileText, Type, List, ToggleLeft, Hash, Paperclip,
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 
 type BilingualString = string | { en: string; ar: string };
