@@ -401,6 +401,83 @@ export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionna
                             </div>
                           )}
 
+                          {/* Attachment Config */}
+                          {question.type === 'attachment' && (
+                            <div className="space-y-3 border border-dashed border-border rounded-lg p-3">
+                              <div className="space-y-2">
+                                <Label className="text-xs">{t('questionnaire.allowed_file_types', 'Allowed File Types')}</Label>
+                                <div className="flex items-center gap-4 flex-wrap">
+                                  {(['image', 'pdf', 'document'] as const).map(ft => {
+                                    const config = question.attachment_config || { allowed_types: ['image', 'pdf'], max_files: 1 };
+                                    const checked = config.allowed_types?.includes(ft) ?? false;
+                                    const labels = { image: t('questionnaire.file_type_image', 'Images'), pdf: 'PDF', document: t('questionnaire.file_type_document', 'Documents') };
+                                    return (
+                                      <label key={ft} className="flex items-center gap-2 cursor-pointer">
+                                        <Checkbox
+                                          checked={checked}
+                                          onCheckedChange={(v) => {
+                                            const current = config.allowed_types || [];
+                                            const next = v ? [...current, ft] : current.filter(t => t !== ft);
+                                            if (next.length === 0) return;
+                                            handleUpdateQuestion(index, {
+                                              attachment_config: { ...config, allowed_types: next },
+                                            });
+                                          }}
+                                        />
+                                        <span className="text-sm">{labels[ft]}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <Label className="text-xs">{t('questionnaire.max_files', 'Max Files')}</Label>
+                                <Select
+                                  value={String(question.attachment_config?.max_files || 1)}
+                                  onValueChange={v => handleUpdateQuestion(index, {
+                                    attachment_config: { ...(question.attachment_config || {}), max_files: parseInt(v) },
+                                  })}
+                                >
+                                  <SelectTrigger className="w-[70px]"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {[1, 2, 3, 4, 5].map(n => (
+                                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs">{t('questionnaire.upload_instructions_en', 'Upload Instructions (EN)')}</Label>
+                                  <Input
+                                    value={getEn(question.attachment_config?.instructions)}
+                                    onChange={(e) => handleUpdateQuestion(index, {
+                                      attachment_config: {
+                                        ...(question.attachment_config || {}),
+                                        instructions: makeBilingual(e.target.value, getAr(question.attachment_config?.instructions)),
+                                      },
+                                    })}
+                                    placeholder="e.g. Upload a clear photo of your National ID"
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs">{t('questionnaire.upload_instructions_ar', 'Upload Instructions (AR)')}</Label>
+                                  <Input
+                                    dir="rtl" className="text-end"
+                                    value={getAr(question.attachment_config?.instructions)}
+                                    onChange={(e) => handleUpdateQuestion(index, {
+                                      attachment_config: {
+                                        ...(question.attachment_config || {}),
+                                        instructions: makeBilingual(getEn(question.attachment_config?.instructions), e.target.value),
+                                      },
+                                    })}
+                                    placeholder="ارفع صورة واضحة لبطاقة الرقم القومي"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Help Text (bilingual) */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
