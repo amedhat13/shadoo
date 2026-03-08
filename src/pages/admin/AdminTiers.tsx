@@ -123,9 +123,8 @@ export default function AdminTiersPage() {
         <AdminPageHeader
           title={t('tiers.title', { defaultValue: 'Agent Tier & Pricing Configuration' })}
           description={t('tiers.description', { defaultValue: 'Configure agent tiers, requirements, and visit pricing.' })}
-        >
-          <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" />{t('tiers.add_tier')}</Button>
-        </AdminPageHeader>
+          actions={<Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" />{t('tiers.add_tier')}</Button>}
+        />
 
         {/* Tier Cards */}
         <div className="grid gap-4">
