@@ -105,6 +105,15 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
     } else {
       updates.max_rating = undefined;
     }
+    if (type === 'attachment') {
+      updates.attachment_config = {
+        allowed_types: ['image', 'pdf'],
+        max_files: 1,
+        instructions: { en: '', ar: '' },
+      };
+    } else {
+      updates.attachment_config = undefined;
+    }
     updateQuestion(qId, updates);
   };
 
