@@ -111,7 +111,8 @@
     "yes_no": "yes no",
     "rating": "rating",
     "multiple_choice": "multiple choice",
-    "short_text": "short text"
+    "short_text": "short text",
+    "attachment": "attachment"
   },
   "responses_detail": {
     "average_rating": "Average Rating",

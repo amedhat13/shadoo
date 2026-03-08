@@ -53,6 +53,12 @@ export interface QuestionPhotoRequirement {
   instructions?: string | { en: string; ar: string };
 }
 
+export interface AttachmentConfig {
+  allowed_types?: string[]; // e.g. ['image', 'pdf', 'document']
+  max_files?: number; // max number of files (default 1)
+  instructions?: string | { en: string; ar: string }; // guidance for the agent
+}
+
 export interface Question {
   id: string;
   type: QuestionType;
@@ -61,6 +67,7 @@ export interface Question {
   options?: QuestionOption[]; // For multiple_choice
   max_rating?: number; // For rating (default 5)
   photoRequirement?: QuestionPhotoRequirement; // Per-question photo requirement
+  attachment_config?: AttachmentConfig; // For attachment type
 }
 
 // Photo Requirements (general/legacy)

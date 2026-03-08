@@ -70,6 +70,7 @@
     "multiple_choice": "اختيار من متعدد",
     "rating": "تقييم",
     "short_text": "نص قصير",
-    "yes_no": "نعم / لا"
+    "yes_no": "نعم / لا",
+    "attachment": "مرفق"
   }
 }

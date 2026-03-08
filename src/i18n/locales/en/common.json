@@ -70,6 +70,7 @@
     "multiple_choice": "Multiple Choice",
     "rating": "Rating",
     "short_text": "Short Text",
-    "yes_no": "Yes / No"
+    "yes_no": "Yes / No",
+    "attachment": "Attachment"
   }
 }
