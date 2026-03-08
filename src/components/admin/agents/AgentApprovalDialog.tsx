@@ -47,7 +47,7 @@ export function AgentApprovalDialog({ agent, open, onOpenChange }: AgentApproval
   const questionnaire = Array.isArray(agent.questionnaire_answers) ? agent.questionnaire_answers : [];
   const documents = Array.isArray(agent.verification_docs) ? agent.verification_docs : [];
   const isResubmission = agent.status === 'rejected_resubmit';
-  const agentAny = agent as Record<string, unknown>;
+  const agentAny = agent as unknown as Record<string, unknown>;
 
   // Auto-assign tiers preview
   const tierCriteria: TierCriteria[] = (tiers || []).map(t => ({
