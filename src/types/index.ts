@@ -38,7 +38,7 @@ export interface Branch {
 }
 
 // Question Types
-export type QuestionType = 'multiple_choice' | 'rating' | 'short_text' | 'yes_no';
+export type QuestionType = 'multiple_choice' | 'rating' | 'short_text' | 'yes_no' | 'attachment';
 
 export interface QuestionOption {
   id: string;
