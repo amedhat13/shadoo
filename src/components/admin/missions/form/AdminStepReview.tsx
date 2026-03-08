@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { MissionFormData, Question } from '@/types';
-import { AGENT_TIERS } from '@/lib/constants';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useTranslation } from 'react-i18next';
 
 interface Branch {
