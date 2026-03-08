@@ -179,8 +179,10 @@ export interface MissionFormData {
   name_ar?: string;
   branch_ids: string[]; // Changed to support multiple branches
   
-  // Step 2: Agent Tier
-  agent_tier: AgentTier;
+  // Step 2: Agent Selection (dual-path)
+  agent_selection_mode?: 'tier' | 'custom';
+  agent_tier?: string; // Used when mode = 'tier' (tier code from agent_tiers)
+  agent_custom_criteria?: AgentCustomCriteriaForm; // Used when mode = 'custom'
   
   // Step 3: Questions & Photos
   questions: Question[];
@@ -198,6 +200,19 @@ export interface MissionFormData {
   
   // Methodology (from template)
   methodology?: string;
+}
+
+export interface AgentCustomCriteriaForm {
+  gender?: 'male' | 'female' | null;
+  min_age?: number | null;
+  max_age?: number | null;
+  cities?: string[];
+  education_levels?: string[];
+  languages?: string[];
+  requires_car?: boolean;
+  requires_motorcycle?: boolean;
+  specializations?: string[];
+  min_experience_years?: number;
 }
 
 // Computed values helper

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { MissionFormData, Question } from '@/types';
-import { AGENT_TIERS } from '@/lib/constants';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useTranslation } from 'react-i18next';
 
 interface Branch {
@@ -32,7 +32,8 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
   const numberOfVisits = data.visit_schedules.length;
   const totalBudget = numberOfVisits * data.purchase_budget_per_visit * branchCount;
   const totalVisits = numberOfVisits * branchCount;
-  const selectedTier = AGENT_TIERS.find((tier) => tier.tier === data.agent_tier);
+  const { data: agentTiersData } = useActiveAgentTiers();
+  const selectedTier = agentTiersData?.find((tier) => tier.tier_code === data.agent_tier);
 
   const formatDuration = (minutes: number) => {
     if (minutes < 60) return `${minutes} min`;

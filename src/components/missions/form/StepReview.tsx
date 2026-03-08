@@ -24,7 +24,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MissionFormData, Branch, Wallet } from '@/types';
-import { CURRENCY, QUESTION_TYPE_LABELS, MESSAGES, AGENT_TIERS } from '@/lib/constants';
+import { CURRENCY, QUESTION_TYPE_LABELS, MESSAGES } from '@/lib/constants';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useTranslation } from 'react-i18next';
 
 interface StepReviewProps {
@@ -59,7 +60,8 @@ export function StepReview({
   const budgetPerMission = numberOfVisits * data.purchase_budget_per_visit;
   const totalVisitsAllMissions = numberOfVisits * branchCount;
   const totalPurchaseBudget = budgetPerMission * branchCount;
-  const selectedTier = AGENT_TIERS.find((t) => t.tier === data.agent_tier);
+  const { data: agentTiers } = useActiveAgentTiers();
+  const selectedTier = agentTiers?.find((t) => t.tier_code === data.agent_tier);
 
   const formatDuration = (minutes: number) => {
     if (minutes < 60) return `${minutes} min`;

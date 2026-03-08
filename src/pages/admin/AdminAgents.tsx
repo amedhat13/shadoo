@@ -162,9 +162,9 @@ export default function AdminAgentsPage() {
             icon={UserCheck} 
           />
           <StatCard 
-            title="Tier A" 
-            value={statsLoading ? '...' : stats?.tierA?.toString() || '0'} 
-            icon={Award} 
+            title="Avg. Rating" 
+            value={statsLoading ? '...' : stats?.avgRating || '0'} 
+            icon={Star} 
           />
           <StatCard 
             title="Avg. Rating" 

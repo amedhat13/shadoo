@@ -85,47 +85,98 @@ export type Database = {
       }
       agent_tiers: {
         Row: {
+          cities: string[] | null
+          color: string | null
           commission_rate: number | null
           created_at: string | null
           description: string | null
+          description_ar: string | null
+          districts: string[] | null
+          education_levels: string[] | null
+          employment_statuses: string[] | null
           features: Json | null
+          gender: string | null
           id: string
           is_active: boolean | null
+          languages: string[] | null
+          marital_statuses: string[] | null
+          max_age: number | null
+          min_age: number | null
           min_completed_visits: number | null
+          min_experience_years: number | null
           min_rating: number | null
           min_subscription_plan: string | null
           name: string
+          name_ar: string | null
+          questionnaire_criteria: Json | null
+          requires_car: boolean | null
+          requires_motorcycle: boolean | null
           sort_order: number | null
+          specializations: string[] | null
           tier_code: string
           updated_at: string | null
         }
         Insert: {
+          cities?: string[] | null
+          color?: string | null
           commission_rate?: number | null
           created_at?: string | null
           description?: string | null
+          description_ar?: string | null
+          districts?: string[] | null
+          education_levels?: string[] | null
+          employment_statuses?: string[] | null
           features?: Json | null
+          gender?: string | null
           id?: string
           is_active?: boolean | null
+          languages?: string[] | null
+          marital_statuses?: string[] | null
+          max_age?: number | null
+          min_age?: number | null
           min_completed_visits?: number | null
+          min_experience_years?: number | null
           min_rating?: number | null
           min_subscription_plan?: string | null
           name: string
+          name_ar?: string | null
+          questionnaire_criteria?: Json | null
+          requires_car?: boolean | null
+          requires_motorcycle?: boolean | null
           sort_order?: number | null
+          specializations?: string[] | null
           tier_code: string
           updated_at?: string | null
         }
         Update: {
+          cities?: string[] | null
+          color?: string | null
           commission_rate?: number | null
           created_at?: string | null
           description?: string | null
+          description_ar?: string | null
+          districts?: string[] | null
+          education_levels?: string[] | null
+          employment_statuses?: string[] | null
           features?: Json | null
+          gender?: string | null
           id?: string
           is_active?: boolean | null
+          languages?: string[] | null
+          marital_statuses?: string[] | null
+          max_age?: number | null
+          min_age?: number | null
           min_completed_visits?: number | null
+          min_experience_years?: number | null
           min_rating?: number | null
           min_subscription_plan?: string | null
           name?: string
+          name_ar?: string | null
+          questionnaire_criteria?: Json | null
+          requires_car?: boolean | null
+          requires_motorcycle?: boolean | null
           sort_order?: number | null
+          specializations?: string[] | null
           tier_code?: string
           updated_at?: string | null
         }
@@ -144,13 +195,24 @@ export type Database = {
           available_balance: number | null
           bank_details: Json | null
           can_resubmit: boolean | null
+          city: string | null
           completed_visits: number | null
           created_at: string | null
+          date_of_birth: string | null
+          district: string | null
+          education_level: string | null
           email: string
+          employment_status: string | null
+          experience_years: number | null
           full_name: string
+          gender: string | null
+          has_car: boolean | null
+          has_motorcycle: boolean | null
           id: string
+          languages: string[] | null
           latitude: number | null
           longitude: number | null
+          marital_status: string | null
           mobile_wallet: string | null
           national_id: string | null
           phone: string
@@ -160,6 +222,7 @@ export type Database = {
           rejected_by: string | null
           rejection_category: string | null
           rejection_reason: string | null
+          specializations: string[] | null
           status: string | null
           tier: string | null
           total_earnings: number | null
@@ -173,13 +236,24 @@ export type Database = {
           available_balance?: number | null
           bank_details?: Json | null
           can_resubmit?: boolean | null
+          city?: string | null
           completed_visits?: number | null
           created_at?: string | null
+          date_of_birth?: string | null
+          district?: string | null
+          education_level?: string | null
           email: string
+          employment_status?: string | null
+          experience_years?: number | null
           full_name: string
+          gender?: string | null
+          has_car?: boolean | null
+          has_motorcycle?: boolean | null
           id?: string
+          languages?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          marital_status?: string | null
           mobile_wallet?: string | null
           national_id?: string | null
           phone: string
@@ -189,6 +263,7 @@ export type Database = {
           rejected_by?: string | null
           rejection_category?: string | null
           rejection_reason?: string | null
+          specializations?: string[] | null
           status?: string | null
           tier?: string | null
           total_earnings?: number | null
@@ -202,13 +277,24 @@ export type Database = {
           available_balance?: number | null
           bank_details?: Json | null
           can_resubmit?: boolean | null
+          city?: string | null
           completed_visits?: number | null
           created_at?: string | null
+          date_of_birth?: string | null
+          district?: string | null
+          education_level?: string | null
           email?: string
+          employment_status?: string | null
+          experience_years?: number | null
           full_name?: string
+          gender?: string | null
+          has_car?: boolean | null
+          has_motorcycle?: boolean | null
           id?: string
+          languages?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          marital_status?: string | null
           mobile_wallet?: string | null
           national_id?: string | null
           phone?: string
@@ -218,6 +304,7 @@ export type Database = {
           rejected_by?: string | null
           rejection_category?: string | null
           rejection_reason?: string | null
+          specializations?: string[] | null
           status?: string | null
           tier?: string | null
           total_earnings?: number | null
@@ -392,6 +479,8 @@ export type Database = {
       }
       missions: {
         Row: {
+          agent_custom_criteria: Json | null
+          agent_selection_mode: string | null
           agent_tier: string
           branch_id: string | null
           budget_used: number
@@ -416,6 +505,8 @@ export type Database = {
           visits_pending: number
         }
         Insert: {
+          agent_custom_criteria?: Json | null
+          agent_selection_mode?: string | null
           agent_tier?: string
           branch_id?: string | null
           budget_used?: number
@@ -440,6 +531,8 @@ export type Database = {
           visits_pending?: number
         }
         Update: {
+          agent_custom_criteria?: Json | null
+          agent_selection_mode?: string | null
           agent_tier?: string
           branch_id?: string | null
           budget_used?: number
