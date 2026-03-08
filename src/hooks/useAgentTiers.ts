@@ -69,14 +69,14 @@ export function useCreateAgentTier() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (tier: Partial<AgentTier>) => {
-      const { questionnaire_criteria, ...rest } = tier;
-      const insertData = {
+      const { questionnaire_criteria, id, ...rest } = tier;
+      const insertData: Record<string, unknown> = {
         ...rest,
         questionnaire_criteria: questionnaire_criteria ? JSON.parse(JSON.stringify(questionnaire_criteria)) : [],
       };
       const { data, error } = await supabase
         .from('agent_tiers')
-        .insert(insertData as Record<string, unknown>)
+        .insert(insertData as never)
         .select()
         .single();
       if (error) throw error;
