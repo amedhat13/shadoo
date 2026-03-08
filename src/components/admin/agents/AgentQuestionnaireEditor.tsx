@@ -17,20 +17,28 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   Plus, Trash2, GripVertical, Save, Loader2,
-  FileText, Type, List, ToggleLeft, Hash,
+  FileText, Type, List, ToggleLeft, Hash, Paperclip,
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
 
 type BilingualString = string | { en: string; ar: string };
 
+export interface AttachmentFieldConfig {
+  allowed_types?: string[]; // e.g. ['image', 'pdf', 'document']
+  max_files?: number;
+  instructions?: BilingualString;
+}
+
 export interface QuestionField {
   id: string;
-  type: 'text' | 'textarea' | 'select' | 'multiselect' | 'boolean' | 'number';
+  type: 'text' | 'textarea' | 'select' | 'multiselect' | 'boolean' | 'number' | 'attachment';
   label: BilingualString;
   placeholder?: BilingualString;
   required: boolean;
   options?: (string | { en: string; ar: string })[];
   helpText?: BilingualString;
+  attachment_config?: AttachmentFieldConfig;
 }
 
 interface AgentQuestionnaireEditorProps {
@@ -47,6 +55,7 @@ const questionTypeIcons: Record<string, React.ReactNode> = {
   multiselect: <List className="h-4 w-4" />,
   boolean: <ToggleLeft className="h-4 w-4" />,
   number: <Hash className="h-4 w-4" />,
+  attachment: <Paperclip className="h-4 w-4" />,
 };
 
 const questionTypeLabels: Record<string, string> = {
@@ -56,6 +65,7 @@ const questionTypeLabels: Record<string, string> = {
   multiselect: 'Multi Select',
   boolean: 'Yes/No',
   number: 'Number',
+  attachment: 'Attachment',
 };
 
 function getEn(val: BilingualString | undefined): string {
@@ -139,9 +149,9 @@ export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionna
         { en: 'Cairo', ar: 'القاهرة' },
         { en: 'Alexandria', ar: 'الإسكندرية' },
         { en: 'Giza', ar: 'الجيزة' },
-        { en: 'Riyadh', ar: 'الرياض' },
-        { en: 'Jeddah', ar: 'جدة' },
-        { en: 'Dammam', ar: 'الدمام' },
+        { en: 'Luxor', ar: 'الأقصر' },
+        { en: 'Aswan', ar: 'أسوان' },
+        { en: 'Mansoura', ar: 'المنصورة' },
         { en: 'Other', ar: 'أخرى' },
       ],
     },
@@ -326,14 +336,18 @@ export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionna
                               <Label className="text-xs">{t('questionnaire.type', 'Question Type')}</Label>
                               <Select
                                 value={question.type}
-                                onValueChange={(value: QuestionField['type']) =>
-                                  handleUpdateQuestion(index, {
+                                onValueChange={(value: QuestionField['type']) => {
+                                  const updates: Partial<QuestionField> = {
                                     type: value,
                                     options: (value === 'select' || value === 'multiselect')
                                       ? question.options || [{ en: 'Option 1', ar: 'خيار 1' }, { en: 'Option 2', ar: 'خيار 2' }]
                                       : undefined,
-                                  })
-                                }
+                                    attachment_config: value === 'attachment'
+                                      ? { allowed_types: ['image', 'pdf'], max_files: 1, instructions: { en: '', ar: '' } }
+                                      : undefined,
+                                  };
+                                  handleUpdateQuestion(index, updates);
+                                }}
                               >
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -383,6 +397,83 @@ export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionna
                                 <Button variant="outline" size="sm" onClick={() => handleAddOption(index)}>
                                   <Plus className="h-3.5 w-3.5 mr-1" />{t('questionnaire.add_option', 'Add Option')}
                                 </Button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Attachment Config */}
+                          {question.type === 'attachment' && (
+                            <div className="space-y-3 border border-dashed border-border rounded-lg p-3">
+                              <div className="space-y-2">
+                                <Label className="text-xs">{t('questionnaire.allowed_file_types', 'Allowed File Types')}</Label>
+                                <div className="flex items-center gap-4 flex-wrap">
+                                  {(['image', 'pdf', 'document'] as const).map(ft => {
+                                    const config = question.attachment_config || { allowed_types: ['image', 'pdf'], max_files: 1 };
+                                    const checked = config.allowed_types?.includes(ft) ?? false;
+                                    const labels = { image: t('questionnaire.file_type_image', 'Images'), pdf: 'PDF', document: t('questionnaire.file_type_document', 'Documents') };
+                                    return (
+                                      <label key={ft} className="flex items-center gap-2 cursor-pointer">
+                                        <Checkbox
+                                          checked={checked}
+                                          onCheckedChange={(v) => {
+                                            const current = config.allowed_types || [];
+                                            const next = v ? [...current, ft] : current.filter(t => t !== ft);
+                                            if (next.length === 0) return;
+                                            handleUpdateQuestion(index, {
+                                              attachment_config: { ...config, allowed_types: next },
+                                            });
+                                          }}
+                                        />
+                                        <span className="text-sm">{labels[ft]}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <Label className="text-xs">{t('questionnaire.max_files', 'Max Files')}</Label>
+                                <Select
+                                  value={String(question.attachment_config?.max_files || 1)}
+                                  onValueChange={v => handleUpdateQuestion(index, {
+                                    attachment_config: { ...(question.attachment_config || {}), max_files: parseInt(v) },
+                                  })}
+                                >
+                                  <SelectTrigger className="w-[70px]"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {[1, 2, 3, 4, 5].map(n => (
+                                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs">{t('questionnaire.upload_instructions_en', 'Upload Instructions (EN)')}</Label>
+                                  <Input
+                                    value={getEn(question.attachment_config?.instructions)}
+                                    onChange={(e) => handleUpdateQuestion(index, {
+                                      attachment_config: {
+                                        ...(question.attachment_config || {}),
+                                        instructions: makeBilingual(e.target.value, getAr(question.attachment_config?.instructions)),
+                                      },
+                                    })}
+                                    placeholder="e.g. Upload a clear photo of your National ID"
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-xs">{t('questionnaire.upload_instructions_ar', 'Upload Instructions (AR)')}</Label>
+                                  <Input
+                                    dir="rtl" className="text-end"
+                                    value={getAr(question.attachment_config?.instructions)}
+                                    onChange={(e) => handleUpdateQuestion(index, {
+                                      attachment_config: {
+                                        ...(question.attachment_config || {}),
+                                        instructions: makeBilingual(getEn(question.attachment_config?.instructions), e.target.value),
+                                      },
+                                    })}
+                                    placeholder="ارفع صورة واضحة لبطاقة الرقم القومي"
+                                  />
+                                </div>
                               </div>
                             </div>
                           )}
