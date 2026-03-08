@@ -24,7 +24,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MissionFormData, Branch, Wallet } from '@/types';
-import { CURRENCY, QUESTION_TYPE_LABELS, MESSAGES, AGENT_TIERS } from '@/lib/constants';
+import { CURRENCY, QUESTION_TYPE_LABELS, MESSAGES } from '@/lib/constants';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useTranslation } from 'react-i18next';
 
 interface StepReviewProps {
