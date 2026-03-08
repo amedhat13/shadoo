@@ -38,32 +38,37 @@ export const FORM_STEPS = [
   { id: 'review', title: 'Review', description: 'Review and publish.' },
 ];
 
-export const AGENT_TIERS = [
-  {
-    tier: 'C' as const,
-    name: 'Class C',
-    description: 'Standard agents for routine mystery shopping tasks.',
-    features: ['Basic training', 'Standard response time', 'Cost-effective'],
-    available: true,
-    requiresUpgrade: false,
-  },
-  {
-    tier: 'B' as const,
-    name: 'Class B',
-    description: 'Experienced agents with proven track records.',
-    features: ['Advanced training', 'Faster response time', 'Detailed reports'],
-    available: true,
-    requiresUpgrade: false,
-  },
-  {
-    tier: 'A' as const,
-    name: 'Class A',
-    description: 'Premium agents for high-stakes evaluations.',
-    features: ['Expert level', 'Priority response', 'Executive reports', 'Dedicated support'],
-    available: false,
-    requiresUpgrade: true,
-  },
-];
+export const AGENT_DEMOGRAPHICS = {
+  genders: ['male', 'female'] as const,
+  education_levels: ['high_school', 'bachelors', 'masters', 'phd', 'other'] as const,
+  marital_statuses: ['single', 'married', 'other'] as const,
+  employment_statuses: ['employed', 'unemployed', 'student', 'freelancer', 'retired'] as const,
+  languages: ['arabic', 'english', 'french', 'german', 'spanish', 'italian'] as const,
+  specializations: [
+    'food_and_beverage', 'retail', 'banking_finance', 'automotive',
+    'healthcare', 'hospitality', 'telecom', 'real_estate',
+    'education', 'government', 'fmcg', 'fashion', 'electronics'
+  ] as const,
+  egyptian_cities: [
+    'Cairo', 'Alexandria', 'Giza', 'Luxor', 'Aswan', 'Tanta',
+    'Mansoura', 'Port Said', 'Suez', 'Ismailia', 'Faiyum',
+    'Zagazig', 'Damietta', 'Beni Suef', 'Minya', 'Sohag',
+    'Qena', 'Hurghada', 'Sharm El Sheikh', 'Marsa Alam',
+    '6th of October', 'New Cairo', 'Obour', 'Shorouk', '10th of Ramadan'
+  ] as const,
+  tier_colors: [
+    { value: '#f59e0b', label: 'Amber' },
+    { value: '#3b82f6', label: 'Blue' },
+    { value: '#22c55e', label: 'Green' },
+    { value: '#ef4444', label: 'Red' },
+    { value: '#a855f7', label: 'Purple' },
+    { value: '#94a3b8', label: 'Slate' },
+    { value: '#92400e', label: 'Brown' },
+    { value: '#14b8a6', label: 'Teal' },
+    { value: '#f97316', label: 'Orange' },
+    { value: '#ec4899', label: 'Pink' },
+  ] as const,
+};
 
 export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', href: '/', icon: 'LayoutDashboard' },
