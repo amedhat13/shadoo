@@ -55,6 +55,7 @@ const questionTypeIcons: Record<string, React.ReactNode> = {
   multiselect: <List className="h-4 w-4" />,
   boolean: <ToggleLeft className="h-4 w-4" />,
   number: <Hash className="h-4 w-4" />,
+  attachment: <Paperclip className="h-4 w-4" />,
 };
 
 const questionTypeLabels: Record<string, string> = {
@@ -64,6 +65,7 @@ const questionTypeLabels: Record<string, string> = {
   multiselect: 'Multi Select',
   boolean: 'Yes/No',
   number: 'Number',
+  attachment: 'Attachment',
 };
 
 function getEn(val: BilingualString | undefined): string {
