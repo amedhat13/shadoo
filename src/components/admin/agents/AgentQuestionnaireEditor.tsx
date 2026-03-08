@@ -336,14 +336,18 @@ export function AgentQuestionnaireEditor({ open, onOpenChange }: AgentQuestionna
                               <Label className="text-xs">{t('questionnaire.type', 'Question Type')}</Label>
                               <Select
                                 value={question.type}
-                                onValueChange={(value: QuestionField['type']) =>
-                                  handleUpdateQuestion(index, {
+                                onValueChange={(value: QuestionField['type']) => {
+                                  const updates: Partial<QuestionField> = {
                                     type: value,
                                     options: (value === 'select' || value === 'multiselect')
                                       ? question.options || [{ en: 'Option 1', ar: 'خيار 1' }, { en: 'Option 2', ar: 'خيار 2' }]
                                       : undefined,
-                                  })
-                                }
+                                    attachment_config: value === 'attachment'
+                                      ? { allowed_types: ['image', 'pdf'], max_files: 1, instructions: { en: '', ar: '' } }
+                                      : undefined,
+                                  };
+                                  handleUpdateQuestion(index, updates);
+                                }}
                               >
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
