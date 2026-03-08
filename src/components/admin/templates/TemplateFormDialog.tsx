@@ -13,8 +13,6 @@ import { Plus, Trash2, Paperclip } from 'lucide-react';
 import { Question, QuestionType, QuestionOption, AttachmentConfig } from '@/types';
 import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
 import { ensureBilingual } from '@/i18n/utils';
-import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
-import { ensureBilingual } from '@/i18n/utils';
 
 interface TemplateFormDialogProps {
   open: boolean;
