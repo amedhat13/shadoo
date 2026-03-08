@@ -8,35 +8,89 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Award, Star, CheckCircle2, Edit2, Loader2, Save, Plus, Trash2 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Award, Star, Edit2, Loader2, Save, Plus, Trash2, Users, ChevronUp, ChevronDown,
+  AlertTriangle,
+} from 'lucide-react';
+import {
+  useAgentTiers, useCreateAgentTier, useUpdateAgentTier, useDeleteAgentTier,
+  useAgentCountByTier, type AgentTier,
+} from '@/hooks/useAgentTiers';
 import { useVisitPricing, useUpdateVisitPrice, useCreateVisitPrice, useDeleteVisitPrice } from '@/hooks/useVisitPricing';
+import { AGENT_DEMOGRAPHICS } from '@/lib/constants';
 import { LoadingState } from '@/components/common/LoadingState';
+import { cn } from '@/lib/utils';
 
-const tiers = [
-  { code: 'A', name: 'Premium Agent', description: 'Top-tier agents with excellent track record.', color: 'bg-amber-500', requirements: { minVisits: 100, minRating: 4.8 } },
-  { code: 'B', name: 'Standard Agent', description: 'Experienced agents with good performance.', color: 'bg-slate-400', requirements: { minVisits: 30, minRating: 4.5 } },
-  { code: 'C', name: 'Entry Agent', description: 'New agents building their reputation.', color: 'bg-amber-700', requirements: { minVisits: 0, minRating: 0 } },
-];
+const emptyTier: Partial<AgentTier> = {
+  name: '', name_ar: '', tier_code: '', description: '', description_ar: '',
+  color: '#6B7280', is_active: true, sort_order: 0,
+  min_age: null, max_age: null, gender: null,
+  cities: [], districts: [], education_levels: [], languages: [],
+  requires_car: false, requires_motorcycle: false,
+  marital_statuses: [], employment_statuses: [],
+  min_experience_years: 0, specializations: [],
+  min_rating: 0, min_completed_visits: 0,
+  questionnaire_criteria: [],
+};
 
 export default function AdminTiersPage() {
-  const { t } = useTranslation('admin');
-  const { data: pricing, isLoading } = useVisitPricing();
+  const { t, i18n } = useTranslation('admin');
+  const { data: tiers, isLoading } = useAgentTiers();
+  const { data: agentCounts } = useAgentCountByTier();
+  const createTier = useCreateAgentTier();
+  const updateTier = useUpdateAgentTier();
+  const deleteTier = useDeleteAgentTier();
+
+  const { data: pricing, isLoading: pricingLoading } = useVisitPricing();
   const updatePrice = useUpdateVisitPrice();
   const createPrice = useCreateVisitPrice();
   const deletePrice = useDeleteVisitPrice();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState('');
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTier, setEditingTier] = useState<Partial<AgentTier> | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [editPriceValue, setEditPriceValue] = useState('');
   const [newDuration, setNewDuration] = useState<Record<string, string>>({});
   const [newPrice, setNewPrice] = useState<Record<string, string>>({});
 
-  const getPricing = (tierCode: string) => {
-    return (pricing || []).filter(p => p.tier_code === tierCode).sort((a, b) => a.duration_minutes - b.duration_minutes);
+  const activeTiers = (tiers || []).filter(t => t.is_active);
+
+  const openCreate = () => { setEditingTier({ ...emptyTier }); setDialogOpen(true); };
+  const openEdit = (tier: AgentTier) => { setEditingTier({ ...tier }); setDialogOpen(true); };
+
+  const handleSave = () => {
+    if (!editingTier) return;
+    if (editingTier.id) {
+      updateTier.mutate(editingTier as AgentTier, { onSuccess: () => setDialogOpen(false) });
+    } else {
+      createTier.mutate(editingTier, { onSuccess: () => setDialogOpen(false) });
+    }
   };
 
+  const handleDelete = () => {
+    if (deleteId) {
+      deleteTier.mutate(deleteId, { onSuccess: () => setDeleteId(null) });
+    }
+  };
+
+  const getPricing = (tierCode: string) =>
+    (pricing || []).filter(p => p.tier_code === tierCode).sort((a, b) => a.duration_minutes - b.duration_minutes);
+
   const handleSavePrice = (id: string) => {
-    const val = parseFloat(editValue);
+    const val = parseFloat(editPriceValue);
     if (isNaN(val) || val <= 0) return;
-    updatePrice.mutate({ id, price: val }, { onSuccess: () => setEditingId(null) });
+    updatePrice.mutate({ id, price: val }, { onSuccess: () => setEditingPriceId(null) });
   };
 
   const handleAddDuration = (tierCode: string) => {
@@ -49,63 +103,113 @@ export default function AdminTiersPage() {
     );
   };
 
+  const buildSummary = (tier: Partial<AgentTier>) => {
+    const parts: string[] = [];
+    if (tier.gender) parts.push(tier.gender === 'male' ? t('tiers.male') : t('tiers.female'));
+    if (tier.min_age != null || tier.max_age != null) parts.push(`${tier.min_age ?? '?'}-${tier.max_age ?? '?'}`);
+    if (tier.cities?.length) parts.push(tier.cities.join(', '));
+    if (tier.education_levels?.length) parts.push(tier.education_levels.map(e => t(`tiers.${e}`, { defaultValue: e })).join(', '));
+    if (tier.requires_car) parts.push(t('tiers.has_car'));
+    if (tier.requires_motorcycle) parts.push(t('tiers.has_motorcycle'));
+    if (tier.specializations?.length) parts.push(tier.specializations.join(', '));
+    return parts.length > 0 ? parts.join(' • ') : t('tiers.all_agents');
+  };
+
+  if (isLoading) return <AdminLayout><LoadingState /></AdminLayout>;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <AdminPageHeader
           title={t('tiers.title', { defaultValue: 'Agent Tier & Pricing Configuration' })}
           description={t('tiers.description', { defaultValue: 'Configure agent tiers, requirements, and visit pricing.' })}
-        />
+        >
+          <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" />{t('tiers.add_tier')}</Button>
+        </AdminPageHeader>
 
         {/* Tier Cards */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {tiers.map((tier) => {
-            const tierPricing = getPricing(tier.code);
+        <div className="grid gap-4">
+          {activeTiers.map((tier) => {
+            const count = agentCounts?.[tier.tier_code] || 0;
+            const name = i18n.language === 'ar' && tier.name_ar ? tier.name_ar : tier.name;
+            const desc = i18n.language === 'ar' && tier.description_ar ? tier.description_ar : tier.description;
+            const tierPricing = getPricing(tier.tier_code);
+
             return (
-              <Card key={tier.code} className="relative overflow-hidden">
-                <div className={`absolute top-0 left-0 right-0 h-1 ${tier.color}`} />
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center text-white font-black ${tier.color}`}>
-                      {tier.code}
+              <Card key={tier.id} className="relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: tier.color || '#6B7280' }} />
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center text-white font-black rounded"
+                        style={{ backgroundColor: tier.color || '#6B7280' }}
+                      >
+                        {tier.tier_code}
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{name}</CardTitle>
+                        {desc && <CardDescription>{desc}</CardDescription>}
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{tier.name}</CardTitle>
-                      <CardDescription>{tier.description}</CardDescription>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="gap-1">
+                        <Users className="h-3 w-3" />
+                        {t('tiers.agents_in_tier', { count })}
+                      </Badge>
+                      {count === 0 && (
+                        <Badge variant="destructive" className="gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          {t('tiers.no_agents_warning', { defaultValue: 'No agents' })}
+                        </Badge>
+                      )}
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(tier)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeleteId(tier.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Criteria Summary */}
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{t('tiers.criteria_summary')}: </span>
+                    {buildSummary(tier)}
+                  </div>
+
+                  {/* Performance requirements */}
                   <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                     <div>
-                      <Label className="text-xs font-semibold uppercase text-muted-foreground">Min. Visits</Label>
-                      <p className="text-lg font-bold">{tier.requirements.minVisits}</p>
+                      <Label className="text-xs font-semibold uppercase text-muted-foreground">{t('tiers.min_visits')}</Label>
+                      <p className="text-lg font-bold">{tier.min_completed_visits || 0}</p>
                     </div>
                     <div>
-                      <Label className="text-xs font-semibold uppercase text-muted-foreground">Min. Rating</Label>
+                      <Label className="text-xs font-semibold uppercase text-muted-foreground">{t('tiers.min_rating')}</Label>
                       <p className="text-lg font-bold flex items-center gap-1">
-                        {tier.requirements.minRating > 0 ? (
-                          <><Star className="h-4 w-4 fill-warning text-warning" />{tier.requirements.minRating}</>
+                        {(tier.min_rating ?? 0) > 0 ? (
+                          <><Star className="h-4 w-4 fill-warning text-warning" />{tier.min_rating}</>
                         ) : 'N/A'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Visit Pricing Table */}
+                  {/* Visit Pricing */}
                   <div className="pt-2 border-t space-y-2">
                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
                       {t('tiers.visit_pricing', { defaultValue: 'Visit Pricing (EGP)' })}
                     </Label>
-                    {isLoading ? (
+                    {pricingLoading ? (
                       <div className="py-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
                     ) : (
                       <div className="space-y-1">
                         {tierPricing.map(p => (
                           <div key={p.id} className="flex items-center justify-between text-sm py-1 px-2 rounded hover:bg-muted/50">
                             <span className="text-muted-foreground">{p.duration_minutes} min</span>
-                            {editingId === p.id ? (
+                            {editingPriceId === p.id ? (
                               <div className="flex items-center gap-1">
-                                <Input className="w-20 h-7 text-xs" value={editValue} onChange={e => setEditValue(e.target.value)} type="number" />
+                                <Input className="w-20 h-7 text-xs" value={editPriceValue} onChange={e => setEditPriceValue(e.target.value)} type="number" />
                                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSavePrice(p.id)}>
                                   <Save className="h-3 w-3" />
                                 </Button>
@@ -113,7 +217,7 @@ export default function AdminTiersPage() {
                             ) : (
                               <div className="flex items-center gap-1">
                                 <span className="font-bold">{p.price} EGP</span>
-                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setEditingId(p.id); setEditValue(String(p.price)); }}>
+                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setEditingPriceId(p.id); setEditPriceValue(String(p.price)); }}>
                                   <Edit2 className="h-3 w-3" />
                                 </Button>
                                 <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => deletePrice.mutate(p.id)}>
@@ -123,11 +227,10 @@ export default function AdminTiersPage() {
                             )}
                           </div>
                         ))}
-                        {/* Add new duration */}
                         <div className="flex items-center gap-1 pt-2">
-                          <Input className="w-16 h-7 text-xs" placeholder="min" value={newDuration[tier.code] || ''} onChange={e => setNewDuration(d => ({ ...d, [tier.code]: e.target.value }))} type="number" />
-                          <Input className="w-16 h-7 text-xs" placeholder="EGP" value={newPrice[tier.code] || ''} onChange={e => setNewPrice(p => ({ ...p, [tier.code]: e.target.value }))} type="number" />
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleAddDuration(tier.code)}>
+                          <Input className="w-16 h-7 text-xs" placeholder="min" value={newDuration[tier.tier_code] || ''} onChange={e => setNewDuration(d => ({ ...d, [tier.tier_code]: e.target.value }))} type="number" />
+                          <Input className="w-16 h-7 text-xs" placeholder="EGP" value={newPrice[tier.tier_code] || ''} onChange={e => setNewPrice(p => ({ ...p, [tier.tier_code]: e.target.value }))} type="number" />
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleAddDuration(tier.tier_code)}>
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
@@ -140,19 +243,19 @@ export default function AdminTiersPage() {
           })}
         </div>
 
-        {/* Auto-Promotion & Location Settings */}
+        {/* Settings Cards */}
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-bold uppercase">
-                {t('tiers.auto_promotion', { defaultValue: 'Auto-Promotion Rules' })}
+                {t('tiers.auto_promotion', { defaultValue: 'Auto-Assignment Rules' })}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-md">
                 <div>
-                  <p className="font-medium">Automatic tier upgrades</p>
-                  <p className="text-sm text-muted-foreground">Agents are automatically promoted when they meet tier requirements.</p>
+                  <p className="font-medium">Automatic tier assignment</p>
+                  <p className="text-sm text-muted-foreground">Agents are automatically assigned to tiers based on their demographics.</p>
                 </div>
                 <Badge variant="outline" className="bg-success/10 text-success border-success/20">Enabled</Badge>
               </div>
@@ -173,17 +276,320 @@ export default function AdminTiersPage() {
                 </div>
                 <Badge variant="outline">30 KM</Badge>
               </div>
-              <div className="flex items-center justify-between p-4 border rounded-md">
-                <div>
-                  <p className="font-medium">{t('tiers.location_filtering', { defaultValue: 'Enable location-based filtering' })}</p>
-                  <p className="text-sm text-muted-foreground">{t('tiers.location_filtering_desc', { defaultValue: 'Filter missions by agent proximity.' })}</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Add/Edit Tier Dialog */}
+      {editingTier && (
+        <TierFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          tier={editingTier}
+          onChange={setEditingTier}
+          onSave={handleSave}
+          saving={createTier.isPending || updateTier.isPending}
+          t={t}
+          i18nLang={i18n.language}
+        />
+      )}
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('tiers.delete_tier')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('tiers.confirm_delete')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('config.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('tiers.delete_tier')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
+}
+
+/* ─── Tier Form Dialog ─── */
+function TierFormDialog({
+  open, onOpenChange, tier, onChange, onSave, saving, t, i18nLang,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  tier: Partial<AgentTier>;
+  onChange: (t: Partial<AgentTier>) => void;
+  onSave: () => void;
+  saving: boolean;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  i18nLang: string;
+}) {
+  const update = (partial: Partial<AgentTier>) => onChange({ ...tier, ...partial });
+  const toggleArrayItem = (field: keyof AgentTier, value: string) => {
+    const current = (tier[field] as string[] | null) || [];
+    const updated = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+    onChange({ ...tier, [field]: updated });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>{tier.id ? t('tiers.edit_tier') : t('tiers.add_tier')}</DialogTitle>
+          <DialogDescription>{t('tiers.demographic_criteria')}</DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[65vh] pr-4">
+          <div className="space-y-6">
+            {/* Section A: Basic Info */}
+            <div className="space-y-4">
+              <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{t('tiers.basic_info')}</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.tier_name')}</Label>
+                  <Input value={tier.name || ''} onChange={e => {
+                    const name = e.target.value;
+                    const code = tier.id ? tier.tier_code : name.toUpperCase().replace(/[^A-Z0-9]/g, '_').slice(0, 10);
+                    update({ name, tier_code: code } as Partial<AgentTier>);
+                  }} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.tier_name_ar')}</Label>
+                  <Input value={tier.name_ar || ''} onChange={e => update({ name_ar: e.target.value })} dir="rtl" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.tier_code')}</Label>
+                  <Input value={tier.tier_code || ''} onChange={e => update({ tier_code: e.target.value.toUpperCase() } as Partial<AgentTier>)} disabled={!!tier.id} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.tier_color')}</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {AGENT_DEMOGRAPHICS.tier_colors.map(c => (
+                      <button key={c.value} type="button"
+                        className={cn('h-8 w-8 rounded-full border-2 transition-all', tier.color === c.value ? 'border-foreground scale-110' : 'border-transparent')}
+                        style={{ backgroundColor: c.value }}
+                        onClick={() => update({ color: c.value })}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.description', { defaultValue: 'Description' })}</Label>
+                  <Textarea value={tier.description || ''} onChange={e => update({ description: e.target.value })} rows={2} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.description', { defaultValue: 'Description' })} (AR)</Label>
+                  <Textarea value={tier.description_ar || ''} onChange={e => update({ description_ar: e.target.value })} rows={2} dir="rtl" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Section B: Demographic Criteria */}
+            <div className="space-y-4">
+              <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{t('tiers.demographic_criteria')}</Label>
+
+              {/* Age */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.age_range')}</Label>
+                <div className="flex gap-2 items-center">
+                  <Input type="number" placeholder={t('tiers.min_age')} className="w-24" value={tier.min_age ?? ''} onChange={e => update({ min_age: e.target.value ? parseInt(e.target.value) : null })} />
+                  <span className="text-muted-foreground">—</span>
+                  <Input type="number" placeholder={t('tiers.max_age')} className="w-24" value={tier.max_age ?? ''} onChange={e => update({ max_age: e.target.value ? parseInt(e.target.value) : null })} />
+                </div>
+              </div>
+
+              {/* Gender */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.gender')}</Label>
+                <div className="flex gap-2">
+                  {[null, 'male', 'female'].map(g => (
+                    <button key={g ?? 'any'} type="button"
+                      className={cn('px-3 py-1.5 border rounded text-xs transition-all',
+                        tier.gender === g ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => update({ gender: g })}
+                    >
+                      {g === null ? t('tiers.any_gender') : g === 'male' ? t('tiers.male') : t('tiers.female')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cities */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.cities')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.egyptian_cities.map(city => (
+                    <button key={city} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.cities?.includes(city) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('cities', city)}
+                    >{city}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Education */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.education')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.education_levels.map(edu => (
+                    <button key={edu} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.education_levels?.includes(edu) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('education_levels', edu)}
+                    >{t(`tiers.${edu}`, { defaultValue: edu })}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Languages */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.languages')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.languages.map(lang => (
+                    <button key={lang} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.languages?.includes(lang) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('languages', lang)}
+                    >{lang.charAt(0).toUpperCase() + lang.slice(1)}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Car/Motorcycle */}
+              <div className="flex gap-6">
+                <div className="flex items-center gap-2">
+                  <Switch checked={tier.requires_car || false} onCheckedChange={v => update({ requires_car: v })} />
+                  <Label className="text-xs">{t('tiers.has_car')}</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={tier.requires_motorcycle || false} onCheckedChange={v => update({ requires_motorcycle: v })} />
+                  <Label className="text-xs">{t('tiers.has_motorcycle')}</Label>
+                </div>
+              </div>
+
+              {/* Marital Status */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.marital_status')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.marital_statuses.map(ms => (
+                    <button key={ms} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.marital_statuses?.includes(ms) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('marital_statuses', ms)}
+                    >{t(`tiers.${ms}`, { defaultValue: ms })}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Employment Status */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.employment_status')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.employment_statuses.map(es => (
+                    <button key={es} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.employment_statuses?.includes(es) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('employment_statuses', es)}
+                    >{t(`tiers.${es}`, { defaultValue: es })}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Specializations */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.specializations')}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {AGENT_DEMOGRAPHICS.specializations.map(spec => (
+                    <button key={spec} type="button"
+                      className={cn('px-2 py-0.5 text-xs border rounded transition-all',
+                        tier.specializations?.includes(spec) ? 'border-primary bg-primary/10 text-primary font-semibold' : 'border-border hover:border-primary/50'
+                      )}
+                      onClick={() => toggleArrayItem('specializations', spec)}
+                    >{spec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Min Experience */}
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.min_experience')}</Label>
+                <Input type="number" className="w-24" value={tier.min_experience_years ?? 0} onChange={e => update({ min_experience_years: parseInt(e.target.value) || 0 })} />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Section D: Performance Criteria */}
+            <div className="space-y-4">
+              <Label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{t('tiers.performance_criteria')}</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.min_rating')}</Label>
+                  <Input type="number" step="0.1" min="0" max="5" className="w-24" value={tier.min_rating ?? 0} onChange={e => update({ min_rating: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('tiers.min_visits')}</Label>
+                  <Input type="number" min="0" className="w-24" value={tier.min_completed_visits ?? 0} onChange={e => update({ min_completed_visits: parseInt(e.target.value) || 0 })} />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Summary Preview */}
+            <div className="p-4 border rounded-lg bg-muted/30">
+              <p className="text-xs font-bold uppercase text-muted-foreground mb-2">{t('tiers.criteria_summary')}</p>
+              <p className="text-sm">
+                {buildCriteriaSummary(tier, t)}
+              </p>
+            </div>
+          </div>
+        </ScrollArea>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('config.cancel')}</Button>
+          <Button onClick={onSave} disabled={saving || !tier.name || !tier.tier_code}>
+            {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {tier.id ? t('config.save') : t('tiers.add_tier')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function buildCriteriaSummary(tier: Partial<AgentTier>, t: (k: string, o?: Record<string, unknown>) => string): string {
+  const parts: string[] = [];
+  if (tier.gender) parts.push(tier.gender === 'male' ? t('tiers.male') : t('tiers.female'));
+  if (tier.min_age != null || tier.max_age != null) parts.push(`aged ${tier.min_age ?? '?'}-${tier.max_age ?? '?'}`);
+  if (tier.cities?.length) parts.push(`in ${tier.cities.join(', ')}`);
+  if (tier.education_levels?.length) parts.push(`with ${tier.education_levels.map(e => t(`tiers.${e}`, { defaultValue: e })).join(' or ')}`);
+  if (tier.requires_car) parts.push('who have a car');
+  if (tier.requires_motorcycle) parts.push('who have a motorcycle');
+  if (tier.languages?.length) parts.push(`speaking ${tier.languages.join(', ')}`);
+  if (tier.specializations?.length) parts.push(`experienced in ${tier.specializations.join(', ')}`);
+  if (tier.min_experience_years && tier.min_experience_years > 0) parts.push(`with ${tier.min_experience_years}+ years experience`);
+  if ((tier.min_rating ?? 0) > 0) parts.push(`rating ≥ ${tier.min_rating}`);
+  if ((tier.min_completed_visits ?? 0) > 0) parts.push(`≥ ${tier.min_completed_visits} visits`);
+
+  return parts.length > 0
+    ? `${parts.join(', ')}.`
+    : t('tiers.all_agents');
 }
