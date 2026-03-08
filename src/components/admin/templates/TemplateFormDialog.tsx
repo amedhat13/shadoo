@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2 } from 'lucide-react';
-import { Question, QuestionType, QuestionOption } from '@/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, Trash2, Paperclip } from 'lucide-react';
+import { Question, QuestionType, QuestionOption, AttachmentConfig } from '@/types';
 import { QuestionTemplate, METHODOLOGY_CATEGORIES, METHODOLOGY_KEYS } from '@/hooks/useQuestionTemplates';
 import { ensureBilingual } from '@/i18n/utils';
 
@@ -101,6 +102,15 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
       updates.max_rating = 5;
     } else {
       updates.max_rating = undefined;
+    }
+    if (type === 'attachment') {
+      updates.attachment_config = {
+        allowed_types: ['image', 'pdf'],
+        max_files: 1,
+        instructions: { en: '', ar: '' },
+      };
+    } else {
+      updates.attachment_config = undefined;
     }
     updateQuestion(qId, updates);
   };
@@ -273,6 +283,12 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
                           <SelectItem value="multiple_choice">{t('templates.multiple_choice')}</SelectItem>
                           <SelectItem value="yes_no">{t('templates.yes_no')}</SelectItem>
                           <SelectItem value="rating">{t('templates.rating')}</SelectItem>
+                          <SelectItem value="attachment">
+                            <span className="flex items-center gap-1.5">
+                              <Paperclip className="h-3.5 w-3.5" />
+                              {t('templates.attachment')}
+                            </span>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
 
@@ -325,6 +341,83 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
                           <Plus className="h-4 w-4" />
                           {t('templates.add_option')}
                         </Button>
+                      </div>
+                    )}
+
+                    {/* Attachment config */}
+                    {q.type === 'attachment' && (
+                      <div className="space-y-3 ps-4 border-s-2 border-muted">
+                        <div className="space-y-2">
+                          <span className="text-xs font-semibold text-muted-foreground uppercase">{t('templates.allowed_file_types')}</span>
+                          <div className="flex items-center gap-4 flex-wrap">
+                            {(['image', 'pdf', 'document'] as const).map(ft => {
+                              const config = q.attachment_config || { allowed_types: ['image', 'pdf'], max_files: 1 };
+                              const checked = config.allowed_types?.includes(ft) ?? false;
+                              return (
+                                <label key={ft} className="flex items-center gap-2 cursor-pointer">
+                                  <Checkbox
+                                    checked={checked}
+                                    onCheckedChange={(v) => {
+                                      const current = config.allowed_types || [];
+                                      const next = v ? [...current, ft] : current.filter(t => t !== ft);
+                                      if (next.length === 0) return; // must have at least one
+                                      updateQuestion(q.id, {
+                                        attachment_config: { ...config, allowed_types: next },
+                                      });
+                                    }}
+                                  />
+                                  <span className="text-sm">{t(`templates.file_type_${ft}`)}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-semibold text-muted-foreground uppercase">{t('templates.max_files')}</span>
+                          <Select
+                            value={String(q.attachment_config?.max_files || 1)}
+                            onValueChange={v => updateQuestion(q.id, {
+                              attachment_config: { ...(q.attachment_config || {}), max_files: parseInt(v) },
+                            })}
+                          >
+                            <SelectTrigger className="w-[70px]"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5].map(n => (
+                                <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <span className="text-xs font-semibold text-muted-foreground uppercase">{t('templates.upload_instructions')}</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <Input
+                              placeholder={t('templates.upload_instructions_placeholder_en')}
+                              value={ensureBilingual(q.attachment_config?.instructions || { en: '', ar: '' }).en}
+                              onChange={e => {
+                                const current = q.attachment_config || {};
+                                const instr = ensureBilingual(current.instructions || { en: '', ar: '' });
+                                updateQuestion(q.id, {
+                                  attachment_config: { ...current, instructions: { ...instr, en: e.target.value } },
+                                });
+                              }}
+                              dir="ltr"
+                            />
+                            <Input
+                              placeholder={t('templates.upload_instructions_placeholder_ar')}
+                              value={ensureBilingual(q.attachment_config?.instructions || { en: '', ar: '' }).ar}
+                              onChange={e => {
+                                const current = q.attachment_config || {};
+                                const instr = ensureBilingual(current.instructions || { en: '', ar: '' });
+                                updateQuestion(q.id, {
+                                  attachment_config: { ...current, instructions: { ...instr, ar: e.target.value } },
+                                });
+                              }}
+                              dir="rtl"
+                              className="font-ar"
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

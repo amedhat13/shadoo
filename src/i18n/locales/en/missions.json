@@ -130,6 +130,7 @@
     "multiple_choice": "Multiple Choice",
     "yes_no": "Yes / No",
     "rating": "Rating",
+    "attachment": "Attachment",
     "system_template": "System Template",
     "using_template": "Using template:",
     "clear_template": "Clear template",

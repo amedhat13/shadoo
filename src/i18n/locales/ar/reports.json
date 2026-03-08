@@ -111,7 +111,8 @@
     "yes_no": "نعم / لا",
     "rating": "تقييم",
     "multiple_choice": "اختيار من متعدد",
-    "short_text": "نص قصير"
+    "short_text": "نص قصير",
+    "attachment": "مرفق"
   },
   "responses_detail": {
     "average_rating": "متوسط التقييم",
