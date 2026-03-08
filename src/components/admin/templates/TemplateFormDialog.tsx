@@ -285,6 +285,12 @@ export function TemplateFormDialog({ open, onOpenChange, template, onSave, isSav
                           <SelectItem value="multiple_choice">{t('templates.multiple_choice')}</SelectItem>
                           <SelectItem value="yes_no">{t('templates.yes_no')}</SelectItem>
                           <SelectItem value="rating">{t('templates.rating')}</SelectItem>
+                          <SelectItem value="attachment">
+                            <span className="flex items-center gap-1.5">
+                              <Paperclip className="h-3.5 w-3.5" />
+                              {t('templates.attachment')}
+                            </span>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
 
