@@ -217,7 +217,7 @@ export async function autoAssignAgentTiers(agentId: string) {
     questionnaire_answers: agent.questionnaire_answers as unknown[] | null,
   }, tierCriteria);
 
-  const tierStr = matchedTiers.length > 0 ? matchedTiers.join(',') : null;
+  const tierStr = matchedTiers.length > 0 ? matchedTiers.join(',') : 'GENERAL';
   await supabase
     .from('agents')
     .update({ tier: tierStr })
