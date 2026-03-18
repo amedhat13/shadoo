@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
@@ -19,8 +20,11 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  Award, Star, Edit2, Loader2, Save, Plus, Trash2, Users, ChevronUp, ChevronDown,
-  AlertTriangle,
+  Award, Star, Edit2, Loader2, Save, Plus, Trash2, Users, AlertTriangle,
+  Shield, Crown, Gem, Zap, Target, BadgeCheck, UserCheck, Briefcase,
+  Rocket, TrendingUp, Eye, Heart, Flame, Medal, Trophy, Sparkles,
+  CircleUser, GraduationCap, Car, Bike, Globe, MapPin, Building2,
+  ShieldCheck, Handshake, Lightbulb, type LucideIcon,
 } from 'lucide-react';
 import {
   useAgentTiers, useCreateAgentTier, useUpdateAgentTier, useDeleteAgentTier,
@@ -31,9 +35,46 @@ import { AGENT_DEMOGRAPHICS } from '@/lib/constants';
 import { LoadingState } from '@/components/common/LoadingState';
 import { cn } from '@/lib/utils';
 
+// Curated icon library for tiers
+const TIER_ICONS: { name: string; icon: LucideIcon }[] = [
+  { name: 'shield', icon: Shield },
+  { name: 'crown', icon: Crown },
+  { name: 'gem', icon: Gem },
+  { name: 'zap', icon: Zap },
+  { name: 'target', icon: Target },
+  { name: 'award', icon: Award },
+  { name: 'badge-check', icon: BadgeCheck },
+  { name: 'user-check', icon: UserCheck },
+  { name: 'briefcase', icon: Briefcase },
+  { name: 'rocket', icon: Rocket },
+  { name: 'trending-up', icon: TrendingUp },
+  { name: 'eye', icon: Eye },
+  { name: 'heart', icon: Heart },
+  { name: 'flame', icon: Flame },
+  { name: 'medal', icon: Medal },
+  { name: 'trophy', icon: Trophy },
+  { name: 'sparkles', icon: Sparkles },
+  { name: 'star', icon: Star },
+  { name: 'circle-user', icon: CircleUser },
+  { name: 'graduation-cap', icon: GraduationCap },
+  { name: 'car', icon: Car },
+  { name: 'bike', icon: Bike },
+  { name: 'globe', icon: Globe },
+  { name: 'map-pin', icon: MapPin },
+  { name: 'building-2', icon: Building2 },
+  { name: 'shield-check', icon: ShieldCheck },
+  { name: 'handshake', icon: Handshake },
+  { name: 'lightbulb', icon: Lightbulb },
+];
+
+function getTierIcon(iconName: string | null | undefined): LucideIcon {
+  if (!iconName) return Shield;
+  return TIER_ICONS.find(i => i.name === iconName)?.icon || Shield;
+}
+
 const emptyTier: Partial<AgentTier> = {
   name: '', name_ar: '', tier_code: '', description: '', description_ar: '',
-  color: '#6B7280', is_active: true, sort_order: 0,
+  color: '#6B7280', icon: null, is_active: true, sort_order: 0,
   min_age: null, max_age: null, gender: null,
   cities: [], districts: [], education_levels: [], languages: [],
   requires_car: false, requires_motorcycle: false,
@@ -61,7 +102,10 @@ export default function AdminTiersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
   const [editPriceValue, setEditPriceValue] = useState('');
-  const [newDuration, setNewDuration] = useState<Record<string, string>>({});
+  const [editMinDur, setEditMinDur] = useState('');
+  const [editMaxDur, setEditMaxDur] = useState('');
+  const [newMinDur, setNewMinDur] = useState<Record<string, string>>({});
+  const [newMaxDur, setNewMaxDur] = useState<Record<string, string>>({});
   const [newPrice, setNewPrice] = useState<Record<string, string>>({});
 
   const activeTiers = (tiers || []).filter(t => t.is_active);
@@ -85,21 +129,35 @@ export default function AdminTiersPage() {
   };
 
   const getPricing = (tierCode: string) =>
-    (pricing || []).filter(p => p.tier_code === tierCode).sort((a, b) => a.duration_minutes - b.duration_minutes);
+    (pricing || []).filter(p => p.tier_code === tierCode).sort((a, b) => a.min_duration_minutes - b.min_duration_minutes);
 
   const handleSavePrice = (id: string) => {
     const val = parseFloat(editPriceValue);
+    const minD = parseInt(editMinDur);
+    const maxD = parseInt(editMaxDur);
     if (isNaN(val) || val <= 0) return;
-    updatePrice.mutate({ id, price: val }, { onSuccess: () => setEditingPriceId(null) });
+    updatePrice.mutate({
+      id,
+      price: val,
+      min_duration_minutes: isNaN(minD) ? undefined : minD,
+      max_duration_minutes: isNaN(maxD) ? undefined : maxD,
+    }, { onSuccess: () => setEditingPriceId(null) });
   };
 
   const handleAddDuration = (tierCode: string) => {
-    const dur = parseInt(newDuration[tierCode]);
+    const minD = parseInt(newMinDur[tierCode]);
+    const maxD = parseInt(newMaxDur[tierCode]);
     const pr = parseFloat(newPrice[tierCode]);
-    if (isNaN(dur) || isNaN(pr) || dur <= 0 || pr <= 0) return;
+    if (isNaN(minD) || isNaN(maxD) || isNaN(pr) || minD <= 0 || maxD <= 0 || pr <= 0 || maxD < minD) return;
     createPrice.mutate(
-      { tier_code: tierCode, duration_minutes: dur, price: pr },
-      { onSuccess: () => { setNewDuration(d => ({ ...d, [tierCode]: '' })); setNewPrice(p => ({ ...p, [tierCode]: '' })); } }
+      { tier_code: tierCode, min_duration_minutes: minD, max_duration_minutes: maxD, price: pr },
+      {
+        onSuccess: () => {
+          setNewMinDur(d => ({ ...d, [tierCode]: '' }));
+          setNewMaxDur(d => ({ ...d, [tierCode]: '' }));
+          setNewPrice(p => ({ ...p, [tierCode]: '' }));
+        },
+      }
     );
   };
 
@@ -133,6 +191,7 @@ export default function AdminTiersPage() {
             const name = i18n.language === 'ar' && tier.name_ar ? tier.name_ar : tier.name;
             const desc = i18n.language === 'ar' && tier.description_ar ? tier.description_ar : tier.description;
             const tierPricing = getPricing(tier.tier_code);
+            const IconComp = getTierIcon(tier.icon);
 
             return (
               <Card key={tier.id} className="relative overflow-hidden">
@@ -141,10 +200,10 @@ export default function AdminTiersPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className="flex h-10 w-10 items-center justify-center text-white font-black rounded"
+                        className="flex h-10 w-10 items-center justify-center text-white rounded"
                         style={{ backgroundColor: tier.color || '#6B7280' }}
                       >
-                        {tier.tier_code}
+                        <IconComp className="h-5 w-5" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">{name}</CardTitle>
@@ -194,7 +253,7 @@ export default function AdminTiersPage() {
                     </div>
                   </div>
 
-                  {/* Visit Pricing */}
+                  {/* Visit Pricing — Duration Ranges */}
                   <div className="pt-2 border-t space-y-2">
                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
                       {t('tiers.visit_pricing', { defaultValue: 'Visit Pricing (EGP)' })}
@@ -205,10 +264,15 @@ export default function AdminTiersPage() {
                       <div className="space-y-1">
                         {tierPricing.map(p => (
                           <div key={p.id} className="flex items-center justify-between text-sm py-1 px-2 rounded hover:bg-muted/50">
-                            <span className="text-muted-foreground">{p.duration_minutes} min</span>
+                            <span className="text-muted-foreground">
+                              {p.min_duration_minutes}-{p.max_duration_minutes ?? p.min_duration_minutes} {t('tiers.mins', { defaultValue: 'mins' })}
+                            </span>
                             {editingPriceId === p.id ? (
                               <div className="flex items-center gap-1">
-                                <Input className="w-20 h-7 text-xs" value={editPriceValue} onChange={e => setEditPriceValue(e.target.value)} type="number" />
+                                <Input className="w-14 h-7 text-xs" placeholder="min" value={editMinDur} onChange={e => setEditMinDur(e.target.value)} type="number" />
+                                <span className="text-xs text-muted-foreground">-</span>
+                                <Input className="w-14 h-7 text-xs" placeholder="max" value={editMaxDur} onChange={e => setEditMaxDur(e.target.value)} type="number" />
+                                <Input className="w-16 h-7 text-xs" value={editPriceValue} onChange={e => setEditPriceValue(e.target.value)} type="number" />
                                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleSavePrice(p.id)}>
                                   <Save className="h-3 w-3" />
                                 </Button>
@@ -216,7 +280,12 @@ export default function AdminTiersPage() {
                             ) : (
                               <div className="flex items-center gap-1">
                                 <span className="font-bold">{p.price} EGP</span>
-                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setEditingPriceId(p.id); setEditPriceValue(String(p.price)); }}>
+                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => {
+                                  setEditingPriceId(p.id);
+                                  setEditPriceValue(String(p.price));
+                                  setEditMinDur(String(p.min_duration_minutes));
+                                  setEditMaxDur(String(p.max_duration_minutes ?? p.min_duration_minutes));
+                                }}>
                                   <Edit2 className="h-3 w-3" />
                                 </Button>
                                 <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => deletePrice.mutate(p.id)}>
@@ -226,8 +295,11 @@ export default function AdminTiersPage() {
                             )}
                           </div>
                         ))}
+                        {/* Add new range */}
                         <div className="flex items-center gap-1 pt-2">
-                          <Input className="w-16 h-7 text-xs" placeholder="min" value={newDuration[tier.tier_code] || ''} onChange={e => setNewDuration(d => ({ ...d, [tier.tier_code]: e.target.value }))} type="number" />
+                          <Input className="w-14 h-7 text-xs" placeholder={t('tiers.min_dur', { defaultValue: 'min' })} value={newMinDur[tier.tier_code] || ''} onChange={e => setNewMinDur(d => ({ ...d, [tier.tier_code]: e.target.value }))} type="number" />
+                          <span className="text-xs text-muted-foreground">-</span>
+                          <Input className="w-14 h-7 text-xs" placeholder={t('tiers.max_dur', { defaultValue: 'max' })} value={newMaxDur[tier.tier_code] || ''} onChange={e => setNewMaxDur(d => ({ ...d, [tier.tier_code]: e.target.value }))} type="number" />
                           <Input className="w-16 h-7 text-xs" placeholder="EGP" value={newPrice[tier.tier_code] || ''} onChange={e => setNewPrice(p => ({ ...p, [tier.tier_code]: e.target.value }))} type="number" />
                           <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleAddDuration(tier.tier_code)}>
                             <Plus className="h-3 w-3" />
@@ -313,6 +385,40 @@ export default function AdminTiersPage() {
   );
 }
 
+/* ─── Icon Picker ─── */
+function IconPicker({ value, onChange, color }: { value: string | null; onChange: (v: string) => void; color: string }) {
+  const [open, setOpen] = useState(false);
+  const SelectedIcon = getTierIcon(value);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="h-10 w-10 p-0" type="button">
+          <SelectedIcon className="h-5 w-5" style={{ color }} />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="start">
+        <p className="text-xs font-semibold text-muted-foreground mb-2">Choose Icon</p>
+        <div className="grid grid-cols-7 gap-1">
+          {TIER_ICONS.map(({ name, icon: Icon }) => (
+            <button
+              key={name}
+              type="button"
+              className={cn(
+                'h-8 w-8 flex items-center justify-center rounded transition-all hover:bg-muted',
+                value === name && 'ring-2 ring-primary bg-primary/10'
+              )}
+              onClick={() => { onChange(name); setOpen(false); }}
+            >
+              <Icon className="h-4 w-4" style={value === name ? { color } : undefined} />
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /* ─── Tier Form Dialog ─── */
 function TierFormDialog({
   open, onOpenChange, tier, onChange, onSave, saving, t, i18nLang,
@@ -366,17 +472,24 @@ function TierFormDialog({
                   <Input value={tier.tier_code || ''} onChange={e => update({ tier_code: e.target.value.toUpperCase() } as Partial<AgentTier>)} disabled={!!tier.id} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs">{t('tiers.tier_color')}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {AGENT_DEMOGRAPHICS.tier_colors.map(c => (
-                      <button key={c.value} type="button"
-                        className={cn('h-8 w-8 rounded-full border-2 transition-all', tier.color === c.value ? 'border-foreground scale-110' : 'border-transparent')}
-                        style={{ backgroundColor: c.value }}
-                        onClick={() => update({ color: c.value })}
-                        title={c.label}
-                      />
-                    ))}
+                  <Label className="text-xs">{t('tiers.tier_icon', { defaultValue: 'Icon' })}</Label>
+                  <div className="flex items-center gap-3">
+                    <IconPicker value={tier.icon || null} onChange={v => update({ icon: v })} color={tier.color || '#6B7280'} />
+                    <span className="text-xs text-muted-foreground">{tier.icon || 'shield'}</span>
                   </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">{t('tiers.tier_color')}</Label>
+                <div className="flex flex-wrap gap-2">
+                  {AGENT_DEMOGRAPHICS.tier_colors.map(c => (
+                    <button key={c.value} type="button"
+                      className={cn('h-8 w-8 rounded-full border-2 transition-all', tier.color === c.value ? 'border-foreground scale-110' : 'border-transparent')}
+                      style={{ backgroundColor: c.value }}
+                      onClick={() => update({ color: c.value })}
+                      title={c.label}
+                    />
+                  ))}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
