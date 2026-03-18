@@ -83,7 +83,7 @@ export default function AdminMissionsPage() {
           <div className="flex justify-between"><span className="text-muted-foreground">{t('missions.budget')}</span><span className="font-medium">{mission.total_purchase_budget?.toLocaleString()} {tc('currency_code')}</span></div>
         </div>
         <div className="flex gap-2 mt-4 pt-3 border-t">
-          <Button variant="outline" size="sm" className="flex-1"><Eye className="h-4 w-4 me-1" />{t('missions.view')}</Button>
+          <Button variant="outline" size="sm" className="flex-1" asChild><Link to={`/admin/missions/${mission.id}`}><Eye className="h-4 w-4 me-1" />{t('missions.view')}</Link></Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-background border">
