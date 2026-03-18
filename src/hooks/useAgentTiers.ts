@@ -29,6 +29,7 @@ export interface AgentTier {
   min_rating: number | null;
   min_completed_visits: number | null;
   questionnaire_criteria: QuestionnaireCriterion[] | null;
+  icon: string | null;
   features: unknown;
   commission_rate: number | null;
   min_subscription_plan: string | null;

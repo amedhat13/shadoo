@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 export interface VisitDurationPricing {
   id: string;
   tier_code: string;
-  duration_minutes: number;
+  min_duration_minutes: number;
+  max_duration_minutes: number | null;
   price: number;
   currency: string;
   is_active: boolean;
@@ -18,11 +19,11 @@ export function useVisitPricing(tierCode?: string) {
     queryKey: ['visit-pricing', tierCode],
     queryFn: async () => {
       let query = supabase
-        .from('visit_duration_pricing' as any)
+        .from('visit_duration_pricing')
         .select('*')
         .eq('is_active', true)
         .order('tier_code')
-        .order('duration_minutes');
+        .order('min_duration_minutes');
 
       if (tierCode) {
         query = query.eq('tier_code', tierCode);
@@ -38,10 +39,13 @@ export function useVisitPricing(tierCode?: string) {
 export function useUpdateVisitPrice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, price }: { id: string; price: number }) => {
+    mutationFn: async ({ id, price, min_duration_minutes, max_duration_minutes }: { id: string; price: number; min_duration_minutes?: number; max_duration_minutes?: number | null }) => {
+      const updateData: Record<string, unknown> = { price, updated_at: new Date().toISOString() };
+      if (min_duration_minutes !== undefined) updateData.min_duration_minutes = min_duration_minutes;
+      if (max_duration_minutes !== undefined) updateData.max_duration_minutes = max_duration_minutes;
       const { error } = await supabase
-        .from('visit_duration_pricing' as any)
-        .update({ price, updated_at: new Date().toISOString() })
+        .from('visit_duration_pricing')
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
     },
@@ -56,15 +60,15 @@ export function useUpdateVisitPrice() {
 export function useCreateVisitPrice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { tier_code: string; duration_minutes: number; price: number }) => {
+    mutationFn: async (data: { tier_code: string; min_duration_minutes: number; max_duration_minutes: number; price: number }) => {
       const { error } = await supabase
-        .from('visit_duration_pricing' as any)
+        .from('visit_duration_pricing')
         .insert(data);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['visit-pricing'] });
-      toast.success('Duration added');
+      toast.success('Duration range added');
     },
     onError: (e) => toast.error('Failed to add: ' + e.message),
   });
@@ -75,7 +79,7 @@ export function useDeleteVisitPrice() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('visit_duration_pricing' as any)
+        .from('visit_duration_pricing')
         .delete()
         .eq('id', id);
       if (error) throw error;
@@ -93,8 +97,11 @@ export function lookupVisitPrice(
   tierCode: string,
   durationMinutes: number
 ): number | null {
+  // Find the range that contains the given duration
   const match = pricing.find(
-    p => p.tier_code === tierCode && p.duration_minutes === durationMinutes
+    p => p.tier_code === tierCode &&
+      durationMinutes >= p.min_duration_minutes &&
+      (p.max_duration_minutes === null || durationMinutes <= p.max_duration_minutes)
   );
   return match ? match.price : null;
 }

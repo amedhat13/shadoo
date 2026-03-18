@@ -190,13 +190,18 @@ export function useApproveVisit() {
         const bestTier = tiers.sort((a: string, b: string) => tierPriority.indexOf(a) - tierPriority.indexOf(b))[0] || 'C';
 
         // Look up price
-        const { data: priceData } = await supabase
-          .from('visit_duration_pricing' as any)
-          .select('price')
+        // Look up price by finding a range that contains the scheduled duration
+        const { data: priceRows } = await supabase
+          .from('visit_duration_pricing')
+          .select('price, min_duration_minutes, max_duration_minutes')
           .eq('tier_code', bestTier)
-          .eq('duration_minutes', visit.scheduled_duration)
           .eq('is_active', true)
-          .single();
+          .order('min_duration_minutes');
+
+        const priceData = (priceRows || []).find((p: any) =>
+          visit.scheduled_duration >= p.min_duration_minutes &&
+          (p.max_duration_minutes === null || visit.scheduled_duration <= p.max_duration_minutes)
+        );
 
         if (priceData) {
           const amount = Number((priceData as any).price);
