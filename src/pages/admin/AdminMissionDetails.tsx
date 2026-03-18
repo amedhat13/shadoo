@@ -164,7 +164,7 @@ export default function AdminMissionDetailsPage() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-black uppercase tracking-tight">{mission.name}</h1>
-                <MissionStatusBadge status={mission.status} />
+                <MissionStatusBadge status={mission.status as MissionStatus} />
               </div>
               <p className="mt-1 text-muted-foreground">
                 {mission.clientName} • {mission.branchName || tm('details.no_branch')}
