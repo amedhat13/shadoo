@@ -67,7 +67,8 @@
 | Table | Purpose | Managed By |
 |-------|---------|------------|
 | `subscription_plans` | Available plans with pricing | Admin |
-| `agent_tiers` | Tier definitions (A/B/C) with requirements | Admin |
+| `agent_tiers` | Dynamic tier definitions with demographic criteria, icons, and auto-assignment rules | Admin |
+| `visit_duration_pricing` | Duration-range-based pricing per tier (min/max minutes → price) | Admin |
 | `question_templates` | Reusable questionnaire templates | Admin |
 | `cities` | Supported cities | Admin |
 | `districts` | Districts within cities | Admin |
