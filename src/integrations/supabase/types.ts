@@ -96,6 +96,7 @@ export type Database = {
           employment_statuses: string[] | null
           features: Json | null
           gender: string | null
+          icon: string | null
           id: string
           is_active: boolean | null
           languages: string[] | null
@@ -128,6 +129,7 @@ export type Database = {
           employment_statuses?: string[] | null
           features?: Json | null
           gender?: string | null
+          icon?: string | null
           id?: string
           is_active?: boolean | null
           languages?: string[] | null
@@ -160,6 +162,7 @@ export type Database = {
           employment_statuses?: string[] | null
           features?: Json | null
           gender?: string | null
+          icon?: string | null
           id?: string
           is_active?: boolean | null
           languages?: string[] | null
@@ -968,9 +971,10 @@ export type Database = {
         Row: {
           created_at: string | null
           currency: string | null
-          duration_minutes: number
           id: string
           is_active: boolean | null
+          max_duration_minutes: number | null
+          min_duration_minutes: number
           price: number
           tier_code: string
           updated_at: string | null
@@ -978,9 +982,10 @@ export type Database = {
         Insert: {
           created_at?: string | null
           currency?: string | null
-          duration_minutes: number
           id?: string
           is_active?: boolean | null
+          max_duration_minutes?: number | null
+          min_duration_minutes: number
           price: number
           tier_code: string
           updated_at?: string | null
@@ -988,9 +993,10 @@ export type Database = {
         Update: {
           created_at?: string | null
           currency?: string | null
-          duration_minutes?: number
           id?: string
           is_active?: boolean | null
+          max_duration_minutes?: number | null
+          min_duration_minutes?: number
           price?: number
           tier_code?: string
           updated_at?: string | null
