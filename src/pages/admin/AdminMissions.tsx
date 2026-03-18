@@ -13,7 +13,8 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus } from 'lucide-react';
+import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus, SlidersHorizontal } from 'lucide-react';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useAdminMissions } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
