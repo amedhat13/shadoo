@@ -31,6 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { MissionStatusBadge } from '@/components/missions/MissionStatusBadge';
+import type { MissionStatus } from '@/types';
 import { CompletedVisitsDialog, CompletedVisit } from '@/components/missions/CompletedVisitsDialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
