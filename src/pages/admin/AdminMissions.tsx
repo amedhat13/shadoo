@@ -13,7 +13,8 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus } from 'lucide-react';
+import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus, SlidersHorizontal } from 'lucide-react';
+import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useAdminMissions } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +31,7 @@ const statusColors: Record<string, string> = {
 
 export default function AdminMissionsPage() {
   const { data: missions, isLoading } = useAdminMissions();
+  const { data: agentTiers } = useActiveAgentTiers();
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
   const { t } = useTranslation('admin');
@@ -80,7 +82,7 @@ export default function AdminMissionsPage() {
           <div className="flex justify-between"><span className="text-muted-foreground">{t('missions.budget')}</span><span className="font-medium">{mission.total_purchase_budget?.toLocaleString()} {tc('currency_code')}</span></div>
         </div>
         <div className="flex gap-2 mt-4 pt-3 border-t">
-          <Button variant="outline" size="sm" className="flex-1"><Eye className="h-4 w-4 me-1" />{t('missions.view')}</Button>
+          <Button variant="outline" size="sm" className="flex-1" asChild><Link to={`/admin/missions/${mission.id}`}><Eye className="h-4 w-4 me-1" />{t('missions.view')}</Link></Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-background border">
@@ -136,6 +138,7 @@ export default function AdminMissionsPage() {
                         <TableHead>{t('missions.mission_label')}</TableHead>
                         <TableHead>{t('missions.client')}</TableHead>
                         <TableHead>{t('missions.branch')}</TableHead>
+                        <TableHead>Agent</TableHead>
                         <TableHead>{t('missions.status')}</TableHead>
                         <TableHead>{t('missions.progress')}</TableHead>
                         <TableHead className="text-end">{t('missions.budget')}</TableHead>
@@ -143,11 +146,24 @@ export default function AdminMissionsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredMissions.map((mission) => (
+                      {filteredMissions.map((mission) => {
+                        const tier = agentTiers?.find((at: { tier_code: string }) => at.tier_code === mission.agent_tier);
+                        return (
                         <TableRow key={mission.id}>
-                          <TableCell className="font-medium">{mission.name}</TableCell>
+                          <TableCell className="font-medium">
+                            <Link to={`/admin/missions/${mission.id}`} className="hover:underline">{mission.name}</Link>
+                          </TableCell>
                           <TableCell className="text-muted-foreground">{mission.clientName}</TableCell>
                           <TableCell>{mission.branchName || 'N/A'}</TableCell>
+                          <TableCell>
+                            {mission.agent_selection_mode === 'custom' ? (
+                              <Badge variant="secondary" className="gap-1 text-xs"><SlidersHorizontal className="h-3 w-3" />Custom</Badge>
+                            ) : tier ? (
+                              <Badge style={{ backgroundColor: tier.color || '#6B7280', color: '#fff' }} className="text-xs">{tier.name}</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-xs">{mission.agent_tier}</Badge>
+                            )}
+                          </TableCell>
                           <TableCell><Badge className={statusColors[mission.status] || ''}>{tc(`statuses.${mission.status}`, mission.status)}</Badge></TableCell>
                           <TableCell>{mission.visits_completed}/{mission.number_of_visits}</TableCell>
                           <TableCell className="text-end font-medium">{mission.total_purchase_budget?.toLocaleString()} {tc('currency_code')}</TableCell>
@@ -155,7 +171,7 @@ export default function AdminMissionsPage() {
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="bg-background border">
-                                <DropdownMenuItem><Eye className="me-2 h-4 w-4" />{t('missions.view_details')}</DropdownMenuItem>
+                                <DropdownMenuItem asChild><Link to={`/admin/missions/${mission.id}`}><Eye className="me-2 h-4 w-4" />{t('missions.view_details')}</Link></DropdownMenuItem>
                                 {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
                                 {mission.status === 'paused' && <DropdownMenuItem onClick={() => handleResume(mission.id)}><Play className="me-2 h-4 w-4" />{t('missions.resume')}</DropdownMenuItem>}
                                 <DropdownMenuItem onClick={() => handleArchive(mission.id)}><Archive className="me-2 h-4 w-4" />{t('missions.force_archive')}</DropdownMenuItem>
@@ -163,7 +179,8 @@ export default function AdminMissionsPage() {
                             </DropdownMenu>
                           </TableCell>
                         </TableRow>
-                      ))}
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </div>

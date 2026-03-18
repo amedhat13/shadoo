@@ -130,19 +130,54 @@ export function StepReview({
         )}
       </div>
 
-      {/* Agent Tier */}
+      {/* Agent Selection */}
       <div className="border border-border p-4 space-y-3">
         <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Star className="h-4 w-4" />
           {t('review.agent_tier')}
         </h3>
-        {selectedTier && (
+        {data.agent_selection_mode === 'custom' && data.agent_custom_criteria ? (
+          <div className="space-y-2">
+            <Badge variant="secondary" className="text-xs">{t('agent_selection.custom_profile')}</Badge>
+            <div className="space-y-1 text-sm">
+              {data.agent_custom_criteria.gender && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.gender_preference')}</span><span className="font-medium capitalize">{t(`agent_selection.${data.agent_custom_criteria.gender}`)}</span></div>
+              )}
+              {(data.agent_custom_criteria.min_age || data.agent_custom_criteria.max_age) && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.age_range')}</span><span className="font-medium">{data.agent_custom_criteria.min_age ?? '—'} - {data.agent_custom_criteria.max_age ?? '—'}</span></div>
+              )}
+              {data.agent_custom_criteria.cities && data.agent_custom_criteria.cities.length > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.city')}</span><span className="font-medium">{data.agent_custom_criteria.cities.join(', ')}</span></div>
+              )}
+              {data.agent_custom_criteria.education_levels && data.agent_custom_criteria.education_levels.length > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.education')}</span><span className="font-medium capitalize">{data.agent_custom_criteria.education_levels.map(e => e.replace('_', ' ')).join(', ')}</span></div>
+              )}
+              {data.agent_custom_criteria.languages && data.agent_custom_criteria.languages.length > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.languages_required')}</span><span className="font-medium capitalize">{data.agent_custom_criteria.languages.join(', ')}</span></div>
+              )}
+              {data.agent_custom_criteria.requires_car && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.must_have_car')}</span><span className="font-medium">✓</span></div>
+              )}
+              {data.agent_custom_criteria.requires_motorcycle && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.must_have_motorcycle')}</span><span className="font-medium">✓</span></div>
+              )}
+              {data.agent_custom_criteria.specializations && data.agent_custom_criteria.specializations.length > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.industry_experience')}</span><span className="font-medium capitalize">{data.agent_custom_criteria.specializations.map(s => s.replace(/_/g, ' ')).join(', ')}</span></div>
+              )}
+              {data.agent_custom_criteria.min_experience_years && data.agent_custom_criteria.min_experience_years > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.min_experience')}</span><span className="font-medium">{data.agent_custom_criteria.min_experience_years} {t('agent_selection.years', { defaultValue: 'years' })}</span></div>
+              )}
+            </div>
+          </div>
+        ) : selectedTier ? (
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="text-sm font-bold">
               {selectedTier.name}
             </Badge>
             <span className="text-sm text-muted-foreground">{selectedTier.description}</span>
           </div>
+        ) : (
+          <Badge variant="outline">{data.agent_tier || 'GENERAL'}</Badge>
         )}
       </div>
 

@@ -101,7 +101,7 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
           </CardContent>
         </Card>
 
-        {/* Agent Tier */}
+        {/* Agent Selection */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase flex items-center gap-2">
@@ -110,13 +110,34 @@ export function AdminStepReview({ data, branches, onCreate, isSubmitting }: Admi
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('admin.selected_tier')}</span>
-              <Badge variant="outline">{selectedTier?.name || data.agent_tier}</Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {selectedTier?.description}
-            </p>
+            {data.agent_selection_mode === 'custom' && data.agent_custom_criteria ? (
+              <>
+                <Badge variant="secondary" className="text-xs mb-2">{t('agent_selection.custom_profile')}</Badge>
+                {data.agent_custom_criteria.gender && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.gender_preference')}</span><span className="font-medium capitalize">{data.agent_custom_criteria.gender}</span></div>
+                )}
+                {(data.agent_custom_criteria.min_age || data.agent_custom_criteria.max_age) && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.age_range')}</span><span className="font-medium">{data.agent_custom_criteria.min_age ?? '—'} - {data.agent_custom_criteria.max_age ?? '—'}</span></div>
+                )}
+                {data.agent_custom_criteria.cities && data.agent_custom_criteria.cities.length > 0 && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.city')}</span><span className="font-medium">{data.agent_custom_criteria.cities.join(', ')}</span></div>
+                )}
+                {data.agent_custom_criteria.requires_car && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.must_have_car')}</span><span>✓</span></div>
+                )}
+                {data.agent_custom_criteria.specializations && data.agent_custom_criteria.specializations.length > 0 && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t('agent_selection.industry_experience')}</span><span className="font-medium capitalize">{data.agent_custom_criteria.specializations.map((s: string) => s.replace(/_/g, ' ')).join(', ')}</span></div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('admin.selected_tier')}</span>
+                  <Badge variant="outline">{selectedTier?.name || data.agent_tier}</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">{selectedTier?.description}</p>
+              </>
+            )}
           </CardContent>
         </Card>
 

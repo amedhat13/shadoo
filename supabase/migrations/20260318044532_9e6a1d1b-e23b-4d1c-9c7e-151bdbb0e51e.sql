@@ -1,0 +1,1 @@
+ALTER TABLE public.agent_tiers DROP CONSTRAINT agent_tiers_tier_code_check;
