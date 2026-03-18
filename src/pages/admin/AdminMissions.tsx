@@ -151,7 +151,9 @@ export default function AdminMissionsPage() {
                           <TableCell className="font-medium">{mission.name}</TableCell>
                           <TableCell className="text-muted-foreground">{mission.clientName}</TableCell>
                           <TableCell>{mission.branchName || 'N/A'}</TableCell>
+                          <TableCell className="text-end font-medium">{mission.total_purchase_budget?.toLocaleString()} {tc('currency_code')}</TableCell>
                           <TableCell>
+                            <DropdownMenu>
                             {mission.agent_selection_mode === 'custom' ? (
                               <Badge variant="secondary" className="gap-1 text-xs"><SlidersHorizontal className="h-3 w-3" />{t('missions.custom_profile_badge', { defaultValue: 'Custom' })}</Badge>
                             ) : (() => {

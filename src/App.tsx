@@ -189,6 +189,16 @@ const App = () => (
               }
             />
             <Route
+              path="/admin/missions/:id"
+              element={
+                <AdminProtectedRoute>
+                  <AdminMissionDetailsPage />
+                </AdminProtectedRoute>
+              }
+            />
+              }
+            />
+            <Route
               path="/admin/visits"
               element={
                 <AdminProtectedRoute>
