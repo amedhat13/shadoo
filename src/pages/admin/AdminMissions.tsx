@@ -31,9 +31,11 @@ const statusColors: Record<string, string> = {
 
 export default function AdminMissionsPage() {
   const { data: missions, isLoading } = useAdminMissions();
+  const { data: agentTiers } = useActiveAgentTiers();
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
   const { t } = useTranslation('admin');
+  const { t: tc } = useTranslation('common');
   const { t: tc } = useTranslation('common');
 
   const filteredMissions = missions?.filter((mission) => {
