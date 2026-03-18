@@ -151,11 +151,20 @@ export default function AdminMissionsPage() {
                           <TableCell className="font-medium">{mission.name}</TableCell>
                           <TableCell className="text-muted-foreground">{mission.clientName}</TableCell>
                           <TableCell>{mission.branchName || 'N/A'}</TableCell>
+                          <TableCell>
+                            {mission.agent_selection_mode === 'custom' ? (
+                              <Badge variant="secondary" className="gap-1 text-xs"><SlidersHorizontal className="h-3 w-3" />{t('missions.custom_profile_badge', { defaultValue: 'Custom' })}</Badge>
+                            ) : (() => {
+                              const tier = agentTiers?.find((at: { tier_code: string }) => at.tier_code === mission.agent_tier);
+                              return tier ? (
+                                <Badge style={{ backgroundColor: tier.color || '#6B7280', color: '#fff' }} className="text-xs">{tier.name}</Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs">{mission.agent_tier}</Badge>
+                              );
+                            })()}
+                          </TableCell>
                           <TableCell><Badge className={statusColors[mission.status] || ''}>{tc(`statuses.${mission.status}`, mission.status)}</Badge></TableCell>
                           <TableCell>{mission.visits_completed}/{mission.number_of_visits}</TableCell>
-                          <TableCell className="text-end font-medium">{mission.total_purchase_budget?.toLocaleString()} {tc('currency_code')}</TableCell>
-                          <TableCell>
-                            <DropdownMenu>
                               <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="bg-background border">
                                 <DropdownMenuItem><Eye className="me-2 h-4 w-4" />{t('missions.view_details')}</DropdownMenuItem>
