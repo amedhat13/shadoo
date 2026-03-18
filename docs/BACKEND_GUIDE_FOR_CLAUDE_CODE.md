@@ -907,23 +907,31 @@ const corsHeaders = {
 
 ## 9. Business Logic Flows
 
-### 9.1 Commission Calculation
+### 9.1 Agent Pricing (Duration-Range Based)
+
+Agent pay is determined by visit duration and tier via the `visit_duration_pricing` table.
+Each row defines a **duration range** (min_duration_minutes to max_duration_minutes) and price per tier.
 
 ```typescript
-// Tier commission rates (from agent_tiers table)
-const TIER_RATES = {
-  'A': 0.85,  // 85% of budget goes to agent
-  'B': 0.75,  // 75%
-  'C': 0.65,  // 65%
-};
+// Example: visit_duration_pricing rows
+// tier_code: 'PREMIUM', min_duration_minutes: 15, max_duration_minutes: 30, price: 100
+// tier_code: 'PREMIUM', min_duration_minutes: 31, max_duration_minutes: 60, price: 175
 
-function calculateCommission(
-  purchaseBudget: number,
-  agentTier: 'A' | 'B' | 'C'
-): number {
-  return purchaseBudget * TIER_RATES[agentTier];
+// Lookup: find the range that contains the scheduled visit duration
+function lookupVisitPrice(pricing, tierCode, durationMinutes) {
+  return pricing.find(
+    p => p.tier_code === tierCode &&
+      durationMinutes >= p.min_duration_minutes &&
+      (p.max_duration_minutes === null || durationMinutes <= p.max_duration_minutes)
+  )?.price ?? null;
 }
 ```
+
+### 9.1b Agent Tier System
+
+Tiers are **dynamic** — admins create tiers with demographic criteria (age, gender, city, education, etc.)
+and agents are **auto-assigned** based on profile matching. Each tier has an `icon` field for UI display.
+A fallback "GENERAL" tier catches agents who don't match any specific tier.
 
 ### 9.2 Geo-Location Verification
 
