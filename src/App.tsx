@@ -31,6 +31,7 @@ import AdminClientsPage from "./pages/admin/AdminClients";
 import AdminBranchesPage from "./pages/admin/AdminBranches";
 import AdminMissionsPage from "./pages/admin/AdminMissions";
 import AdminMissionCreatePage from "./pages/admin/AdminMissionCreate";
+import AdminMissionDetailsPage from "./pages/admin/AdminMissionDetails";
 import AdminVisitsPage from "./pages/admin/AdminVisits";
 import AdminAgentsPage from "./pages/admin/AdminAgents";
 import AdminTiersPage from "./pages/admin/AdminTiers";
