@@ -36,7 +36,6 @@ export default function AdminMissionsPage() {
   const queryClient = useQueryClient();
   const { t } = useTranslation('admin');
   const { t: tc } = useTranslation('common');
-  const { t: tc } = useTranslation('common');
 
   const filteredMissions = missions?.filter((mission) => {
     const search = searchQuery.toLowerCase();

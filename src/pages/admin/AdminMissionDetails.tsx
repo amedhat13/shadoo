@@ -138,7 +138,7 @@ export default function AdminMissionDetailsPage() {
   const photoReqs = mission.photo_requirements as { required_count: number; instructions?: string | { en: string; ar: string } };
   const budgetRemaining = mission.total_purchase_budget - mission.budget_used;
   const visitsRemaining = mission.number_of_visits - mission.visits_completed - mission.visits_pending;
-  const isActiveMission = ['published', 'paused', 'completed'].includes(mission.status as string);
+  const isActiveMission = ['published', 'paused', 'completed'].includes(mission.status);
 
   const selectedTier = agentTiers?.find(t => t.tier_code === mission.agent_tier);
   const customCriteria = mission.agent_custom_criteria as AgentCustomCriteria | null;
