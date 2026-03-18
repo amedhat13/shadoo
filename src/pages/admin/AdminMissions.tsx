@@ -139,8 +139,8 @@ export default function AdminMissionsPage() {
                         <TableHead>{t('missions.mission_label')}</TableHead>
                         <TableHead>{t('missions.client')}</TableHead>
                         <TableHead>{t('missions.branch')}</TableHead>
+                        <TableHead>{t('missions.agent_selection_section', { defaultValue: 'Agent' })}</TableHead>
                         <TableHead>{t('missions.status')}</TableHead>
-                        <TableHead>{t('missions.progress')}</TableHead>
                         <TableHead className="text-end">{t('missions.budget')}</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
