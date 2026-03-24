@@ -40,15 +40,17 @@ export function BulkBranchForm({ open, onOpenChange, onSubmit, isLoading }: Bulk
   const downloadSampleCSV = () => {
     const csvContent = [
       CSV_HEADERS.join(','),
-      ...SAMPLE_CSV_DATA.map(row => row.join(',')),
+      ...SAMPLE_CSV_DATA.map(row => row.map(cell => cell.includes(',') ? `"${cell}"` : cell).join(',')),
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const bom = '\uFEFF';
+    const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(bom + csvContent);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'branches_sample.csv';
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', 'branches_sample.csv');
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(link.href);
+    document.body.removeChild(link);
   };
 
   const parseCSV = (content: string): { valid: BranchFormData[]; errors: string[] } => {
