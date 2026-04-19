@@ -26,15 +26,49 @@ export async function seedTLabDemo(): Promise<SeedResult> {
   }
   const userId = userData.user.id;
 
-  // ---- Idempotency check: any T-Lab branch already present for this user? ----
-  const { data: existing, error: checkErr } = await supabase
+  // ---- Idempotency check: count existing T-Lab branches/missions/visits ----
+  const { data: existingBranches, error: checkErr } = await supabase
     .from('branches')
     .select('id, name')
     .eq('user_id', userId)
     .ilike('name', 'T-Lab Boba%');
   if (checkErr) return { ok: false, error: checkErr.message };
-  if (existing && existing.length > 0) {
+
+  const { data: existingMissions } = await supabase
+    .from('missions')
+    .select('id, name')
+    .eq('user_id', userId)
+    .ilike('name', 'T-Lab Boba%');
+
+  let existingVisitCount = 0;
+  if (existingMissions && existingMissions.length > 0) {
+    const missionIds = existingMissions.map((m) => m.id);
+    const { count } = await supabase
+      .from('visits')
+      .select('id', { count: 'exact', head: true })
+      .in('mission_id', missionIds);
+    existingVisitCount = count || 0;
+  }
+
+  // Fully seeded already
+  if (
+    (existingBranches?.length || 0) >= TLAB_BRANCHES.length &&
+    (existingMissions?.length || 0) >= TLAB_MISSIONS.length &&
+    existingVisitCount >= TLAB_VISITS.length
+  ) {
     return { ok: true, alreadySeeded: true };
+  }
+
+  // Partial seed — recover by clearing T-Lab rows and re-inserting cleanly
+  if ((existingBranches?.length || 0) > 0 || (existingMissions?.length || 0) > 0) {
+    if (existingMissions && existingMissions.length > 0) {
+      const missionIds = existingMissions.map((m) => m.id);
+      await supabase.from('visits').delete().in('mission_id', missionIds);
+      await supabase.from('missions').delete().in('id', missionIds);
+    }
+    if (existingBranches && existingBranches.length > 0) {
+      await supabase.from('branches').delete().in('id', existingBranches.map((b) => b.id));
+    }
   }
 
   // ---- Insert branches ----
