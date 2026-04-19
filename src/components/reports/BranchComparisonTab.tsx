@@ -96,26 +96,38 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
   const activeBranches = verifiedBranches.filter(b => selectedBranchIds.includes(b.id));
   const hasEnoughBranches = activeBranches.length >= 2;
 
-  const methodologyGroups = useMemo(() => {
-    if (selectedMission) return null;
-    const groups: Record<string, ReportMission[]> = {};
-    missions.forEach(m => {
-      const meth = m.methodology || 'custom';
-      if (meth === 'custom') return;
-      if (!groups[meth]) groups[meth] = [];
-      groups[meth].push(m);
+  // Aggregate questions across all selected missions, deduped by id (so the same
+  // question reused in multiple branch missions only appears once in the comparison)
+  const aggregatedQuestions = useMemo(() => {
+    const sourceMissions = selectedMission ? [selectedMission] : missions;
+    const seen = new Map<string, any>();
+    sourceMissions.forEach(m => {
+      (m.questions || []).forEach((q: any) => {
+        if (!q?.id) return;
+        if (!seen.has(q.id)) seen.set(q.id, q);
+      });
     });
-    return groups;
+    return Array.from(seen.values());
   }, [selectedMission, missions]);
 
+  // Effective methodology for the branch primary score. When comparing across
+  // missions with different methodologies we fall back to 'custom' (avg ratings).
+  const effectiveMethodology = useMemo(() => {
+    if (selectedMission) return selectedMission.methodology || 'custom';
+    const set = new Set(missions.map(m => m.methodology || 'custom'));
+    if (set.size === 1) return Array.from(set)[0];
+    return 'custom';
+  }, [selectedMission, missions]);
+
+
+
   const scoreComparisonData = useMemo(() => {
-    if (!selectedMission || !hasEnoughBranches) return null;
-    const methodology = selectedMission.methodology || 'custom';
-    if (methodology === 'custom') return null;
+    if (!hasEnoughBranches) return null;
+    const methodology = effectiveMethodology;
 
     const data = activeBranches.map(branch => {
       const bVisits = branchVisitsMap[branch.id] || [];
-      const result = calcBranchScore(methodology, selectedMission.questions || [], bVisits);
+      const result = calcBranchScore(methodology, aggregatedQuestions, bVisits);
       return {
         name: language === 'ar' && branch.name_ar ? branch.name_ar : branch.name,
         branchId: branch.id,
@@ -126,13 +138,18 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
     const allScores = data.filter(d => d.visits > 0).map(d => d.score);
     const average = allScores.length > 0 ? Math.round(allScores.reduce((s, v) => s + v, 0) / allScores.length * 10) / 10 : 0;
+    const label = METHODOLOGY_LABELS[methodology] || methodology;
+    const titleSuffix = selectedMission
+      ? (language === 'ar' && selectedMission.name_ar ? selectedMission.name_ar : selectedMission.name)
+      : t('branch_comparison.all_missions', { defaultValue: 'All Missions' });
 
-    return { data, average, methodology, label: METHODOLOGY_LABELS[methodology] || methodology };
-  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches]);
+    return { data, average, methodology, label, titleSuffix };
+  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches, effectiveMethodology, aggregatedQuestions, t]);
 
   const questionComparison = useMemo(() => {
-    if (!selectedMission || !hasEnoughBranches) return null;
-    const questions = (selectedMission.questions || []).filter((q: any) => q.type !== 'short_text');
+    if (!hasEnoughBranches) return null;
+    const questions = aggregatedQuestions.filter((q: any) => q.type !== 'short_text');
+    if (questions.length === 0) return null;
 
     return questions.map((q: any) => {
       const qText = typeof q.text === 'object' ? (language === 'ar' ? q.text.ar : q.text.en) : q.text;
@@ -168,7 +185,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       return { question: q, questionText: qText, branchResults, average };
     });
-  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches]);
+  }, [activeBranches, branchVisitsMap, language, hasEnoughBranches, aggregatedQuestions]);
 
   const rankingData = useMemo(() => {
     return activeBranches.map((branch, _i) => {
@@ -177,16 +194,13 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       let primaryScoreText = '-';
       let primaryScoreValue = 0;
-      if (selectedMission) {
-        const meth = selectedMission.methodology || 'custom';
-        if (meth !== 'custom' && bVisits.length > 0) {
-          const result = getPrimaryScore(meth, selectedMission.questions || [], bVisits);
-          primaryScoreText = `${result.score} (${METHODOLOGY_LABELS[meth]})`;
-          primaryScoreValue = result.score;
-        }
+      if (bVisits.length > 0) {
+        const result = getPrimaryScore(effectiveMethodology, aggregatedQuestions, bVisits);
+        primaryScoreText = `${result.score} (${METHODOLOGY_LABELS[effectiveMethodology] || effectiveMethodology})`;
+        primaryScoreValue = result.score;
       }
 
-      const branchMissions = missions.filter(m => m.branch_id === branch.id || !m.branch_id);
+      const branchMissions = missions.filter(m => m.branch_id === branch.id);
       const totalPlanned = branchMissions.reduce((s, m) => s + m.number_of_visits, 0);
       const totalCompleted = bVisits.length;
       const completionRate = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : 0;
@@ -209,7 +223,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
         avgResponseTime,
       };
     }).sort((a, b) => b.primaryScoreValue - a.primaryScoreValue);
-  }, [activeBranches, branchVisitsMap, selectedMission, missions, language]);
+  }, [activeBranches, branchVisitsMap, missions, language, effectiveMethodology, aggregatedQuestions]);
 
   const operationalSummary = useMemo(() => {
     const withData = activeBranches.filter(b => (branchVisitsMap[b.id] || []).length > 0);
@@ -312,11 +326,11 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       {hasEnoughBranches && (
         <>
-          {selectedMission && scoreComparisonData && (
+          {scoreComparisonData && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">{t('branch_comparison.score_comparison', { defaultValue: 'CX Score Comparison' })}</CardTitle>
-                <CardDescription>{scoreComparisonData.label} — {language === 'ar' && selectedMission.name_ar ? selectedMission.name_ar : selectedMission.name}</CardDescription>
+                <CardDescription>{scoreComparisonData.label} — {scoreComparisonData.titleSuffix}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-72">
@@ -343,55 +357,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
             </Card>
           )}
 
-          {!selectedMission && methodologyGroups && Object.keys(methodologyGroups).length > 0 && (
-            <div className="space-y-4">
-              {Object.entries(methodologyGroups).map(([meth, groupMissions]) => {
-                const methLabel = METHODOLOGY_LABELS[meth] || meth;
-                const chartData = activeBranches.map(branch => {
-                  const branchName = language === 'ar' && branch.name_ar ? branch.name_ar : branch.name;
-                  const branchVisitsForMeth = groupMissions.flatMap(m => {
-                    return (branchVisitsMap[branch.id] || []).filter(v => v.mission_id === m.id);
-                  });
-                  if (branchVisitsForMeth.length === 0) return { name: branchName, score: 0, visits: 0 };
-                  const result = getPrimaryScore(meth, groupMissions[0].questions || [], branchVisitsForMeth);
-                  return { name: branchName, score: result.score, visits: branchVisitsForMeth.length };
-                });
-
-                const withData = chartData.filter(d => d.visits > 0);
-                if (withData.length < 2) return null;
-                const average = Math.round(withData.reduce((s, d) => s + d.score, 0) / withData.length * 10) / 10;
-
-                return (
-                  <Card key={meth}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">{methLabel} — {t('branch_comparison.score_comparison', { defaultValue: 'CX Score Comparison' })}</CardTitle>
-                      <CardDescription>{groupMissions.length} {groupMissions.length === 1 ? 'mission' : 'missions'}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-56">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} layout="vertical">
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" fontSize={10} />
-                            <YAxis type="category" dataKey="name" fontSize={10} width={120} tick={{ width: 110 }} />
-                            <RechartsTooltip />
-                            <ReferenceLine x={average} stroke="#888" strokeDasharray="3 3" />
-                            <Bar dataKey="score" name={methLabel}>
-                              {chartData.map((entry, i) => (
-                                <Cell key={i} fill={entry.visits === 0 ? '#D1D5DB' : entry.score >= average ? '#22C55E' : '#EF4444'} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-
-          {selectedMission && questionComparison && questionComparison.length > 0 && (
+          {questionComparison && questionComparison.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-foreground">{t('branch_comparison.question_breakdown', { defaultValue: 'Question-Level Comparison' })}</h3>
               {questionComparison.map((qc, qi) => (
