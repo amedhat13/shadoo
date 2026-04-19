@@ -96,6 +96,29 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
   const activeBranches = verifiedBranches.filter(b => selectedBranchIds.includes(b.id));
   const hasEnoughBranches = activeBranches.length >= 2;
 
+  // Aggregate questions across all selected missions, deduped by id (so the same
+  // question reused in multiple branch missions only appears once in the comparison)
+  const aggregatedQuestions = useMemo(() => {
+    const sourceMissions = selectedMission ? [selectedMission] : missions;
+    const seen = new Map<string, any>();
+    sourceMissions.forEach(m => {
+      (m.questions || []).forEach((q: any) => {
+        if (!q?.id) return;
+        if (!seen.has(q.id)) seen.set(q.id, q);
+      });
+    });
+    return Array.from(seen.values());
+  }, [selectedMission, missions]);
+
+  // Effective methodology for the branch primary score. When comparing across
+  // missions with different methodologies we fall back to 'custom' (avg ratings).
+  const effectiveMethodology = useMemo(() => {
+    if (selectedMission) return selectedMission.methodology || 'custom';
+    const set = new Set(missions.map(m => m.methodology || 'custom'));
+    if (set.size === 1) return Array.from(set)[0];
+    return 'custom';
+  }, [selectedMission, missions]);
+
   const methodologyGroups = useMemo(() => {
     if (selectedMission) return null;
     const groups: Record<string, ReportMission[]> = {};
@@ -109,13 +132,12 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
   }, [selectedMission, missions]);
 
   const scoreComparisonData = useMemo(() => {
-    if (!selectedMission || !hasEnoughBranches) return null;
-    const methodology = selectedMission.methodology || 'custom';
-    if (methodology === 'custom') return null;
+    if (!hasEnoughBranches) return null;
+    const methodology = effectiveMethodology;
 
     const data = activeBranches.map(branch => {
       const bVisits = branchVisitsMap[branch.id] || [];
-      const result = calcBranchScore(methodology, selectedMission.questions || [], bVisits);
+      const result = calcBranchScore(methodology, aggregatedQuestions, bVisits);
       return {
         name: language === 'ar' && branch.name_ar ? branch.name_ar : branch.name,
         branchId: branch.id,
@@ -126,13 +148,18 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
     const allScores = data.filter(d => d.visits > 0).map(d => d.score);
     const average = allScores.length > 0 ? Math.round(allScores.reduce((s, v) => s + v, 0) / allScores.length * 10) / 10 : 0;
+    const label = METHODOLOGY_LABELS[methodology] || methodology;
+    const titleSuffix = selectedMission
+      ? (language === 'ar' && selectedMission.name_ar ? selectedMission.name_ar : selectedMission.name)
+      : t('branch_comparison.all_missions', { defaultValue: 'All Missions' });
 
-    return { data, average, methodology, label: METHODOLOGY_LABELS[methodology] || methodology };
-  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches]);
+    return { data, average, methodology, label, titleSuffix };
+  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches, effectiveMethodology, aggregatedQuestions, t]);
 
   const questionComparison = useMemo(() => {
-    if (!selectedMission || !hasEnoughBranches) return null;
-    const questions = (selectedMission.questions || []).filter((q: any) => q.type !== 'short_text');
+    if (!hasEnoughBranches) return null;
+    const questions = aggregatedQuestions.filter((q: any) => q.type !== 'short_text');
+    if (questions.length === 0) return null;
 
     return questions.map((q: any) => {
       const qText = typeof q.text === 'object' ? (language === 'ar' ? q.text.ar : q.text.en) : q.text;
@@ -168,7 +195,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       return { question: q, questionText: qText, branchResults, average };
     });
-  }, [selectedMission, activeBranches, branchVisitsMap, language, hasEnoughBranches]);
+  }, [activeBranches, branchVisitsMap, language, hasEnoughBranches, aggregatedQuestions]);
 
   const rankingData = useMemo(() => {
     return activeBranches.map((branch, _i) => {
