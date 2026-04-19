@@ -1,0 +1,1 @@
+UPDATE public.profiles SET logo_url = '/tlab-logo.png', company_name = 'T-Lab Boba' WHERE company_name = 'T-Lab Boba' OR full_name = 'Demo User' OR user_id IN (SELECT user_id FROM public.profiles WHERE company_name ILIKE '%t-lab%');
