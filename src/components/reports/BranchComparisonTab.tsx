@@ -119,17 +119,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
     return 'custom';
   }, [selectedMission, missions]);
 
-  const methodologyGroups = useMemo(() => {
-    if (selectedMission) return null;
-    const groups: Record<string, ReportMission[]> = {};
-    missions.forEach(m => {
-      const meth = m.methodology || 'custom';
-      if (meth === 'custom') return;
-      if (!groups[meth]) groups[meth] = [];
-      groups[meth].push(m);
-    });
-    return groups;
-  }, [selectedMission, missions]);
+
 
   const scoreComparisonData = useMemo(() => {
     if (!hasEnoughBranches) return null;
