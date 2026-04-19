@@ -8,6 +8,7 @@ import {
   Settings,
   Menu,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -17,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { useDirectionalIcons, useDirectionalSide } from '@/i18n/utils';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const navItems = [
   { id: 'dashboard', labelKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -43,6 +46,30 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
   const { t } = useTranslation('nav');
   const { t: tc } = useTranslation('common');
   const { ChevronStart, ChevronEnd } = useDirectionalIcons();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ['sidebar-profile', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('company_name, full_name, logo_url')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const displayName = profile?.company_name || profile?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayEmail = user?.email || '';
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="flex h-full flex-col">
@@ -135,16 +162,24 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
       {/* User */}
       <div className="border-t border-sidebar-border p-4">
         <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-          <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0">
-            AC
-          </div>
+          {profile?.logo_url ? (
+            <img
+              src={profile.logo_url}
+              alt={displayName}
+              className="h-9 w-9 shrink-0 object-contain bg-white border border-sidebar-border"
+            />
+          ) : (
+            <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0">
+              {initials}
+            </div>
+          )}
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <div className="truncate text-sm font-semibold text-sidebar-foreground">
-                Acme Corp
+                {displayName}
               </div>
               <div className="truncate text-xs text-sidebar-muted">
-                admin@acme.com
+                {displayEmail}
               </div>
             </div>
           )}
