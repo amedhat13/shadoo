@@ -1,7 +1,7 @@
 // TODO: Remove this file and set USE_MOCK_DATA = false in useClientReports.ts when real data is available
 import { TLAB_BRANCHES, TLAB_MISSIONS, TLAB_VISITS } from './tlabDemoData';
 
-export const USE_MOCK_DATA = true;
+export const USE_MOCK_DATA = false;
 
 const DEMO_BRANCHES = [
   // T-Lab Boba branches (real qualitative data — drives Branch Comparison view)
