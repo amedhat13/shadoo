@@ -141,7 +141,7 @@ export default function MissionDetailsPage() {
 
   const handlePause = async () => {
     // Block pause if in-progress visits exist
-    if (mockInProgressVisits > 0) {
+    if (inProgressCount > 0) {
       setShowPauseBlockDialog(true);
       return;
     }
@@ -218,7 +218,7 @@ export default function MissionDetailsPage() {
                     <CheckCircle2 className="h-5 w-5" />
                     <span className="text-xs uppercase tracking-wide font-bold">{t('details.completed')}</span>
                   </div>
-                  <div className="text-4xl font-black text-success">{mission.visits_completed}</div>
+                  <div className="text-4xl font-black text-success">{completedCount}</div>
                   <p className="text-xs text-muted-foreground mt-1">{t('details.click_view_details')}</p>
                 </CardContent>
               </Card>
@@ -231,7 +231,7 @@ export default function MissionDetailsPage() {
                   <Loader2 className="h-5 w-5" />
                   <span className="text-xs uppercase tracking-wide font-bold">{t('details.in_progress_label')}</span>
                 </div>
-                <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{mockInProgressVisits}</div>
+                <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{inProgressCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">{t('details.currently_executing')}</p>
               </CardContent>
             </Card>
@@ -242,7 +242,7 @@ export default function MissionDetailsPage() {
                   <Clock className="h-5 w-5" />
                   <span className="text-xs uppercase tracking-wide font-bold">{t('details.pending_label')}</span>
                 </div>
-                <div className="text-4xl font-black text-primary">{mission.visits_pending}</div>
+                <div className="text-4xl font-black text-primary">{pendingCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">{t('details.awaiting_submission')}</p>
               </CardContent>
             </Card>
@@ -383,7 +383,7 @@ export default function MissionDetailsPage() {
         </div>
       </div>
 
-      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={mockCompletedVisits} missionName={mission.name} />
+      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={completedVisitsForDialog} missionName={mission.name} />
 
       {/* Pause Block Dialog */}
       <AlertDialog open={showPauseBlockDialog} onOpenChange={setShowPauseBlockDialog}>
@@ -394,7 +394,7 @@ export default function MissionDetailsPage() {
               {t('actions.cannot_pause_title')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('actions.cannot_pause_desc', { count: mockInProgressVisits })}
+              {t('actions.cannot_pause_desc', { count: inProgressCount })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
