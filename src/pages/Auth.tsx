@@ -86,18 +86,33 @@ export default function AuthPage() {
     setIsLoading(true);
     try {
       const creds = generateDemoCredentials();
-      const emailRedirectTo = `${window.location.origin}/dashboard`;
-      const { data, error } = await supabase.auth.signUp({
-        email: creds.email, password: creds.password,
-        options: { data: { full_name: creds.fullName }, emailRedirectTo },
+      // Try signing in to the shared demo account first so any previously
+      // seeded demo data (T-Lab Boba branches/missions/visits, etc.) is
+      // preserved across sessions.
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password,
       });
-      if (error) throw error;
-      if (!data.session) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email: creds.email, password: creds.password });
-        if (signInError) throw signInError;
+
+      if (signInError || !signInData.session) {
+        // Account doesn't exist yet — create it once, then it will be reused.
+        const emailRedirectTo = `${window.location.origin}/dashboard`;
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: creds.email,
+          password: creds.password,
+          options: { data: { full_name: creds.fullName }, emailRedirectTo },
+        });
+        if (signUpError) throw signUpError;
+        if (!signUpData.session) {
+          const { error: retryError } = await supabase.auth.signInWithPassword({
+            email: creds.email,
+            password: creds.password,
+          });
+          if (retryError) throw retryError;
+        }
       }
-      try { await navigator.clipboard?.writeText(`Email: ${creds.email}\nPassword: ${creds.password}`); } catch {}
-      toast({ title: t('demo_ready'), description: `Email: ${creds.email} | Password: ${creds.password} (copied)` });
+
+      toast({ title: t('demo_ready'), description: `Email: ${creds.email}` });
       navigate('/dashboard', { replace: true });
     } catch (error: unknown) {
       const err = error as { message?: string };
