@@ -9,12 +9,12 @@ const mockPackage: Package = {
   price_per_month: 2500,
 };
 
-// Mock subscription data
+// Mock subscription data — aligned with T-Lab demo (2 missions × 2 visits = 4 visits used)
 const mockSubscription: OrganizationSubscription = {
   id: 'sub-1',
   organization_id: 'org-1',
   package: mockPackage,
-  visits_used_this_month: 12,
+  visits_used_this_month: 4,
   current_period_start: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
   current_period_end: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString(),
 };
