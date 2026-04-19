@@ -26,7 +26,14 @@
     "password_description": "Change your password or request a password reset.",
     "current_password": "Current Password",
     "change_password": "Change Password",
-    "password_reset_sent": "Password reset email sent."
+    "password_reset_sent": "Password reset email sent.",
+    "demo_data_title": "Demo Data",
+    "demo_data_description": "Load the T-Lab Boba sample dataset (2 branches, 2 missions, 4 visits) into your account.",
+    "seed_demo": "Load T-Lab Demo Data",
+    "seed_demo_loading": "Loading demo data…",
+    "seed_demo_success": "T-Lab demo data loaded successfully.",
+    "seed_demo_already": "T-Lab demo data is already loaded for this account.",
+    "seed_demo_error": "Could not load demo data:"
   },
   "security": {
     "two_factor_title": "Two-Factor Authentication",
