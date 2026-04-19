@@ -162,16 +162,24 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
       {/* User */}
       <div className="border-t border-sidebar-border p-4">
         <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-          <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0">
-            AC
-          </div>
+          {profile?.logo_url ? (
+            <img
+              src={profile.logo_url}
+              alt={displayName}
+              className="h-9 w-9 shrink-0 object-contain bg-white border border-sidebar-border"
+            />
+          ) : (
+            <div className="flex h-9 w-9 items-center justify-center bg-primary text-sm font-bold text-primary-foreground shrink-0">
+              {initials}
+            </div>
+          )}
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <div className="truncate text-sm font-semibold text-sidebar-foreground">
-                Acme Corp
+                {displayName}
               </div>
               <div className="truncate text-xs text-sidebar-muted">
-                admin@acme.com
+                {displayEmail}
               </div>
             </div>
           )}
