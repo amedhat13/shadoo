@@ -2,11 +2,12 @@ import { useState, useCallback } from 'react';
 import { Wallet } from '@/types';
 import { Transaction } from '@/components/wallet/TransactionList';
 
+// Mock wallet — aligned with T-Lab demo: 15,000 EGP topped up, 1,000 EGP spent on 2 completed missions
 const mockWallet: Wallet = {
   id: 'wallet-1',
   organization_id: 'org-1',
-  available_balance: 15000,
-  allocated_to_missions: 2500,
+  available_balance: 14000,
+  allocated_to_missions: 0,
   currency: 'EGP',
   updated_at: new Date().toISOString(),
 };
@@ -15,26 +16,26 @@ const mockTransactions: Transaction[] = [
   {
     id: 'tx-1',
     type: 'topup',
-    amount: 10000,
+    amount: 15000,
     description: 'Wallet top-up via PayMob',
     status: 'completed',
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'tx-2',
     type: 'allocation',
-    amount: 2500,
-    description: 'Allocated to "Summer Campaign"',
+    amount: 500,
+    description: 'Allocated to "T-Lab Boba — The Yard — In-Store Visit"',
     status: 'completed',
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'tx-3',
-    type: 'topup',
-    amount: 5000,
-    description: 'Wallet top-up via PayMob',
+    type: 'allocation',
+    amount: 500,
+    description: 'Allocated to "T-Lab Boba — Arabella — In-Store Visit"',
     status: 'completed',
-    created_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
