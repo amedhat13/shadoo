@@ -46,6 +46,30 @@ function SidebarContent({ collapsed, onToggle, onNavigate }: {
   const { t } = useTranslation('nav');
   const { t: tc } = useTranslation('common');
   const { ChevronStart, ChevronEnd } = useDirectionalIcons();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ['sidebar-profile', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('company_name, full_name, logo_url')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const displayName = profile?.company_name || profile?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayEmail = user?.email || '';
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="flex h-full flex-col">
