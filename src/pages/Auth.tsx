@@ -86,33 +86,14 @@ export default function AuthPage() {
     setIsLoading(true);
     try {
       const creds = generateDemoCredentials();
-      // Try signing in to the shared demo account first so any previously
-      // seeded demo data (T-Lab Boba branches/missions/visits, etc.) is
-      // preserved across sessions.
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      // Single shared T-Lab Boba demo account, pre-seeded with branches,
+      // missions, and visits. Just sign in — never create new data.
+      const { error } = await supabase.auth.signInWithPassword({
         email: creds.email,
         password: creds.password,
       });
-
-      if (signInError || !signInData.session) {
-        // Account doesn't exist yet — create it once, then it will be reused.
-        const emailRedirectTo = `${window.location.origin}/dashboard`;
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: creds.email,
-          password: creds.password,
-          options: { data: { full_name: creds.fullName }, emailRedirectTo },
-        });
-        if (signUpError) throw signUpError;
-        if (!signUpData.session) {
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email: creds.email,
-            password: creds.password,
-          });
-          if (retryError) throw retryError;
-        }
-      }
-
-      toast({ title: t('demo_ready'), description: `Email: ${creds.email}` });
+      if (error) throw error;
+      toast({ title: t('demo_ready'), description: 'Welcome to the T-Lab Boba demo account.' });
       navigate('/dashboard', { replace: true });
     } catch (error: unknown) {
       const err = error as { message?: string };
