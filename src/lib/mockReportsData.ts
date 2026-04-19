@@ -1,7 +1,13 @@
 // TODO: Remove this file and set USE_MOCK_DATA = false in useClientReports.ts when real data is available
+import { TLAB_BRANCHES, TLAB_MISSIONS, TLAB_VISITS } from './tlabDemoData';
+
 export const USE_MOCK_DATA = true;
 
 const DEMO_BRANCHES = [
+  // T-Lab Boba branches (real qualitative data — drives Branch Comparison view)
+  { id: 'tlab-branch-yard', name: 'T-Lab Boba — The Yard', name_ar: 'تي لاب بوبا — ذا يارد', city: 'Cairo', status: 'verified' },
+  { id: 'tlab-branch-arabella', name: 'T-Lab Boba — Arabella', name_ar: 'تي لاب بوبا — أرابيلا', city: 'Cairo', status: 'verified' },
+  // Original synthetic branches
   { id: 'demo-branch-1', name: 'Nasr City Branch', name_ar: 'فرع مدينة نصر', city: 'Cairo', status: 'verified' },
   { id: 'demo-branch-2', name: 'Smouha Branch', name_ar: 'فرع سموحة', city: 'Alexandria', status: 'verified' },
   { id: 'demo-branch-3', name: 'Maadi Branch', name_ar: 'فرع المعادي', city: 'Cairo', status: 'verified' },
