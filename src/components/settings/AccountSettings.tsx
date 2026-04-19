@@ -200,6 +200,32 @@ export function AccountSettings() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Demo Data */}
+      <Card className="border border-border">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5" />
+            {t('account.demo_data_title')}
+          </CardTitle>
+          <CardDescription>{t('account.demo_data_description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleSeedDemo} disabled={isSeeding} variant="outline" className="gap-2">
+            {isSeeding ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t('account.seed_demo_loading')}
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                {t('account.seed_demo')}
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
