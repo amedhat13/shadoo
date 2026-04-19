@@ -336,11 +336,11 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       {hasEnoughBranches && (
         <>
-          {selectedMission && scoreComparisonData && (
+          {scoreComparisonData && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">{t('branch_comparison.score_comparison', { defaultValue: 'CX Score Comparison' })}</CardTitle>
-                <CardDescription>{scoreComparisonData.label} — {language === 'ar' && selectedMission.name_ar ? selectedMission.name_ar : selectedMission.name}</CardDescription>
+                <CardDescription>{scoreComparisonData.label} — {scoreComparisonData.titleSuffix}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-72">
@@ -367,55 +367,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
             </Card>
           )}
 
-          {!selectedMission && methodologyGroups && Object.keys(methodologyGroups).length > 0 && (
-            <div className="space-y-4">
-              {Object.entries(methodologyGroups).map(([meth, groupMissions]) => {
-                const methLabel = METHODOLOGY_LABELS[meth] || meth;
-                const chartData = activeBranches.map(branch => {
-                  const branchName = language === 'ar' && branch.name_ar ? branch.name_ar : branch.name;
-                  const branchVisitsForMeth = groupMissions.flatMap(m => {
-                    return (branchVisitsMap[branch.id] || []).filter(v => v.mission_id === m.id);
-                  });
-                  if (branchVisitsForMeth.length === 0) return { name: branchName, score: 0, visits: 0 };
-                  const result = getPrimaryScore(meth, groupMissions[0].questions || [], branchVisitsForMeth);
-                  return { name: branchName, score: result.score, visits: branchVisitsForMeth.length };
-                });
-
-                const withData = chartData.filter(d => d.visits > 0);
-                if (withData.length < 2) return null;
-                const average = Math.round(withData.reduce((s, d) => s + d.score, 0) / withData.length * 10) / 10;
-
-                return (
-                  <Card key={meth}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">{methLabel} — {t('branch_comparison.score_comparison', { defaultValue: 'CX Score Comparison' })}</CardTitle>
-                      <CardDescription>{groupMissions.length} {groupMissions.length === 1 ? 'mission' : 'missions'}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-56">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} layout="vertical">
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" fontSize={10} />
-                            <YAxis type="category" dataKey="name" fontSize={10} width={120} tick={{ width: 110 }} />
-                            <RechartsTooltip />
-                            <ReferenceLine x={average} stroke="#888" strokeDasharray="3 3" />
-                            <Bar dataKey="score" name={methLabel}>
-                              {chartData.map((entry, i) => (
-                                <Cell key={i} fill={entry.visits === 0 ? '#D1D5DB' : entry.score >= average ? '#22C55E' : '#EF4444'} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-
-          {selectedMission && questionComparison && questionComparison.length > 0 && (
+          {questionComparison && questionComparison.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-foreground">{t('branch_comparison.question_breakdown', { defaultValue: 'Question-Level Comparison' })}</h3>
               {questionComparison.map((qc, qi) => (
