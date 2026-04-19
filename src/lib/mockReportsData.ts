@@ -1,7 +1,13 @@
 // TODO: Remove this file and set USE_MOCK_DATA = false in useClientReports.ts when real data is available
+import { TLAB_BRANCHES, TLAB_MISSIONS, TLAB_VISITS } from './tlabDemoData';
+
 export const USE_MOCK_DATA = true;
 
 const DEMO_BRANCHES = [
+  // T-Lab Boba branches (real qualitative data — drives Branch Comparison view)
+  { id: 'tlab-branch-yard', name: 'T-Lab Boba — The Yard', name_ar: 'تي لاب بوبا — ذا يارد', city: 'Cairo', status: 'verified' },
+  { id: 'tlab-branch-arabella', name: 'T-Lab Boba — Arabella', name_ar: 'تي لاب بوبا — أرابيلا', city: 'Cairo', status: 'verified' },
+  // Original synthetic branches
   { id: 'demo-branch-1', name: 'Nasr City Branch', name_ar: 'فرع مدينة نصر', city: 'Cairo', status: 'verified' },
   { id: 'demo-branch-2', name: 'Smouha Branch', name_ar: 'فرع سموحة', city: 'Alexandria', status: 'verified' },
   { id: 'demo-branch-3', name: 'Maadi Branch', name_ar: 'فرع المعادي', city: 'Cairo', status: 'verified' },
@@ -369,6 +375,23 @@ function genInStoreAnswers(count: number, branchId: string) {
 
 // Build mock missions
 export const MOCK_MISSIONS = [
+  // T-Lab Boba real missions (qualitative data from real reports)
+  ...TLAB_MISSIONS.map((m) => ({
+    id: m.id,
+    name: m.name,
+    name_ar: m.name_ar,
+    methodology: m.methodology,
+    status: m.status,
+    questions: m.questions,
+    number_of_visits: m.number_of_visits,
+    visits_completed: m.visits_completed,
+    purchase_budget_per_visit: m.purchase_budget_per_visit,
+    total_purchase_budget: m.total_purchase_budget,
+    budget_used: m.budget_used,
+    branch_id: m.branch_id,
+    created_at: m.created_at,
+    branch: DEMO_BRANCHES.find((b) => b.id === m.branch_id) || null,
+  })),
   {
     id: 'mock-mission-1', name: 'Q1 Customer Experience Survey', name_ar: 'استبيان تجربة العملاء الربع الأول',
     methodology: 'nps', status: 'completed', questions: npsQuestions,
@@ -383,7 +406,7 @@ export const MOCK_MISSIONS = [
     number_of_visits: 62, visits_completed: 55, purchase_budget_per_visit: 80,
     total_purchase_budget: 4960, budget_used: 4100, branch_id: 'demo-branch-1',
     created_at: '2026-02-01T00:00:00Z',
-    branch: DEMO_BRANCHES[0],
+    branch: DEMO_BRANCHES.find((b) => b.id === 'demo-branch-1'),
   },
   {
     id: 'mock-mission-3', name: 'New Burger Launch Test', name_ar: 'اختبار إطلاق البرغر الجديد',
@@ -391,7 +414,7 @@ export const MOCK_MISSIONS = [
     number_of_visits: 45, visits_completed: 42, purchase_budget_per_visit: 120,
     total_purchase_budget: 5400, budget_used: 4800, branch_id: 'demo-branch-4',
     created_at: '2026-02-15T00:00:00Z',
-    branch: DEMO_BRANCHES[3],
+    branch: DEMO_BRANCHES.find((b) => b.id === 'demo-branch-4'),
   },
   {
     id: 'mock-mission-4', name: 'Delivery Experience Audit', name_ar: 'تدقيق تجربة التوصيل',
@@ -424,6 +447,8 @@ let _cachedVisits: any[] | null = null;
 export function getMockVisits() {
   if (_cachedVisits) return _cachedVisits;
   const visits: any[] = [];
+  // T-Lab Boba real visits — preserved exactly as the source reports
+  visits.push(...TLAB_VISITS.map((v) => ({ ...v })));
   // NPS visits across all branches
   DEMO_BRANCHES.forEach(b => visits.push(...genNPSAnswers(20, b.id)));
   // CSAT visits across all branches
