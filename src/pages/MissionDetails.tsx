@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Users,
@@ -14,6 +14,7 @@ import {
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,49 +37,21 @@ import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDirectionalIcons } from '@/i18n/utils';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock completed visits data - agent names hidden from client
-const mockCompletedVisits: CompletedVisit[] = [
-  {
-    id: 'visit-1',
-    agent_name: 'Mystery Shopper',
-    completed_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    purchase_amount: 150,
-    photos: ['photo1.jpg', 'photo2.jpg'],
-    answers: [
-      { question: 'Was the store clean?', type: 'yes_no', answer: true },
-      { question: 'Rate the staff friendliness', type: 'rating', answer: 4 },
-      { question: 'Any additional comments?', type: 'short_text', answer: 'Staff was very helpful and professional.' },
-    ],
-  },
-  {
-    id: 'visit-2',
-    agent_name: 'Mystery Shopper',
-    completed_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    purchase_amount: 200,
-    photos: ['photo3.jpg', 'photo4.jpg', 'photo5.jpg'],
-    answers: [
-      { question: 'Was the store clean?', type: 'yes_no', answer: true },
-      { question: 'Rate the staff friendliness', type: 'rating', answer: 5 },
-      { question: 'Any additional comments?', type: 'short_text', answer: 'Excellent experience overall!' },
-    ],
-  },
-  {
-    id: 'visit-3',
-    agent_name: 'Mystery Shopper',
-    completed_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    purchase_amount: 175,
-    photos: ['photo6.jpg', 'photo7.jpg'],
-    answers: [
-      { question: 'Was the store clean?', type: 'yes_no', answer: false },
-      { question: 'Rate the staff friendliness', type: 'rating', answer: 3 },
-      { question: 'Any additional comments?', type: 'short_text', answer: 'Store needs some cleaning, but staff was okay.' },
-    ],
-  },
-];
-
-// Mock in-progress visits
-const mockInProgressVisits = 2;
+interface DBVisit {
+  id: string;
+  status: string | null;
+  purchase_amount: number | null;
+  submitted_at: string | null;
+  started_at: string | null;
+  created_at: string | null;
+  answers: any;
+  photos: string[] | null;
+  client_rating: number | null;
+  client_feedback: string | null;
+  rated_at: string | null;
+}
 
 export default function MissionDetailsPage() {
   const navigate = useNavigate();
@@ -93,6 +66,57 @@ export default function MissionDetailsPage() {
   const { ArrowStart } = useDirectionalIcons();
 
   const mission = id ? getMission(id) : null;
+
+  const { data: visits = [] } = useQuery({
+    queryKey: ['mission-visits', id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('visits')
+        .select('id, status, purchase_amount, submitted_at, started_at, created_at, answers, photos, client_rating, client_feedback, rated_at')
+        .eq('mission_id', id!)
+        .order('submitted_at', { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return (data || []) as DBVisit[];
+    },
+  });
+
+  const completedCount = visits.filter(v => v.status === 'approved' || v.status === 'submitted').length;
+  const inProgressCount = visits.filter(v => v.status === 'in_progress').length;
+  const pendingCount = visits.filter(v => v.status === 'pending').length;
+
+  const completedVisitsForDialog: CompletedVisit[] = useMemo(() => {
+    if (!mission) return [];
+    const questionMap = new Map<string, any>();
+    (mission.questions || []).forEach((q: any) => questionMap.set(q.id, q));
+    return visits
+      .filter(v => v.status === 'approved' || v.status === 'submitted')
+      .map(v => {
+        const answersArr = Array.isArray(v.answers) ? v.answers : [];
+        const mappedAnswers = answersArr.map((a: any) => {
+          const q = questionMap.get(a.question_id);
+          const questionText = q
+            ? (typeof q.text === 'string' ? q.text : (q.text?.en || q.text?.ar || a.question_id))
+            : a.question_id;
+          return {
+            question: questionText,
+            type: q?.type || 'short_text',
+            answer: a.value,
+          };
+        });
+        return {
+          id: v.id,
+          agent_name: 'Mystery Shopper',
+          completed_at: v.submitted_at || v.started_at || v.created_at || new Date().toISOString(),
+          purchase_amount: Number(v.purchase_amount || 0),
+          photos: v.photos || [],
+          answers: mappedAnswers,
+          client_rating: v.client_rating ?? undefined,
+          client_feedback: v.client_feedback ?? undefined,
+          rated_at: v.rated_at ?? undefined,
+        };
+      });
+  }, [visits, mission]);
 
   if (!mission) {
     return (
@@ -117,7 +141,7 @@ export default function MissionDetailsPage() {
 
   const handlePause = async () => {
     // Block pause if in-progress visits exist
-    if (mockInProgressVisits > 0) {
+    if (inProgressCount > 0) {
       setShowPauseBlockDialog(true);
       return;
     }
@@ -194,7 +218,7 @@ export default function MissionDetailsPage() {
                     <CheckCircle2 className="h-5 w-5" />
                     <span className="text-xs uppercase tracking-wide font-bold">{t('details.completed')}</span>
                   </div>
-                  <div className="text-4xl font-black text-success">{mission.visits_completed}</div>
+                  <div className="text-4xl font-black text-success">{completedCount}</div>
                   <p className="text-xs text-muted-foreground mt-1">{t('details.click_view_details')}</p>
                 </CardContent>
               </Card>
@@ -207,7 +231,7 @@ export default function MissionDetailsPage() {
                   <Loader2 className="h-5 w-5" />
                   <span className="text-xs uppercase tracking-wide font-bold">{t('details.in_progress_label')}</span>
                 </div>
-                <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{mockInProgressVisits}</div>
+                <div className="text-4xl font-black text-amber-600 dark:text-amber-400">{inProgressCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">{t('details.currently_executing')}</p>
               </CardContent>
             </Card>
@@ -218,7 +242,7 @@ export default function MissionDetailsPage() {
                   <Clock className="h-5 w-5" />
                   <span className="text-xs uppercase tracking-wide font-bold">{t('details.pending_label')}</span>
                 </div>
-                <div className="text-4xl font-black text-primary">{mission.visits_pending}</div>
+                <div className="text-4xl font-black text-primary">{pendingCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">{t('details.awaiting_submission')}</p>
               </CardContent>
             </Card>
@@ -359,7 +383,7 @@ export default function MissionDetailsPage() {
         </div>
       </div>
 
-      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={mockCompletedVisits} missionName={mission.name} />
+      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={completedVisitsForDialog} missionName={mission.name} />
 
       {/* Pause Block Dialog */}
       <AlertDialog open={showPauseBlockDialog} onOpenChange={setShowPauseBlockDialog}>
@@ -370,7 +394,7 @@ export default function MissionDetailsPage() {
               {t('actions.cannot_pause_title')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t('actions.cannot_pause_desc', { count: mockInProgressVisits })}
+              {t('actions.cannot_pause_desc', { count: inProgressCount })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
