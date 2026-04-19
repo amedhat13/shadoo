@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { User, Mail, Phone, Building2, Camera, Loader2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { User, Mail, Phone, Building2, Camera, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { seedTLabDemo } from '@/lib/seedTLabDemo';
 
 interface AccountData {
   full_name: string;
@@ -29,7 +31,32 @@ export function AccountSettings() {
   const [account, setAccount] = useState<AccountData>(mockAccount);
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const { t } = useTranslation('settings');
+  const queryClient = useQueryClient();
+
+  const handleSeedDemo = async () => {
+    setIsSeeding(true);
+    try {
+      const result = await seedTLabDemo();
+      if (!result.ok) {
+        toast.error(`${t('account.seed_demo_error')} ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info(t('account.seed_demo_already'));
+      } else {
+        toast.success(t('account.seed_demo_success'));
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+      }
+    } catch (e) {
+      toast.error(`${t('account.seed_demo_error')} ${(e as Error).message}`);
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     setIsLoading(true);
