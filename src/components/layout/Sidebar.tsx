@@ -8,6 +8,7 @@ import {
   Settings,
   Menu,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -17,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { useDirectionalIcons, useDirectionalSide } from '@/i18n/utils';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const navItems = [
   { id: 'dashboard', labelKey: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
