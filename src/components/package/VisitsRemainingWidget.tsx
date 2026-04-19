@@ -80,18 +80,18 @@ export function VisitsRemainingWidget({
             isZero ? 'text-destructive' : isLow ? 'text-primary' : 'text-success'
           )}
         >
-          {visitsRemaining} / {visitsTotal}
+          {visitsUsed} / {visitsTotal}
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar (used) */}
       <div className="h-2 overflow-hidden bg-muted">
         <div
           className={cn(
             'h-full transition-all duration-500',
             isZero ? 'bg-destructive' : isLow ? 'bg-primary' : 'bg-success'
           )}
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${usedPercentage}%` }}
         />
       </div>
 
