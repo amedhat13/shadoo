@@ -204,16 +204,13 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
 
       let primaryScoreText = '-';
       let primaryScoreValue = 0;
-      if (selectedMission) {
-        const meth = selectedMission.methodology || 'custom';
-        if (meth !== 'custom' && bVisits.length > 0) {
-          const result = getPrimaryScore(meth, selectedMission.questions || [], bVisits);
-          primaryScoreText = `${result.score} (${METHODOLOGY_LABELS[meth]})`;
-          primaryScoreValue = result.score;
-        }
+      if (bVisits.length > 0) {
+        const result = getPrimaryScore(effectiveMethodology, aggregatedQuestions, bVisits);
+        primaryScoreText = `${result.score} (${METHODOLOGY_LABELS[effectiveMethodology] || effectiveMethodology})`;
+        primaryScoreValue = result.score;
       }
 
-      const branchMissions = missions.filter(m => m.branch_id === branch.id || !m.branch_id);
+      const branchMissions = missions.filter(m => m.branch_id === branch.id);
       const totalPlanned = branchMissions.reduce((s, m) => s + m.number_of_visits, 0);
       const totalCompleted = bVisits.length;
       const completionRate = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : 0;
