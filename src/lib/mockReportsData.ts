@@ -375,6 +375,23 @@ function genInStoreAnswers(count: number, branchId: string) {
 
 // Build mock missions
 export const MOCK_MISSIONS = [
+  // T-Lab Boba real missions (qualitative data from real reports)
+  ...TLAB_MISSIONS.map((m) => ({
+    id: m.id,
+    name: m.name,
+    name_ar: m.name_ar,
+    methodology: m.methodology,
+    status: m.status,
+    questions: m.questions,
+    number_of_visits: m.number_of_visits,
+    visits_completed: m.visits_completed,
+    purchase_budget_per_visit: m.purchase_budget_per_visit,
+    total_purchase_budget: m.total_purchase_budget,
+    budget_used: m.budget_used,
+    branch_id: m.branch_id,
+    created_at: m.created_at,
+    branch: DEMO_BRANCHES.find((b) => b.id === m.branch_id) || null,
+  })),
   {
     id: 'mock-mission-1', name: 'Q1 Customer Experience Survey', name_ar: 'استبيان تجربة العملاء الربع الأول',
     methodology: 'nps', status: 'completed', questions: npsQuestions,
@@ -389,7 +406,7 @@ export const MOCK_MISSIONS = [
     number_of_visits: 62, visits_completed: 55, purchase_budget_per_visit: 80,
     total_purchase_budget: 4960, budget_used: 4100, branch_id: 'demo-branch-1',
     created_at: '2026-02-01T00:00:00Z',
-    branch: DEMO_BRANCHES[0],
+    branch: DEMO_BRANCHES.find((b) => b.id === 'demo-branch-1'),
   },
   {
     id: 'mock-mission-3', name: 'New Burger Launch Test', name_ar: 'اختبار إطلاق البرغر الجديد',
@@ -397,7 +414,7 @@ export const MOCK_MISSIONS = [
     number_of_visits: 45, visits_completed: 42, purchase_budget_per_visit: 120,
     total_purchase_budget: 5400, budget_used: 4800, branch_id: 'demo-branch-4',
     created_at: '2026-02-15T00:00:00Z',
-    branch: DEMO_BRANCHES[3],
+    branch: DEMO_BRANCHES.find((b) => b.id === 'demo-branch-4'),
   },
   {
     id: 'mock-mission-4', name: 'Delivery Experience Audit', name_ar: 'تدقيق تجربة التوصيل',
@@ -430,6 +447,8 @@ let _cachedVisits: any[] | null = null;
 export function getMockVisits() {
   if (_cachedVisits) return _cachedVisits;
   const visits: any[] = [];
+  // T-Lab Boba real visits — preserved exactly as the source reports
+  visits.push(...TLAB_VISITS.map((v) => ({ ...v })));
   // NPS visits across all branches
   DEMO_BRANCHES.forEach(b => visits.push(...genNPSAnswers(20, b.id)));
   // CSAT visits across all branches
