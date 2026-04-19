@@ -233,7 +233,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
         avgResponseTime,
       };
     }).sort((a, b) => b.primaryScoreValue - a.primaryScoreValue);
-  }, [activeBranches, branchVisitsMap, selectedMission, missions, language]);
+  }, [activeBranches, branchVisitsMap, missions, language, effectiveMethodology, aggregatedQuestions]);
 
   const operationalSummary = useMemo(() => {
     const withData = activeBranches.filter(b => (branchVisitsMap[b.id] || []).length > 0);
