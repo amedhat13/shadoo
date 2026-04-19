@@ -16,7 +16,8 @@ export function VisitsRemainingWidget({
   className,
 }: VisitsRemainingWidgetProps) {
   const { t } = useTranslation('dashboard');
-  const percentage = (visitsRemaining / visitsTotal) * 100;
+  const visitsUsed = Math.max(0, visitsTotal - visitsRemaining);
+  const usedPercentage = visitsTotal > 0 ? (visitsUsed / visitsTotal) * 100 : 0;
   const isLow = visitsRemaining <= 5;
   const isZero = visitsRemaining === 0;
 
@@ -79,18 +80,18 @@ export function VisitsRemainingWidget({
             isZero ? 'text-destructive' : isLow ? 'text-primary' : 'text-success'
           )}
         >
-          {visitsRemaining} / {visitsTotal}
+          {visitsUsed} / {visitsTotal}
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar (used) */}
       <div className="h-2 overflow-hidden bg-muted">
         <div
           className={cn(
             'h-full transition-all duration-500',
             isZero ? 'bg-destructive' : isLow ? 'bg-primary' : 'bg-success'
           )}
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${usedPercentage}%` }}
         />
       </div>
 
