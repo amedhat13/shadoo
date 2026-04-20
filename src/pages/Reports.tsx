@@ -25,6 +25,8 @@ import {
   calcYesPercent,
   getRatingDistribution,
   identifyQuestionRoles,
+  isNPSLikeQuestion,
+  calcNPSFromYesNo,
   ReportMission,
   ReportVisit,
 } from '@/hooks/useClientReports';
@@ -624,11 +626,85 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">{qText}</CardTitle>
-                <Badge variant="outline" className="text-xs">{q.type}</Badge>
+                <div className="flex items-center gap-1.5">
+                  {isNPSLikeQuestion(q) && (
+                    <Badge className="text-[10px] bg-primary/15 text-primary border-primary/30 hover:bg-primary/15">NPS</Badge>
+                  )}
+                  <Badge variant="outline" className="text-xs">{q.type}</Badge>
+                </div>
               </div>
               <CardDescription>{answers.length} responses</CardDescription>
             </CardHeader>
             <CardContent>
+              {/* NPS visualization for recommend yes/no or 0-10 rating questions */}
+              {isNPSLikeQuestion(q) === 'recommend_yesno' && (() => {
+                const nps = calcNPSFromYesNo(answers);
+                const color = nps.score < 0 ? 'text-destructive' : nps.score < 30 ? 'text-amber-500' : nps.score < 50 ? 'text-green-500' : 'text-green-700';
+                const benchmark = nps.score >= 70 ? 'World-class' : nps.score >= 50 ? 'Excellent' : nps.score >= 30 ? 'Good' : nps.score >= 0 ? 'Needs Work' : 'Critical';
+                return (
+                  <div className="space-y-3 mb-4 p-3 border border-primary/30 bg-primary/5 rounded-md">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">NPS Score</span>
+                      <span className={`text-3xl font-black ${color}`}>{nps.score > 0 ? '+' : ''}{nps.score}</span>
+                      <Badge variant="secondary" className="text-[10px]">{benchmark}</Badge>
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-green-600 font-semibold">Promoters (Yes)</span>
+                        <span className="text-muted-foreground">{nps.promoterPct}% · {nps.promoters}</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5">
+                        <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${nps.promoterPct}%` }} />
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-destructive font-semibold">Detractors (No)</span>
+                        <span className="text-muted-foreground">{nps.detractorPct}% · {nps.detractors}</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5">
+                        <div className="bg-destructive h-2.5 rounded-full" style={{ width: `${nps.detractorPct}%` }} />
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">NPS = % Promoters − % Detractors · Range: −100 to +100</p>
+                  </div>
+                );
+              })()}
+              {isNPSLikeQuestion(q) === 'rating10' && (() => {
+                const nums = answers.map(Number).filter(n => !isNaN(n));
+                const nps = calcNPS(nums);
+                const color = nps.score < 0 ? 'text-destructive' : nps.score < 30 ? 'text-amber-500' : nps.score < 50 ? 'text-green-500' : 'text-green-700';
+                const benchmark = nps.score >= 70 ? 'World-class' : nps.score >= 50 ? 'Excellent' : nps.score >= 30 ? 'Good' : nps.score >= 0 ? 'Needs Work' : 'Critical';
+                const promoterPct = nps.total > 0 ? Math.round((nps.promoters / nps.total) * 100) : 0;
+                const passivePct = nps.total > 0 ? Math.round((nps.passives / nps.total) * 100) : 0;
+                const detractorPct = nps.total > 0 ? Math.round((nps.detractors / nps.total) * 100) : 0;
+                return (
+                  <div className="space-y-3 mb-4 p-3 border border-primary/30 bg-primary/5 rounded-md">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">NPS Score</span>
+                      <span className={`text-3xl font-black ${color}`}>{nps.score > 0 ? '+' : ''}{nps.score}</span>
+                      <Badge variant="secondary" className="text-[10px]">{benchmark}</Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div>
+                        <p className="text-green-600 font-semibold">Promoters (9-10)</p>
+                        <p className="text-muted-foreground">{promoterPct}% · {nps.promoters}</p>
+                      </div>
+                      <div>
+                        <p className="text-amber-500 font-semibold">Passives (7-8)</p>
+                        <p className="text-muted-foreground">{passivePct}% · {nps.passives}</p>
+                      </div>
+                      <div>
+                        <p className="text-destructive font-semibold">Detractors (0-6)</p>
+                        <p className="text-muted-foreground">{detractorPct}% · {nps.detractors}</p>
+                      </div>
+                    </div>
+                    <div className="flex w-full h-3 rounded-full overflow-hidden bg-muted">
+                      <div className="bg-destructive" style={{ width: `${detractorPct}%` }} />
+                      <div className="bg-amber-400" style={{ width: `${passivePct}%` }} />
+                      <div className="bg-green-500" style={{ width: `${promoterPct}%` }} />
+                    </div>
+                  </div>
+                );
+              })()}
               {q.type === 'rating' && (() => {
                 const nums = answers.map(Number).filter(n => !isNaN(n));
                 const avg = calcAverage(nums);
