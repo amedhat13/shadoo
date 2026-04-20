@@ -463,6 +463,7 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
                         <th className="text-start p-2 font-medium text-muted-foreground">{t('branch_comparison.rank', { defaultValue: 'Rank' })}</th>
                         <th className="text-start p-2 font-medium text-muted-foreground">{t('export.branch', { defaultValue: 'Branch' })}</th>
                         <th className="text-end p-2 font-medium text-muted-foreground">{t('branch_comparison.primary_score', { defaultValue: 'Primary Score' })}</th>
+                        <th className="text-end p-2 font-medium text-muted-foreground">{t('branch_comparison.overall_score', { defaultValue: 'Overall Score' })}</th>
                         <th className="text-end p-2 font-medium text-muted-foreground">{t('performance_tab.visits', { defaultValue: 'Visits' })}</th>
                         <th className="text-end p-2 font-medium text-muted-foreground">{t('export.completion_rate', { defaultValue: 'Completion' })}</th>
                         <th className="text-end p-2 font-medium text-muted-foreground">{t('avg_response_time', { defaultValue: 'Avg Time' })}</th>
@@ -472,6 +473,11 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
                       {rankingData.map((row, i) => {
                         const isTop = i === 0 && row.primaryScoreValue > 0;
                         const isBottom = i === rankingData.length - 1 && rankingData.length > 1 && row.primaryScoreValue > 0;
+                        const overallColor = row.overallCount === 0
+                          ? 'text-muted-foreground'
+                          : row.overallPercent >= 80 ? 'text-green-600'
+                          : row.overallPercent >= 60 ? 'text-amber-500'
+                          : 'text-destructive';
                         return (
                           <tr key={row.branchId} className={`border-b last:border-0 hover:bg-muted/50 ${isTop ? 'bg-green-50 dark:bg-green-950/20' : isBottom ? 'bg-red-50 dark:bg-red-950/20' : ''}`}>
                             <td className="p-2 font-bold text-muted-foreground">{i + 1}</td>
@@ -480,6 +486,14 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
                               <span className="text-xs text-muted-foreground ml-1">({row.city})</span>
                             </td>
                             <td className="p-2 text-end font-semibold">{row.primaryScoreText}</td>
+                            <td className={`p-2 text-end font-bold ${overallColor}`}>
+                              {row.overallCount === 0 ? '-' : (
+                                <>
+                                  {row.overallScore}<span className="text-xs text-muted-foreground">/10</span>
+                                  <span className="text-[10px] text-muted-foreground ml-1">({row.overallPercent}%)</span>
+                                </>
+                              )}
+                            </td>
                             <td className="p-2 text-end">{row.totalVisits}</td>
                             <td className="p-2 text-end">
                               <Badge variant={row.completionRate >= 80 ? 'default' : row.completionRate >= 50 ? 'secondary' : 'destructive'} className="text-xs">
