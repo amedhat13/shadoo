@@ -145,6 +145,50 @@ export function calcYesPercent(answers: (boolean | string)[]): number {
   return Math.round((yesCount / answers.length) * 100);
 }
 
+// Detect "NPS-like" questions in custom missions: rating 0-10 OR recommend/nps yes/no
+export function isNPSLikeQuestion(q: any): 'rating10' | 'recommend_yesno' | null {
+  if (!q) return null;
+  const id = String(q.id || '').toLowerCase();
+  const txt = typeof q.text === 'object' ? `${q.text.en || ''} ${q.text.ar || ''}` : String(q.text || '');
+  const txtLower = txt.toLowerCase();
+  const isRecommend = id.includes('recommend') || id.includes('nps') || /recommend|نصح|تنصح/.test(txtLower);
+  if (q.type === 'rating' && (q.max_rating === 10 || q.max_rating === 11) && isRecommend) return 'rating10';
+  if (q.type === 'yes_no' && isRecommend) return 'recommend_yesno';
+  return null;
+}
+
+// Convert yes/no recommend answers into an NPS-style breakdown.
+// Yes = Promoter, No = Detractor (no Passives). Score = %Promoters - %Detractors.
+export function calcNPSFromYesNo(answers: (boolean | string)[]): { score: number; promoters: number; detractors: number; total: number; promoterPct: number; detractorPct: number } {
+  if (answers.length === 0) return { score: 0, promoters: 0, detractors: 0, total: 0, promoterPct: 0, detractorPct: 0 };
+  const promoters = answers.filter(a => a === true || a === 'true' || a === 'yes' || a === 'Yes').length;
+  const detractors = answers.length - promoters;
+  const total = answers.length;
+  const promoterPct = Math.round((promoters / total) * 100);
+  const detractorPct = Math.round((detractors / total) * 100);
+  return { score: promoterPct - detractorPct, promoters, detractors, total, promoterPct, detractorPct };
+}
+
+// Overall Score: average of all rating answers across given questions, normalized to a max.
+// Returns score on 0-10 scale (or maxScale provided) and a percent equivalent.
+export function calcOverallScore(visits: ReportVisit[], questions: any[], maxScale: number = 10): { score: number; percent: number; count: number; maxScale: number } {
+  const ratingQs = (questions || []).filter((q: any) => q.type === 'rating');
+  let total = 0;
+  let count = 0;
+  for (const q of ratingQs) {
+    const max = q.max_rating || 5;
+    const answers = getAnswersForQuestion(visits, q.id).map(Number).filter(n => !isNaN(n));
+    for (const a of answers) {
+      total += (a / max) * maxScale; // normalize each answer to maxScale
+      count += 1;
+    }
+  }
+  if (count === 0) return { score: 0, percent: 0, count: 0, maxScale };
+  const score = Math.round((total / count) * 10) / 10;
+  const percent = Math.round((score / maxScale) * 100);
+  return { score, percent, count, maxScale };
+}
+
 export function calcOptionDistribution(answers: string[], options: string[]): { option: string; count: number; percent: number }[] {
   const total = answers.length;
   return options.map(opt => {
