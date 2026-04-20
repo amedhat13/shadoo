@@ -201,6 +201,9 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
         primaryScoreValue = result.score;
       }
 
+      // Overall Score: avg of all rating answers normalized to 0-10
+      const overall = calcOverallScore(bVisits, aggregatedQuestions, 10);
+
       const branchMissions = missions.filter(m => m.branch_id === branch.id);
       const totalPlanned = branchMissions.reduce((s, m) => s + m.number_of_visits, 0);
       const totalCompleted = bVisits.length;
@@ -219,6 +222,9 @@ export function BranchComparisonTab({ missions, visits, branches, allVisits, lan
         city: branch.city,
         primaryScoreText,
         primaryScoreValue,
+        overallScore: overall.score,
+        overallPercent: overall.percent,
+        overallCount: overall.count,
         totalVisits: totalCompleted,
         completionRate,
         avgResponseTime,
