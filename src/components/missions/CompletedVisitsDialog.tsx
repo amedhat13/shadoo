@@ -22,6 +22,7 @@ export interface CompletedVisit {
   completed_at: string;
   purchase_amount: number;
   photos: string[];
+  receipt_photo?: string;
   answers: {
     question: string;
     type: string;
@@ -300,6 +301,29 @@ export function CompletedVisitsDialog({
                           </a>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Receipt */}
+                  {selectedVisit.receipt_photo && (
+                    <div>
+                      <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <Camera className="h-4 w-4" />
+                        {tc('receipt') !== 'receipt' ? tc('receipt') : 'Receipt'}
+                      </h4>
+                      <a
+                        href={selectedVisit.receipt_photo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block aspect-[3/4] w-40 bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity"
+                      >
+                        <img
+                          src={selectedVisit.receipt_photo}
+                          alt="Receipt"
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </a>
                     </div>
                   )}
                 </div>

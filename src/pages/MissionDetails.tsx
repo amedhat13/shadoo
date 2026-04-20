@@ -48,6 +48,7 @@ interface DBVisit {
   created_at: string | null;
   answers: any;
   photos: string[] | null;
+  receipt_photo: string | null;
   client_rating: number | null;
   client_feedback: string | null;
   rated_at: string | null;
@@ -73,7 +74,7 @@ export default function MissionDetailsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('visits')
-        .select('id, status, purchase_amount, submitted_at, started_at, created_at, answers, photos, client_rating, client_feedback, rated_at')
+        .select('id, status, purchase_amount, submitted_at, started_at, created_at, answers, photos, receipt_photo, client_rating, client_feedback, rated_at')
         .eq('mission_id', id!)
         .order('submitted_at', { ascending: false, nullsFirst: false });
       if (error) throw error;
@@ -110,6 +111,7 @@ export default function MissionDetailsPage() {
           completed_at: v.submitted_at || v.started_at || v.created_at || new Date().toISOString(),
           purchase_amount: Number(v.purchase_amount || 0),
           photos: v.photos || [],
+          receipt_photo: v.receipt_photo ?? undefined,
           answers: mappedAnswers,
           client_rating: v.client_rating ?? undefined,
           client_feedback: v.client_feedback ?? undefined,
