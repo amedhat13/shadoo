@@ -18,6 +18,7 @@ import {
   calcTopBox,
   calcYesPercent,
   identifyQuestionRoles,
+  calcOverallScore,
   ReportMission,
   ReportVisit,
 } from '@/hooks/useClientReports';
