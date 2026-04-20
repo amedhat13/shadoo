@@ -284,12 +284,20 @@ export function CompletedVisitsDialog({
                       </h4>
                       <div className="grid grid-cols-3 gap-2">
                         {selectedVisit.photos.map((photo, idx) => (
-                          <div
+                          <a
                             key={idx}
-                            className="aspect-square bg-muted border border-border flex items-center justify-center"
+                            href={photo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="aspect-square bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
                           >
-                            <Camera className="h-6 w-6 text-muted-foreground" />
-                          </div>
+                            <img
+                              src={photo}
+                              alt={`Visit photo ${idx + 1}`}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          </a>
                         ))}
                       </div>
                     </div>
