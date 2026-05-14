@@ -349,6 +349,22 @@ export default function ReportsPage() {
                   subtitle={`${overviewMetrics.totalUsed.toLocaleString()} / ${overviewMetrics.totalAllocated.toLocaleString()}`}
                   icon={<DollarSign className="h-4 w-4" />}
                 />
+                {/* NPS card (if any NPS-like question exists) */}
+                {overviewMetrics.npsScore !== null && (
+                  <MetricCard
+                    title="NPS Score"
+                    value={`${overviewMetrics.npsScore}`}
+                    subtitle={`${overviewMetrics.npsTotal} responses`}
+                    icon={<TrendingUp className="h-4 w-4" />}
+                  />
+                )}
+                {/* Overall Score */}
+                <MetricCard
+                  title="Overall Score"
+                  value={`${overviewMetrics.overallScore.toFixed(1)} / 10`}
+                  subtitle={`${overviewMetrics.overallPercent}% (${overviewMetrics.overallCount} answers)`}
+                  icon={<Activity className="h-4 w-4" />}
+                />
                 <MetricCard
                   title={t('metrics.active_missions')}
                   value={`${overviewMetrics.activeMissions}`}
