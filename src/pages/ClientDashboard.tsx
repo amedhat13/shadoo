@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle, TrendingUp, Star } from 'lucide-react';
+import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
