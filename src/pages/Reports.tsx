@@ -235,6 +235,62 @@ export default function ReportsPage() {
     return Object.entries(counts).map(([name, value], i) => ({ name, value, color: COLORS[i % COLORS.length] }));
   }, [missions]);
 
+  // NPS breakdown (Promoters / Passives / Detractors) across relevant missions
+  const npsBreakdown = useMemo(() => {
+    const allQs: any[] = [];
+    for (const m of relevantMissions) {
+      const qs = Array.isArray(m.questions) ? m.questions : [];
+      allQs.push(...(qs as any[]));
+    }
+    const npsQ = allQs.find(isNPSLikeQuestion);
+    if (!npsQ) return null;
+    const kind = isNPSLikeQuestion(npsQ);
+    const raw = getAnswersForQuestion(completedVisits, npsQ.id);
+    if (kind === 'rating10') {
+      const nums = raw.map(Number).filter((n) => !isNaN(n));
+      const r = calcNPS(nums);
+      return {
+        score: r.score,
+        total: r.total,
+        data: [
+          { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
+          { name: t('nps.passives') || 'Passives', value: r.passives, color: '#f59e0b' },
+          { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+        ],
+      };
+    }
+    const r = calcNPSFromYesNo(raw as any);
+    return {
+      score: r.score,
+      total: r.total,
+      data: [
+        { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
+        { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+      ],
+    };
+  }, [relevantMissions, completedVisits, t]);
+
+  // Overall Score by branch (0-10 scale)
+  const overallByBranch = useMemo(() => {
+    const byBranch: { name: string; score: number; count: number }[] = [];
+    for (const branch of branches) {
+      const branchMissions = relevantMissions.filter(m => m.branch_id === branch.id);
+      if (branchMissions.length === 0) continue;
+      const branchVisits = completedVisits.filter(v => branchMissions.some(m => m.id === v.mission_id));
+      const qs: any[] = [];
+      for (const m of branchMissions) {
+        const mq = Array.isArray(m.questions) ? m.questions : [];
+        qs.push(...(mq as any[]));
+      }
+      const r = calcOverallScore(branchVisits, qs, 10);
+      if (r.count > 0) {
+        const label = (language === 'ar' && branch.name_ar ? branch.name_ar : branch.name) as string;
+        byBranch.push({ name: label.length > 20 ? label.slice(0, 20) + '…' : label, score: r.score, count: r.count });
+      }
+    }
+    return byBranch;
+  }, [branches, relevantMissions, completedVisits, language]);
+
   if (isLoading) {
     return <DashboardLayout><LoadingState message={t('loading') || 'Loading...'} /></DashboardLayout>;
   }
