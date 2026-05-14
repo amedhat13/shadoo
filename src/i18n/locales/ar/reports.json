@@ -162,6 +162,11 @@
     "above_average": "فوق المتوسط",
     "below_average": "تحت المتوسط",
     "ranking": "ترتيب الفروع",
-    "empty_state": "أنشئ مهام وعيّنها للفروع لبدء المقارنة"
-  }
+    "empty_state": "أنشئ مهام وعيّنها للفروع لبدء المقارنة",
+    "overall_score": "الدرجة الإجمالية"
+  },
+  "option": "الخيار",
+  "total_branches": "فروع بها بيانات",
+  "best_completion": "أفضل إنجاز",
+  "fastest_response": "أسرع استجابة"
 }

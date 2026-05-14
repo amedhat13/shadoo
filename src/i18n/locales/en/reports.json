@@ -162,6 +162,11 @@
     "above_average": "Above Average",
     "below_average": "Below Average",
     "ranking": "Branch Ranking",
-    "empty_state": "Create missions and assign them to branches to start comparing"
-  }
+    "empty_state": "Create missions and assign them to branches to start comparing",
+    "overall_score": "Overall Score"
+  },
+  "option": "Option",
+  "total_branches": "Branches with Data",
+  "best_completion": "Best Completion",
+  "fastest_response": "Fastest Response"
 }
