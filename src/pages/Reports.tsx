@@ -437,21 +437,38 @@ export default function ReportsPage() {
 
               {/* Charts */}
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Mission Status */}
+                {/* NPS Breakdown */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">{t('visits_tab.mission_status_dist')}</CardTitle>
+                    <CardTitle className="text-sm">
+                      {t('charts.nps_breakdown') || 'NPS Breakdown'}
+                      {npsBreakdown && (
+                        <span className="ms-2 text-muted-foreground font-normal">
+                          ({t('nps.score') || 'Score'}: {npsBreakdown.score} · {npsBreakdown.total} {t('nps.responses') || 'responses'})
+                        </span>
+                      )}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {missionStatusDist.length > 0 ? (
+                    {npsBreakdown && npsBreakdown.total > 0 ? (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
-                            <Pie data={missionStatusDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" nameKey="name" label={({ name, value }) => `${name}: ${value}`}>
-                              {missionStatusDist.map((_, i) => (
-                                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            <Pie
+                              data={npsBreakdown.data}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={80}
+                              dataKey="value"
+                              nameKey="name"
+                              label={({ name, value }) => `${name}: ${value}`}
+                            >
+                              {npsBreakdown.data.map((entry, i) => (
+                                <Cell key={i} fill={entry.color} />
                               ))}
                             </Pie>
+                            <RechartsTooltip />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
@@ -461,25 +478,24 @@ export default function ReportsPage() {
                   </CardContent>
                 </Card>
 
-                {/* Visit Completion by Mission */}
+                {/* Overall Score by Branch */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">{t('visits_tab.completion_over_time')}</CardTitle>
+                    <CardTitle className="text-sm">
+                      {t('charts.overall_by_branch') || 'Overall Score by Branch'}
+                      <span className="ms-2 text-muted-foreground font-normal">({t('overall.scale_10') || 'out of 10'})</span>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {relevantMissions.length > 0 ? (
+                    {overallByBranch.length > 0 ? (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={relevantMissions.slice(0, 10).map(m => ({
-                            name: (language === 'ar' && m.name_ar ? m.name_ar : m.name).slice(0, 15),
-                            planned: m.number_of_visits,
-                            completed: m.visits_completed,
-                          }))}>
+                          <BarChart data={overallByBranch}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" fontSize={10} />
-                            <YAxis />
-                            <Bar dataKey="planned" fill={COLORS[0]} name={t('chart_labels.planned')} />
-                            <Bar dataKey="completed" fill={COLORS[1]} name={t('chart_labels.completed')} />
+                            <YAxis domain={[0, 10]} />
+                            <RechartsTooltip />
+                            <Bar dataKey="score" fill={COLORS[0]} name={t('overall.score') || 'Overall Score'} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
