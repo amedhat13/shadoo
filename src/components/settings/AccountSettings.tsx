@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { seedTLabDemo } from '@/lib/seedTLabDemo';
+import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
 
 interface AccountData {
   full_name: string;
@@ -32,6 +33,7 @@ export function AccountSettings() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isSeedingTamara, setIsSeedingTamara] = useState(false);
   const { t } = useTranslation('settings');
   const queryClient = useQueryClient();
 
@@ -210,7 +212,7 @@ export function AccountSettings() {
           </CardTitle>
           <CardDescription>{t('account.demo_data_description')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-wrap gap-3">
           <Button onClick={handleSeedDemo} disabled={isSeeding} variant="outline" className="gap-2">
             {isSeeding ? (
               <>
@@ -221,6 +223,19 @@ export function AccountSettings() {
               <>
                 <Sparkles className="h-4 w-4" />
                 {t('account.seed_demo')}
+              </>
+            )}
+          </Button>
+          <Button onClick={handleSeedTamara} disabled={isSeedingTamara} variant="outline" className="gap-2">
+            {isSeedingTamara ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading Tamara demo…
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Load Tamara Demo
               </>
             )}
           </Button>
