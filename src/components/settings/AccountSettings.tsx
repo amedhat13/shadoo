@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { seedTLabDemo } from '@/lib/seedTLabDemo';
+import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
 
 interface AccountData {
   full_name: string;
@@ -32,6 +33,7 @@ export function AccountSettings() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isSeedingTamara, setIsSeedingTamara] = useState(false);
   const { t } = useTranslation('settings');
   const queryClient = useQueryClient();
 
@@ -55,6 +57,30 @@ export function AccountSettings() {
       toast.error(`${t('account.seed_demo_error')} ${(e as Error).message}`);
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const handleSeedTamara = async () => {
+    setIsSeedingTamara(true);
+    try {
+      const result = await seedTamaraDemo();
+      if (!result.ok) {
+        toast.error(`Failed to seed Tamara demo. ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info('Tamara demo already seeded.');
+      } else {
+        toast.success(`Tamara demo loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-scores'] });
+      }
+    } catch (e) {
+      toast.error(`Failed to seed Tamara demo. ${(e as Error).message}`);
+    } finally {
+      setIsSeedingTamara(false);
     }
   };
 
@@ -210,7 +236,7 @@ export function AccountSettings() {
           </CardTitle>
           <CardDescription>{t('account.demo_data_description')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-wrap gap-3">
           <Button onClick={handleSeedDemo} disabled={isSeeding} variant="outline" className="gap-2">
             {isSeeding ? (
               <>
@@ -221,6 +247,19 @@ export function AccountSettings() {
               <>
                 <Sparkles className="h-4 w-4" />
                 {t('account.seed_demo')}
+              </>
+            )}
+          </Button>
+          <Button onClick={handleSeedTamara} disabled={isSeedingTamara} variant="outline" className="gap-2">
+            {isSeedingTamara ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading Tamara demo…
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Load Tamara Demo
               </>
             )}
           </Button>

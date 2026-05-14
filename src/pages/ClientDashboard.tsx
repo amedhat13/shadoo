@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle, TrendingUp, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -13,6 +13,7 @@ import { useBranches } from '@/hooks/useBranches';
 import { useToast } from '@/hooks/use-toast';
 import { useDirectionalIcons } from '@/i18n/utils';
 import { useLanguage } from '@/i18n/LanguageProvider';
+import { useDashboardScores } from '@/hooks/useDashboardScores';
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const ClientDashboard = () => {
   const { missions } = useMissions();
   const { visitsRemaining, visitsTotal, visitsUsed, subscription } = usePackage();
   const { branches } = useBranches();
+  const { data: scores } = useDashboardScores();
 
   const canCreateMission = visitsRemaining > 0;
 
