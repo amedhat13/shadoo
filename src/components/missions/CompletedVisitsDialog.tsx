@@ -283,20 +283,20 @@ export function CompletedVisitsDialog({
                         <Camera className="h-4 w-4" />
                         {t('details.photos_label')} ({selectedVisit.photos.length})
                       </h4>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {selectedVisit.photos.map((photo, idx) => (
                           <a
                             key={idx}
                             href={photo}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="aspect-square bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
+                            className="bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
                           >
                             <img
                               src={photo}
                               alt={`Visit photo ${idx + 1}`}
                               loading="lazy"
-                              className="w-full h-full object-cover"
+                              className="w-full h-auto max-h-96 object-contain bg-muted"
                             />
                           </a>
                         ))}
@@ -315,13 +315,13 @@ export function CompletedVisitsDialog({
                         href={selectedVisit.receipt_photo}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block aspect-[3/4] w-40 bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity"
+                        className="block w-full bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity"
                       >
                         <img
                           src={selectedVisit.receipt_photo}
                           alt="Receipt"
                           loading="lazy"
-                          className="w-full h-full object-cover"
+                          className="w-full h-auto max-h-[32rem] object-contain bg-muted"
                         />
                       </a>
                     </div>
