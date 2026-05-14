@@ -24,6 +24,13 @@ export async function seedTamaraDemo(): Promise<SeedResult> {
   if (userErr || !userData.user) return { ok: false, error: 'Not authenticated' };
   const userId = userData.user.id;
 
+  // Customize the demo account profile to Tamara branding
+  await supabase.from('profiles').update({
+    company_name: 'Tamara — Lebanese Bistro',
+    full_name: 'Tamara Demo',
+    phone: '+961 1 234 567',
+  }).eq('user_id', userId);
+
   const { data: existingBranches, error: checkErr } = await supabase
     .from('branches').select('id, name').eq('user_id', userId).ilike('name', 'Tamara%');
   if (checkErr) return { ok: false, error: checkErr.message };
