@@ -253,9 +253,9 @@ export default function ReportsPage() {
         score: r.score,
         total: r.total,
         data: [
-          { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
-          { name: t('nps.passives') || 'Passives', value: r.passives, color: '#f59e0b' },
-          { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+          { name: 'Promoters', value: r.promoters, color: '#16a34a' },
+          { name: 'Passives', value: r.passives, color: '#f59e0b' },
+          { name: 'Detractors', value: r.detractors, color: '#dc2626' },
         ],
       };
     }
@@ -264,8 +264,8 @@ export default function ReportsPage() {
       score: r.score,
       total: r.total,
       data: [
-        { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
-        { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+        { name: 'Promoters', value: r.promoters, color: '#16a34a' },
+        { name: 'Detractors', value: r.detractors, color: '#dc2626' },
       ],
     };
   }, [relevantMissions, completedVisits, t]);
