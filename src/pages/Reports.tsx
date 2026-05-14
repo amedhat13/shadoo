@@ -441,10 +441,10 @@ export default function ReportsPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm">
-                      {t('charts.nps_breakdown') || 'NPS Breakdown'}
+                      NPS Breakdown
                       {npsBreakdown && (
-                        <span className="ms-2 text-muted-foreground font-normal">
-                          ({t('nps.score') || 'Score'}: {npsBreakdown.score} · {npsBreakdown.total} {t('nps.responses') || 'responses'})
+                        <span className="ms-2 text-muted-foreground font-normal normal-case">
+                          (Score: {npsBreakdown.score} · {npsBreakdown.total} responses)
                         </span>
                       )}
                     </CardTitle>
@@ -482,8 +482,8 @@ export default function ReportsPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm">
-                      {t('charts.overall_by_branch') || 'Overall Score by Branch'}
-                      <span className="ms-2 text-muted-foreground font-normal">({t('overall.scale_10') || 'out of 10'})</span>
+                      Overall Score by Branch
+                      <span className="ms-2 text-muted-foreground font-normal normal-case">(out of 10)</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -495,7 +495,7 @@ export default function ReportsPage() {
                             <XAxis dataKey="name" fontSize={10} />
                             <YAxis domain={[0, 10]} />
                             <RechartsTooltip />
-                            <Bar dataKey="score" fill={COLORS[0]} name={t('overall.score') || 'Overall Score'} />
+                            <Bar dataKey="score" fill={COLORS[0]} name="Overall Score" />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
