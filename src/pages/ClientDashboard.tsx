@@ -27,7 +27,7 @@ const ClientDashboard = () => {
   const { missions } = useMissions();
   const { visitsRemaining, visitsTotal, visitsUsed, subscription } = usePackage();
   const { branches } = useBranches();
-  const { data: scores } = useDashboardScores();
+  
 
   const canCreateMission = visitsRemaining > 0;
 
