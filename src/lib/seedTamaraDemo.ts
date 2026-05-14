@@ -29,6 +29,7 @@ export async function seedTamaraDemo(): Promise<SeedResult> {
     company_name: 'Tamara — Lebanese Bistro',
     full_name: 'Tamara Demo',
     phone: '+961 1 234 567',
+    logo_url: '/tamara-demo/logo.png',
   }).eq('user_id', userId);
 
   // Clear any T-Lab demo data so Reports only shows Tamara
