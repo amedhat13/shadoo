@@ -60,6 +60,30 @@ export function AccountSettings() {
     }
   };
 
+  const handleSeedTamara = async () => {
+    setIsSeedingTamara(true);
+    try {
+      const result = await seedTamaraDemo();
+      if (!result.ok) {
+        toast.error(`Failed to seed Tamara demo. ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info('Tamara demo already seeded.');
+      } else {
+        toast.success(`Tamara demo loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-scores'] });
+      }
+    } catch (e) {
+      toast.error(`Failed to seed Tamara demo. ${(e as Error).message}`);
+    } finally {
+      setIsSeedingTamara(false);
+    }
+  };
+
   const handleSaveProfile = async () => {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
