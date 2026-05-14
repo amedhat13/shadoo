@@ -235,6 +235,62 @@ export default function ReportsPage() {
     return Object.entries(counts).map(([name, value], i) => ({ name, value, color: COLORS[i % COLORS.length] }));
   }, [missions]);
 
+  // NPS breakdown (Promoters / Passives / Detractors) across relevant missions
+  const npsBreakdown = useMemo(() => {
+    const allQs: any[] = [];
+    for (const m of relevantMissions) {
+      const qs = Array.isArray(m.questions) ? m.questions : [];
+      allQs.push(...(qs as any[]));
+    }
+    const npsQ = allQs.find(isNPSLikeQuestion);
+    if (!npsQ) return null;
+    const kind = isNPSLikeQuestion(npsQ);
+    const raw = getAnswersForQuestion(completedVisits, npsQ.id);
+    if (kind === 'rating10') {
+      const nums = raw.map(Number).filter((n) => !isNaN(n));
+      const r = calcNPS(nums);
+      return {
+        score: r.score,
+        total: r.total,
+        data: [
+          { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
+          { name: t('nps.passives') || 'Passives', value: r.passives, color: '#f59e0b' },
+          { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+        ],
+      };
+    }
+    const r = calcNPSFromYesNo(raw as any);
+    return {
+      score: r.score,
+      total: r.total,
+      data: [
+        { name: t('nps.promoters') || 'Promoters', value: r.promoters, color: '#16a34a' },
+        { name: t('nps.detractors') || 'Detractors', value: r.detractors, color: '#dc2626' },
+      ],
+    };
+  }, [relevantMissions, completedVisits, t]);
+
+  // Overall Score by branch (0-10 scale)
+  const overallByBranch = useMemo(() => {
+    const byBranch: { name: string; score: number; count: number }[] = [];
+    for (const branch of branches) {
+      const branchMissions = relevantMissions.filter(m => m.branch_id === branch.id);
+      if (branchMissions.length === 0) continue;
+      const branchVisits = completedVisits.filter(v => branchMissions.some(m => m.id === v.mission_id));
+      const qs: any[] = [];
+      for (const m of branchMissions) {
+        const mq = Array.isArray(m.questions) ? m.questions : [];
+        qs.push(...(mq as any[]));
+      }
+      const r = calcOverallScore(branchVisits, qs, 10);
+      if (r.count > 0) {
+        const label = (language === 'ar' && branch.name_ar ? branch.name_ar : branch.name) as string;
+        byBranch.push({ name: label.length > 20 ? label.slice(0, 20) + '…' : label, score: r.score, count: r.count });
+      }
+    }
+    return byBranch;
+  }, [branches, relevantMissions, completedVisits, language]);
+
   if (isLoading) {
     return <DashboardLayout><LoadingState message={t('loading') || 'Loading...'} /></DashboardLayout>;
   }
@@ -381,21 +437,38 @@ export default function ReportsPage() {
 
               {/* Charts */}
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Mission Status */}
+                {/* NPS Breakdown */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">{t('visits_tab.mission_status_dist')}</CardTitle>
+                    <CardTitle className="text-sm">
+                      NPS Breakdown
+                      {npsBreakdown && (
+                        <span className="ms-2 text-muted-foreground font-normal normal-case">
+                          (Score: {npsBreakdown.score} · {npsBreakdown.total} responses)
+                        </span>
+                      )}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {missionStatusDist.length > 0 ? (
+                    {npsBreakdown && npsBreakdown.total > 0 ? (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
-                            <Pie data={missionStatusDist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" nameKey="name" label={({ name, value }) => `${name}: ${value}`}>
-                              {missionStatusDist.map((_, i) => (
-                                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            <Pie
+                              data={npsBreakdown.data}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={80}
+                              dataKey="value"
+                              nameKey="name"
+                              label={({ name, value }) => `${name}: ${value}`}
+                            >
+                              {npsBreakdown.data.map((entry, i) => (
+                                <Cell key={i} fill={entry.color} />
                               ))}
                             </Pie>
+                            <RechartsTooltip />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
@@ -405,25 +478,24 @@ export default function ReportsPage() {
                   </CardContent>
                 </Card>
 
-                {/* Visit Completion by Mission */}
+                {/* Overall Score by Branch */}
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">{t('visits_tab.completion_over_time')}</CardTitle>
+                    <CardTitle className="text-sm">
+                      Overall Score by Branch
+                      <span className="ms-2 text-muted-foreground font-normal normal-case">(out of 10)</span>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {relevantMissions.length > 0 ? (
+                    {overallByBranch.length > 0 ? (
                       <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={relevantMissions.slice(0, 10).map(m => ({
-                            name: (language === 'ar' && m.name_ar ? m.name_ar : m.name).slice(0, 15),
-                            planned: m.number_of_visits,
-                            completed: m.visits_completed,
-                          }))}>
+                          <BarChart data={overallByBranch}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" fontSize={10} />
-                            <YAxis />
-                            <Bar dataKey="planned" fill={COLORS[0]} name={t('chart_labels.planned')} />
-                            <Bar dataKey="completed" fill={COLORS[1]} name={t('chart_labels.completed')} />
+                            <YAxis domain={[0, 10]} />
+                            <RechartsTooltip />
+                            <Bar dataKey="score" fill={COLORS[0]} name="Overall Score" />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
