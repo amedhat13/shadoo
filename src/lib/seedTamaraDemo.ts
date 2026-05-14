@@ -31,6 +31,16 @@ export async function seedTamaraDemo(): Promise<SeedResult> {
     phone: '+961 1 234 567',
   }).eq('user_id', userId);
 
+  // Clear any T-Lab demo data so Reports only shows Tamara
+  const { data: tlabMissions } = await supabase
+    .from('missions').select('id').eq('user_id', userId).ilike('name', 'T-Lab%');
+  if (tlabMissions && tlabMissions.length > 0) {
+    const ids = tlabMissions.map((m) => m.id);
+    await supabase.from('visits').delete().in('mission_id', ids);
+    await supabase.from('missions').delete().in('id', ids);
+  }
+  await supabase.from('branches').delete().eq('user_id', userId).ilike('name', 'T-Lab%');
+
   const { data: existingBranches, error: checkErr } = await supabase
     .from('branches').select('id, name').eq('user_id', userId).ilike('name', 'Tamara%');
   if (checkErr) return { ok: false, error: checkErr.message };

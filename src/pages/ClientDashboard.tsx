@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle, TrendingUp, Star } from 'lucide-react';
+import { Plus, ClipboardList, Building2, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -13,7 +13,7 @@ import { useBranches } from '@/hooks/useBranches';
 import { useToast } from '@/hooks/use-toast';
 import { useDirectionalIcons } from '@/i18n/utils';
 import { useLanguage } from '@/i18n/LanguageProvider';
-import { useDashboardScores } from '@/hooks/useDashboardScores';
+
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ClientDashboard = () => {
   const { missions } = useMissions();
   const { visitsRemaining, visitsTotal, visitsUsed, subscription } = usePackage();
   const { branches } = useBranches();
-  const { data: scores } = useDashboardScores();
+  
 
   const canCreateMission = visitsRemaining > 0;
 
@@ -71,49 +71,6 @@ const ClientDashboard = () => {
             <Plus className="h-4 w-4" />
             {t('create_mission')}
           </Button>
-        </div>
-
-        {/* CX Score Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-                <TrendingUp className="h-4 w-4" />
-                NPS Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl md:text-4xl font-black text-primary">
-                  {scores?.nps ?? '—'}
-                </div>
-                <span className="text-xs text-muted-foreground">/ 100</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Based on {scores?.npsTotal ?? 0} responses
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-                <Star className="h-4 w-4" />
-                Overall Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline gap-2">
-                <div className="text-3xl md:text-4xl font-black text-primary">
-                  {scores?.overallScore?.toFixed(1) ?? '—'}
-                </div>
-                <span className="text-xs text-muted-foreground">/ 10 ({scores?.overallPercent ?? 0}%)</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Across {scores?.ratingsCount ?? 0} rated answers
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Key Metrics Row */}

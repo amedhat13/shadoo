@@ -27,6 +27,7 @@ import {
   identifyQuestionRoles,
   isNPSLikeQuestion,
   calcNPSFromYesNo,
+  calcOverallScore,
   ReportMission,
   ReportVisit,
 } from '@/hooks/useClientReports';
@@ -130,7 +131,30 @@ export default function ReportsPage() {
       primaryScore = getPrimaryScore(methodology, selectedMission.questions || [], completedVisits);
     }
 
-    return { totalPlanned, totalCompleted, completionRate, totalAllocated, totalUsed, budgetEfficiency, activeMissions, verifiedBranches, avgResponseTime, primaryScore };
+    // Aggregate NPS across relevant missions
+    const allQs: any[] = [];
+    for (const m of relevantMissions) {
+      const qs = Array.isArray(m.questions) ? m.questions : [];
+      allQs.push(...(qs as any[]));
+    }
+    const npsQ = allQs.find(isNPSLikeQuestion);
+    let npsScore: number | null = null;
+    let npsTotal = 0;
+    if (npsQ) {
+      const kind = isNPSLikeQuestion(npsQ);
+      const raw = getAnswersForQuestion(completedVisits, npsQ.id);
+      if (kind === 'rating10') {
+        const nums = raw.map(Number).filter((n) => !isNaN(n));
+        const r = calcNPS(nums);
+        npsScore = r.score; npsTotal = r.total;
+      } else if (kind === 'recommend_yesno') {
+        const r = calcNPSFromYesNo(raw as any);
+        npsScore = r.score; npsTotal = r.total;
+      }
+    }
+    const overall = calcOverallScore(completedVisits, allQs, 10);
+
+    return { totalPlanned, totalCompleted, completionRate, totalAllocated, totalUsed, budgetEfficiency, activeMissions, verifiedBranches, avgResponseTime, primaryScore, npsScore, npsTotal, overallScore: overall.score, overallPercent: overall.percent, overallCount: overall.count };
   }, [relevantMissions, completedVisits, missions, branches, selectedMission, methodology]);
 
   const handleExport = useCallback(() => {
@@ -324,6 +348,22 @@ export default function ReportsPage() {
                   value={`${overviewMetrics.budgetEfficiency}%`}
                   subtitle={`${overviewMetrics.totalUsed.toLocaleString()} / ${overviewMetrics.totalAllocated.toLocaleString()}`}
                   icon={<DollarSign className="h-4 w-4" />}
+                />
+                {/* NPS card (if any NPS-like question exists) */}
+                {overviewMetrics.npsScore !== null && (
+                  <MetricCard
+                    title="NPS Score"
+                    value={`${overviewMetrics.npsScore}`}
+                    subtitle={`${overviewMetrics.npsTotal} responses`}
+                    icon={<TrendingUp className="h-4 w-4" />}
+                  />
+                )}
+                {/* Overall Score */}
+                <MetricCard
+                  title="Overall Score"
+                  value={`${overviewMetrics.overallScore.toFixed(1)} / 10`}
+                  subtitle={`${overviewMetrics.overallPercent}% (${overviewMetrics.overallCount} answers)`}
+                  icon={<Activity className="h-4 w-4" />}
                 />
                 <MetricCard
                   title={t('metrics.active_missions')}
