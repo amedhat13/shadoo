@@ -13,7 +13,7 @@ import { useBranches } from '@/hooks/useBranches';
 import { useToast } from '@/hooks/use-toast';
 import { useDirectionalIcons } from '@/i18n/utils';
 import { useLanguage } from '@/i18n/LanguageProvider';
-import { useDashboardScores } from '@/hooks/useDashboardScores';
+
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
