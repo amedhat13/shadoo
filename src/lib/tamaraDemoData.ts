@@ -255,7 +255,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-almaza-4', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 601, scheduled_date: visitDate(6),
+    status: 'approved' as const, purchase_amount: 601.37, scheduled_date: visitDate(6),
     started_at: daysAgo(6), submitted_at: daysAgo(6),
     client_rating: 4, client_feedback: 'Hummus was amazing; oregano on the Fattoush was unexpected.',
     photos: ['/tamara-demo/almaza-4-food.jpg'], receipt_photo: '/tamara-demo/almaza-4-receipt.jpg',
