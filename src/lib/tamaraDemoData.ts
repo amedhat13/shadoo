@@ -109,7 +109,7 @@ export const TAMARA_MISSIONS = [
     total_purchase_budget: 2400,
     visits_completed: 4,
     visits_pending: 0,
-    budget_used: 2400,
+    budget_used: 2206.31,
     published_at: daysAgo(10),
   },
   {
@@ -126,7 +126,7 @@ export const TAMARA_MISSIONS = [
     total_purchase_budget: 2400,
     visits_completed: 4,
     visits_pending: 0,
-    budget_used: 2400,
+    budget_used: 3774.22,
     published_at: daysAgo(8),
   },
 ];
