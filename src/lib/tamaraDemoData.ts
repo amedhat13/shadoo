@@ -247,7 +247,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-almaza-3', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 350, scheduled_date: visitDate(6),
+    status: 'approved' as const, purchase_amount: 702.24, scheduled_date: visitDate(6),
     started_at: daysAgo(6), submitted_at: daysAgo(6),
     client_rating: 5, client_feedback: 'تجربة حلوة، الأكل ممتاز والمكان جميل.',
     photos: ['/tamara-demo/almaza-3-food.jpg'], receipt_photo: '/tamara-demo/almaza-3-receipt.jpg',
