@@ -231,7 +231,7 @@ const visitDate = (n: number) => {
 export const TAMARA_VISITS = [
   {
     id: 'tamara-visit-almaza-1', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 207, scheduled_date: visitDate(7),
+    status: 'approved' as const, purchase_amount: 695.86, scheduled_date: visitDate(7),
     started_at: daysAgo(7), submitted_at: daysAgo(7),
     client_rating: 4, client_feedback: 'Friendly staff and great taste — dusty tables noted.',
     photos: ['/tamara-demo/almaza-1-food.jpg'], receipt_photo: '/tamara-demo/almaza-1-receipt.jpg',
