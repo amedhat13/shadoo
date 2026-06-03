@@ -271,7 +271,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-2', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 320, scheduled_date: visitDate(5),
+    status: 'approved' as const, purchase_amount: 842.69, scheduled_date: visitDate(5),
     started_at: daysAgo(5), submitted_at: daysAgo(5),
     client_rating: 3, client_feedback: 'Staff did not check in on the table.',
     photos: ['/tamara-demo/waterway-2-food.png'], receipt_photo: '/tamara-demo/waterway-2-receipt.png',
