@@ -263,7 +263,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-1', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 480, scheduled_date: visitDate(5),
+    status: 'approved' as const, purchase_amount: 651.17, scheduled_date: visitDate(5),
     started_at: daysAgo(5), submitted_at: daysAgo(5),
     client_rating: 3, client_feedback: 'Slow service — over 20 minutes to take the order.',
     photos: ['/tamara-demo/waterway-1-food.jpg'], receipt_photo: '/tamara-demo/waterway-1-receipt.jpg',
