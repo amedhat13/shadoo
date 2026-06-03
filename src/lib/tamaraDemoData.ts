@@ -231,7 +231,7 @@ const visitDate = (n: number) => {
 export const TAMARA_VISITS = [
   {
     id: 'tamara-visit-almaza-1', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 207, scheduled_date: visitDate(7),
+    status: 'approved' as const, purchase_amount: 695.86, scheduled_date: visitDate(7),
     started_at: daysAgo(7), submitted_at: daysAgo(7),
     client_rating: 4, client_feedback: 'Friendly staff and great taste — dusty tables noted.',
     photos: ['/tamara-demo/almaza-1-food.jpg'], receipt_photo: '/tamara-demo/almaza-1-receipt.jpg',
@@ -239,7 +239,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-almaza-2', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 207, scheduled_date: visitDate(7),
+    status: 'approved' as const, purchase_amount: 206.84, scheduled_date: visitDate(7),
     started_at: daysAgo(7), submitted_at: daysAgo(7),
     client_rating: 5, client_feedback: 'Loved the taste — only the tables were dusty.',
     photos: ['/tamara-demo/almaza-2-food.jpg'], receipt_photo: '/tamara-demo/almaza-2-receipt.jpg',
@@ -247,7 +247,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-almaza-3', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 350, scheduled_date: visitDate(6),
+    status: 'approved' as const, purchase_amount: 702.24, scheduled_date: visitDate(6),
     started_at: daysAgo(6), submitted_at: daysAgo(6),
     client_rating: 5, client_feedback: 'تجربة حلوة، الأكل ممتاز والمكان جميل.',
     photos: ['/tamara-demo/almaza-3-food.jpg'], receipt_photo: '/tamara-demo/almaza-3-receipt.jpg',
@@ -255,7 +255,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-almaza-4', mission_id: 'tamara-mission-almaza', branch_id: 'tamara-branch-almaza',
-    status: 'approved' as const, purchase_amount: 601, scheduled_date: visitDate(6),
+    status: 'approved' as const, purchase_amount: 601.37, scheduled_date: visitDate(6),
     started_at: daysAgo(6), submitted_at: daysAgo(6),
     client_rating: 4, client_feedback: 'Hummus was amazing; oregano on the Fattoush was unexpected.',
     photos: ['/tamara-demo/almaza-4-food.jpg'], receipt_photo: '/tamara-demo/almaza-4-receipt.jpg',
@@ -263,7 +263,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-1', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 480, scheduled_date: visitDate(5),
+    status: 'approved' as const, purchase_amount: 651.17, scheduled_date: visitDate(5),
     started_at: daysAgo(5), submitted_at: daysAgo(5),
     client_rating: 3, client_feedback: 'Slow service — over 20 minutes to take the order.',
     photos: ['/tamara-demo/waterway-1-food.jpg'], receipt_photo: '/tamara-demo/waterway-1-receipt.jpg',
@@ -271,7 +271,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-2', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 320, scheduled_date: visitDate(5),
+    status: 'approved' as const, purchase_amount: 842.69, scheduled_date: visitDate(5),
     started_at: daysAgo(5), submitted_at: daysAgo(5),
     client_rating: 3, client_feedback: 'Staff did not check in on the table.',
     photos: ['/tamara-demo/waterway-2-food.png'], receipt_photo: '/tamara-demo/waterway-2-receipt.png',
@@ -279,7 +279,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-3', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 540, scheduled_date: visitDate(4),
+    status: 'approved' as const, purchase_amount: 1067.40, scheduled_date: visitDate(4),
     started_at: daysAgo(4), submitted_at: daysAgo(4),
     client_rating: 3, client_feedback: 'Beautiful place but the food arrived cold and late.',
     photos: ['/tamara-demo/waterway-3-food.jpg'], receipt_photo: '/tamara-demo/waterway-3-receipt.jpg',
@@ -287,7 +287,7 @@ export const TAMARA_VISITS = [
   },
   {
     id: 'tamara-visit-waterway-4', mission_id: 'tamara-mission-waterway', branch_id: 'tamara-branch-waterway',
-    status: 'approved' as const, purchase_amount: 620, scheduled_date: visitDate(4),
+    status: 'approved' as const, purchase_amount: 1212.96, scheduled_date: visitDate(4),
     started_at: daysAgo(4), submitted_at: daysAgo(4),
     client_rating: 4, client_feedback: 'Manager handled the cold-food issue well; menu app was glitching.',
     photos: ['/tamara-demo/waterway-4-food.jpg'], receipt_photo: '/tamara-demo/waterway-4-receipt.jpg',
