@@ -33,6 +33,8 @@ import {
 import { useVisitPricing, useUpdateVisitPrice, useCreateVisitPrice, useDeleteVisitPrice } from '@/hooks/useVisitPricing';
 import { AGENT_DEMOGRAPHICS } from '@/lib/constants';
 import { LoadingState } from '@/components/common/LoadingState';
+import { QuestionnaireCriteriaEditor } from '@/components/common/QuestionnaireCriteriaEditor';
+import type { QuestionnaireCriterion } from '@/lib/agentHelpers';
 import { cn } from '@/lib/utils';
 
 // Curated icon library for tiers
@@ -645,6 +647,18 @@ function TierFormDialog({
                 <Input type="number" className="w-24" value={tier.min_experience_years ?? 0} onChange={e => update({ min_experience_years: parseInt(e.target.value) || 0 })} />
               </div>
             </div>
+
+            <Separator />
+
+            {/* Section C: Questionnaire-Based Criteria */}
+            <QuestionnaireCriteriaEditor
+              value={(tier.questionnaire_criteria as QuestionnaireCriterion[]) || []}
+              onChange={(next) => update({ questionnaire_criteria: next })}
+              title={t('tiers.questionnaire_criteria', { defaultValue: 'Questionnaire-Based Criteria' })}
+              description={t('tiers.questionnaire_criteria_desc', {
+                defaultValue: 'Filter by answers given during agent registration (lifestyle, income, interests, availability, etc.).',
+              })}
+            />
 
             <Separator />
 

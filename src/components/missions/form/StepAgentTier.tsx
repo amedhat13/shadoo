@@ -9,7 +9,8 @@ import { AGENT_DEMOGRAPHICS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useActiveAgentTiers, useMatchingAgentCount } from '@/hooks/useAgentTiers';
-import type { AgentCustomCriteria } from '@/lib/agentHelpers';
+import type { AgentCustomCriteria, QuestionnaireCriterion } from '@/lib/agentHelpers';
+import { QuestionnaireCriteriaEditor } from '@/components/common/QuestionnaireCriteriaEditor';
 
 interface StepAgentTierProps {
   data: MissionFormData;
@@ -371,6 +372,14 @@ function CustomCriteriaForm({
           value={criteria.min_experience_years ?? 0}
           onChange={(e) => update({ min_experience_years: parseInt(e.target.value) || 0 })}
           className="w-24"
+        />
+      </div>
+
+      {/* Questionnaire-based filters from agent registration */}
+      <div className="pt-2 border-t">
+        <QuestionnaireCriteriaEditor
+          value={(criteria.questionnaire_criteria as QuestionnaireCriterion[]) || []}
+          onChange={(next) => update({ questionnaire_criteria: next })}
         />
       </div>
 
