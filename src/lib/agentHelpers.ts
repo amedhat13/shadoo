@@ -67,6 +67,7 @@ export interface AgentCustomCriteria {
   requires_motorcycle?: boolean;
   specializations?: string[];
   min_experience_years?: number;
+  questionnaire_criteria?: QuestionnaireCriterion[];
 }
 
 function arrayHasItems(arr: unknown[] | null | undefined): boolean {
@@ -209,6 +210,10 @@ export function matchAgentToCustomCriteria(agent: AgentDemographics, criteria: A
     if (!criteria.specializations!.some(s => agentSpecs.includes(s))) return false;
   }
   if (criteria.min_experience_years && criteria.min_experience_years > 0 && (agent.experience_years ?? 0) < criteria.min_experience_years) return false;
+
+  if (arrayHasItems(criteria.questionnaire_criteria)) {
+    if (!matchesQuestionnaireCriteria(criteria.questionnaire_criteria!, agent.questionnaire_answers)) return false;
+  }
 
   return true;
 }
