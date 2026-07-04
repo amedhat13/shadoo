@@ -43,10 +43,10 @@ type Visual =
   | { kind: 'table'; title?: string; headers: string[]; rows: TableCell[][] }
   | { kind: 'callouts'; title?: string; items: { icon: 'check' | 'alert' | 'x'; label: string; text: string }[] };
 
-type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[] };
+type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[]; followUps?: string[] };
 type Conversation = { id: string; title: string; updatedAt: number; messages: Message[] };
-type Answer = { content: string; visuals: Visual[] };
-type Suggestion = { id: string; pill: string; prompt: string; keywords: string[]; build: () => Answer };
+type Answer = { content: string; visuals: Visual[]; followUps: string[] };
+type Suggestion = { id: string; pill: string; prompt: string; keywords: string[]; followUps: string[]; build: () => Omit<Answer, 'followUps'> };
 
 const C = {
   primary: 'hsl(var(--primary))',
