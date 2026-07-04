@@ -168,11 +168,10 @@ export function UsersSettings() {
               return (
                 <div key={member.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
-                    <Avatar className={`h-10 w-10 border ${member.isAI ? 'border-primary' : 'border-border'}`}>
-                      <AvatarFallback className={member.isAI ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground text-sm font-medium'}>
-                        {member.isAI ? <Sparkles className="h-4 w-4" /> : initials}
-                      </AvatarFallback>
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarFallback className="bg-muted text-foreground text-sm font-medium">{initials}</AvatarFallback>
                     </Avatar>
+
 
                     <div>
                       <div className="flex items-center gap-2">
