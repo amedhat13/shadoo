@@ -983,7 +983,7 @@ export default function ReportsV2Page() {
                   </div>
                 )}
               </div>
-              <div className="pb-2">
+              <div className="pt-3 pb-3">
                 <div className="rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
                   <Textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
