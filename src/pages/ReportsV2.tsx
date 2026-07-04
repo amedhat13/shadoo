@@ -398,6 +398,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Exec summary',
     prompt: "Draft an executive summary of this month's performance.",
     keywords: ['exec', 'executive', 'summary', 'draft', 'monthly', 'recap', 'email'],
+    followUps: [
+      'Turn this into an email',
+      'Add revenue impact estimate',
+      'Compare to last month',
+      'Break down by region',
+    ],
     build: () => ({
       content: `**June was a strong month.** Overall CX **86.2** (+2.1 MoM), NPS **+64** — the year's best. One watch-out: wait time is emerging as the #1 recurring complaint.`,
       visuals: [
