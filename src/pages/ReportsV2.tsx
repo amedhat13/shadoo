@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import shadooLogo from '@/assets/shadoo-logo.png';
+import shadooCap from '@/assets/shadoo-cap.png';
 import {
   Plus, ArrowUp, Paperclip, FileText, BarChart3, TrendingUp, Sparkles,
   MessageSquarePlus, Bot, User as UserIcon, Trash2, Command,
@@ -840,7 +841,7 @@ export default function ReportsV2Page() {
           {isEmpty ? (
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <div className="flex items-center gap-3 mb-3">
-                <img src={shadooLogo} alt="Shadoo" className="h-10 w-auto" />
+                <img src={shadooCap} alt="Shadoo" className="h-16 w-auto" />
                 <h1 className="text-3xl md:text-4xl font-black tracking-tight">Shadoo AI</h1>
               </div>
               <p className="text-sm md:text-base text-muted-foreground text-center max-w-lg mb-8 leading-relaxed">
