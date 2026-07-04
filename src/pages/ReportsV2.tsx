@@ -439,6 +439,206 @@ const ANSWERS: Suggestion[] = [
       ],
     }),
   },
+  {
+    id: 'peak-hours',
+    pill: 'Peak hours',
+    prompt: 'When are my busiest hours and how is service holding up?',
+    keywords: ['peak', 'busy', 'hour', 'hours', 'traffic', 'rush'],
+    followUps: ['Staff schedule vs traffic', 'Wait time by hour', 'Weekend vs weekday load', 'Recommend a shift plan'],
+    build: () => ({
+      content: `Peak load is **7pm–10pm on Thu–Sat**. Service quality dips **9 pts** at peak vs off-peak — mostly wait time and staff attention.`,
+      visuals: [
+        { kind: 'line', title: 'Traffic by hour (visits observed)', series: [{ key: 'v', label: 'Visits', color: C.primary }],
+          data: [{ name: '10a', v: 4 }, { name: '12p', v: 7 }, { name: '2p', v: 9 }, { name: '4p', v: 11 }, { name: '6p', v: 16 }, { name: '8p', v: 22 }, { name: '10p', v: 14 }] },
+        { kind: 'bar', title: 'Service score — peak vs off-peak', series: [{ key: 'peak', label: 'Peak', color: C.bad }, { key: 'off', label: 'Off-peak', color: C.good }],
+          data: [{ name: 'Service', peak: 78, off: 89 }, { name: 'Wait', peak: 68, off: 88 }, { name: 'Cleanliness', peak: 84, off: 91 }, { name: 'Staff', peak: 79, off: 90 }] },
+      ],
+    }),
+  },
+  {
+    id: 'stockouts',
+    pill: 'Stockouts',
+    prompt: 'How often are products out of stock across branches?',
+    keywords: ['stock', 'stockout', 'out of stock', 'availability', 'inventory'],
+    followUps: ['Which SKUs are missing most?', 'Branch-level stockout rate', 'Lost revenue estimate', 'Alert operations'],
+    build: () => ({
+      content: `**18%** of tracked SKUs were unavailable during shopper visits — up from 12% last month. Alexandria region drives most of the gap.`,
+      visuals: [
+        { kind: 'kpis', items: [
+          { label: 'SKU availability', value: '82%', delta: '−6pp', up: false },
+          { label: 'Branches affected', value: '9 / 12' },
+          { label: 'Est. lost sales', value: '~64k EGP', delta: '+22k', up: false },
+          { label: 'Top missing cat.', value: 'Beverages' },
+        ] },
+        { kind: 'ranking', title: 'Stockout rate by branch', items: [
+          { name: 'Alexandria – Smouha', value: 34, max: 40, tone: 'bad' },
+          { name: 'Alexandria – Sidi Gaber', value: 28, max: 40, tone: 'bad' },
+          { name: 'Giza – Dokki', value: 22, max: 40 },
+          { name: 'Nasr City', value: 14, max: 40 },
+          { name: 'Cairo Festival City', value: 6, max: 40, tone: 'good' },
+        ] },
+      ],
+    }),
+  },
+  {
+    id: 'competitor',
+    pill: 'Competitor benchmark',
+    prompt: 'How do I compare to competitors on service and cleanliness?',
+    keywords: ['competitor', 'benchmark', 'industry', 'market', 'peers'],
+    followUps: ['Where do competitors beat me?', 'Benchmark by category', 'Suggest gap-closing missions', 'Share benchmark deck'],
+    build: () => ({
+      content: `You beat the category average on **Service (+4)** and **NPS (+11)**, but trail on **Speed at checkout (−6)**.`,
+      visuals: [
+        { kind: 'radar', title: 'You vs category average', a: 'You', b: 'Category avg',
+          data: [
+            { metric: 'Service', a: 88, b: 84 }, { metric: 'Cleanliness', a: 87, b: 86 },
+            { metric: 'Speed', a: 78, b: 84 }, { metric: 'NPS', a: 64, b: 53 },
+            { metric: 'Price value', a: 76, b: 79 }, { metric: 'Product', a: 85, b: 82 },
+          ] },
+        { kind: 'callouts', title: 'Gaps to close', items: [
+          { icon: 'x', label: 'Speed at checkout', text: '6 pts behind category. Peak-hour queues are the main driver.' },
+          { icon: 'alert', label: 'Price perception', text: 'Slight gap (−3). Consider clearer value messaging in-store.' },
+          { icon: 'check', label: 'NPS leadership', text: 'You lead the category by 11 points — protect it via staff recognition.' },
+        ] },
+      ],
+    }),
+  },
+  {
+    id: 'staff-friendliness',
+    pill: 'Staff friendliness',
+    prompt: 'How is staff friendliness trending across my network?',
+    keywords: ['friendly', 'friendliness', 'staff attitude', 'greeting', 'politeness'],
+    followUps: ['Best-performing staff behaviors', 'Coaching topics to prioritize', 'Branch drill-down', 'Reward top branches'],
+    build: () => ({
+      content: `Staff friendliness averages **4.6/5** across the network — up from **4.3** in Q1. Zamalek and Maadi still lag.`,
+      visuals: [
+        { kind: 'line', title: 'Friendliness score — 6 months', series: [{ key: 's', label: 'Score /5', color: C.good }],
+          data: [{ name: 'Jan', s: 4.3 }, { name: 'Feb', s: 4.3 }, { name: 'Mar', s: 4.4 }, { name: 'Apr', s: 4.5 }, { name: 'May', s: 4.5 }, { name: 'Jun', s: 4.6 }] },
+        { kind: 'ranking', title: 'By branch', items: [
+          { name: 'Cairo Festival City', value: 4.9, max: 5, tone: 'good' },
+          { name: 'Heliopolis', value: 4.8, max: 5, tone: 'good' },
+          { name: 'Nasr City', value: 4.7, max: 5 },
+          { name: 'Zamalek', value: 4.1, max: 5, tone: 'bad' },
+          { name: 'Maadi', value: 3.9, max: 5, tone: 'bad' },
+        ] },
+      ],
+    }),
+  },
+  {
+    id: 'anomaly',
+    pill: 'Anomalies',
+    prompt: "Find anomalies in this month's visits.",
+    keywords: ['anomaly', 'anomalies', 'outlier', 'unusual', 'suspicious', 'weird'],
+    followUps: ['Investigate Zamalek drop', 'Flag suspect visits for review', 'Show anomaly history', 'Alert me next time this happens'],
+    build: () => ({
+      content: `Detected **3 anomalies** worth investigating. Zamalek's sudden CX drop is the most material.`,
+      visuals: [
+        { kind: 'callouts', title: 'Anomalies detected', items: [
+          { icon: 'x', label: 'Zamalek — CX drop', text: 'CX fell from 84 to 61 over 6 visits in one week. 3σ deviation from baseline.' },
+          { icon: 'alert', label: 'Nasr City — rating inflation', text: '5 back-to-back perfect scores from same agent. Worth spot-checking.' },
+          { icon: 'alert', label: 'Heliopolis — wait spike', text: 'Wait time jumped 40% on Fridays only. Likely staffing gap.' },
+        ] },
+        { kind: 'table', title: 'Anomaly summary', headers: ['Branch', 'Metric', 'Baseline', 'Observed', 'Severity'],
+          rows: [
+            [{ text: 'Zamalek' }, { text: 'CX score' }, { text: '84' }, { text: '61', tone: 'bad' }, { text: 'High', tone: 'bad' }],
+            [{ text: 'Nasr City' }, { text: 'Rating pattern' }, { text: 'mixed' }, { text: '5×5.0' }, { text: 'Medium' }],
+            [{ text: 'Heliopolis' }, { text: 'Fri wait' }, { text: '4 min' }, { text: '5.6 min', tone: 'bad' }, { text: 'Medium' }],
+          ] },
+      ],
+    }),
+  },
+  {
+    id: 'forecast',
+    pill: 'Forecast',
+    prompt: 'Forecast my CX and NPS for the next 3 months.',
+    keywords: ['forecast', 'predict', 'projection', 'future', 'next month', 'next quarter'],
+    followUps: ['Show confidence bands', 'What could change this?', 'Set a goal for Q3', 'Alert me if we go off-track'],
+    build: () => ({
+      content: `If current trends hold, CX reaches **~89** and NPS **~+72** by September. Wait-time complaints are the biggest downside risk.`,
+      visuals: [
+        { kind: 'line', title: 'CX — actual & 3-month forecast', series: [{ key: 'cx', label: 'CX', color: C.primary }],
+          data: [{ name: 'Apr', cx: 83.6 }, { name: 'May', cx: 84.1 }, { name: 'Jun', cx: 86.2 }, { name: 'Jul*', cx: 87.1 }, { name: 'Aug*', cx: 88.0 }, { name: 'Sep*', cx: 89.0 }] },
+        { kind: 'kpis', title: 'Projected Sep', items: [
+          { label: 'CX (proj.)', value: '89.0', delta: '+2.8', up: true },
+          { label: 'NPS (proj.)', value: '+72', delta: '+8', up: true },
+          { label: 'Visits (proj.)', value: '75/mo', delta: '+10', up: true },
+          { label: 'Confidence', value: '±2.5 pts' },
+        ] },
+      ],
+    }),
+  },
+  {
+    id: 'agent-fraud',
+    pill: 'Fraud check',
+    prompt: 'Are any agents submitting fake or copy-paste answers?',
+    keywords: ['fraud', 'fake', 'copy', 'paste', 'duplicate', 'suspicious agent', 'cheat'],
+    followUps: ['Show flagged submissions', 'Block agent X', 'Tighten photo requirements', 'Auto-reject duplicates'],
+    build: () => ({
+      content: `**2 agents** show patterns worth reviewing. No confirmed fraud, but likelihood is elevated on **4 recent visits**.`,
+      visuals: [
+        { kind: 'kpis', items: [
+          { label: 'Flagged visits', value: '4', delta: 'of 65', up: false },
+          { label: 'Duplicate text %', value: '11%', delta: '+6pp', up: false },
+          { label: 'GPS mismatch', value: '2', hint: 'in flagged batch' },
+          { label: 'Photo re-use', value: '1', hint: 'metadata match' },
+        ] },
+        { kind: 'table', title: 'Flagged agents', headers: ['Agent', 'Visits', 'Signal', 'Action'],
+          rows: [
+            [{ text: 'Karim H.', strong: true }, { text: '9' }, { text: '3 near-duplicate answer sets', tone: 'bad' }, { text: 'Review + coach', tone: 'bad' }],
+            [{ text: 'Omar T.', strong: true }, { text: '6' }, { text: 'GPS 400m off branch (1 visit)', tone: 'bad' }, { text: 'Warn' }],
+          ] },
+      ],
+    }),
+  },
+  {
+    id: 'action-plan',
+    pill: 'Action plan',
+    prompt: 'Give me a 30-day action plan to improve CX.',
+    keywords: ['action', 'plan', 'improve', 'roadmap', 'next steps', 'recommend'],
+    followUps: ['Assign owners', 'Turn into missions', 'Estimate impact', 'Add to calendar'],
+    build: () => ({
+      content: `Here is a prioritized **30-day plan** — three moves that together should lift CX by an estimated **+3 points**.`,
+      visuals: [
+        { kind: 'callouts', title: 'Prioritized actions', items: [
+          { icon: 'check', label: 'Week 1 — Wait time fix', text: 'Add a second cashier 7–10pm at CFC, MoA, Nasr City. Expected: −40% queue complaints.' },
+          { icon: 'check', label: 'Week 2 — Smouha refresh', text: 'Product-knowledge training + surprise audit missions ×3. Expected: +6 pts CX.' },
+          { icon: 'alert', label: 'Week 3 — Coach Karim H.', text: 'Ride-along + submission review. Reassign to lower-stakes branches until approval rate ≥85%.' },
+          { icon: 'check', label: 'Week 4 — Reward top 3', text: 'Bonus + public shout-out for Ahmed M., Salma K., Youssef R.' },
+        ] },
+        { kind: 'kpis', title: 'Expected 30-day impact', items: [
+          { label: 'CX', value: '+3.0', up: true },
+          { label: 'Wait complaints', value: '−40%', up: true },
+          { label: 'Smouha CX', value: '+6', up: true },
+          { label: 'Cost', value: '~22k EGP' },
+        ] },
+      ],
+    }),
+  },
+  {
+    id: 'expansion',
+    pill: 'Expansion',
+    prompt: 'Where should I open my next branch?',
+    keywords: ['expand', 'expansion', 'open', 'new branch', 'location', 'where should'],
+    followUps: ['Detail on 6th of October', 'Compare New Cairo vs Sheikh Zayed', 'Cost model for a new site', 'Draft investor slide'],
+    build: () => ({
+      content: `Based on demand signals from shoppers and unmet-need feedback, **6th of October** and **Sheikh Zayed** score highest for expansion.`,
+      visuals: [
+        { kind: 'ranking', title: 'Expansion attractiveness score', items: [
+          { name: '6th of October', value: 88, max: 100, tone: 'good' },
+          { name: 'Sheikh Zayed', value: 84, max: 100, tone: 'good' },
+          { name: 'Mansoura', value: 72, max: 100 },
+          { name: 'Hurghada', value: 66, max: 100 },
+          { name: 'Tanta', value: 58, max: 100 },
+        ] },
+        { kind: 'table', title: 'Signal breakdown', headers: ['City', 'Requests', 'Nearest branch', 'Est. demand', 'Payback'],
+          rows: [
+            [{ text: '6th of October', strong: true }, { text: '142' }, { text: '18 km' }, { text: 'High', tone: 'good' }, { text: '~9 mo', tone: 'good' }],
+            [{ text: 'Sheikh Zayed', strong: true }, { text: '118' }, { text: '14 km' }, { text: 'High', tone: 'good' }, { text: '~11 mo', tone: 'good' }],
+            [{ text: 'Mansoura' }, { text: '84' }, { text: '120 km' }, { text: 'Medium' }, { text: '~16 mo' }],
+          ] },
+      ],
+    }),
+  },
 ];
 
 // ---------- Matcher — keyword score, then substring on prompt ----------
@@ -448,7 +648,6 @@ function findAnswer(text: string): Answer {
   for (const s of ANSWERS) {
     let score = 0;
     for (const k of s.keywords) if (q.includes(k)) score += 2;
-    // small bonus for prompt overlap
     for (const w of s.prompt.toLowerCase().split(/\W+/).filter(w => w.length > 4)) {
       if (q.includes(w)) score += 1;
     }
@@ -490,9 +689,23 @@ function seedConvo(id: string, title: string, days: number, prompt: string): Con
   };
 }
 const SEED: Conversation[] = [
-  seedConvo('s1', 'June monthly CX summary', 2, ANSWERS[7].prompt),
-  seedConvo('s2', 'Cairo branch comparison', 6, ANSWERS[6].prompt),
-  seedConvo('s3', 'Where to focus next', 12, ANSWERS[3].prompt),
+  seedConvo('s01', "June executive summary", 1, "Draft an executive summary of this month's performance."),
+  seedConvo('s02', 'Top branch last month', 2, 'Which branch performed best last month?'),
+  seedConvo('s03', 'CFC vs Mall of Arabia', 3, 'Compare Cairo Festival City vs Mall of Arabia side by side.'),
+  seedConvo('s04', 'NPS trend — 6 months', 4, 'Show me the NPS trend for the last 6 months.'),
+  seedConvo('s05', 'Where to focus next', 5, 'Where am I underperforming geographically?'),
+  seedConvo('s06', 'Top customer complaints', 7, 'What are customers complaining about most?'),
+  seedConvo('s07', 'Mission ROI this quarter', 9, 'What is my ROI on missions this quarter?'),
+  seedConvo('s08', 'Agent quality check', 11, 'Are my agents catching real issues?'),
+  seedConvo('s09', 'Peak hours & service dip', 13, 'When are my busiest hours and how is service holding up?'),
+  seedConvo('s10', 'Stockouts across branches', 15, 'How often are products out of stock across branches?'),
+  seedConvo('s11', 'Competitor benchmark', 17, 'How do I compare to competitors on service and cleanliness?'),
+  seedConvo('s12', 'Staff friendliness trend', 19, 'How is staff friendliness trending across my network?'),
+  seedConvo('s13', 'Anomaly detection', 21, "Find anomalies in this month's visits."),
+  seedConvo('s14', 'Q3 CX & NPS forecast', 24, 'Forecast my CX and NPS for the next 3 months.'),
+  seedConvo('s15', 'Fake submissions check', 27, 'Are any agents submitting fake or copy-paste answers?'),
+  seedConvo('s16', '30-day action plan', 30, 'Give me a 30-day action plan to improve CX.'),
+  seedConvo('s17', 'Next branch to open', 34, 'Where should I open my next branch?'),
 ];
 
 const QUICK_COMMANDS = [
