@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { seedTLabDemo } from '@/lib/seedTLabDemo';
 import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
+import { seedAIDemo } from '@/lib/seedAIDemo';
+
 
 interface AccountData {
   full_name: string;
@@ -34,6 +36,8 @@ export function AccountSettings() {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isSeedingTamara, setIsSeedingTamara] = useState(false);
+  const [isSeedingAI, setIsSeedingAI] = useState(false);
+
   const { t } = useTranslation('settings');
   const queryClient = useQueryClient();
 
@@ -83,6 +87,31 @@ export function AccountSettings() {
       setIsSeedingTamara(false);
     }
   };
+
+  const handleSeedAI = async () => {
+    setIsSeedingAI(true);
+    try {
+      const result = await seedAIDemo();
+      if (!result.ok) {
+        toast.error(`Failed to seed AI demo. ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info('AI Account demo already seeded.');
+      } else {
+        toast.success(`AI Account demo loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-scores'] });
+      }
+    } catch (e) {
+      toast.error(`Failed to seed AI demo. ${(e as Error).message}`);
+    } finally {
+      setIsSeedingAI(false);
+    }
+  };
+
 
   const handleSaveProfile = async () => {
     setIsLoading(true);
@@ -263,6 +292,20 @@ export function AccountSettings() {
               </>
             )}
           </Button>
+          <Button onClick={handleSeedAI} disabled={isSeedingAI} variant="outline" className="gap-2">
+            {isSeedingAI ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading AI account…
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Load AI Account
+              </>
+            )}
+          </Button>
+
         </CardContent>
       </Card>
     </div>
