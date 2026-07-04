@@ -839,8 +839,10 @@ export default function ReportsV2Page() {
         <div className="flex-1 flex flex-col min-w-0 max-w-3xl mx-auto w-full">
           {isEmpty ? (
             <div className="flex-1 flex flex-col items-center justify-center px-4">
-              <img src={shadooLogo} alt="Shadoo" className="h-12 w-auto mb-5" />
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-3">Meet Shadoo AI</h1>
+              <div className="flex items-center gap-3 mb-3">
+                <img src={shadooLogo} alt="Shadoo" className="h-10 w-auto" />
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight">Shadoo AI</h1>
+              </div>
               <p className="text-sm md:text-base text-muted-foreground text-center max-w-lg mb-8 leading-relaxed">
                 Ask anything about your branches, agents, and visits — get straight answers with charts, in seconds.
               </p>
