@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import shadooLogo from '@/assets/shadoo-logo.png';
+import shadooCap from '@/assets/shadoo-cap.png';
 import {
   Plus, ArrowUp, Paperclip, FileText, BarChart3, TrendingUp, Sparkles,
   MessageSquarePlus, Bot, User as UserIcon, Trash2, Command,
