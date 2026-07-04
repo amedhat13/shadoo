@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2, Info, MessageSquare, Sparkles } from 'lucide-react';
+import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2, Info, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
