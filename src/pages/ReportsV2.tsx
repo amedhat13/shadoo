@@ -244,6 +244,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Top complaints',
     prompt: 'What are customers complaining about most?',
     keywords: ['complain', 'complaint', 'issue', 'problem', 'negative', 'feedback'],
+    followUps: [
+      'Wait-time complaints by branch',
+      'Show hourly wait patterns',
+      'Compare complaints vs industry benchmark',
+      'Draft response template for customers',
+    ],
     build: () => ({
       content: `**Wait time at checkout** is the #1 complaint (28% of mentions) and it's growing. Overall sentiment is still healthy — 62% positive.`,
       visuals: [
