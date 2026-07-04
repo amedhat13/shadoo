@@ -55,7 +55,9 @@ export function UsersSettings() {
     admin: { label: t('users.roles.admin'), description: t('users.roles.admin_description'), variant: 'default' as const },
     manager: { label: t('users.roles.manager'), description: t('users.roles.manager_description'), variant: 'secondary' as const },
     viewer: { label: t('users.roles.viewer'), description: t('users.roles.viewer_description'), variant: 'outline' as const },
+    ai: { label: 'Shadoo AI', description: 'Automated AI assistant with read access to reports and analytics.', variant: 'secondary' as const },
   };
+
 
   const handleInvite = async () => {
     if (!inviteEmail || isAtLimit) return;
