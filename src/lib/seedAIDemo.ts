@@ -83,7 +83,9 @@ export async function seedAIDemo(): Promise<SeedResult> {
     company_name: 'Test Account',
     full_name: 'Test Account',
     phone: '+20 100 000 0000',
+    logo_url: null,
   }).eq('user_id', userId);
+
 
 
   // Clear other demo brands so Reports reflects only the active demo
