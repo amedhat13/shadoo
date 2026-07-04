@@ -935,7 +935,9 @@ export default function ReportsV2Page() {
                 </div>
               </div>
               <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
-                {messages.map(msg => (
+                {messages.map((msg, idx) => {
+                  const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1 && !thinking;
+                  return (
                   <div key={msg.id} className={cn('flex gap-3', msg.role === 'user' && 'flex-row-reverse')}>
                     <div className={cn('h-8 w-8 rounded-full flex items-center justify-center shrink-0',
                       msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground')}>
@@ -950,11 +952,27 @@ export default function ReportsV2Page() {
                         <div className="text-sm text-foreground/90 w-full">
                           {renderMarkdown(msg.content)}
                           {msg.visuals?.map((v, i) => <VisualBlock key={i} v={v} />)}
+                          {isLastAssistant && msg.followUps && msg.followUps.length > 0 && (
+                            <div className="mt-5 pt-4 border-t border-border/60">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                                <Sparkles className="h-3 w-3" />Suggested follow-ups
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {msg.followUps.map((f, i) => (
+                                  <button key={i} onClick={() => send(f)} disabled={thinking}
+                                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
+                                    {f}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 {thinking && (
                   <div className="flex gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
