@@ -344,6 +344,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Compare branches',
     prompt: 'Compare Cairo Festival City vs Mall of Arabia side by side.',
     keywords: ['compare', 'vs', 'versus', 'side'],
+    followUps: [
+      'Add Nasr City to this comparison',
+      'Show 6-month trend for both',
+      'Which one improved more this quarter?',
+      'Save this comparison as a report',
+    ],
     build: () => ({
       content: `**Cairo Festival City** wins overall on service and NPS. **Mall of Arabia** edges ahead on cleanliness and speed at checkout.`,
       visuals: [
