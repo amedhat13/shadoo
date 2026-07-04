@@ -20,7 +20,7 @@ export interface SeedResult {
   error?: string;
 }
 
-const AI_BRAND = 'Aida AI';
+const AI_BRAND = 'Test Account';
 
 const AI_BRANCHES = [
   {
