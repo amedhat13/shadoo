@@ -65,6 +65,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Top branch',
     prompt: 'Which branch performed best last month?',
     keywords: ['top', 'best', 'performed', 'winner', 'leader'],
+    followUps: [
+      'What drove Cairo Festival City to #1?',
+      'Compare Cairo Festival City vs Mall of Arabia',
+      'Which branch dropped the most vs last month?',
+      'Draft a congrats note to the CFC store manager',
+    ],
     build: () => ({
       content: `**Cairo Festival City** was your #1 branch last month — leading on service quality and NPS across all 12 locations. Here's the ranking and what drove the win:`,
       visuals: [
