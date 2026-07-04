@@ -88,6 +88,31 @@ export function AccountSettings() {
     }
   };
 
+  const handleSeedAI = async () => {
+    setIsSeedingAI(true);
+    try {
+      const result = await seedAIDemo();
+      if (!result.ok) {
+        toast.error(`Failed to seed AI demo. ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info('AI Account demo already seeded.');
+      } else {
+        toast.success(`AI Account demo loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-scores'] });
+      }
+    } catch (e) {
+      toast.error(`Failed to seed AI demo. ${(e as Error).message}`);
+    } finally {
+      setIsSeedingAI(false);
+    }
+  };
+
+
   const handleSaveProfile = async () => {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
