@@ -62,7 +62,7 @@ const AI_MISSIONS = TAMARA_MISSIONS.map((m) => ({
   ...m,
   id: m.id.replace('tamara', 'ai'),
   name: m.name.replace(/^Tamara/i, AI_BRAND),
-  name_ar: m.name_ar.replace(/^تمارا/, 'عايدة إيه آي'),
+  name_ar: m.name_ar.replace(/^تمارا/, 'حساب تجريبي'),
   branch_id: branchIdRemap[m.branch_id] || m.branch_id,
 }));
 
