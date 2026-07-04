@@ -862,6 +862,10 @@ export default function ReportsV2Page() {
       <div className="flex gap-4 h-[calc(100vh-8rem)] -mx-4 md:-mx-6 -my-4 md:-my-6 px-4 md:px-6 py-4 md:py-6">
         {/* Secondary nav */}
         <aside className="hidden md:flex flex-col w-64 shrink-0 border-e border-border pe-4">
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <img src={shadooLogo} alt="Shadoo" className="h-6 w-auto" />
+            <span className="text-sm font-black tracking-tight">Shadoo AI</span>
+          </div>
           <Button onClick={startNew} variant="outline" className="justify-start gap-2 mb-3">
             <MessageSquarePlus className="h-4 w-4" />New conversation
           </Button>
@@ -927,14 +931,7 @@ export default function ReportsV2Page() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-3 pb-3 border-b border-border">
-                <img src={shadooLogo} alt="Shadoo" className="h-7 w-auto" />
-                <div className="min-w-0">
-                  <h1 className="text-sm font-black uppercase tracking-wide truncate">{active!.title}</h1>
-                  <p className="text-[11px] text-muted-foreground">Shadoo AI</p>
-                </div>
-              </div>
-              <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto pt-2 pb-4 space-y-6">
                 {messages.map((msg, idx) => {
                   const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1 && !thinking;
                   return (
@@ -957,10 +954,10 @@ export default function ReportsV2Page() {
                               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
                                 <Sparkles className="h-3 w-3" />Suggested follow-ups
                               </div>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:thin]">
                                 {msg.followUps.map((f, i) => (
                                   <button key={i} onClick={() => send(f)} disabled={thinking}
-                                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
+                                    className="shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
                                     {f}
                                   </button>
                                 ))}
@@ -986,7 +983,7 @@ export default function ReportsV2Page() {
                   </div>
                 )}
               </div>
-              <div className="pb-2">
+              <div className="pt-3 pb-3">
                 <div className="rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
                   <Textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); } }}
