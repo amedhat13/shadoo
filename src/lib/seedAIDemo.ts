@@ -39,7 +39,7 @@ const AI_BRANCHES = [
   {
     id: 'ai-branch-newcairo',
     name: `${AI_BRAND} — Point 90 Mall`,
-    name_ar: 'عايدة إيه آي — بوينت ٩٠ مول',
+    name_ar: 'حساب تجريبي — بوينت ٩٠ مول',
     address: 'Point 90 Mall, New Cairo',
     address_ar: 'بوينت ٩٠ مول، القاهرة الجديدة',
     city: 'Cairo',
