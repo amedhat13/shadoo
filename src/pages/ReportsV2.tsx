@@ -643,6 +643,70 @@ const ANSWERS: Suggestion[] = [
 
 // ---------- Matcher — keyword score, then substring on prompt ----------
 function findAnswer(text: string): Answer {
+  const q = text.toLowerCase();
+  let best: { s: Suggestion; score: number } | null = null;
+  for (const s of ANSWERS) {
+    let score = 0;
+    for (const k of s.keywords) if (q.includes(k)) score += 2;
+    for (const w of s.prompt.toLowerCase().split(/\W+/).filter(w => w.length > 4)) {
+      if (q.includes(w)) score += 1;
+    }
+    if (!best || score > best.score) best = { s, score };
+  }
+  if (best && best.score >= 2) return { ...best.s.build(), followUps: best.s.followUps };
+
+  return {
+    content: `Here's the pulse on your account. Ask me a more specific question — a branch name, a metric, or a timeframe — and I'll pull a detailed answer with charts.`,
+    visuals: [
+      {
+        kind: 'kpis',
+        items: [
+          { label: 'Overall CX', value: '86.2', delta: '+2.1', up: true },
+          { label: 'NPS', value: '+64', delta: '+6', up: true },
+          { label: 'Visits (30d)', value: '65', delta: '+8', up: true },
+          { label: 'Complaints', value: '87', delta: '−12', up: true },
+        ],
+      },
+    ],
+    followUps: [
+      'Which branch performed best last month?',
+      'Show me the NPS trend',
+      'Where am I underperforming?',
+      "Draft this month's executive summary",
+    ],
+  };
+}
+
+// ---------- Seed conversations ----------
+function seedConvo(id: string, title: string, days: number, prompt: string): Conversation {
+  const ans = findAnswer(prompt);
+  return {
+    id, title, updatedAt: Date.now() - 1000 * 60 * 60 * 24 * days,
+    messages: [
+      { id: 'u', role: 'user', content: prompt },
+      { id: 'a', role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps },
+    ],
+  };
+}
+const SEED: Conversation[] = [
+  seedConvo('s01', "June executive summary", 1, "Draft an executive summary of this month's performance."),
+  seedConvo('s02', 'Top branch last month', 2, 'Which branch performed best last month?'),
+  seedConvo('s03', 'CFC vs Mall of Arabia', 3, 'Compare Cairo Festival City vs Mall of Arabia side by side.'),
+  seedConvo('s04', 'NPS trend — 6 months', 4, 'Show me the NPS trend for the last 6 months.'),
+  seedConvo('s05', 'Where to focus next', 5, 'Where am I underperforming geographically?'),
+  seedConvo('s06', 'Top customer complaints', 7, 'What are customers complaining about most?'),
+  seedConvo('s07', 'Mission ROI this quarter', 9, 'What is my ROI on missions this quarter?'),
+  seedConvo('s08', 'Agent quality check', 11, 'Are my agents catching real issues?'),
+  seedConvo('s09', 'Peak hours & service dip', 13, 'When are my busiest hours and how is service holding up?'),
+  seedConvo('s10', 'Stockouts across branches', 15, 'How often are products out of stock across branches?'),
+  seedConvo('s11', 'Competitor benchmark', 17, 'How do I compare to competitors on service and cleanliness?'),
+  seedConvo('s12', 'Staff friendliness trend', 19, 'How is staff friendliness trending across my network?'),
+  seedConvo('s13', 'Anomaly detection', 21, "Find anomalies in this month's visits."),
+  seedConvo('s14', 'Q3 CX & NPS forecast', 24, 'Forecast my CX and NPS for the next 3 months.'),
+  seedConvo('s15', 'Fake submissions check', 27, 'Are any agents submitting fake or copy-paste answers?'),
+  seedConvo('s16', '30-day action plan', 30, 'Give me a 30-day action plan to improve CX.'),
+  seedConvo('s17', 'Next branch to open', 34, 'Where should I open my next branch?'),
+];
 
 const QUICK_COMMANDS = [
   { id: 'q1', label: 'Compare Cairo Festival City vs Mall of Arabia side by side.', short: 'Compare two branches', icon: BarChart3 },
