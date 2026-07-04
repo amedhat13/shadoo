@@ -7,6 +7,7 @@ import {
   BarChart3, 
   Settings,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ const navItems = [
   { id: 'branches', labelKey: 'branches', href: '/branches', icon: Building2 },
   { id: 'wallet', labelKey: 'wallet', href: '/wallet', icon: Wallet },
   { id: 'reports', labelKey: 'reports', href: '/reports', icon: BarChart3 },
+  { id: 'reports_v2', labelKey: 'reports_v2', href: '/reports-v2', icon: Sparkles, fallback: 'REPORTS AI' },
   { id: 'settings', labelKey: 'settings', href: '/settings', icon: Settings },
 ];
 

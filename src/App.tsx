@@ -21,6 +21,7 @@ import MissionCreatePage from "./pages/MissionCreate";
 import MissionDetailsPage from "./pages/MissionDetails";
 import WalletPage from "./pages/Wallet";
 import ReportsPage from "./pages/Reports";
+import ReportsV2Page from "./pages/ReportsV2";
 import BranchesPage from "./pages/Branches";
 import SettingsPage from "./pages/Settings";
 
@@ -132,6 +133,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports-v2"
+              element={
+                <ProtectedRoute>
+                  <ReportsV2Page />
                 </ProtectedRoute>
               }
             />

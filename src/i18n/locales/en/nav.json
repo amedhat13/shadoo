@@ -4,6 +4,7 @@
   "branches": "BRANCHES",
   "wallet": "WALLET",
   "reports": "REPORTS",
+  "reports_v2": "REPORTS AI",
   "settings": "SETTINGS",
   "wallet_balance": "Wallet Balance",
   "in_mission_balance": "In-Mission Balance",
