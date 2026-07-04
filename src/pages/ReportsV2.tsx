@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,20 +12,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import shadooLogo from '@/assets/shadoo-logo.png';
 import {
   Plus,
   ArrowUp,
-  Sparkles,
   Paperclip,
   FileText,
   BarChart3,
   TrendingUp,
-  Users,
-  MapPin,
-  Star,
-  DollarSign,
+  Sparkles,
+  MessageSquarePlus,
   Bot,
   User as UserIcon,
+  Trash2,
 } from 'lucide-react';
 
 type Message = {
@@ -35,18 +33,25 @@ type Message = {
   content: string;
 };
 
+type Conversation = {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messages: Message[];
+};
+
 type Suggestion = {
   id: string;
-  label: string;
-  icon: typeof BarChart3;
+  pill: string; // short 3-4 words
+  prompt: string; // full prompt inserted into box
   answer: string;
 };
 
 const SUGGESTIONS: Suggestion[] = [
   {
     id: 'top-branch',
-    label: 'Which branch performed best last month?',
-    icon: TrendingUp,
+    pill: 'Top branch',
+    prompt: 'Which branch performed best last month?',
     answer: `**Cairo Festival City** led all branches last month with an overall CX score of **91.4/100** across 24 completed visits.
 
 Key drivers:
@@ -60,8 +65,8 @@ Weakest area across all branches this month was **Wait Time Perception** (avg 78
   },
   {
     id: 'nps-trend',
-    label: 'Show me NPS trend for the last 6 months',
-    icon: BarChart3,
+    pill: 'NPS trend',
+    prompt: 'Show me the NPS trend for the last 6 months.',
     answer: `Your NPS has climbed steadily over the last 6 months:
 
 - Jan: **+41**
@@ -71,70 +76,101 @@ Weakest area across all branches this month was **Wait Time Perception** (avg 78
 - May: **+58**
 - Jun: **+64** ← current
 
-That's a **+23 point improvement** in half a year, mostly driven by improvements in Heliopolis and Nasr City locations. Detractor mentions dropped 38% — the most common complaint moving from "slow service" to "limited product availability", which is a healthier signal.
+That's a **+23 point improvement** in half a year, mostly driven by Heliopolis and Nasr City locations. Detractor mentions dropped 38%.
 
 Want me to break this down by branch or by methodology?`,
   },
   {
     id: 'agent-quality',
-    label: 'Are my agents catching real issues?',
-    icon: Users,
+    pill: 'Agent quality',
+    prompt: 'Are my agents catching real issues?',
     answer: `Yes — agent submissions look reliable this quarter.
 
 - **Approval rate**: 91% (114 approved / 125 submitted)
-- **Photo compliance**: 96% (agents attaching required evidence)
+- **Photo compliance**: 96%
 - **Rejection reasons**: mostly incomplete answers (7), only 2 flagged as low-quality
 - **Avg agent rating** you've given: **4.6/5**
 
-Top performers: Ahmed M. (4.9), Salma K. (4.8), Youssef R. (4.8). No agents currently below the 3.5 threshold.
+Top performers: Ahmed M. (4.9), Salma K. (4.8), Youssef R. (4.8).
 
-Recommendation: agent **Karim H.** submitted 4 visits with rushed answers — worth a review or extra training assignment before their next mission.`,
+Recommendation: agent **Karim H.** submitted 4 rushed visits — worth a review before their next mission.`,
   },
   {
     id: 'geo-weakness',
-    label: 'Where am I underperforming geographically?',
-    icon: MapPin,
+    pill: 'Weak areas',
+    prompt: 'Where am I underperforming geographically?',
     answer: `Three areas need attention:
 
-1. **Alexandria – Smouha** — CX score **68/100** (12 points below your network avg). Main issue: staff product knowledge scored 61/100 in the last 3 visits.
+1. **Alexandria – Smouha** — CX score **68/100** (12 points below your network avg). Main issue: staff product knowledge scored 61/100.
 2. **Giza – Dokki** — Cleanliness dropped to **72/100** after being stable at 85+ all year.
-3. **Cairo – Maadi** — NPS turned negative (-8) for the first time in 2026. Only 6 visits so far this month, so sample is small but worth watching.
+3. **Cairo – Maadi** — NPS turned negative (-8) for the first time in 2026.
 
 Everything in **Nasr City, Heliopolis, and New Cairo** is performing at or above target.`,
   },
   {
     id: 'complaints',
-    label: 'What are customers complaining about most?',
-    icon: Star,
-    answer: `Across 87 open-ended responses this month, the top themes are:
+    pill: 'Top complaints',
+    prompt: 'What are customers complaining about most?',
+    answer: `Across 87 open-ended responses this month:
 
 1. **Wait time at checkout** — 24 mentions (28%)
-2. **Product availability / out of stock** — 19 mentions (22%)
+2. **Product availability** — 19 mentions (22%)
 3. **Staff attentiveness** — 11 mentions (13%)
-4. **Store temperature / A/C** — 8 mentions (9%)
+4. **Store temperature** — 8 mentions (9%)
 5. **Restroom cleanliness** — 6 mentions (7%)
 
-Sentiment breakdown: **62% positive, 24% neutral, 14% negative**. The negative share has actually shrunk from 21% last month, so the trajectory is good — but wait times are becoming a signature complaint and would be the highest-leverage thing to fix.`,
+Sentiment: **62% positive, 24% neutral, 14% negative** — negative share shrank from 21% last month.`,
   },
   {
     id: 'roi',
-    label: 'What is my ROI on missions this quarter?',
-    icon: DollarSign,
+    pill: 'Mission ROI',
+    prompt: 'What is my ROI on missions this quarter?',
     answer: `This quarter you've invested **48,750 EGP** across 65 completed visits (avg **750 EGP/visit**).
 
-Insights uncovered:
-- 3 operational issues fixed after mystery shopper flags (est. recovered revenue: **~180,000 EGP** based on historical churn data for similar issues).
+- 3 operational issues fixed after mystery shopper flags (est. recovered revenue: **~180,000 EGP**).
 - Staff training gap identified in 2 branches — training rolled out reduced complaint rate 34%.
-- 1 compliance risk caught (expired signage) before any regulatory issue.
+- 1 compliance risk caught before any regulatory issue.
 
-Estimated ROI: **~3.7×** on spend, not counting brand-equity effects. Your best-value mission type this quarter was **Service Audit at Peak Hours** — cheapest per insight generated.`,
+Estimated ROI: **~3.7×** on spend.`,
   },
-];
+  {
+    id: 'compare',
+    pill: 'Compare branches',
+    prompt: 'Compare Cairo Festival City vs Mall of Arabia side by side.',
+    answer: `**Head-to-head — last 30 days**
 
-const READY_REPORTS = [
-  { id: 'r1', title: 'June 2026 — Monthly CX Summary', desc: 'All branches, all methodologies', date: '2 days ago' },
-  { id: 'r2', title: 'Cairo Region — Branch Comparison', desc: '8 branches ranked by NPS + CSAT', date: '1 week ago' },
-  { id: 'r3', title: 'Ramadan Campaign Recap', desc: 'Foot traffic + service quality during promo', date: '3 weeks ago' },
+| Metric | Cairo Festival City | Mall of Arabia |
+|---|---|---|
+| Overall CX | **91.4** | 88.7 |
+| NPS | **+72** | +61 |
+| Cleanliness | 92 | **93** |
+| Service Quality | **94** | 87 |
+| Wait Time | 82 | **85** |
+| Visits | 24 | 19 |
+
+**Cairo Festival City** wins on service and NPS. **Mall of Arabia** is slightly cleaner and faster at checkout.`,
+  },
+  {
+    id: 'exec-summary',
+    pill: 'Exec summary',
+    prompt: 'Draft an executive summary email of this month\'s performance.',
+    answer: `**Subject: June 2026 CX Performance Snapshot**
+
+Team,
+
+June was a strong month. Overall CX landed at **86.2/100** (+2.1 MoM) across **65 visits in 12 branches**, and **NPS hit +64** — our best reading of the year.
+
+**Highlights**
+- Cairo Festival City topped the network at 91.4
+- Complaint volume dropped 12% vs May
+- Agent approval rate held at 91%
+
+**Watch-outs**
+- Alexandria Smouha (CX 68) needs a service refresh
+- Wait time is emerging as the #1 recurring complaint
+
+Full report attached.`,
+  },
 ];
 
 const QUICK_COMMANDS = [
@@ -144,11 +180,52 @@ const QUICK_COMMANDS = [
   { id: 'q4', label: 'Suggest which branches need attention', icon: TrendingUp },
 ];
 
+const SEED_CONVERSATIONS: Conversation[] = [
+  {
+    id: 'seed-1',
+    title: 'June monthly CX summary',
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
+    messages: [
+      { id: 'a', role: 'user', content: 'Give me a June monthly CX summary.' },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[7].answer },
+    ],
+  },
+  {
+    id: 'seed-2',
+    title: 'Cairo region branch comparison',
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 6,
+    messages: [
+      { id: 'a', role: 'user', content: 'Compare Cairo branches.' },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[6].answer },
+    ],
+  },
+  {
+    id: 'seed-3',
+    title: 'Where should I focus next?',
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 12,
+    messages: [
+      { id: 'a', role: 'user', content: 'Where am I underperforming?' },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[3].answer },
+    ],
+  },
+];
+
 function renderMarkdown(text: string) {
-  // Minimal markdown: **bold**, bullet lists, line breaks
   const lines = text.split('\n');
   return lines.map((line, i) => {
     if (line.trim() === '') return <div key={i} className="h-2" />;
+    // Table row
+    if (line.trim().startsWith('|')) {
+      const cells = line.split('|').slice(1, -1).map(c => c.trim());
+      if (cells.every(c => /^-+$/.test(c))) return null;
+      return (
+        <div key={i} className="grid gap-2 py-1 border-b border-border/50 text-xs" style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0,1fr))` }}>
+          {cells.map((c, j) => (
+            <div key={j}>{c.split(/(\*\*[^*]+\*\*)/g).map((p, k) => p.startsWith('**') ? <strong key={k}>{p.slice(2, -2)}</strong> : <span key={k}>{p}</span>)}</div>
+          ))}
+        </div>
+      );
+    }
     const isBullet = /^\s*[-*]\s/.test(line);
     const isNumbered = /^\s*\d+\.\s/.test(line);
     const clean = line.replace(/^\s*[-*]\s/, '').replace(/^\s*\d+\.\s/, '');
@@ -173,252 +250,355 @@ function renderMarkdown(text: string) {
 }
 
 function findAnswer(query: string): string {
-  const q = query.toLowerCase();
-  const hit = SUGGESTIONS.find(s => s.label.toLowerCase() === q)
+  const q = query.toLowerCase().trim();
+  const hit = SUGGESTIONS.find(s => s.prompt.toLowerCase() === q)
     || SUGGESTIONS.find(s => {
-      const words = s.label.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+      const words = s.prompt.toLowerCase().split(/\s+/).filter(w => w.length > 4);
       return words.some(w => q.includes(w));
     });
   if (hit) return hit.answer;
   return `I looked across your visits, branches, and agent submissions for **"${query}"**.
 
-Here's what I can tell you at a glance:
+At a glance:
 - Overall CX score this month: **86.2/100** (+2.1 vs last month)
 - Total completed visits: **65** across **12 branches**
 - NPS: **+64**, CSAT: **4.5/5**
 - No critical alerts in the last 7 days
 
-Try asking me something more specific — for example: "which branch has the lowest cleanliness score?" or "how did the Maadi branch perform this month?" I can also draft summaries, spot anomalies, or compare any two branches for you.`;
+Try something more specific — e.g. "which branch has the lowest cleanliness score?" or "how did Maadi perform this month?"`;
+}
+
+function formatRelative(ts: number) {
+  const diff = Date.now() - ts;
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (d === 0) return 'Today';
+  if (d === 1) return 'Yesterday';
+  if (d < 7) return `${d}d ago`;
+  if (d < 30) return `${Math.floor(d / 7)}w ago`;
+  return `${Math.floor(d / 30)}mo ago`;
 }
 
 export default function ReportsV2Page() {
-  const { t: tc } = useTranslation('common');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>(SEED_CONVERSATIONS);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const active = conversations.find(c => c.id === activeId) ?? null;
+  const messages = active?.messages ?? [];
+  const isEmpty = !active;
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, thinking]);
+  }, [messages.length, thinking]);
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, [messages.length]);
+  }, [activeId]);
+
+  const startNew = () => {
+    setActiveId(null);
+    setInput('');
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
 
   const send = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
     const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: trimmed };
-    setMessages(m => [...m, userMsg]);
+
+    let convoId = activeId;
+    if (!convoId) {
+      convoId = crypto.randomUUID();
+      const title = trimmed.length > 42 ? trimmed.slice(0, 42) + '…' : trimmed;
+      setConversations(cs => [{ id: convoId!, title, updatedAt: Date.now(), messages: [userMsg] }, ...cs]);
+      setActiveId(convoId);
+    } else {
+      setConversations(cs => cs.map(c => c.id === convoId
+        ? { ...c, messages: [...c.messages, userMsg], updatedAt: Date.now() }
+        : c));
+    }
     setInput('');
     setThinking(true);
     setTimeout(() => {
       const answer = findAnswer(trimmed);
-      setMessages(m => [...m, { id: crypto.randomUUID(), role: 'assistant', content: answer }]);
+      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: answer };
+      setConversations(cs => cs.map(c => c.id === convoId
+        ? { ...c, messages: [...c.messages, asstMsg], updatedAt: Date.now() }
+        : c));
       setThinking(false);
     }, 700);
   };
 
-  const isEmpty = messages.length === 0;
+  const insertPrompt = (prompt: string) => {
+    setInput(prompt);
+    inputRef.current?.focus();
+  };
+
+  const deleteConvo = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setConversations(cs => cs.filter(c => c.id !== id));
+    if (activeId === id) setActiveId(null);
+  };
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto w-full">
-        {/* Header */}
-        <div className="flex items-center gap-3 pb-4 border-b border-border">
-          <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-            <Sparkles className="h-5 w-5" />
+      <div className="flex gap-4 h-[calc(100vh-8rem)] -mx-4 md:-mx-6 -my-4 md:-my-6 px-4 md:px-6 py-4 md:py-6">
+        {/* Secondary nav — Recent Conversations */}
+        <aside className="hidden md:flex flex-col w-64 shrink-0 border-e border-border pe-4">
+          <Button
+            onClick={startNew}
+            variant="outline"
+            className="justify-start gap-2 mb-3"
+          >
+            <MessageSquarePlus className="h-4 w-4" />
+            New conversation
+          </Button>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2 mb-1">
+            Recent conversations
           </div>
-          <div>
-            <h1 className="text-lg font-black uppercase tracking-wide">Reports AI</h1>
-            <p className="text-xs text-muted-foreground">Ask anything about your data — get instant insights</p>
-          </div>
-          <span className="ms-auto text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-primary/10 text-primary rounded">
-            Beta
-          </span>
-        </div>
+          <ScrollArea className="flex-1 -me-2 pe-2">
+            <div className="space-y-0.5">
+              {conversations.map(c => (
+                <div
+                  key={c.id}
+                  onClick={() => setActiveId(c.id)}
+                  className={cn(
+                    'group flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer text-sm transition-colors',
+                    activeId === c.id ? 'bg-accent text-foreground' : 'hover:bg-accent/50 text-foreground/80'
+                  )}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate">{c.title}</div>
+                    <div className="text-[10px] text-muted-foreground">{formatRelative(c.updatedAt)}</div>
+                  </div>
+                  <button
+                    onClick={(e) => deleteConvo(c.id, e)}
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive p-1 rounded transition"
+                    aria-label="Delete conversation"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+              {conversations.length === 0 && (
+                <div className="text-xs text-muted-foreground px-2 py-4 text-center">
+                  No conversations yet
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </aside>
 
-        {/* Conversation area */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
+        {/* Main chat area */}
+        <div className="flex-1 flex flex-col min-w-0 max-w-3xl mx-auto w-full">
           {isEmpty ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                <Sparkles className="h-7 w-7" />
-              </div>
-              <h2 className="text-2xl font-black tracking-tight mb-2">
-                What do you want to know?
-              </h2>
-              <p className="text-sm text-muted-foreground mb-8 max-w-md">
-                Ask questions in plain language. I'll pull insights from your missions, visits, agents, and branch data.
+            // WELCOME — centered hero with composer
+            <div className="flex-1 flex flex-col items-center justify-center px-4">
+              <img src={shadooLogo} alt="Shadoo" className="h-12 w-auto mb-5" />
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-3">
+                Meet Shadoo AI
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground text-center max-w-xl mb-8 leading-relaxed">
+                Your branches speak. Shadoo listens. Ask anything about how your stores are really performing —
+                what customers loved, where staff dropped the ball, which location needs your attention this week —
+                and get a straight answer in seconds. No dashboards to hunt through. No charts to decode.
+                Just the truth about your customer experience, on demand.
               </p>
 
-              {/* Suggestion pills */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-2xl">
-                {SUGGESTIONS.slice(0, 4).map(s => {
-                  const Icon = s.icon;
-                  return (
+              {/* Big centered composer */}
+              <div className="w-full max-w-2xl">
+                <div className="rounded-2xl border border-border bg-card shadow-lg focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-primary/10 transition">
+                  <Textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        send(input);
+                      }
+                    }}
+                    placeholder="Ask Shadoo about your branches, agents, visits, or trends…"
+                    rows={2}
+                    className="resize-none border-0 shadow-none focus-visible:ring-0 min-h-[72px] max-h-40 bg-transparent px-5 pt-4 text-base"
+                  />
+                  <div className="flex items-center justify-between px-2 pb-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground">
+                          <Plus className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-64">
+                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Attach
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem>
+                          <Paperclip className="h-4 w-4 me-2" />
+                          Upload file (CSV, PDF, image)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <FileText className="h-4 w-4 me-2" />
+                          Attach a saved report
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Quick commands
+                        </DropdownMenuLabel>
+                        {QUICK_COMMANDS.map(c => {
+                          const Icon = c.icon;
+                          return (
+                            <DropdownMenuItem key={c.id} onClick={() => insertPrompt(c.label)}>
+                              <Icon className="h-4 w-4 me-2" />
+                              {c.label}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Button
+                      size="icon"
+                      onClick={() => send(input)}
+                      disabled={!input.trim() || thinking}
+                      className="h-9 w-9 rounded-full"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Small suggestion pills under the box */}
+                <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                  {SUGGESTIONS.map(s => (
                     <button
                       key={s.id}
-                      onClick={() => send(s.label)}
-                      className="flex items-start gap-3 p-3 text-start rounded-lg border border-border bg-card hover:bg-accent hover:border-primary/30 transition-colors group"
+                      onClick={() => insertPrompt(s.prompt)}
+                      className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-muted-foreground hover:text-foreground transition"
                     >
-                      <Icon className="h-4 w-4 mt-0.5 text-muted-foreground group-hover:text-primary shrink-0" />
-                      <span className="text-sm text-foreground">{s.label}</span>
+                      {s.pill}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
-            messages.map(msg => (
-              <div key={msg.id} className={cn('flex gap-3', msg.role === 'user' && 'flex-row-reverse')}>
-                <div
-                  className={cn(
-                    'h-8 w-8 rounded-full flex items-center justify-center shrink-0',
-                    msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground'
-                  )}
-                >
-                  {msg.role === 'assistant' ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
-                </div>
-                <div
-                  className={cn(
-                    'flex-1 max-w-[85%]',
-                    msg.role === 'user' && 'flex justify-end'
-                  )}
-                >
-                  {msg.role === 'user' ? (
-                    <div className="inline-block bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm">
-                      {msg.content}
-                    </div>
-                  ) : (
-                    <div className="text-sm text-foreground/90">
-                      {renderMarkdown(msg.content)}
-                    </div>
-                  )}
+            // ACTIVE CONVERSATION
+            <>
+              <div className="flex items-center gap-3 pb-3 border-b border-border">
+                <img src={shadooLogo} alt="Shadoo" className="h-7 w-auto" />
+                <div className="min-w-0">
+                  <h1 className="text-sm font-black uppercase tracking-wide truncate">{active!.title}</h1>
+                  <p className="text-[11px] text-muted-foreground">Shadoo AI</p>
                 </div>
               </div>
-            ))
-          )}
 
-          {thinking && (
-            <div className="flex gap-3">
-              <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Bot className="h-4 w-4" />
-              </div>
-              <div className="flex items-center gap-1 pt-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '0ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '150ms' }} />
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '300ms' }} />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Composer */}
-        <div className="pb-2">
-          <div className="rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
-            <Textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  send(input);
-                }
-              }}
-              placeholder="Ask about your branches, agents, visits, or trends…"
-              rows={1}
-              className="resize-none border-0 shadow-none focus-visible:ring-0 min-h-[52px] max-h-40 bg-transparent px-4 pt-3.5"
-            />
-            <div className="flex items-center justify-between px-2 pb-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64">
-                  <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Attach
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem>
-                    <Paperclip className="h-4 w-4 me-2" />
-                    Upload file (CSV, PDF, image)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <FileText className="h-4 w-4 me-2" />
-                    Attach a saved report
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Quick commands
-                  </DropdownMenuLabel>
-                  {QUICK_COMMANDS.map(c => {
-                    const Icon = c.icon;
-                    return (
-                      <DropdownMenuItem key={c.id} onClick={() => send(c.label)}>
-                        <Icon className="h-4 w-4 me-2" />
-                        {c.label}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button
-                size="icon"
-                onClick={() => send(input)}
-                disabled={!input.trim() || thinking}
-                className="h-8 w-8 rounded-full"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {isEmpty && (
-            <div className="mt-2 flex flex-wrap gap-1.5 justify-center">
-              {SUGGESTIONS.slice(4).map(s => (
-                <button
-                  key={s.id}
-                  onClick={() => send(s.label)}
-                  className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/40 hover:bg-accent text-muted-foreground hover:text-foreground transition"
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Ready-made reports (secondary) */}
-        {isEmpty && (
-          <div className="pt-6 mt-2 border-t border-border">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Recent reports generated for you
-              </h3>
-              <Button variant="ghost" size="sm" className="text-xs h-7">View all</Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              {READY_REPORTS.map(r => (
-                <Card key={r.id} className="p-3 hover:border-primary/30 hover:shadow-sm transition cursor-pointer group">
-                  <div className="flex items-start gap-2">
-                    <FileText className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold truncate group-hover:text-primary">{r.title}</div>
-                      <div className="text-xs text-muted-foreground truncate">{r.desc}</div>
-                      <div className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wide">{r.date}</div>
+              <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
+                {messages.map(msg => (
+                  <div key={msg.id} className={cn('flex gap-3', msg.role === 'user' && 'flex-row-reverse')}>
+                    <div
+                      className={cn(
+                        'h-8 w-8 rounded-full flex items-center justify-center shrink-0',
+                        msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground'
+                      )}
+                    >
+                      {msg.role === 'assistant' ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
+                    </div>
+                    <div className={cn('flex-1 max-w-[85%]', msg.role === 'user' && 'flex justify-end')}>
+                      {msg.role === 'user' ? (
+                        <div className="inline-block bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm">
+                          {msg.content}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-foreground/90">{renderMarkdown(msg.content)}</div>
+                      )}
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+                ))}
+
+                {thinking && (
+                  <div className="flex gap-3">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="flex items-center gap-1 pt-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '0ms' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '150ms' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Composer (bottom) */}
+              <div className="pb-2">
+                <div className="rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
+                  <Textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        send(input);
+                      }
+                    }}
+                    placeholder="Ask a follow-up…"
+                    rows={1}
+                    className="resize-none border-0 shadow-none focus-visible:ring-0 min-h-[52px] max-h-40 bg-transparent px-4 pt-3.5"
+                  />
+                  <div className="flex items-center justify-between px-2 pb-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-64">
+                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Attach
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem>
+                          <Paperclip className="h-4 w-4 me-2" />
+                          Upload file (CSV, PDF, image)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <FileText className="h-4 w-4 me-2" />
+                          Attach a saved report
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Quick commands
+                        </DropdownMenuLabel>
+                        {QUICK_COMMANDS.map(c => {
+                          const Icon = c.icon;
+                          return (
+                            <DropdownMenuItem key={c.id} onClick={() => insertPrompt(c.label)}>
+                              <Icon className="h-4 w-4 me-2" />
+                              {c.label}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Button
+                      size="icon"
+                      onClick={() => send(input)}
+                      disabled={!input.trim() || thinking}
+                      className="h-8 w-8 rounded-full"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
