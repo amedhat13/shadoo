@@ -196,6 +196,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Weak areas',
     prompt: 'Where am I underperforming geographically?',
     keywords: ['weak', 'underperform', 'worst', 'lowest', 'attention', 'geograph', 'area'],
+    followUps: [
+      'Deep dive on Alexandria – Smouha',
+      'Suggest recovery missions',
+      'Draft action-plan email to regional manager',
+      'Compare Alexandria vs Cairo regions',
+    ],
     build: () => ({
       content: `Three branches need your attention this month. **Alexandria – Smouha** is the most urgent — CX is 18 points below your network average.`,
       visuals: [
