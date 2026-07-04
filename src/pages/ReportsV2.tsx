@@ -931,14 +931,7 @@ export default function ReportsV2Page() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-3 pb-3 border-b border-border">
-                <img src={shadooLogo} alt="Shadoo" className="h-7 w-auto" />
-                <div className="min-w-0">
-                  <h1 className="text-sm font-black uppercase tracking-wide truncate">{active!.title}</h1>
-                  <p className="text-[11px] text-muted-foreground">Shadoo AI</p>
-                </div>
-              </div>
-              <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto pt-2 pb-4 space-y-6">
                 {messages.map((msg, idx) => {
                   const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1 && !thinking;
                   return (
