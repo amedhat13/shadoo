@@ -485,7 +485,7 @@ function seedConvo(id: string, title: string, days: number, prompt: string): Con
     id, title, updatedAt: Date.now() - 1000 * 60 * 60 * 24 * days,
     messages: [
       { id: 'u', role: 'user', content: prompt },
-      { id: 'a', role: 'assistant', content: ans.content, visuals: ans.visuals },
+      { id: 'a', role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps },
     ],
   };
 }
