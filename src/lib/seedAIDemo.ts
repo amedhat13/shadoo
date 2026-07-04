@@ -20,13 +20,13 @@ export interface SeedResult {
   error?: string;
 }
 
-const AI_BRAND = 'Aida AI';
+const AI_BRAND = 'Test Account';
 
 const AI_BRANCHES = [
   {
     id: 'ai-branch-downtown',
     name: `${AI_BRAND} — Downtown Cairo`,
-    name_ar: 'عايدة إيه آي — وسط البلد',
+    name_ar: 'حساب تجريبي — وسط البلد',
     address: '15 Talaat Harb St, Downtown, Cairo',
     address_ar: '١٥ شارع طلعت حرب، وسط البلد، القاهرة',
     city: 'Cairo',
@@ -39,7 +39,7 @@ const AI_BRANCHES = [
   {
     id: 'ai-branch-newcairo',
     name: `${AI_BRAND} — Point 90 Mall`,
-    name_ar: 'عايدة إيه آي — بوينت ٩٠ مول',
+    name_ar: 'حساب تجريبي — بوينت ٩٠ مول',
     address: 'Point 90 Mall, New Cairo',
     address_ar: 'بوينت ٩٠ مول، القاهرة الجديدة',
     city: 'Cairo',
@@ -62,7 +62,7 @@ const AI_MISSIONS = TAMARA_MISSIONS.map((m) => ({
   ...m,
   id: m.id.replace('tamara', 'ai'),
   name: m.name.replace(/^Tamara/i, AI_BRAND),
-  name_ar: m.name_ar.replace(/^تمارا/, 'عايدة إيه آي'),
+  name_ar: m.name_ar.replace(/^تمارا/, 'حساب تجريبي'),
   branch_id: branchIdRemap[m.branch_id] || m.branch_id,
 }));
 
@@ -80,10 +80,11 @@ export async function seedAIDemo(): Promise<SeedResult> {
 
   // Rebrand profile
   await supabase.from('profiles').update({
-    company_name: `${AI_BRAND} — Smart Retail`,
-    full_name: 'AI Account Demo',
+    company_name: 'Test Account',
+    full_name: 'Test Account',
     phone: '+20 100 000 0000',
   }).eq('user_id', userId);
+
 
   // Clear other demo brands so Reports reflects only the active demo
   for (const prefix of ['T-Lab%', 'Tamara%']) {
