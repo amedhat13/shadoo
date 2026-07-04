@@ -36,6 +36,8 @@ export function AccountSettings() {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isSeedingTamara, setIsSeedingTamara] = useState(false);
+  const [isSeedingAI, setIsSeedingAI] = useState(false);
+
   const { t } = useTranslation('settings');
   const queryClient = useQueryClient();
 
