@@ -106,6 +106,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'NPS trend',
     prompt: 'Show me the NPS trend for the last 6 months.',
     keywords: ['nps', 'trend', 'promoter', 'months', 'over time'],
+    followUps: [
+      'Why did NPS jump in May?',
+      'Show NPS by branch',
+      'Which branches dragged NPS down?',
+      'Forecast NPS for next month',
+    ],
     build: () => ({
       content: `Your NPS climbed **+23 points** in six months — the steepest gain came in May–June after the Heliopolis service refresh.`,
       visuals: [
