@@ -10,6 +10,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import shadooLogo from '@/assets/shadoo-logo.png';
@@ -25,12 +29,42 @@ import {
   Bot,
   User as UserIcon,
   Trash2,
+  Command,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
+
+// ---- Visual types ----------------------------------------------------------
+type KPI = { label: string; value: string; delta?: string; up?: boolean };
+type Visual =
+  | { kind: 'kpis'; items: KPI[] }
+  | { kind: 'line'; title?: string; data: { name: string; value: number }[]; unit?: string }
+  | { kind: 'bar'; title?: string; data: { name: string; value: number }[]; unit?: string }
+  | { kind: 'ranking'; title?: string; items: { name: string; value: number; max: number; unit?: string }[] }
+  | { kind: 'donut'; title?: string; data: { name: string; value: number }[] }
+  | { kind: 'compare'; title?: string; a: string; b: string; rows: { label: string; a: number; b: number; unit?: string }[] };
 
 type Message = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  visual?: Visual;
 };
 
 type Conversation = {
@@ -42,141 +76,156 @@ type Conversation = {
 
 type Suggestion = {
   id: string;
-  pill: string; // short 3-4 words
-  prompt: string; // full prompt inserted into box
+  pill: string;
+  prompt: string;
   answer: string;
+  visual?: Visual;
 };
 
+const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--muted-foreground))', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'];
+
+// ---- Suggestions with rich visuals ----------------------------------------
 const SUGGESTIONS: Suggestion[] = [
   {
     id: 'top-branch',
     pill: 'Top branch',
     prompt: 'Which branch performed best last month?',
-    answer: `**Cairo Festival City** led all branches last month with an overall CX score of **91.4/100** across 24 completed visits.
-
-Key drivers:
-- **Service Quality**: 94/100 (up 6 points vs previous month)
-- **Cleanliness**: 92/100
-- **NPS**: +72 (industry benchmark: +40)
-- **Staff Friendliness**: 4.8/5 avg
-
-Second place: **Mall of Arabia – Giza** at 88.7/100.
-Weakest area across all branches this month was **Wait Time Perception** (avg 78/100) — worth flagging for operations.`,
+    answer: `**Cairo Festival City** led all branches with a CX score of **91.4/100** across 24 visits. Service quality jumped 6 points; NPS is nearly 2× the industry benchmark.`,
+    visual: {
+      kind: 'ranking',
+      title: 'Top branches — Overall CX (last 30 days)',
+      items: [
+        { name: 'Cairo Festival City', value: 91.4, max: 100 },
+        { name: 'Mall of Arabia – Giza', value: 88.7, max: 100 },
+        { name: 'Nasr City', value: 86.1, max: 100 },
+        { name: 'Heliopolis', value: 84.9, max: 100 },
+        { name: 'New Cairo', value: 82.3, max: 100 },
+      ],
+    },
   },
   {
     id: 'nps-trend',
     pill: 'NPS trend',
     prompt: 'Show me the NPS trend for the last 6 months.',
-    answer: `Your NPS has climbed steadily over the last 6 months:
-
-- Jan: **+41**
-- Feb: **+45**
-- Mar: **+48**
-- Apr: **+52**
-- May: **+58**
-- Jun: **+64** ← current
-
-That's a **+23 point improvement** in half a year, mostly driven by Heliopolis and Nasr City locations. Detractor mentions dropped 38%.
-
-Want me to break this down by branch or by methodology?`,
+    answer: `NPS has climbed **+23 points** in six months, driven by Heliopolis and Nasr City. Detractor mentions dropped 38%.`,
+    visual: {
+      kind: 'line',
+      title: 'Net Promoter Score — last 6 months',
+      unit: '',
+      data: [
+        { name: 'Jan', value: 41 },
+        { name: 'Feb', value: 45 },
+        { name: 'Mar', value: 48 },
+        { name: 'Apr', value: 52 },
+        { name: 'May', value: 58 },
+        { name: 'Jun', value: 64 },
+      ],
+    },
   },
   {
     id: 'agent-quality',
     pill: 'Agent quality',
     prompt: 'Are my agents catching real issues?',
-    answer: `Yes — agent submissions look reliable this quarter.
-
-- **Approval rate**: 91% (114 approved / 125 submitted)
-- **Photo compliance**: 96%
-- **Rejection reasons**: mostly incomplete answers (7), only 2 flagged as low-quality
-- **Avg agent rating** you've given: **4.6/5**
-
-Top performers: Ahmed M. (4.9), Salma K. (4.8), Youssef R. (4.8).
-
-Recommendation: agent **Karim H.** submitted 4 rushed visits — worth a review before their next mission.`,
+    answer: `Yes — agent submissions are reliable this quarter. Approval rate **91%**, photo compliance **96%**. Watch agent **Karim H.** — 4 rushed visits.`,
+    visual: {
+      kind: 'kpis',
+      items: [
+        { label: 'Approval rate', value: '91%', delta: '+3pp', up: true },
+        { label: 'Photo compliance', value: '96%', delta: '+1pp', up: true },
+        { label: 'Avg rating given', value: '4.6/5', delta: '+0.2', up: true },
+        { label: 'Rejections', value: '9', delta: '-4', up: true },
+      ],
+    },
   },
   {
     id: 'geo-weakness',
     pill: 'Weak areas',
     prompt: 'Where am I underperforming geographically?',
-    answer: `Three areas need attention:
-
-1. **Alexandria – Smouha** — CX score **68/100** (12 points below your network avg). Main issue: staff product knowledge scored 61/100.
-2. **Giza – Dokki** — Cleanliness dropped to **72/100** after being stable at 85+ all year.
-3. **Cairo – Maadi** — NPS turned negative (-8) for the first time in 2026.
-
-Everything in **Nasr City, Heliopolis, and New Cairo** is performing at or above target.`,
+    answer: `Three areas need attention: **Alexandria – Smouha** (staff knowledge), **Giza – Dokki** (cleanliness slipping), **Cairo – Maadi** (NPS turned negative).`,
+    visual: {
+      kind: 'ranking',
+      title: 'Weakest branches — CX score',
+      items: [
+        { name: 'Alexandria – Smouha', value: 68, max: 100 },
+        { name: 'Giza – Dokki', value: 72, max: 100 },
+        { name: 'Cairo – Maadi', value: 74, max: 100 },
+        { name: 'Alexandria – Sidi Gaber', value: 77, max: 100 },
+      ],
+    },
   },
   {
     id: 'complaints',
     pill: 'Top complaints',
     prompt: 'What are customers complaining about most?',
-    answer: `Across 87 open-ended responses this month:
-
-1. **Wait time at checkout** — 24 mentions (28%)
-2. **Product availability** — 19 mentions (22%)
-3. **Staff attentiveness** — 11 mentions (13%)
-4. **Store temperature** — 8 mentions (9%)
-5. **Restroom cleanliness** — 6 mentions (7%)
-
-Sentiment: **62% positive, 24% neutral, 14% negative** — negative share shrank from 21% last month.`,
+    answer: `Across 87 open-ended responses this month. Sentiment is **62% positive**, negative share shrank from 21% to 14%.`,
+    visual: {
+      kind: 'bar',
+      title: 'Complaint themes — mentions this month',
+      data: [
+        { name: 'Wait time', value: 24 },
+        { name: 'Out of stock', value: 19 },
+        { name: 'Staff attention', value: 11 },
+        { name: 'Temperature', value: 8 },
+        { name: 'Restrooms', value: 6 },
+      ],
+    },
   },
   {
     id: 'roi',
     pill: 'Mission ROI',
     prompt: 'What is my ROI on missions this quarter?',
-    answer: `This quarter you've invested **48,750 EGP** across 65 completed visits (avg **750 EGP/visit**).
-
-- 3 operational issues fixed after mystery shopper flags (est. recovered revenue: **~180,000 EGP**).
-- Staff training gap identified in 2 branches — training rolled out reduced complaint rate 34%.
-- 1 compliance risk caught before any regulatory issue.
-
-Estimated ROI: **~3.7×** on spend.`,
+    answer: `You invested **48,750 EGP** across 65 visits. Estimated recovered revenue from flagged issues: **~180,000 EGP** — a **~3.7× ROI**.`,
+    visual: {
+      kind: 'kpis',
+      items: [
+        { label: 'Spend', value: '48,750 EGP' },
+        { label: 'Recovered value', value: '~180,000 EGP', delta: '+3.7×', up: true },
+        { label: 'Issues fixed', value: '3', delta: 'ops', up: true },
+        { label: 'Avg / visit', value: '750 EGP' },
+      ],
+    },
   },
   {
     id: 'compare',
     pill: 'Compare branches',
     prompt: 'Compare Cairo Festival City vs Mall of Arabia side by side.',
-    answer: `**Head-to-head — last 30 days**
-
-| Metric | Cairo Festival City | Mall of Arabia |
-|---|---|---|
-| Overall CX | **91.4** | 88.7 |
-| NPS | **+72** | +61 |
-| Cleanliness | 92 | **93** |
-| Service Quality | **94** | 87 |
-| Wait Time | 82 | **85** |
-| Visits | 24 | 19 |
-
-**Cairo Festival City** wins on service and NPS. **Mall of Arabia** is slightly cleaner and faster at checkout.`,
+    answer: `**Cairo Festival City** wins on service and NPS. **Mall of Arabia** is slightly cleaner and faster at checkout.`,
+    visual: {
+      kind: 'compare',
+      title: 'Head-to-head — last 30 days',
+      a: 'Cairo Festival City',
+      b: 'Mall of Arabia',
+      rows: [
+        { label: 'Overall CX', a: 91.4, b: 88.7 },
+        { label: 'NPS', a: 72, b: 61 },
+        { label: 'Cleanliness', a: 92, b: 93 },
+        { label: 'Service Quality', a: 94, b: 87 },
+        { label: 'Wait Time', a: 82, b: 85 },
+        { label: 'Visits', a: 24, b: 19 },
+      ],
+    },
   },
   {
     id: 'exec-summary',
     pill: 'Exec summary',
-    prompt: 'Draft an executive summary email of this month\'s performance.',
-    answer: `**Subject: June 2026 CX Performance Snapshot**
-
-Team,
-
-June was a strong month. Overall CX landed at **86.2/100** (+2.1 MoM) across **65 visits in 12 branches**, and **NPS hit +64** — our best reading of the year.
-
-**Highlights**
-- Cairo Festival City topped the network at 91.4
-- Complaint volume dropped 12% vs May
-- Agent approval rate held at 91%
-
-**Watch-outs**
-- Alexandria Smouha (CX 68) needs a service refresh
-- Wait time is emerging as the #1 recurring complaint
-
-Full report attached.`,
+    prompt: "Draft an executive summary of this month's performance.",
+    answer: `**June was a strong month.** Overall CX **86.2** (+2.1 MoM) across 65 visits in 12 branches. NPS **+64** — the year's best. Watch-out: wait time is the emerging #1 complaint.`,
+    visual: {
+      kind: 'kpis',
+      items: [
+        { label: 'Overall CX', value: '86.2', delta: '+2.1', up: true },
+        { label: 'NPS', value: '+64', delta: '+6', up: true },
+        { label: 'Visits', value: '65', delta: '+8', up: true },
+        { label: 'Complaints', value: '87', delta: '-12', up: true },
+      ],
+    },
   },
 ];
 
 const QUICK_COMMANDS = [
   { id: 'q1', label: 'Compare two branches side-by-side', icon: BarChart3 },
   { id: 'q2', label: 'Draft an executive summary email', icon: FileText },
-  { id: 'q3', label: 'Find anomalies in this month\'s visits', icon: Sparkles },
+  { id: 'q3', label: "Find anomalies in this month's visits", icon: Sparkles },
   { id: 'q4', label: 'Suggest which branches need attention', icon: TrendingUp },
 ];
 
@@ -187,7 +236,7 @@ const SEED_CONVERSATIONS: Conversation[] = [
     updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
     messages: [
       { id: 'a', role: 'user', content: 'Give me a June monthly CX summary.' },
-      { id: 'b', role: 'assistant', content: SUGGESTIONS[7].answer },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[7].answer, visual: SUGGESTIONS[7].visual },
     ],
   },
   {
@@ -196,7 +245,7 @@ const SEED_CONVERSATIONS: Conversation[] = [
     updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 6,
     messages: [
       { id: 'a', role: 'user', content: 'Compare Cairo branches.' },
-      { id: 'b', role: 'assistant', content: SUGGESTIONS[6].answer },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[6].answer, visual: SUGGESTIONS[6].visual },
     ],
   },
   {
@@ -205,36 +254,24 @@ const SEED_CONVERSATIONS: Conversation[] = [
     updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 12,
     messages: [
       { id: 'a', role: 'user', content: 'Where am I underperforming?' },
-      { id: 'b', role: 'assistant', content: SUGGESTIONS[3].answer },
+      { id: 'b', role: 'assistant', content: SUGGESTIONS[3].answer, visual: SUGGESTIONS[3].visual },
     ],
   },
 ];
 
+// ---- Markdown (inline only) -----------------------------------------------
 function renderMarkdown(text: string) {
   const lines = text.split('\n');
   return lines.map((line, i) => {
     if (line.trim() === '') return <div key={i} className="h-2" />;
-    // Table row
-    if (line.trim().startsWith('|')) {
-      const cells = line.split('|').slice(1, -1).map(c => c.trim());
-      if (cells.every(c => /^-+$/.test(c))) return null;
-      return (
-        <div key={i} className="grid gap-2 py-1 border-b border-border/50 text-xs" style={{ gridTemplateColumns: `repeat(${cells.length}, minmax(0,1fr))` }}>
-          {cells.map((c, j) => (
-            <div key={j}>{c.split(/(\*\*[^*]+\*\*)/g).map((p, k) => p.startsWith('**') ? <strong key={k}>{p.slice(2, -2)}</strong> : <span key={k}>{p}</span>)}</div>
-          ))}
-        </div>
-      );
-    }
     const isBullet = /^\s*[-*]\s/.test(line);
     const isNumbered = /^\s*\d+\.\s/.test(line);
     const clean = line.replace(/^\s*[-*]\s/, '').replace(/^\s*\d+\.\s/, '');
-    const parts = clean.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={j} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>;
-      }
-      return <span key={j}>{part}</span>;
-    });
+    const parts = clean.split(/(\*\*[^*]+\*\*)/g).map((part, j) =>
+      part.startsWith('**') && part.endsWith('**')
+        ? <strong key={j} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
+        : <span key={j}>{part}</span>
+    );
     if (isBullet || isNumbered) {
       return (
         <div key={i} className="flex gap-2 my-1">
@@ -249,28 +286,146 @@ function renderMarkdown(text: string) {
   });
 }
 
-function findAnswer(query: string): string {
+// ---- Visual renderer -------------------------------------------------------
+function VisualBlock({ v }: { v: Visual }) {
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-card p-4">
+      {'title' in v && v.title && (
+        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">{v.title}</div>
+      )}
+      {v.kind === 'kpis' && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {v.items.map((k, i) => (
+            <div key={i} className="rounded-lg border border-border/60 bg-background p-3">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{k.label}</div>
+              <div className="text-lg font-black mt-1">{k.value}</div>
+              {k.delta && (
+                <div className={cn('flex items-center gap-1 text-[11px] mt-0.5', k.up ? 'text-emerald-600' : 'text-red-600')}>
+                  {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                  {k.delta}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {v.kind === 'line' && (
+        <div className="h-56 -ml-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={v.data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+              <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+              <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {v.kind === 'bar' && (
+        <div className="h-56 -ml-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={v.data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+              <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="value" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {v.kind === 'donut' && (
+        <div className="h-56">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={v.data} dataKey="value" nameKey="name" innerRadius={45} outerRadius={80} paddingAngle={2}>
+                {v.data.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+              </Pie>
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8, fontSize: 12 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {v.kind === 'ranking' && (
+        <div className="space-y-2.5">
+          {v.items.map((r, i) => {
+            const pct = (r.value / r.max) * 100;
+            return (
+              <div key={i}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="font-medium">{r.name}</span>
+                  <span className="font-mono font-semibold">{r.value}{r.unit ?? ''}</span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all"
+                    style={{ width: `${pct}%`, opacity: 1 - i * 0.12 }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {v.kind === 'compare' && (
+        <div>
+          <div className="grid grid-cols-3 gap-2 text-[10px] uppercase tracking-wider font-bold text-muted-foreground pb-2 border-b border-border">
+            <div>Metric</div>
+            <div className="text-center">{v.a}</div>
+            <div className="text-center">{v.b}</div>
+          </div>
+          {v.rows.map((r, i) => {
+            const aWins = r.a > r.b;
+            const bWins = r.b > r.a;
+            return (
+              <div key={i} className="grid grid-cols-3 gap-2 py-2 border-b border-border/50 text-sm items-center">
+                <div className="text-muted-foreground">{r.label}</div>
+                <div className={cn('text-center font-mono font-semibold', aWins && 'text-primary')}>
+                  {r.a}{r.unit ?? ''} {aWins && <TrendingUp className="inline h-3 w-3 ms-1" />}
+                </div>
+                <div className={cn('text-center font-mono font-semibold', bWins && 'text-primary')}>
+                  {r.b}{r.unit ?? ''} {bWins && <TrendingUp className="inline h-3 w-3 ms-1" />}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function findSuggestion(query: string): Suggestion | null {
   const q = query.toLowerCase().trim();
-  const hit = SUGGESTIONS.find(s => s.prompt.toLowerCase() === q)
-    || SUGGESTIONS.find(s => {
+  return (
+    SUGGESTIONS.find(s => s.prompt.toLowerCase() === q) ||
+    SUGGESTIONS.find(s => {
       const words = s.prompt.toLowerCase().split(/\s+/).filter(w => w.length > 4);
       return words.some(w => q.includes(w));
-    });
-  if (hit) return hit.answer;
-  return `I looked across your visits, branches, and agent submissions for **"${query}"**.
+    }) ||
+    null
+  );
+}
 
-At a glance:
-- Overall CX score this month: **86.2/100** (+2.1 vs last month)
-- Total completed visits: **65** across **12 branches**
-- NPS: **+64**, CSAT: **4.5/5**
-- No critical alerts in the last 7 days
-
-Try something more specific — e.g. "which branch has the lowest cleanliness score?" or "how did Maadi perform this month?"`;
+function fallbackAnswer(query: string): { content: string; visual: Visual } {
+  return {
+    content: `Here's a quick pulse on your data for **"${query}"**. Ask me something more specific — a branch name, a metric, a timeframe — and I'll dig deeper.`,
+    visual: {
+      kind: 'kpis',
+      items: [
+        { label: 'Overall CX', value: '86.2', delta: '+2.1', up: true },
+        { label: 'NPS', value: '+64', delta: '+6', up: true },
+        { label: 'Visits (30d)', value: '65', delta: '+8', up: true },
+        { label: 'Branches', value: '12' },
+      ],
+    },
+  };
 }
 
 function formatRelative(ts: number) {
-  const diff = Date.now() - ts;
-  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const d = Math.floor((Date.now() - ts) / (1000 * 60 * 60 * 24));
   if (d === 0) return 'Today';
   if (d === 1) return 'Yesterday';
   if (d < 7) return `${d}d ago`;
@@ -278,6 +433,61 @@ function formatRelative(ts: number) {
   return `${Math.floor(d / 30)}mo ago`;
 }
 
+// ---- + menu ----------------------------------------------------------------
+function ComposerPlusMenu({ onInsertPrompt }: { onInsertPrompt: (p: string) => void }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
+          <Plus className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-52">
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Paperclip className="h-4 w-4 me-2" />
+            Attach
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="w-60">
+              <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">Attach</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Paperclip className="h-4 w-4 me-2" />
+                Upload file (CSV, PDF, image)
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <FileText className="h-4 w-4 me-2" />
+                Attach a saved report
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Command className="h-4 w-4 me-2" />
+            Commands
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="w-64">
+              <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">Ready-made commands</DropdownMenuLabel>
+              {QUICK_COMMANDS.map(c => {
+                const Icon = c.icon;
+                return (
+                  <DropdownMenuItem key={c.id} onClick={() => onInsertPrompt(c.label)}>
+                    <Icon className="h-4 w-4 me-2" />
+                    {c.label}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// ---- Page ------------------------------------------------------------------
 export default function ReportsV2Page() {
   const [conversations, setConversations] = useState<Conversation[]>(SEED_CONVERSATIONS);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -323,8 +533,10 @@ export default function ReportsV2Page() {
     setInput('');
     setThinking(true);
     setTimeout(() => {
-      const answer = findAnswer(trimmed);
-      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: answer };
+      const hit = findSuggestion(trimmed);
+      const asstMsg: Message = hit
+        ? { id: crypto.randomUUID(), role: 'assistant', content: hit.answer, visual: hit.visual }
+        : { id: crypto.randomUUID(), role: 'assistant', ...fallbackAnswer(trimmed) };
       setConversations(cs => cs.map(c => c.id === convoId
         ? { ...c, messages: [...c.messages, asstMsg], updatedAt: Date.now() }
         : c));
@@ -348,11 +560,7 @@ export default function ReportsV2Page() {
       <div className="flex gap-4 h-[calc(100vh-8rem)] -mx-4 md:-mx-6 -my-4 md:-my-6 px-4 md:px-6 py-4 md:py-6">
         {/* Secondary nav — Recent Conversations */}
         <aside className="hidden md:flex flex-col w-64 shrink-0 border-e border-border pe-4">
-          <Button
-            onClick={startNew}
-            variant="outline"
-            className="justify-start gap-2 mb-3"
-          >
+          <Button onClick={startNew} variant="outline" className="justify-start gap-2 mb-3">
             <MessageSquarePlus className="h-4 w-4" />
             New conversation
           </Button>
@@ -384,9 +592,7 @@ export default function ReportsV2Page() {
                 </div>
               ))}
               {conversations.length === 0 && (
-                <div className="text-xs text-muted-foreground px-2 py-4 text-center">
-                  No conversations yet
-                </div>
+                <div className="text-xs text-muted-foreground px-2 py-4 text-center">No conversations yet</div>
               )}
             </div>
           </ScrollArea>
@@ -395,20 +601,13 @@ export default function ReportsV2Page() {
         {/* Main chat area */}
         <div className="flex-1 flex flex-col min-w-0 max-w-3xl mx-auto w-full">
           {isEmpty ? (
-            // WELCOME — centered hero with composer
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <img src={shadooLogo} alt="Shadoo" className="h-12 w-auto mb-5" />
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-3">
-                Meet Shadoo AI
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground text-center max-w-xl mb-8 leading-relaxed">
-                Your branches speak. Shadoo listens. Ask anything about how your stores are really performing —
-                what customers loved, where staff dropped the ball, which location needs your attention this week —
-                and get a straight answer in seconds. No dashboards to hunt through. No charts to decode.
-                Just the truth about your customer experience, on demand.
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-3">Meet Shadoo AI</h1>
+              <p className="text-sm md:text-base text-muted-foreground text-center max-w-lg mb-8 leading-relaxed">
+                Ask anything about your branches, agents, and visits — get straight answers with charts, in seconds.
               </p>
 
-              {/* Big centered composer */}
               <div className="w-full max-w-2xl">
                 <div className="rounded-2xl border border-border bg-card shadow-lg focus-within:border-primary/60 focus-within:ring-4 focus-within:ring-primary/10 transition">
                   <Textarea
@@ -416,62 +615,20 @@ export default function ReportsV2Page() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        send(input);
-                      }
+                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); }
                     }}
                     placeholder="Ask Shadoo about your branches, agents, visits, or trends…"
                     rows={2}
                     className="resize-none border-0 shadow-none focus-visible:ring-0 min-h-[72px] max-h-40 bg-transparent px-5 pt-4 text-base"
                   />
                   <div className="flex items-center justify-between px-2 pb-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground">
-                          <Plus className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-64">
-                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Attach
-                        </DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          <Paperclip className="h-4 w-4 me-2" />
-                          Upload file (CSV, PDF, image)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FileText className="h-4 w-4 me-2" />
-                          Attach a saved report
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Quick commands
-                        </DropdownMenuLabel>
-                        {QUICK_COMMANDS.map(c => {
-                          const Icon = c.icon;
-                          return (
-                            <DropdownMenuItem key={c.id} onClick={() => insertPrompt(c.label)}>
-                              <Icon className="h-4 w-4 me-2" />
-                              {c.label}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <Button
-                      size="icon"
-                      onClick={() => send(input)}
-                      disabled={!input.trim() || thinking}
-                      className="h-9 w-9 rounded-full"
-                    >
+                    <ComposerPlusMenu onInsertPrompt={insertPrompt} />
+                    <Button size="icon" onClick={() => send(input)} disabled={!input.trim() || thinking} className="h-9 w-9 rounded-full">
                       <ArrowUp className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
-                {/* Small suggestion pills under the box */}
                 <div className="mt-4 flex flex-wrap gap-2 justify-center">
                   {SUGGESTIONS.map(s => (
                     <button
@@ -486,7 +643,6 @@ export default function ReportsV2Page() {
               </div>
             </div>
           ) : (
-            // ACTIVE CONVERSATION
             <>
               <div className="flex items-center gap-3 pb-3 border-b border-border">
                 <img src={shadooLogo} alt="Shadoo" className="h-7 w-auto" />
@@ -499,21 +655,22 @@ export default function ReportsV2Page() {
               <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn('flex gap-3', msg.role === 'user' && 'flex-row-reverse')}>
-                    <div
-                      className={cn(
-                        'h-8 w-8 rounded-full flex items-center justify-center shrink-0',
-                        msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground'
-                      )}
-                    >
+                    <div className={cn(
+                      'h-8 w-8 rounded-full flex items-center justify-center shrink-0',
+                      msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground'
+                    )}>
                       {msg.role === 'assistant' ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
                     </div>
-                    <div className={cn('flex-1 max-w-[85%]', msg.role === 'user' && 'flex justify-end')}>
+                    <div className={cn('flex-1 min-w-0', msg.role === 'user' ? 'max-w-[85%] flex justify-end' : 'max-w-full')}>
                       {msg.role === 'user' ? (
                         <div className="inline-block bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm">
                           {msg.content}
                         </div>
                       ) : (
-                        <div className="text-sm text-foreground/90">{renderMarkdown(msg.content)}</div>
+                        <div className="text-sm text-foreground/90 w-full">
+                          {renderMarkdown(msg.content)}
+                          {msg.visual && <VisualBlock v={msg.visual} />}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -533,7 +690,6 @@ export default function ReportsV2Page() {
                 )}
               </div>
 
-              {/* Composer (bottom) */}
               <div className="pb-2">
                 <div className="rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
                   <Textarea
@@ -541,56 +697,15 @@ export default function ReportsV2Page() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        send(input);
-                      }
+                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); }
                     }}
                     placeholder="Ask a follow-up…"
                     rows={1}
                     className="resize-none border-0 shadow-none focus-visible:ring-0 min-h-[52px] max-h-40 bg-transparent px-4 pt-3.5"
                   />
                   <div className="flex items-center justify-between px-2 pb-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground">
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-64">
-                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Attach
-                        </DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          <Paperclip className="h-4 w-4 me-2" />
-                          Upload file (CSV, PDF, image)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FileText className="h-4 w-4 me-2" />
-                          Attach a saved report
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Quick commands
-                        </DropdownMenuLabel>
-                        {QUICK_COMMANDS.map(c => {
-                          const Icon = c.icon;
-                          return (
-                            <DropdownMenuItem key={c.id} onClick={() => insertPrompt(c.label)}>
-                              <Icon className="h-4 w-4 me-2" />
-                              {c.label}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <Button
-                      size="icon"
-                      onClick={() => send(input)}
-                      disabled={!input.trim() || thinking}
-                      className="h-8 w-8 rounded-full"
-                    >
+                    <ComposerPlusMenu onInsertPrompt={insertPrompt} />
+                    <Button size="icon" onClick={() => send(input)} disabled={!input.trim() || thinking} className="h-8 w-8 rounded-full">
                       <ArrowUp className="h-4 w-4" />
                     </Button>
                   </div>
