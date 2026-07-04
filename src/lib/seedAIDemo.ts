@@ -26,7 +26,7 @@ const AI_BRANCHES = [
   {
     id: 'ai-branch-downtown',
     name: `${AI_BRAND} — Downtown Cairo`,
-    name_ar: 'عايدة إيه آي — وسط البلد',
+    name_ar: 'حساب تجريبي — وسط البلد',
     address: '15 Talaat Harb St, Downtown, Cairo',
     address_ar: '١٥ شارع طلعت حرب، وسط البلد، القاهرة',
     city: 'Cairo',
