@@ -292,19 +292,17 @@ export function AccountSettings() {
               </>
             )}
           </Button>
-          <Button onClick={handleSeedAI} disabled={isSeedingAI} variant="outline" className="gap-2">
+          <Button onClick={handleSeedAI} disabled={isSeedingAI} variant="outline">
             {isSeedingAI ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Loading AI account…
+                <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                Loading Test account…
               </>
             ) : (
-              <>
-                <Sparkles className="h-4 w-4" />
-                Load AI Account
-              </>
+              'Load Test Account'
             )}
           </Button>
+
 
         </CardContent>
       </Card>
