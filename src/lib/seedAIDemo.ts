@@ -80,10 +80,11 @@ export async function seedAIDemo(): Promise<SeedResult> {
 
   // Rebrand profile
   await supabase.from('profiles').update({
-    company_name: `${AI_BRAND} — Smart Retail`,
-    full_name: 'AI Account Demo',
+    company_name: 'Test Account',
+    full_name: 'Test Account',
     phone: '+20 100 000 0000',
   }).eq('user_id', userId);
+
 
   // Clear other demo brands so Reports reflects only the active demo
   for (const prefix of ['T-Lab%', 'Tamara%']) {
