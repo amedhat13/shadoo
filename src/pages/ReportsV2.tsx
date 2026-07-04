@@ -954,10 +954,10 @@ export default function ReportsV2Page() {
                               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
                                 <Sparkles className="h-3 w-3" />Suggested follow-ups
                               </div>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:thin]">
                                 {msg.followUps.map((f, i) => (
                                   <button key={i} onClick={() => send(f)} disabled={thinking}
-                                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
+                                    className="shrink-0 whitespace-nowrap text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
                                     {f}
                                   </button>
                                 ))}
