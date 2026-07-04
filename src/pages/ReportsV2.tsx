@@ -295,6 +295,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Mission ROI',
     prompt: 'What is my ROI on missions this quarter?',
     keywords: ['roi', 'return', 'value', 'spend', 'invest', 'cost'],
+    followUps: [
+      'ROI by branch',
+      'Which mission type has best ROI?',
+      'Forecast next quarter ROI',
+      'Justify Q3 budget in a slide',
+    ],
     build: () => ({
       content: `You spent **48,750 EGP** and recovered an estimated **180,000 EGP** in prevented churn — a **~3.7×** return, before brand-equity effects.`,
       visuals: [
