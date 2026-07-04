@@ -862,6 +862,10 @@ export default function ReportsV2Page() {
       <div className="flex gap-4 h-[calc(100vh-8rem)] -mx-4 md:-mx-6 -my-4 md:-my-6 px-4 md:px-6 py-4 md:py-6">
         {/* Secondary nav */}
         <aside className="hidden md:flex flex-col w-64 shrink-0 border-e border-border pe-4">
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <img src={shadooLogo} alt="Shadoo" className="h-6 w-auto" />
+            <span className="text-sm font-black tracking-tight">Shadoo AI</span>
+          </div>
           <Button onClick={startNew} variant="outline" className="justify-start gap-2 mb-3">
             <MessageSquarePlus className="h-4 w-4" />New conversation
           </Button>
