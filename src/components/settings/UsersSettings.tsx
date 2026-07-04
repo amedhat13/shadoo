@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2, Info, MessageSquare } from 'lucide-react';
+import { Users, Plus, MoreHorizontal, Mail, Shield, Trash2, Loader2, Info, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,21 +22,24 @@ import {
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
-const MAX_USERS = 2;
+const MAX_USERS = 3;
 
 interface TeamMember {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'viewer';
+  role: 'admin' | 'manager' | 'viewer' | 'ai';
   status: 'active' | 'pending';
   joined_at: string;
+  isAI?: boolean;
 }
 
 const mockTeam: TeamMember[] = [
   { id: '1', name: 'Ahmed Hassan', email: 'ahmed@shadoo.com', role: 'admin', status: 'active', joined_at: '2024-01-15' },
   { id: '2', name: 'Sara Mohamed', email: 'sara@shadoo.com', role: 'manager', status: 'active', joined_at: '2024-02-20' },
+  { id: '3', name: 'AI Account', email: 'ai@shadoo.com', role: 'ai', status: 'active', joined_at: '2026-07-04', isAI: true },
 ];
+
 
 export function UsersSettings() {
   const [team, setTeam] = useState<TeamMember[]>(mockTeam);
@@ -52,7 +55,9 @@ export function UsersSettings() {
     admin: { label: t('users.roles.admin'), description: t('users.roles.admin_description'), variant: 'default' as const },
     manager: { label: t('users.roles.manager'), description: t('users.roles.manager_description'), variant: 'secondary' as const },
     viewer: { label: t('users.roles.viewer'), description: t('users.roles.viewer_description'), variant: 'outline' as const },
+    ai: { label: 'Shadoo AI', description: 'Automated AI assistant with read access to reports and analytics.', variant: 'secondary' as const },
   };
+
 
   const handleInvite = async () => {
     if (!inviteEmail || isAtLimit) return;
@@ -164,9 +169,12 @@ export function UsersSettings() {
               return (
                 <div key={member.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border border-border">
-                      <AvatarFallback className="bg-muted text-foreground text-sm font-medium">{initials}</AvatarFallback>
+                    <Avatar className={`h-10 w-10 border ${member.isAI ? 'border-primary' : 'border-border'}`}>
+                      <AvatarFallback className={member.isAI ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground text-sm font-medium'}>
+                        {member.isAI ? <Sparkles className="h-4 w-4" /> : initials}
+                      </AvatarFallback>
                     </Avatar>
+
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{member.name}</span>
