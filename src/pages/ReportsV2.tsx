@@ -454,7 +454,7 @@ function findAnswer(text: string): Answer {
     }
     if (!best || score > best.score) best = { s, score };
   }
-  if (best && best.score >= 2) return best.s.build();
+  if (best && best.score >= 2) return { ...best.s.build(), followUps: best.s.followUps };
 
   return {
     content: `Here's the pulse on your account. Ask me a more specific question — a branch name, a metric, or a timeframe — and I'll pull a detailed answer with charts.`,
@@ -468,6 +468,12 @@ function findAnswer(text: string): Answer {
           { label: 'Complaints', value: '87', delta: '−12', up: true },
         ],
       },
+    ],
+    followUps: [
+      'Which branch performed best last month?',
+      'Show me the NPS trend',
+      'Where am I underperforming?',
+      "Draft this month's executive summary",
     ],
   };
 }
