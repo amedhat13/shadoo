@@ -22,21 +22,24 @@ import {
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
-const MAX_USERS = 2;
+const MAX_USERS = 3;
 
 interface TeamMember {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'viewer';
+  role: 'admin' | 'manager' | 'viewer' | 'ai';
   status: 'active' | 'pending';
   joined_at: string;
+  isAI?: boolean;
 }
 
 const mockTeam: TeamMember[] = [
   { id: '1', name: 'Ahmed Hassan', email: 'ahmed@shadoo.com', role: 'admin', status: 'active', joined_at: '2024-01-15' },
   { id: '2', name: 'Sara Mohamed', email: 'sara@shadoo.com', role: 'manager', status: 'active', joined_at: '2024-02-20' },
+  { id: '3', name: 'AI Account', email: 'ai@shadoo.com', role: 'ai', status: 'active', joined_at: '2026-07-04', isAI: true },
 ];
+
 
 export function UsersSettings() {
   const [team, setTeam] = useState<TeamMember[]>(mockTeam);
