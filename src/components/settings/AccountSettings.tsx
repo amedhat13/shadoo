@@ -93,11 +93,12 @@ export function AccountSettings() {
     try {
       const result = await seedAIDemo();
       if (!result.ok) {
-        toast.error(`Failed to seed AI demo. ${result.error || ''}`);
+        toast.error(`Failed to seed Test Account. ${result.error || ''}`);
       } else if (result.alreadySeeded) {
-        toast.info('AI Account demo already seeded.');
+        toast.info('Test Account already seeded.');
       } else {
-        toast.success(`AI Account demo loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+        toast.success(`Test Account loaded: ${result.branchesInserted} branches, ${result.missionsInserted} missions, ${result.visitsInserted} visits.`);
+
         queryClient.invalidateQueries({ queryKey: ['branches'] });
         queryClient.invalidateQueries({ queryKey: ['missions'] });
         queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
