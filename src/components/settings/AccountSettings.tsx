@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { seedTLabDemo } from '@/lib/seedTLabDemo';
 import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
+import { seedAIDemo } from '@/lib/seedAIDemo';
+
 
 interface AccountData {
   full_name: string;
