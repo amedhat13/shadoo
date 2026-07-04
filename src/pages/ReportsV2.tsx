@@ -43,10 +43,10 @@ type Visual =
   | { kind: 'table'; title?: string; headers: string[]; rows: TableCell[][] }
   | { kind: 'callouts'; title?: string; items: { icon: 'check' | 'alert' | 'x'; label: string; text: string }[] };
 
-type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[] };
+type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[]; followUps?: string[] };
 type Conversation = { id: string; title: string; updatedAt: number; messages: Message[] };
-type Answer = { content: string; visuals: Visual[] };
-type Suggestion = { id: string; pill: string; prompt: string; keywords: string[]; build: () => Answer };
+type Answer = { content: string; visuals: Visual[]; followUps: string[] };
+type Suggestion = { id: string; pill: string; prompt: string; keywords: string[]; followUps: string[]; build: () => Omit<Answer, 'followUps'> };
 
 const C = {
   primary: 'hsl(var(--primary))',
@@ -65,6 +65,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Top branch',
     prompt: 'Which branch performed best last month?',
     keywords: ['top', 'best', 'performed', 'winner', 'leader'],
+    followUps: [
+      'What drove Cairo Festival City to #1?',
+      'Compare Cairo Festival City vs Mall of Arabia',
+      'Which branch dropped the most vs last month?',
+      'Draft a congrats note to the CFC store manager',
+    ],
     build: () => ({
       content: `**Cairo Festival City** was your #1 branch last month — leading on service quality and NPS across all 12 locations. Here's the ranking and what drove the win:`,
       visuals: [
@@ -100,6 +106,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'NPS trend',
     prompt: 'Show me the NPS trend for the last 6 months.',
     keywords: ['nps', 'trend', 'promoter', 'months', 'over time'],
+    followUps: [
+      'Why did NPS jump in May?',
+      'Show NPS by branch',
+      'Which branches dragged NPS down?',
+      'Forecast NPS for next month',
+    ],
     build: () => ({
       content: `Your NPS climbed **+23 points** in six months — the steepest gain came in May–June after the Heliopolis service refresh.`,
       visuals: [
@@ -138,6 +150,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Agent quality',
     prompt: 'Are my agents catching real issues?',
     keywords: ['agent', 'agents', 'catching', 'quality', 'reliable', 'submissions'],
+    followUps: [
+      'Coaching plan for Karim H.',
+      'Reward the top 3 agents',
+      'Break down rejection reasons',
+      'Approval rate trend over 6 months',
+    ],
     build: () => ({
       content: `Agent submissions look reliable this quarter — **91% approval**, **96% photo compliance**. Three top performers to reward, one to coach.`,
       visuals: [
@@ -178,6 +196,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Weak areas',
     prompt: 'Where am I underperforming geographically?',
     keywords: ['weak', 'underperform', 'worst', 'lowest', 'attention', 'geograph', 'area'],
+    followUps: [
+      'Deep dive on Alexandria – Smouha',
+      'Suggest recovery missions',
+      'Draft action-plan email to regional manager',
+      'Compare Alexandria vs Cairo regions',
+    ],
     build: () => ({
       content: `Three branches need your attention this month. **Alexandria – Smouha** is the most urgent — CX is 18 points below your network average.`,
       visuals: [
@@ -220,6 +244,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Top complaints',
     prompt: 'What are customers complaining about most?',
     keywords: ['complain', 'complaint', 'issue', 'problem', 'negative', 'feedback'],
+    followUps: [
+      'Wait-time complaints by branch',
+      'Show hourly wait patterns',
+      'Compare complaints vs industry benchmark',
+      'Draft response template for customers',
+    ],
     build: () => ({
       content: `**Wait time at checkout** is the #1 complaint (28% of mentions) and it's growing. Overall sentiment is still healthy — 62% positive.`,
       visuals: [
@@ -265,6 +295,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Mission ROI',
     prompt: 'What is my ROI on missions this quarter?',
     keywords: ['roi', 'return', 'value', 'spend', 'invest', 'cost'],
+    followUps: [
+      'ROI by branch',
+      'Which mission type has best ROI?',
+      'Forecast next quarter ROI',
+      'Justify Q3 budget in a slide',
+    ],
     build: () => ({
       content: `You spent **48,750 EGP** and recovered an estimated **180,000 EGP** in prevented churn — a **~3.7×** return, before brand-equity effects.`,
       visuals: [
@@ -308,6 +344,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Compare branches',
     prompt: 'Compare Cairo Festival City vs Mall of Arabia side by side.',
     keywords: ['compare', 'vs', 'versus', 'side'],
+    followUps: [
+      'Add Nasr City to this comparison',
+      'Show 6-month trend for both',
+      'Which one improved more this quarter?',
+      'Save this comparison as a report',
+    ],
     build: () => ({
       content: `**Cairo Festival City** wins overall on service and NPS. **Mall of Arabia** edges ahead on cleanliness and speed at checkout.`,
       visuals: [
@@ -356,6 +398,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Exec summary',
     prompt: "Draft an executive summary of this month's performance.",
     keywords: ['exec', 'executive', 'summary', 'draft', 'monthly', 'recap', 'email'],
+    followUps: [
+      'Turn this into an email',
+      'Add revenue impact estimate',
+      'Compare to last month',
+      'Break down by region',
+    ],
     build: () => ({
       content: `**June was a strong month.** Overall CX **86.2** (+2.1 MoM), NPS **+64** — the year's best. One watch-out: wait time is emerging as the #1 recurring complaint.`,
       visuals: [
@@ -406,7 +454,7 @@ function findAnswer(text: string): Answer {
     }
     if (!best || score > best.score) best = { s, score };
   }
-  if (best && best.score >= 2) return best.s.build();
+  if (best && best.score >= 2) return { ...best.s.build(), followUps: best.s.followUps };
 
   return {
     content: `Here's the pulse on your account. Ask me a more specific question — a branch name, a metric, or a timeframe — and I'll pull a detailed answer with charts.`,
@@ -421,6 +469,12 @@ function findAnswer(text: string): Answer {
         ],
       },
     ],
+    followUps: [
+      'Which branch performed best last month?',
+      'Show me the NPS trend',
+      'Where am I underperforming?',
+      "Draft this month's executive summary",
+    ],
   };
 }
 
@@ -431,7 +485,7 @@ function seedConvo(id: string, title: string, days: number, prompt: string): Con
     id, title, updatedAt: Date.now() - 1000 * 60 * 60 * 24 * days,
     messages: [
       { id: 'u', role: 'user', content: prompt },
-      { id: 'a', role: 'assistant', content: ans.content, visuals: ans.visuals },
+      { id: 'a', role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps },
     ],
   };
 }
@@ -790,7 +844,7 @@ export default function ReportsV2Page() {
     setThinking(true);
     setTimeout(() => {
       const ans = findAnswer(trimmed);
-      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: ans.content, visuals: ans.visuals };
+      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps };
       setConversations(cs => cs.map(c => c.id === convoId ? { ...c, messages: [...c.messages, asstMsg], updatedAt: Date.now() } : c));
       setThinking(false);
     }, 700);
@@ -881,7 +935,9 @@ export default function ReportsV2Page() {
                 </div>
               </div>
               <div ref={scrollRef} className="flex-1 overflow-y-auto py-6 space-y-6">
-                {messages.map(msg => (
+                {messages.map((msg, idx) => {
+                  const isLastAssistant = msg.role === 'assistant' && idx === messages.length - 1 && !thinking;
+                  return (
                   <div key={msg.id} className={cn('flex gap-3', msg.role === 'user' && 'flex-row-reverse')}>
                     <div className={cn('h-8 w-8 rounded-full flex items-center justify-center shrink-0',
                       msg.role === 'assistant' ? 'bg-primary/10 text-primary' : 'bg-muted text-foreground')}>
@@ -896,11 +952,27 @@ export default function ReportsV2Page() {
                         <div className="text-sm text-foreground/90 w-full">
                           {renderMarkdown(msg.content)}
                           {msg.visuals?.map((v, i) => <VisualBlock key={i} v={v} />)}
+                          {isLastAssistant && msg.followUps && msg.followUps.length > 0 && (
+                            <div className="mt-5 pt-4 border-t border-border/60">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                                <Sparkles className="h-3 w-3" />Suggested follow-ups
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {msg.followUps.map((f, i) => (
+                                  <button key={i} onClick={() => send(f)} disabled={thinking}
+                                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-accent text-foreground/80 hover:text-foreground transition disabled:opacity-50">
+                                    {f}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 {thinking && (
                   <div className="flex gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
