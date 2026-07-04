@@ -150,6 +150,12 @@ const ANSWERS: Suggestion[] = [
     pill: 'Agent quality',
     prompt: 'Are my agents catching real issues?',
     keywords: ['agent', 'agents', 'catching', 'quality', 'reliable', 'submissions'],
+    followUps: [
+      'Coaching plan for Karim H.',
+      'Reward the top 3 agents',
+      'Break down rejection reasons',
+      'Approval rate trend over 6 months',
+    ],
     build: () => ({
       content: `Agent submissions look reliable this quarter — **91% approval**, **96% photo compliance**. Three top performers to reward, one to coach.`,
       visuals: [
