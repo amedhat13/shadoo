@@ -63,6 +63,7 @@ export interface Question {
   id: string;
   type: QuestionType;
   text: string | { en: string; ar: string };
+  description?: string | { en: string; ar: string }; // Optional 2-line helper shown under the question (keywords the agent should evaluate)
   required: boolean;
   options?: QuestionOption[]; // For multiple_choice
   max_rating?: number; // For rating (default 5)

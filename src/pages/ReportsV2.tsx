@@ -639,7 +639,69 @@ const ANSWERS: Suggestion[] = [
       ],
     }),
   },
+  {
+    id: 'tbs-pilot',
+    pill: 'TBS Pilot scorecard',
+    prompt: 'Show the TBS Mystery Shopping Pilot scorecard for last month.',
+    keywords: ['tbs', 'pilot', 'scorecard', '1-5', 'pass criteria', 'mystery shopping pilot'],
+    followUps: [
+      'Which branch scored highest on the TBS pilot?',
+      'Break down Service score by question',
+      'Where are the biggest pass-criteria gaps?',
+      'Draft the TBS pilot recap for the client',
+    ],
+    build: () => ({
+      content: `**TBS Pilot — Overall 84.6 / 100** across 4 pilot branches and 32 visits, using the 14-question 1-5 form with weighted scoring (Service 30 · Upselling 20 · Order Accuracy 25 · Product Quality 20 · Packaging 5).`,
+      visuals: [
+        { kind: 'hero', title: 'TBS Pilot — weighted overall', subtitle: '4 branches • 32 visits • 14 core questions', value: '84.6 / 100', badge: 'Pilot result', icon: 'trophy' },
+        { kind: 'kpis', title: 'Weighted category scores', items: [
+          { label: 'Service (30%)', value: '4.4 / 5', delta: '88 pts', up: true },
+          { label: 'Upselling (20%)', value: '3.6 / 5', delta: '72 pts', up: false },
+          { label: 'Order Accuracy (25%)', value: '4.5 / 5', delta: '90 pts', up: true },
+          { label: 'Product Quality (20%)', value: '4.3 / 5', delta: '86 pts', up: true },
+          { label: 'Packaging (5%)', value: '4.2 / 5', delta: '84 pts', up: true },
+        ] },
+        { kind: 'bar', title: 'Average rating (1-5) per question', horizontal: true,
+          series: [{ key: 'r', label: 'Avg /5', color: C.primary }],
+          data: [
+            { name: 'Q1 Acknowledgement', r: 4.6 },
+            { name: 'Q2 Greeting & Engagement', r: 4.5 },
+            { name: 'Q3 Menu Support', r: 4.1 },
+            { name: 'Q4 Item Availability', r: 4.4 },
+            { name: 'Q5 Alternative Offered', r: 3.9 },
+            { name: 'Q6 Upselling', r: 3.4 },
+            { name: 'Q7 Recommendation Relevance', r: 3.8 },
+            { name: 'Q8 Order Confirmation', r: 4.7 },
+            { name: 'Q9 Order Timing', r: 4.2 },
+            { name: 'Q10 Order Accuracy', r: 4.6 },
+            { name: 'Q11 Final Check', r: 4.4 },
+            { name: 'Q12 Product Quality', r: 4.3 },
+            { name: 'Q13 Packaging', r: 4.2 },
+            { name: 'Q14 Overall Experience', r: 4.5 },
+          ] },
+        { kind: 'ranking', title: 'Branch scorecard — weighted /100', items: [
+          { name: 'TBS — Cairo Festival City', value: 89.2, max: 100, tone: 'good' },
+          { name: 'TBS — Mall of Arabia', value: 86.4, max: 100, tone: 'good' },
+          { name: 'TBS — Nasr City', value: 83.1, max: 100 },
+          { name: 'TBS — Alexandria Smouha', value: 79.6, max: 100, tone: 'bad' },
+        ] },
+        { kind: 'callouts', title: 'Top pass-criteria gaps observed', items: [
+          { icon: 'x', label: 'Q6 Upselling (3.4/5)', text: 'In 42% of visits staff did NOT proactively suggest a drink, side or upgrade — the single biggest score drag.' },
+          { icon: 'alert', label: 'Q5 Alternative (3.9/5)', text: 'When an item was unavailable, only 61% of staff offered a close-match alternative without being prompted.' },
+          { icon: 'alert', label: 'Q3 Menu Support (4.1/5)', text: 'Preference-based recommendations missing at Smouha; staff defaulted to reading the menu.' },
+          { icon: 'check', label: 'Q8 Order Confirmation (4.7/5)', text: 'Strongest control — staff repeated full order + add-ons before payment in 94% of visits.' },
+        ] },
+        { kind: 'table', title: 'Must-check controls', headers: ['Control', 'Pass rate', 'Trend', 'Owner'],
+          rows: [
+            [{ text: 'Greeting & Staff Engagement', strong: true }, { text: '91%', tone: 'good' }, { text: '+4 pts', tone: 'good' }, { text: 'Shift lead' }],
+            [{ text: 'Item Availability / Alternative', strong: true }, { text: '76%' }, { text: '−3 pts', tone: 'bad' }, { text: 'Operations' }],
+            [{ text: 'Order Confirmation / Final Check', strong: true }, { text: '93%', tone: 'good' }, { text: '+2 pts', tone: 'good' }, { text: 'Cashier lead' }],
+          ] },
+      ],
+    }),
+  },
 ];
+
 
 // ---------- Matcher — keyword score, then substring on prompt ----------
 function findAnswer(text: string): Answer {
@@ -706,7 +768,9 @@ const SEED: Conversation[] = [
   seedConvo('s15', 'Fake submissions check', 27, 'Are any agents submitting fake or copy-paste answers?'),
   seedConvo('s16', '30-day action plan', 30, 'Give me a 30-day action plan to improve CX.'),
   seedConvo('s17', 'Next branch to open', 34, 'Where should I open my next branch?'),
+  seedConvo('s18', 'TBS Pilot scorecard', 1, 'Show the TBS Mystery Shopping Pilot scorecard for last month.'),
 ];
+
 
 const QUICK_COMMANDS = [
   { id: 'q1', label: 'Compare Cairo Festival City vs Mall of Arabia side by side.', short: 'Compare two branches', icon: BarChart3 },

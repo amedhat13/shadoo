@@ -198,6 +198,11 @@ export function StepReview({
                 </span>
                 <div className="flex-1 min-w-0">
                   <span className="truncate block">{getBilingualText(q.text) || t('review.empty_question')}</span>
+                  {q.description && getBilingualText(q.description) && (
+                    <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-line">
+                      {getBilingualText(q.description)}
+                    </p>
+                  )}
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-muted-foreground">({QUESTION_TYPE_LABELS[q.type]})</span>
                     {q.photoRequirement?.enabled && (

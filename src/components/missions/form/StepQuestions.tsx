@@ -365,6 +365,37 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
                     </div>
 
+                    {/* Optional description / evaluation keywords (2 lines) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          {tc('english')} — {t('questions_section.description_label', { defaultValue: 'Description (optional)' })}
+                        </span>
+                        <Textarea
+                          rows={2}
+                          placeholder={t('questions_section.description_placeholder', { defaultValue: 'Keywords / what to look for. Shown to the agent under the question.' })}
+                          value={ensureBilingual(question.description || '').en}
+                          onChange={(e) => updateQuestion(question.id, { description: { ...ensureBilingual(question.description || ''), en: e.target.value } })}
+                          dir="ltr"
+                          className="text-xs resize-none"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          {tc('arabic')} — {t('questions_section.description_label', { defaultValue: 'وصف (اختياري)' })}
+                        </span>
+                        <Textarea
+                          rows={2}
+                          placeholder={t('questions_section.description_placeholder', { defaultValue: 'كلمات مفتاحية / ما يجب ملاحظته.' })}
+                          value={ensureBilingual(question.description || '').ar}
+                          onChange={(e) => updateQuestion(question.id, { description: { ...ensureBilingual(question.description || ''), ar: e.target.value } })}
+                          dir="rtl"
+                          className="text-xs resize-none font-ar"
+                        />
+                      </div>
+                    </div>
+
+
                     <div className="flex items-center gap-4 flex-wrap">
                       {/* Question Type */}
                       <Select
