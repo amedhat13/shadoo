@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { seedTLabDemo } from '@/lib/seedTLabDemo';
 import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
 import { seedAIDemo } from '@/lib/seedAIDemo';
+import { seedTBSDemo } from '@/lib/seedTBSDemo';
 
 
 interface AccountData {
@@ -37,6 +38,31 @@ export function AccountSettings() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [isSeedingTamara, setIsSeedingTamara] = useState(false);
   const [isSeedingAI, setIsSeedingAI] = useState(false);
+  const [isSeedingTBS, setIsSeedingTBS] = useState(false);
+
+  const handleSeedTBS = async () => {
+    setIsSeedingTBS(true);
+    try {
+      const result = await seedTBSDemo();
+      if (!result.ok) {
+        toast.error(`Failed to seed TBS demo. ${result.error || ''}`);
+      } else if (result.alreadySeeded) {
+        toast.info('TBS demo already seeded.');
+      } else {
+        toast.success(`TBS demo loaded: ${result.branchesInserted} branch, ${result.missionsInserted} mission, ${result.visitsInserted} visits.`);
+        queryClient.invalidateQueries({ queryKey: ['branches'] });
+        queryClient.invalidateQueries({ queryKey: ['missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-missions'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-visits'] });
+        queryClient.invalidateQueries({ queryKey: ['client-reports-branches'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-scores'] });
+      }
+    } catch (e) {
+      toast.error(`Failed to seed TBS demo. ${(e as Error).message}`);
+    } finally {
+      setIsSeedingTBS(false);
+    }
+  };
 
   const { t } = useTranslation('settings');
   const queryClient = useQueryClient();
@@ -301,6 +327,19 @@ export function AccountSettings() {
               </>
             ) : (
               'Load Test Account'
+            )}
+          </Button>
+          <Button onClick={handleSeedTBS} disabled={isSeedingTBS} variant="outline" className="gap-2">
+            {isSeedingTBS ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading TBS demo…
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Load TBS Demo
+              </>
             )}
           </Button>
 

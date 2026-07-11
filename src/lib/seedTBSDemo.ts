@@ -43,7 +43,7 @@ export async function seedTBSDemo(): Promise<SeedResult> {
 
   // Branch
   const { data: branch, error: branchErr } = await supabase
-    .from('branches').insert({
+    .from('branches').insert([{
       user_id: userId,
       name: BRANCH_NAME,
       name_ar: 'تي بي إس — وسط القاهرة',
@@ -51,10 +51,11 @@ export async function seedTBSDemo(): Promise<SeedResult> {
       address_ar: '١٥ شارع طلعت حرب، وسط البلد',
       city: 'Cairo',
       district: 'Downtown',
+      google_maps_link: 'https://maps.google.com/?q=30.0489,31.2394',
       latitude: 30.0489,
       longitude: 31.2394,
       status: 'active',
-    }).select('id').single();
+    }]).select('id').single();
   if (branchErr || !branch) return { ok: false, error: branchErr?.message || 'Branch insert failed' };
 
   // Mission
