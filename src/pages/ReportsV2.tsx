@@ -1277,7 +1277,7 @@ export default function ReportsV2Page() {
     setThinking(true);
     setTimeout(() => {
       const ans = findAnswer(trimmed);
-      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps };
+      const asstMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content: ans.content, visuals: ans.visuals, followUps: ans.followUps, artifacts: ans.artifacts };
       setConversations(cs => cs.map(c => c.id === convoId ? { ...c, messages: [...c.messages, asstMsg], updatedAt: Date.now() } : c));
       setThinking(false);
     }, 700);
