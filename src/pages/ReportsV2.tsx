@@ -1382,6 +1382,45 @@ export default function ReportsV2Page() {
                         <div className="text-sm text-foreground/90 w-full">
                           {renderMarkdown(msg.content)}
                           {msg.visuals?.map((v, i) => <VisualBlock key={i} v={v} />)}
+                          {msg.artifacts && msg.artifacts.length > 0 && (
+                            <div className="mt-4 rounded-xl border border-border bg-card p-4">
+                              <div className="flex items-center justify-between mb-3 gap-3">
+                                <div className="flex items-center gap-2">
+                                  <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                    Artifacts · {msg.artifacts.length}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => downloadAll(msg.artifacts!)}
+                                  className="text-[11px] font-medium text-primary hover:underline flex items-center gap-1"
+                                >
+                                  <Download className="h-3 w-3" />Download all
+                                </button>
+                              </div>
+                              <div className="grid gap-2 sm:grid-cols-2">
+                                {msg.artifacts.map(a => {
+                                  const Icon = a.kind === 'csv' ? FileSpreadsheet : a.kind === 'md' ? FileType2 : FileText;
+                                  return (
+                                    <button
+                                      key={a.id}
+                                      onClick={() => downloadArtifact(a)}
+                                      className="group flex items-center gap-3 rounded-lg border border-border/60 bg-background p-2.5 text-start hover:border-primary/50 hover:bg-accent/40 transition"
+                                    >
+                                      <div className="h-8 w-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                        <Icon className="h-4 w-4" />
+                                      </div>
+                                      <div className="min-w-0 flex-1">
+                                        <div className="text-xs font-semibold truncate">{a.label}</div>
+                                        <div className="text-[10px] text-muted-foreground truncate">{a.name}</div>
+                                      </div>
+                                      <Download className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 shrink-0" />
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                           {isLastAssistant && msg.followUps && msg.followUps.length > 0 && (
                             <div className="mt-5 pt-4 border-t border-border/60">
                               <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
