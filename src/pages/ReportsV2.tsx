@@ -21,7 +21,7 @@ import {
   Plus, ArrowUp, Paperclip, FileText, BarChart3, TrendingUp, Sparkles,
   MessageSquarePlus, Bot, User as UserIcon, Trash2, Command,
   ArrowUpRight, ArrowDownRight, Trophy, AlertTriangle, CheckCircle2, XCircle,
-  MapPin, Star,
+  MapPin, Star, Download, FileSpreadsheet, FileType2,
 } from 'lucide-react';
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -43,9 +43,16 @@ type Visual =
   | { kind: 'table'; title?: string; headers: string[]; rows: TableCell[][] }
   | { kind: 'callouts'; title?: string; items: { icon: 'check' | 'alert' | 'x'; label: string; text: string }[] };
 
-type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[]; followUps?: string[] };
+type Artifact = {
+  id: string;
+  name: string;                // filename incl. extension
+  label: string;               // display label
+  kind: 'csv' | 'md' | 'json';
+  build: () => string;         // returns file text content
+};
+type Message = { id: string; role: 'user' | 'assistant'; content: string; visuals?: Visual[]; followUps?: string[]; artifacts?: Artifact[] };
 type Conversation = { id: string; title: string; updatedAt: number; messages: Message[] };
-type Answer = { content: string; visuals: Visual[]; followUps: string[] };
+type Answer = { content: string; visuals: Visual[]; followUps: string[]; artifacts?: Artifact[] };
 type Suggestion = { id: string; pill: string; prompt: string; keywords: string[]; followUps: string[]; build: () => Omit<Answer, 'followUps'> };
 
 const C = {
