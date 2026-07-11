@@ -722,9 +722,12 @@ function findAnswer(text: string): Answer {
     }
     if (!best || score > best.score) best = { s, score };
   }
-  if (best && best.score >= 2) return { ...best.s.build(), followUps: best.s.followUps };
+  if (best && best.score >= 2) {
+    const built = best.s.build();
+    return { ...built, followUps: best.s.followUps, artifacts: artifactsFor(best.s.prompt, built) };
+  }
 
-  return {
+  const fallback: Omit<Answer, 'followUps' | 'artifacts'> = {
     content: `Here's the pulse on your account. Ask me a more specific question — a branch name, a metric, or a timeframe — and I'll pull a detailed answer with charts.`,
     visuals: [
       {
@@ -737,12 +740,16 @@ function findAnswer(text: string): Answer {
         ],
       },
     ],
+  };
+  return {
+    ...fallback,
     followUps: [
       'Which branch performed best last month?',
       'Show me the NPS trend',
       'Where am I underperforming?',
       "Draft this month's executive summary",
     ],
+    artifacts: artifactsFor(text || 'account-pulse', fallback),
   };
 }
 
