@@ -15,7 +15,7 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   PieChart, Pie, Cell,
-  ResponsiveContainer,
+  ResponsiveContainer, Tooltip as RechartsTooltip,
 } from 'recharts';
 import {
   Target, DollarSign, Activity, Users, BarChart3, TrendingUp,
@@ -486,6 +486,12 @@ function MethodologyDashboard({ mission, visits, branches, language }: { mission
                       <BarChart data={qa.dist}>
                         <XAxis dataKey="rating" fontSize={10} />
                         <YAxis fontSize={10} />
+                        <RechartsTooltip
+                          cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                          contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: 6, fontSize: 12 }}
+                          formatter={(value: number) => [`${value} responses`, `Rating`]}
+                          labelFormatter={(l) => `${l} ★`}
+                        />
                         <Bar dataKey="count" fill={COLORS[0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -587,6 +593,12 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
                         <BarChart data={dist}>
                           <XAxis dataKey="rating" fontSize={10} />
                           <YAxis fontSize={10} />
+                          <RechartsTooltip
+                            cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                            contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: 6, fontSize: 12 }}
+                            formatter={(value: number) => [`${value} responses`, `Rating`]}
+                            labelFormatter={(l) => `${l} ★`}
+                          />
                           <Bar dataKey="count" fill={COLORS[0]} />
                         </BarChart>
                       </ResponsiveContainer>
