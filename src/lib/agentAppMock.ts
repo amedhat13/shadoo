@@ -10,6 +10,13 @@ export interface AgentQuestion {
   options?: string[];
   max_rating?: number;
   required?: boolean;
+  /** Conditional photo trigger. If set, when the answer meets the condition, agent must attach a photo justifying it. */
+  photoOn?: {
+    /** rating <= threshold, or yes_no === 'No', or option match */
+    ratingLte?: number;
+    ifAnswer?: string;
+    prompt: string; // guidance shown to the agent
+  };
 }
 
 export interface AgentSection {
