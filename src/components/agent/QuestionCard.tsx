@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AgentQuestion } from '@/lib/agentAppMock';
-import { Star, ChevronDown, Check } from 'lucide-react';
+import { Star, ChevronDown, Check, Camera, AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -8,10 +8,28 @@ interface Props {
   question: AgentQuestion;
   value: any;
   onChange: (v: any) => void;
+  photo?: string;
+  onPhoto?: (dataUrl: string | undefined) => void;
 }
 
-export function QuestionCard({ question, value, onChange }: Props) {
+export function QuestionCard({ question, value, onChange, photo, onPhoto }: Props) {
   const [showWhy, setShowWhy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const trig = question.photoOn;
+  const photoRequired = !!trig && (
+    (trig.ratingLte !== undefined && typeof value === 'number' && value > 0 && value <= trig.ratingLte) ||
+    (trig.ifAnswer !== undefined && value === trig.ifAnswer)
+  );
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f || !onPhoto) return;
+    const r = new FileReader();
+    r.onload = () => onPhoto(r.result as string);
+    r.readAsDataURL(f);
+  };
+
   return (
     <div className="rounded-2xl border bg-card p-4 space-y-4">
       <div>
