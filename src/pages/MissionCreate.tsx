@@ -94,20 +94,21 @@ export default function MissionCreatePage() {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
+  // Steps: 0 basics, 1 brief, 2 questions, 3 agent_tier, 4 funding, 5 review
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0:
         return Boolean(formData.name && formData.branch_ids.length > 0);
       case 1:
-        return Boolean(formData.agent_tier);
+        return true; // brief is optional but recommended
       case 2:
         return formData.questions.length > 0 && formData.questions.every(q => getBilingualText(q.text).trim() !== '');
       case 3:
-        return true;
+        return Boolean(formData.agent_tier);
       case 4:
         return formData.visit_schedules.length > 0;
       case 5:
-        return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
+        return isStepValid(0) && isStepValid(2) && isStepValid(3) && isStepValid(4);
       default:
         return false;
     }
