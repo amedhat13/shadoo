@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { AgentTopBar } from './AgentAppLayout';
 import { getMission } from '@/lib/agentAppMock';
-import { MapPin, Clock, Coins, Users, Calendar, ShieldCheck } from 'lucide-react';
+import { MapPin, Clock, Coins, Users, Calendar, ShieldCheck, ShoppingBag, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
@@ -49,6 +49,32 @@ export default function AgentMissionDetail() {
             <h3 className="font-bold uppercase text-xs tracking-wide mb-2">What you'll do</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{mission.coverStory}</p>
           </div>
+          {mission.requiresReceipt && mission.purchaseBudget > 0 && (
+            <div className="rounded-xl border-2 border-primary/30 bg-primary/5 overflow-hidden">
+              <div className="px-3 py-2 bg-primary/10 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <ShoppingBag className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-bold uppercase tracking-wide text-primary">Purchase required</span>
+                </div>
+                <span className="text-sm font-bold text-primary">{mission.purchaseBudget} EGP</span>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="text-[10px] uppercase text-muted-foreground font-semibold">Items to buy</div>
+                <ul className="space-y-1.5">
+                  {mission.itemsToPurchase.map((it) => (
+                    <li key={it.name} className="flex justify-between text-sm">
+                      <span>{it.name}</span>
+                      <span className="text-muted-foreground">up to {it.budget} EGP</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-start gap-1.5 pt-2 border-t text-[11px] text-muted-foreground leading-relaxed">
+                  <Receipt className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                  Keep the receipt — full amount is reimbursed to your wallet after approval.
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-xl border overflow-hidden">
             <div className="aspect-[16/9] bg-gradient-to-br from-primary/10 to-muted flex items-center justify-center">

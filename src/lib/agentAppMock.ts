@@ -10,6 +10,13 @@ export interface AgentQuestion {
   options?: string[];
   max_rating?: number;
   required?: boolean;
+  /** Conditional photo trigger. If set, when the answer meets the condition, agent must attach a photo justifying it. */
+  photoOn?: {
+    /** rating <= threshold, or yes_no === 'No', or option match */
+    ratingLte?: number;
+    ifAnswer?: string;
+    prompt: string; // guidance shown to the agent
+  };
 }
 
 export interface AgentSection {
@@ -90,7 +97,8 @@ const tamaraSections: AgentSection[] = [
     description: 'How ordering felt from start to finish.',
     questions: [
       { id: 'q3', text: 'Did the server suggest any specials or upsells?', description: 'Recommendations, add-ons, or upgrades — any proactive upselling.', type: 'yes_no', required: true },
-      { id: 'q4', text: 'Rate the accuracy of your order', description: 'Everything you ordered arrived exactly as requested.', type: 'rating', max_rating: 5, required: true },
+      { id: 'q4', text: 'Rate the accuracy of your order', description: 'Everything you ordered arrived exactly as requested.', type: 'rating', max_rating: 5, required: true,
+        photoOn: { ratingLte: 3, prompt: 'You rated order accuracy 3★ or less. Please attach a photo of what was wrong (missing item, wrong dish, etc.).' } },
       { id: 'q5', text: 'How long did you wait for your food?', type: 'single_select', options: ['<5 min', '5–10 min', '10–20 min', '20+ min'], required: true },
     ],
   },
@@ -98,16 +106,19 @@ const tamaraSections: AgentSection[] = [
     id: 'sec-food',
     title: 'Food Quality',
     questions: [
-      { id: 'q6', text: 'Rate the food taste', type: 'rating', max_rating: 5, required: true },
+      { id: 'q6', text: 'Rate the food taste', type: 'rating', max_rating: 5, required: true,
+        photoOn: { ratingLte: 3, prompt: 'You rated the taste 3★ or less. Please attach a photo of the dish so we can review.' } },
       { id: 'q7', text: 'Rate the food presentation', description: 'Plating, garnish, cleanliness of the plate edge.', type: 'rating', max_rating: 5, required: true },
-      { id: 'q8', text: 'Was the food served at the right temperature?', type: 'yes_no', required: true },
+      { id: 'q8', text: 'Was the food served at the right temperature?', type: 'yes_no', required: true,
+        photoOn: { ifAnswer: 'No', prompt: 'You said the temperature was wrong. If safe to do so, attach a photo of the dish.' } },
     ],
   },
   {
     id: 'sec-cleanliness',
     title: 'Cleanliness',
     questions: [
-      { id: 'q9', text: 'Rate the dining area cleanliness', type: 'rating', max_rating: 5, required: true },
+      { id: 'q9', text: 'Rate the dining area cleanliness', type: 'rating', max_rating: 5, required: true,
+        photoOn: { ratingLte: 2, prompt: 'You rated cleanliness 2★ or less. Please attach a photo showing the issue.' } },
       { id: 'q10', text: 'Rate the restroom cleanliness', description: 'Only if you visited the restroom.', type: 'rating', max_rating: 5 },
     ],
   },
