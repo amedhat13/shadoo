@@ -225,11 +225,11 @@ export default function MissionCreatePage() {
         return <StepBasics data={formData} onChange={updateFormData} branches={verifiedBranches} />;
       }
       case 1:
-        return <StepAgentTier data={formData} onChange={updateFormData} />;
+        return <StepBrief data={formData} onChange={updateFormData} />;
       case 2:
         return <StepQuestions data={formData} onChange={updateFormData} />;
       case 3:
-        return <StepGeoSettings data={formData} onChange={updateFormData} />;
+        return <StepAgentTier data={formData} onChange={updateFormData} />;
       case 4:
         return (
           <StepFunding
