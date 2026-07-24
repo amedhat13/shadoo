@@ -319,6 +319,24 @@ const App = () => (
               }
             />
 
+            {/* Agent App prototype */}
+            <Route path="/agent-app" element={<AgentAppLayout />}>
+              <Route index element={<AgentHome />} />
+              <Route path="mission/:id" element={<AgentMissionDetail />} />
+              <Route path="mission/:id/brief" element={<AgentMissionBrief />} />
+              <Route path="active/:visitId" element={<AgentActive />} />
+              <Route path="active/:visitId/section/:sectionId" element={<AgentSectionRunner />} />
+              <Route path="active/:visitId/photo/:taskId" element={<AgentPhotoCapture />} />
+              <Route path="active/:visitId/receipt" element={<AgentReceipt />} />
+              <Route path="active/:visitId/review" element={<AgentReview />} />
+              <Route path="active/:visitId/submitted" element={<AgentSubmitted />} />
+              <Route path="my-missions" element={<AgentMyMissions />} />
+              <Route path="my-missions/:visitId" element={<AgentVisitHistory />} />
+              <Route path="wallet" element={<AgentWallet />} />
+              <Route path="notifications" element={<AgentNotifications />} />
+              <Route path="profile" element={<AgentProfile />} />
+            </Route>
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
