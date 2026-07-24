@@ -10,10 +10,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
     <div className="rounded-2xl overflow-hidden border bg-card shadow-sm">
       <div className="relative aspect-video bg-muted">
         <img src={mission.hero} alt={mission.title} className="w-full h-full object-cover" />
-        <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-semibold uppercase">
-          {mission.reward} EGP
-        </div>
-        <div className="absolute top-2 right-2 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold">
+        <div className="absolute top-2 left-2 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold uppercase">
           {mission.category}
         </div>
       </div>
