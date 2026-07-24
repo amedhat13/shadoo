@@ -199,6 +199,26 @@ export function StepFunding({
           </div>
         </div>
       )}
+
+      {/* Geo verification toggle (merged from StepGeoSettings) */}
+      <div className="flex items-start gap-3 border border-border rounded-md p-4">
+        <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0">
+          <MapPin className="h-4 w-4" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="geo-tagged" className="text-sm font-semibold cursor-pointer">
+              {t('geo.title')}
+            </Label>
+            <Switch
+              id="geo-tagged"
+              checked={data.is_geo_tagged ?? false}
+              onCheckedChange={(checked) => onChange({ is_geo_tagged: checked })}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{t('geo.description')}</p>
+        </div>
+      </div>
     </div>
   );
 }
