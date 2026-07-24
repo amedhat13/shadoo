@@ -9,9 +9,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils';
 import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
+import { StepBrief } from '@/components/missions/form/StepBrief';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
-import { StepGeoSettings } from '@/components/missions/form/StepGeoSettings';
 import { StepFunding } from '@/components/missions/form/StepFunding';
 import { StepReview } from '@/components/missions/form/StepReview';
 import { useMissions } from '@/hooks/useMissions';
@@ -37,9 +37,11 @@ const initialFormData: MissionFormData = {
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
   is_geo_tagged: false,
+  cover_story: { en: '', ar: '' },
+  rules: [{ en: '', ar: '' }],
 };
 
-const STEP_KEYS = ['basics', 'agent_tier', 'questions', 'geo_settings', 'funding', 'review'] as const;
+const STEP_KEYS = ['basics', 'brief', 'questions', 'agent_tier', 'funding', 'review'] as const;
 
 export default function MissionCreatePage() {
   const navigate = useNavigate();
