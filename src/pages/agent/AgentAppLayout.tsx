@@ -1,0 +1,70 @@
+import { ReactNode } from 'react';
+import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
+import { Home, ClipboardList, Wallet, User, ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export function MobileFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen bg-muted/40 flex items-start justify-center py-4 sm:py-8">
+      <div className="w-full sm:w-[420px] min-h-[calc(100vh-4rem)] sm:min-h-[820px] bg-background sm:rounded-[2.5rem] sm:shadow-2xl sm:border-8 sm:border-foreground/90 sm:overflow-hidden flex flex-col relative">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function AgentTopBar({ title, showBack = false, right }: { title?: string; showBack?: boolean; right?: ReactNode }) {
+  const nav = useNavigate();
+  return (
+    <div className="sticky top-0 z-30 flex items-center gap-2 px-4 h-14 bg-background/95 backdrop-blur border-b">
+      {showBack && (
+        <button onClick={() => nav(-1)} aria-label="Back" className="-ml-2 p-2 rounded-full hover:bg-muted">
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+      )}
+      <div className="flex-1 font-bold uppercase tracking-wide text-sm truncate">{title}</div>
+      {right}
+    </div>
+  );
+}
+
+export function BottomTabs() {
+  const items = [
+    { to: '/agent-app', icon: Home, label: 'Home', end: true },
+    { to: '/agent-app/my-missions', icon: ClipboardList, label: 'Missions' },
+    { to: '/agent-app/wallet', icon: Wallet, label: 'Wallet' },
+    { to: '/agent-app/profile', icon: User, label: 'Profile' },
+  ];
+  return (
+    <nav className="sticky bottom-0 z-30 bg-background border-t grid grid-cols-4">
+      {items.map((it) => (
+        <NavLink
+          key={it.to}
+          to={it.to}
+          end={it.end}
+          className={({ isActive }) =>
+            cn('flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-wide',
+              isActive ? 'text-primary' : 'text-muted-foreground')
+          }
+        >
+          <it.icon className="h-5 w-5" />
+          {it.label}
+        </NavLink>
+      ))}
+    </nav>
+  );
+}
+
+export default function AgentAppLayout() {
+  const location = useLocation();
+  // Hide bottom tabs on immersive/task screens
+  const hideTabs = /\/agent-app\/(active|mission)\//.test(location.pathname);
+  return (
+    <MobileFrame>
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        <Outlet />
+      </div>
+      {!hideTabs && <BottomTabs />}
+    </MobileFrame>
+  );
+}
