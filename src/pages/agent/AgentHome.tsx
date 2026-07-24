@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { AgentTopBar } from './AgentAppLayout';
 import { MissionCard } from '@/components/agent/MissionCard';
+import { NearYouMap } from '@/components/agent/NearYouMap';
 import { getMissions } from '@/lib/agentAppMock';
-import { Bell, Coins, MapPin, Search } from 'lucide-react';
+import { Bell, Coins, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
