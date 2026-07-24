@@ -46,6 +46,23 @@ import AdminAuditPage from "./pages/admin/AdminAudit";
 import AdminAdminsPage from "./pages/admin/AdminAdmins";
 import AdminSalesRequestsPage from "./pages/admin/AdminSalesRequests";
 
+// Agent App (mobile prototype)
+import AgentAppLayout from "./pages/agent/AgentAppLayout";
+import AgentHome from "./pages/agent/AgentHome";
+import AgentMissionDetail from "./pages/agent/AgentMissionDetail";
+import AgentMissionBrief from "./pages/agent/AgentMissionBrief";
+import AgentActive from "./pages/agent/AgentActive";
+import AgentSectionRunner from "./pages/agent/AgentSectionRunner";
+import AgentPhotoCapture from "./pages/agent/AgentPhotoCapture";
+import AgentReceipt from "./pages/agent/AgentReceipt";
+import AgentReview from "./pages/agent/AgentReview";
+import AgentSubmitted from "./pages/agent/AgentSubmitted";
+import AgentMyMissions from "./pages/agent/AgentMyMissions";
+import AgentVisitHistory from "./pages/agent/AgentVisitHistory";
+import AgentWallet from "./pages/agent/AgentWallet";
+import AgentNotifications from "./pages/agent/AgentNotifications";
+import AgentProfile from "./pages/agent/AgentProfile";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -301,6 +318,24 @@ const App = () => (
                 </AdminProtectedRoute>
               }
             />
+
+            {/* Agent App prototype */}
+            <Route path="/agent-app" element={<AgentAppLayout />}>
+              <Route index element={<AgentHome />} />
+              <Route path="mission/:id" element={<AgentMissionDetail />} />
+              <Route path="mission/:id/brief" element={<AgentMissionBrief />} />
+              <Route path="active/:visitId" element={<AgentActive />} />
+              <Route path="active/:visitId/section/:sectionId" element={<AgentSectionRunner />} />
+              <Route path="active/:visitId/photo/:taskId" element={<AgentPhotoCapture />} />
+              <Route path="active/:visitId/receipt" element={<AgentReceipt />} />
+              <Route path="active/:visitId/review" element={<AgentReview />} />
+              <Route path="active/:visitId/submitted" element={<AgentSubmitted />} />
+              <Route path="my-missions" element={<AgentMyMissions />} />
+              <Route path="my-missions/:visitId" element={<AgentVisitHistory />} />
+              <Route path="wallet" element={<AgentWallet />} />
+              <Route path="notifications" element={<AgentNotifications />} />
+              <Route path="profile" element={<AgentProfile />} />
+            </Route>
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
