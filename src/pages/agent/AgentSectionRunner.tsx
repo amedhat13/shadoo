@@ -19,10 +19,23 @@ export default function AgentSectionRunner() {
 
   const q = section.questions[idx];
   const answers = visit.answers || {};
+  const photos = visit.photos || {};
   const setAnswer = (val: any) => updateVisit(visit.id, { answers: { ...answers, [q.id]: val } });
+  const setPhoto = (dataUrl: string | undefined) => {
+    const next = { ...photos };
+    if (dataUrl) next[`q:${q.id}`] = dataUrl; else delete next[`q:${q.id}`];
+    updateVisit(visit.id, { photos: next });
+  };
 
+  const answer = answers[q.id];
+  const trig = q.photoOn;
+  const needsPhoto = !!trig && (
+    (trig.ratingLte !== undefined && typeof answer === 'number' && answer > 0 && answer <= trig.ratingLte) ||
+    (trig.ifAnswer !== undefined && answer === trig.ifAnswer)
+  );
   const isLast = idx === section.questions.length - 1;
-  const canNext = !q.required || (answers[q.id] !== undefined && answers[q.id] !== '');
+  const answered = answer !== undefined && answer !== '';
+  const canNext = (!q.required || answered) && (!needsPhoto || !!photos[`q:${q.id}`]);
 
   return (
     <>
