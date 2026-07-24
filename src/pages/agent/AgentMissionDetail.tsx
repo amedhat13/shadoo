@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { AgentTopBar } from './AgentAppLayout';
 import { getMission } from '@/lib/agentAppMock';
-import { MapPin, Clock, Coins, Users, Calendar, ShieldCheck } from 'lucide-react';
+import { MapPin, Clock, Coins, Users, Calendar, ShieldCheck, ShoppingBag, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
