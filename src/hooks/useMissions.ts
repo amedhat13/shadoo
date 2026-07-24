@@ -204,6 +204,9 @@ export function useMissions() {
     purchase_item_name?: string;
     is_geo_tagged?: boolean;
     methodology?: string;
+    category?: string;
+    cover_story?: { en: string; ar: string };
+    rules?: { en: string; ar: string }[];
   }): Promise<Mission> => {
     setIsLoading(true);
     try {
@@ -228,6 +231,9 @@ export function useMissions() {
           total_purchase_budget: totalBudget,
           is_geo_tagged: data.is_geo_tagged ?? false,
           methodology: data.methodology || 'custom',
+          category: data.category || null,
+          cover_story: data.cover_story ? JSON.parse(JSON.stringify(data.cover_story)) : null,
+          rules: data.rules ? JSON.parse(JSON.stringify(data.rules)) : null,
         };
 
         const { data: mission, error } = await supabase
