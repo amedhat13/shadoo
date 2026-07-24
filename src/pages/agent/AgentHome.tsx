@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { AgentTopBar } from './AgentAppLayout';
 import { MissionCard } from '@/components/agent/MissionCard';
+import { NearYouMap } from '@/components/agent/NearYouMap';
 import { getMissions } from '@/lib/agentAppMock';
-import { Bell, Coins, MapPin, Search } from 'lucide-react';
+import { Bell, Coins, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -56,18 +57,7 @@ export default function AgentHome() {
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="rounded-2xl overflow-hidden relative aspect-[16/9] bg-gradient-to-br from-primary/20 via-primary/5 to-muted">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <MapPin className="h-8 w-8 text-primary" />
-          </div>
-          <div className="absolute bottom-2 left-2 right-2 bg-background/95 backdrop-blur rounded-xl p-2.5 flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-semibold text-muted-foreground">Missions near you</div>
-              <div className="text-sm font-bold">Cairo · 30 km radius</div>
-            </div>
-            <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5 font-semibold">{missions.length}</span>
-          </div>
-        </div>
+        <NearYouMap missions={missions} />
 
         <div className="flex items-center justify-between">
           <h2 className="font-bold uppercase text-sm tracking-wide">Available missions</h2>
