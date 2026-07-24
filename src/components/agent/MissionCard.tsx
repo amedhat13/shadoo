@@ -1,5 +1,5 @@
 import { AgentMission } from '@/lib/agentAppMock';
-import { MapPin, Clock, Coins, Camera, ClipboardList, Receipt, CheckCircle2 } from 'lucide-react';
+import { MapPin, Clock, Coins, Camera, ClipboardList, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,8 +11,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
       <div className="relative aspect-video bg-muted">
         <img src={mission.hero} alt={mission.title} className="w-full h-full object-cover" />
         <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-semibold uppercase">
-          <CheckCircle2 className="h-3 w-3 text-primary" />
-          Verified
+          {mission.reward} EGP
         </div>
         <div className="absolute top-2 right-2 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold">
           {mission.category}

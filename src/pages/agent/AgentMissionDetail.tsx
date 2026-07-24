@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { AgentTopBar } from './AgentAppLayout';
 import { getMission } from '@/lib/agentAppMock';
-import { MapPin, Clock, Coins, Users, Calendar, ShieldCheck, ShoppingBag, Receipt } from 'lucide-react';
+import { MapPin, Clock, Coins, Users, Calendar, ShoppingBag, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
@@ -22,8 +22,7 @@ export default function AgentMissionDetail() {
         <div className="p-4 space-y-5">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-primary uppercase">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Verified by Shadoo
+              {mission.category}
             </div>
             <div className="text-xs font-semibold uppercase text-muted-foreground mt-2 tracking-wide">{mission.brand}</div>
             <h1 className="font-bold text-xl leading-tight mt-1">{mission.title}</h1>
