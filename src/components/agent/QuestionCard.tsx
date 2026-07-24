@@ -108,6 +108,32 @@ export function QuestionCard({ question, value, onChange, photo, onPhoto }: Prop
       {question.type === 'text' && (
         <Textarea rows={4} value={value ?? ''} onChange={(e) => onChange(e.target.value)} placeholder="Type your answer..." />
       )}
+
+      {photoRequired && (
+        <div className="rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 p-3 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-xs text-amber-900 leading-relaxed">
+              <div className="font-semibold uppercase tracking-wide text-[10px] mb-0.5">Photo required</div>
+              {trig!.prompt}
+            </div>
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+          {photo ? (
+            <div className="relative rounded-lg overflow-hidden">
+              <img src={photo} alt="Attached" className="w-full aspect-video object-cover" />
+              <button onClick={() => onPhoto?.(undefined)} className="absolute top-1.5 right-1.5 bg-background/90 rounded-full p-1">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => fileRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 bg-background border border-amber-400 rounded-lg py-2.5 text-sm font-semibold text-amber-900">
+              <Camera className="h-4 w-4" /> Attach photo
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
