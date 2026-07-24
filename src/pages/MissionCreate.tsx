@@ -148,6 +148,9 @@ export default function MissionCreatePage() {
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
           methodology: formData.methodology || 'custom',
+          category: formData.category,
+          cover_story: formData.cover_story,
+          rules: formData.rules,
         });
       }
       toast({
