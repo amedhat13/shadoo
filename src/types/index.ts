@@ -109,21 +109,26 @@ export interface Mission {
   branch_id: string;
   branch?: Branch;
   status: MissionStatus;
-  
+
+  // Agent Brief
+  category?: string;
+  cover_story?: { en: string; ar: string };
+  rules?: { en: string; ar: string }[];
+
   // Questions & Photos
   questions: Question[];
   photo_requirements: PhotoRequirements;
-  
+
   // Visits & Funding
   number_of_visits: number;
   purchase_budget_per_visit: number;
-  total_purchase_budget: number; // Computed: number_of_visits × purchase_budget_per_visit
-  
+  total_purchase_budget: number;
+
   // Stats
   visits_completed: number;
   visits_pending: number;
   budget_used: number;
-  
+
   // Metadata
   created_at: string;
   updated_at: string;
