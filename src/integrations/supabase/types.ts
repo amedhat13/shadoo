@@ -487,6 +487,8 @@ export type Database = {
           agent_tier: string
           branch_id: string | null
           budget_used: number
+          category: string | null
+          cover_story: Json | null
           created_at: string
           id: string
           is_geo_tagged: boolean
@@ -499,6 +501,7 @@ export type Database = {
           purchase_budget_per_visit: number
           purchase_item_name: string | null
           questions: Json
+          rules: Json | null
           status: string
           total_purchase_budget: number
           updated_at: string
@@ -513,6 +516,8 @@ export type Database = {
           agent_tier?: string
           branch_id?: string | null
           budget_used?: number
+          category?: string | null
+          cover_story?: Json | null
           created_at?: string
           id?: string
           is_geo_tagged?: boolean
@@ -525,6 +530,7 @@ export type Database = {
           purchase_budget_per_visit?: number
           purchase_item_name?: string | null
           questions?: Json
+          rules?: Json | null
           status?: string
           total_purchase_budget?: number
           updated_at?: string
@@ -539,6 +545,8 @@ export type Database = {
           agent_tier?: string
           branch_id?: string | null
           budget_used?: number
+          category?: string | null
+          cover_story?: Json | null
           created_at?: string
           id?: string
           is_geo_tagged?: boolean
@@ -551,6 +559,7 @@ export type Database = {
           purchase_budget_per_visit?: number
           purchase_item_name?: string | null
           questions?: Json
+          rules?: Json | null
           status?: string
           total_purchase_budget?: number
           updated_at?: string

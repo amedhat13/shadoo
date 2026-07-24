@@ -1,0 +1,1 @@
+ALTER TABLE public.missions ADD COLUMN IF NOT EXISTS cover_story jsonb, ADD COLUMN IF NOT EXISTS rules jsonb, ADD COLUMN IF NOT EXISTS category text;
