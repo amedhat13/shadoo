@@ -300,6 +300,56 @@ export default function AdminMissionDetailsPage() {
               </CardContent>
             </Card>
 
+            {/* Agent Brief */}
+            {(() => {
+              const m = mission as any;
+              const cover = m?.cover_story as { en?: string; ar?: string } | null;
+              const rules = (Array.isArray(m?.rules) ? m.rules : []) as Array<{ en?: string; ar?: string }>;
+              const category = typeof m?.category === 'string' ? m.category : '';
+              const hasBrief = category || (cover && (cover.en || cover.ar)) || rules.some(r => r?.en || r?.ar);
+              if (!hasBrief) return null;
+              return (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm font-bold uppercase tracking-wide">Agent Brief</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {category && (
+                      <div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Category</div>
+                        <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">{category}</div>
+                      </div>
+                    )}
+                    {cover && (cover.en || cover.ar) && (
+                      <div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Cover Story</div>
+                        {cover.en && <p className="text-sm leading-relaxed">{cover.en}</p>}
+                        {cover.ar && <p className="text-sm leading-relaxed font-ar mt-1" dir="rtl">{cover.ar}</p>}
+                      </div>
+                    )}
+                    {rules.some(r => r?.en || r?.ar) && (
+                      <div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Rules</div>
+                        <ol className="space-y-2">
+                          {rules.filter(r => r?.en || r?.ar).map((r, i) => (
+                            <li key={i} className="flex gap-2 text-sm">
+                              <span className="shrink-0 h-5 w-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                              <div className="flex-1">
+                                {r.en && <div>{r.en}</div>}
+                                {r.ar && <div className="font-ar text-muted-foreground" dir="rtl">{r.ar}</div>}
+                              </div>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
+
+
             {/* Questions */}
             <Card>
               <CardHeader>
@@ -311,18 +361,30 @@ export default function AdminMissionDetailsPage() {
                 {questions.length === 0 ? (
                   <p className="text-muted-foreground text-sm">{tm('details.no_questions')}</p>
                 ) : (
-                  questions.map((q, i) => (
-                    <div key={q.id} className="flex items-start gap-3 border border-border p-3">
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{i + 1}</div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{typeof q.text === 'string' ? q.text : q.text.en || q.text.ar}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {QUESTION_TYPE_LABELS[q.type] || q.type}
-                          {q.required && ` • ${tc('required')}`}
-                        </p>
+                  questions.map((q, i) => {
+                    const desc = (q as any).description as { en?: string; ar?: string } | string | undefined;
+                    const descEn = typeof desc === 'object' ? desc?.en : (typeof desc === 'string' ? desc : '');
+                    const descAr = typeof desc === 'object' ? desc?.ar : '';
+                    return (
+                      <div key={q.id} className="flex items-start gap-3 border border-border p-3">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{i + 1}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{typeof q.text === 'string' ? q.text : q.text.en || q.text.ar}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {QUESTION_TYPE_LABELS[q.type] || q.type}
+                            {q.required && ` • ${tc('required')}`}
+                          </p>
+                          {(descEn || descAr) && (
+                            <div className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-2.5 py-1.5">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-primary mb-0.5">Why we ask</div>
+                              {descEn && <p className="text-xs text-muted-foreground leading-relaxed">{descEn}</p>}
+                              {descAr && <p className="text-xs text-muted-foreground leading-relaxed font-ar mt-0.5" dir="rtl">{descAr}</p>}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </CardContent>
             </Card>

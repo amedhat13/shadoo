@@ -278,6 +278,48 @@ export default function MissionDetailsPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
+            {/* Agent Brief — Cover Story & Rules */}
+            {(mission.cover_story || (mission.rules && mission.rules.length > 0) || mission.category) && (
+              <Card className="border border-border">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold uppercase tracking-wide">
+                    Agent Brief
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {mission.category && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Category</div>
+                      <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">{mission.category}</div>
+                    </div>
+                  )}
+                  {mission.cover_story && (mission.cover_story.en || mission.cover_story.ar) && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Cover Story</div>
+                      {mission.cover_story.en && <p className="text-sm leading-relaxed">{mission.cover_story.en}</p>}
+                      {mission.cover_story.ar && <p className="text-sm leading-relaxed font-ar mt-1" dir="rtl">{mission.cover_story.ar}</p>}
+                    </div>
+                  )}
+                  {mission.rules && mission.rules.length > 0 && mission.rules.some(r => r.en || r.ar) && (
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Rules</div>
+                      <ol className="space-y-2">
+                        {mission.rules.filter(r => r.en || r.ar).map((r, i) => (
+                          <li key={i} className="flex gap-2 text-sm">
+                            <span className="shrink-0 h-5 w-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                            <div className="flex-1">
+                              {r.en && <div>{r.en}</div>}
+                              {r.ar && <div className="font-ar text-muted-foreground" dir="rtl">{r.ar}</div>}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Questions Summary */}
             <Card className="border border-border">
               <CardHeader>
@@ -289,18 +331,30 @@ export default function MissionDetailsPage() {
                 {mission.questions.length === 0 ? (
                   <p className="text-muted-foreground text-sm">{t('details.no_questions')}</p>
                 ) : (
-                  mission.questions.map((question, index) => (
-                    <div key={question.id} className="flex items-start gap-3 border border-border p-3">
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{index + 1}</div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{typeof question.text === 'string' ? question.text : question.text.en || question.text.ar}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {QUESTION_TYPE_LABELS[question.type]}
-                          {question.required && ` • ${tc('required')}`}
-                        </p>
+                  mission.questions.map((question, index) => {
+                    const desc = question.description as { en?: string; ar?: string } | string | undefined;
+                    const descEn = typeof desc === 'object' ? desc?.en : (typeof desc === 'string' ? desc : '');
+                    const descAr = typeof desc === 'object' ? desc?.ar : '';
+                    return (
+                      <div key={question.id} className="flex items-start gap-3 border border-border p-3">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{index + 1}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{typeof question.text === 'string' ? question.text : question.text.en || question.text.ar}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {QUESTION_TYPE_LABELS[question.type]}
+                            {question.required && ` • ${tc('required')}`}
+                          </p>
+                          {(descEn || descAr) && (
+                            <div className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-2.5 py-1.5">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-primary mb-0.5">Why we ask</div>
+                              {descEn && <p className="text-xs text-muted-foreground leading-relaxed">{descEn}</p>}
+                              {descAr && <p className="text-xs text-muted-foreground leading-relaxed font-ar mt-0.5" dir="rtl">{descAr}</p>}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </CardContent>
             </Card>

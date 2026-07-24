@@ -109,21 +109,26 @@ export interface Mission {
   branch_id: string;
   branch?: Branch;
   status: MissionStatus;
-  
+
+  // Agent Brief
+  category?: string;
+  cover_story?: { en: string; ar: string };
+  rules?: { en: string; ar: string }[];
+
   // Questions & Photos
   questions: Question[];
   photo_requirements: PhotoRequirements;
-  
+
   // Visits & Funding
   number_of_visits: number;
   purchase_budget_per_visit: number;
-  total_purchase_budget: number; // Computed: number_of_visits × purchase_budget_per_visit
-  
+  total_purchase_budget: number;
+
   // Stats
   visits_completed: number;
   visits_pending: number;
   budget_used: number;
-  
+
   // Metadata
   created_at: string;
   updated_at: string;
@@ -178,28 +183,33 @@ export interface MissionFormData {
   // Step 1: Basics
   name: string;
   name_ar?: string;
-  branch_ids: string[]; // Changed to support multiple branches
-  
-  // Step 2: Agent Selection (dual-path)
+  branch_ids: string[];
+  category?: string;
+
+  // Step 2: Agent Brief
+  cover_story?: { en: string; ar: string };
+  rules?: { en: string; ar: string }[];
+
+  // Agent Selection
   agent_selection_mode?: 'tier' | 'custom';
-  agent_tier?: string; // Used when mode = 'tier' (tier code from agent_tiers)
-  agent_custom_criteria?: AgentCustomCriteriaForm; // Used when mode = 'custom'
-  
-  // Step 3: Questions & Photos
+  agent_tier?: string;
+  agent_custom_criteria?: AgentCustomCriteriaForm;
+
+  // Questions & Photos
   questions: Question[];
   photo_requirements: PhotoRequirements;
-  
-  // Step 4: Visits & Funding
+
+  // Visits & Funding
   number_of_visits: number;
-  visit_schedules: VisitSchedule[]; // Scheduled visits with date, time, duration
-  purchase_items: PurchaseItem[]; // Multiple items with individual budgets
-  purchase_budget_per_visit: number; // Computed from purchase_items
-  purchase_item_name?: string; // Legacy - computed from purchase_items
-  
+  visit_schedules: VisitSchedule[];
+  purchase_items: PurchaseItem[];
+  purchase_budget_per_visit: number;
+  purchase_item_name?: string;
+
   // Geo Settings
   is_geo_tagged?: boolean;
-  
-  // Methodology (from template)
+
+  // Methodology
   methodology?: string;
 }
 

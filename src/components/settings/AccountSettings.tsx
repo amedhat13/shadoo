@@ -20,14 +20,29 @@ interface AccountData {
   email: string;
   phone: string;
   company_name: string;
+  industry?: string;
   avatar_url?: string;
 }
+
+const INDUSTRY_OPTIONS = [
+  { value: 'fnb', label: 'Food & Beverage' },
+  { value: 'retail', label: 'Retail' },
+  { value: 'banking', label: 'Banking & Finance' },
+  { value: 'telecom', label: 'Telecom' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'automotive', label: 'Automotive' },
+  { value: 'hospitality', label: 'Hospitality & Hotels' },
+  { value: 'ecommerce', label: 'E-commerce' },
+  { value: 'education', label: 'Education' },
+  { value: 'other', label: 'Other' },
+];
 
 const mockAccount: AccountData = {
   full_name: 'Ahmed Hassan',
   email: 'ahmed@shadoo.com',
   phone: '+20 100 123 4567',
   company_name: 'Shadoo Inc.',
+  industry: 'fnb',
   avatar_url: '',
 };
 
@@ -250,6 +265,24 @@ export function AccountSettings() {
                 placeholder={t('account.company_placeholder')}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="industry" className="flex items-center gap-2">
+                <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                Industry / Category
+              </Label>
+              <select
+                id="industry"
+                value={account.industry || ''}
+                onChange={(e) => setAccount({ ...account, industry: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="">Select an industry…</option>
+                {INDUSTRY_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">Drives default mission templates and cover-story suggestions.</p>
+            </div>
           </div>
 
           <div className="flex justify-end">
@@ -260,6 +293,7 @@ export function AccountSettings() {
           </div>
         </CardContent>
       </Card>
+
 
       {/* Password */}
       <Card className="border border-border">

@@ -22,6 +22,9 @@ interface DbMission {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  category?: string | null;
+  cover_story?: unknown;
+  rules?: unknown;
   branches?: {
     id: string;
     name: string;
@@ -66,6 +69,9 @@ function mapDbMissionToMission(dbMission: DbMission): Mission {
     visits_completed: dbMission.visits_completed,
     visits_pending: dbMission.visits_pending,
     budget_used: dbMission.budget_used,
+    category: dbMission.category || undefined,
+    cover_story: (dbMission.cover_story as { en: string; ar: string } | null) || undefined,
+    rules: (dbMission.rules as { en: string; ar: string }[] | null) || undefined,
     created_at: dbMission.created_at,
     updated_at: dbMission.updated_at,
     published_at: dbMission.published_at || undefined,
@@ -198,6 +204,9 @@ export function useMissions() {
     purchase_item_name?: string;
     is_geo_tagged?: boolean;
     methodology?: string;
+    category?: string;
+    cover_story?: { en: string; ar: string };
+    rules?: { en: string; ar: string }[];
   }): Promise<Mission> => {
     setIsLoading(true);
     try {
@@ -222,6 +231,9 @@ export function useMissions() {
           total_purchase_budget: totalBudget,
           is_geo_tagged: data.is_geo_tagged ?? false,
           methodology: data.methodology || 'custom',
+          category: data.category || null,
+          cover_story: data.cover_story ? JSON.parse(JSON.stringify(data.cover_story)) : null,
+          rules: data.rules ? JSON.parse(JSON.stringify(data.rules)) : null,
         };
 
         const { data: mission, error } = await supabase

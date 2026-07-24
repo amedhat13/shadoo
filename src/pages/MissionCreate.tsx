@@ -9,9 +9,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils';
 import { MissionFormData, canPublishMission } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
+import { StepBrief } from '@/components/missions/form/StepBrief';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
 import { StepQuestions } from '@/components/missions/form/StepQuestions';
-import { StepGeoSettings } from '@/components/missions/form/StepGeoSettings';
 import { StepFunding } from '@/components/missions/form/StepFunding';
 import { StepReview } from '@/components/missions/form/StepReview';
 import { useMissions } from '@/hooks/useMissions';
@@ -37,9 +37,11 @@ const initialFormData: MissionFormData = {
   purchase_budget_per_visit: 100,
   purchase_item_name: '',
   is_geo_tagged: false,
+  cover_story: { en: '', ar: '' },
+  rules: [{ en: '', ar: '' }],
 };
 
-const STEP_KEYS = ['basics', 'agent_tier', 'questions', 'geo_settings', 'funding', 'review'] as const;
+const STEP_KEYS = ['basics', 'brief', 'questions', 'agent_tier', 'funding', 'review'] as const;
 
 export default function MissionCreatePage() {
   const navigate = useNavigate();
@@ -92,20 +94,21 @@ export default function MissionCreatePage() {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
+  // Steps: 0 basics, 1 brief, 2 questions, 3 agent_tier, 4 funding, 5 review
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 0:
         return Boolean(formData.name && formData.branch_ids.length > 0);
       case 1:
-        return Boolean(formData.agent_tier);
+        return true; // brief is optional but recommended
       case 2:
         return formData.questions.length > 0 && formData.questions.every(q => getBilingualText(q.text).trim() !== '');
       case 3:
-        return true;
+        return Boolean(formData.agent_tier);
       case 4:
         return formData.visit_schedules.length > 0;
       case 5:
-        return isStepValid(0) && isStepValid(1) && isStepValid(2) && isStepValid(4);
+        return isStepValid(0) && isStepValid(2) && isStepValid(3) && isStepValid(4);
       default:
         return false;
     }
@@ -145,6 +148,9 @@ export default function MissionCreatePage() {
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
           methodology: formData.methodology || 'custom',
+          category: formData.category,
+          cover_story: formData.cover_story,
+          rules: formData.rules,
         });
       }
       toast({
@@ -188,6 +194,9 @@ export default function MissionCreatePage() {
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
           methodology: formData.methodology || 'custom',
+          category: formData.category,
+          cover_story: formData.cover_story,
+          rules: formData.rules,
         });
 
         await publishMission(mission.id);
@@ -222,11 +231,11 @@ export default function MissionCreatePage() {
         return <StepBasics data={formData} onChange={updateFormData} branches={verifiedBranches} />;
       }
       case 1:
-        return <StepAgentTier data={formData} onChange={updateFormData} />;
+        return <StepBrief data={formData} onChange={updateFormData} />;
       case 2:
         return <StepQuestions data={formData} onChange={updateFormData} />;
       case 3:
-        return <StepGeoSettings data={formData} onChange={updateFormData} />;
+        return <StepAgentTier data={formData} onChange={updateFormData} />;
       case 4:
         return (
           <StepFunding
