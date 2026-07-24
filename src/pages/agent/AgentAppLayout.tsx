@@ -31,7 +31,7 @@ export function AgentTopBar({ title, showBack = false, right }: { title?: string
 export function BottomTabs() {
   const items = [
     { to: '/agent-app', icon: Home, label: 'Home', end: true },
-    { to: '/agent-app/my-missions', icon: ClipboardList, label: 'Missions' },
+    { to: '/agent-app/my-missions', icon: ClipboardList, label: 'My missions' },
     { to: '/agent-app/wallet', icon: Wallet, label: 'Wallet' },
     { to: '/agent-app/profile', icon: User, label: 'Profile' },
   ];
