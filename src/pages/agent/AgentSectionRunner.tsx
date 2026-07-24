@@ -52,7 +52,7 @@ export default function AgentSectionRunner() {
         </div>
         <div className="text-center text-xs text-muted-foreground">Question {idx + 1} of {section.questions.length}</div>
 
-        <QuestionCard question={q} value={answers[q.id]} onChange={setAnswer} />
+        <QuestionCard question={q} value={answer} onChange={setAnswer} photo={photos[`q:${q.id}`]} onPhoto={setPhoto} />
       </div>
 
       <div className="sticky bottom-0 bg-background border-t p-3 flex gap-2">
