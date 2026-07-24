@@ -362,7 +362,7 @@ export default function AdminMissionDetailsPage() {
                   <p className="text-muted-foreground text-sm">{tm('details.no_questions')}</p>
                 ) : (
                   questions.map((q, i) => {
-                    const desc = q.description as { en?: string; ar?: string } | string | undefined;
+                    const desc = (q as any).description as { en?: string; ar?: string } | string | undefined;
                     const descEn = typeof desc === 'object' ? desc?.en : (typeof desc === 'string' ? desc : '');
                     const descAr = typeof desc === 'object' ? desc?.ar : '';
                     return (
