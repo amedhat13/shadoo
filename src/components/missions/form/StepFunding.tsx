@@ -1,4 +1,5 @@
-import { Users, AlertTriangle, Info, Calculator, Building2, Wallet } from 'lucide-react';
+import { Users, AlertTriangle, Info, Calculator, Building2, Wallet, MapPin } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
