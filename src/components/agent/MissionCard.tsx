@@ -1,11 +1,34 @@
-import { AgentMission } from '@/lib/agentAppMock';
-import { MapPin, Clock, Coins, Camera, ClipboardList, Receipt } from 'lucide-react';
+import { AgentMission, VisitSlot, Branch } from '@/lib/agentAppMock';
+import { MapPin, Clock, Coins, Camera, ClipboardList, Receipt, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-export function MissionCard({ mission }: { mission: AgentMission }) {
+function fmtStart(startAtIso: string, now: number) {
+  const start = new Date(startAtIso).getTime();
+  const diff = start - now;
+  if (diff <= 0) return { chip: 'Available now', canStart: true };
+  const s = Math.floor(diff / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (d > 0) return { chip: `Starts in ${d}d ${h}h`, canStart: false };
+  if (h > 0) return { chip: `Starts in ${h}h ${m}m`, canStart: false };
+  return { chip: `Starts in ${m}m`, canStart: false };
+}
+
+export function MissionCard({ mission, slot, branch }: { mission: AgentMission; slot: VisitSlot; branch: Branch }) {
   const nav = useNavigate();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
   const qCount = mission.sections.reduce((s, sec) => s + sec.questions.length, 0);
+  const { chip, canStart } = fmtStart(slot.startAt, now);
+  const startDate = new Date(slot.startAt);
+  const dateLabel = startDate.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
   return (
     <div className="rounded-2xl overflow-hidden border bg-card shadow-sm">
       <div
@@ -16,7 +39,6 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
             : 'hsl(var(--muted))',
         }}
       >
-        {/* Shadoo branding — subtle flowing lines */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.13]"
           viewBox="0 0 400 200"
@@ -45,15 +67,24 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
         <div className="absolute top-2 left-2 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold uppercase">
           {mission.category}
         </div>
+        <div className={`absolute top-2 right-2 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold uppercase ${canStart ? 'bg-emerald-500/95 text-white' : 'bg-background/95'}`}>
+          {chip}
+        </div>
       </div>
       <div className="p-3.5 space-y-3">
         <div>
           <div className="text-[11px] font-semibold uppercase text-muted-foreground tracking-wide">{mission.brand}</div>
           <h3 className="font-bold text-[15px] leading-snug mt-0.5">{mission.title}</h3>
+          <div className="flex items-center gap-1 text-xs text-foreground mt-1">
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+            <span className="font-semibold">{branch.name}</span>
+            <span className="text-muted-foreground">· {branch.city}</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{mission.distanceKm} km</span>
+        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+          <span className="flex items-center gap-1"><CalendarClock className="h-3.5 w-3.5" />{dateLabel}</span>
+          <span className="flex items-center gap-1">{branch.distanceKm} km</span>
           <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{mission.durationMin} min</span>
           <span className="flex items-center gap-1 font-semibold text-primary"><Coins className="h-3.5 w-3.5" />{mission.reward} EGP</span>
         </div>
@@ -66,7 +97,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
           )}
         </div>
 
-        <Button className="w-full" onClick={() => nav(`/agent-app/mission/${mission.id}`)}>View mission</Button>
+        <Button className="w-full" onClick={() => nav(`/agent-app/mission/${mission.id}?slot=${slot.id}`)}>View visit</Button>
       </div>
     </div>
   );
