@@ -30,12 +30,26 @@ interface CreateClientFormData {
   companyName: string;
   fullName: string;
   phone: string;
+  industry: string;
   planId: string;
   logoFile: File | null;
   isFreeTrial: boolean;
   trialDays: number;
   trialVisits: number;
 }
+
+const INDUSTRY_OPTIONS = [
+  { value: 'fnb', label: 'Food & Beverage' },
+  { value: 'retail', label: 'Retail' },
+  { value: 'banking', label: 'Banking & Finance' },
+  { value: 'telecom', label: 'Telecom' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'automotive', label: 'Automotive' },
+  { value: 'hospitality', label: 'Hospitality & Hotels' },
+  { value: 'ecommerce', label: 'E-commerce' },
+  { value: 'education', label: 'Education' },
+  { value: 'other', label: 'Other' },
+];
 
 interface CreateClientResponse {
   success: boolean;
