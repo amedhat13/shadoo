@@ -40,9 +40,11 @@ export interface AgentMission {
   id: string;
   brand: string;
   brandLogo?: string;
+  brandDomain?: string;
+  brandColor?: string;
   title: string;
   hero: string;
-  category: 'F&B' | 'Retail' | 'Service';
+  category: 'F&B' | 'Retail' | 'Service' | 'Banking';
   distanceKm: number;
   durationMin: number;
   reward: number; // EGP
