@@ -672,6 +672,102 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
           </div>
         </div>
 
+        {/* Named Photo Slots */}
+        {(() => {
+          const slots = data.photo_requirements.slots || [];
+          const updateSlots = (next: typeof slots) =>
+            onChange({ photo_requirements: { ...data.photo_requirements, slots: next } });
+          const addSlot = () =>
+            updateSlots([
+              ...slots,
+              { id: crypto.randomUUID(), label: { en: '', ar: '' }, hint: { en: '', ar: '' } },
+            ]);
+          const removeSlot = (id: string) => updateSlots(slots.filter((s) => s.id !== id));
+          const setSlot = (id: string, patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string } }>) =>
+            updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+
+          return (
+            <div className="space-y-3 rounded-md border border-dashed border-primary/30 bg-primary/5 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Named Photo Slots</div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Give each photo a title (e.g. "Front door", "Food plate", "Receipt"). The agent sees these as separate upload slots.
+                  </p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addSlot} className="gap-1 shrink-0">
+                  <Plus className="h-3.5 w-3.5" /> Add slot
+                </Button>
+              </div>
+
+              {slots.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">
+                  No named slots — the agent will see {data.photo_requirements.required_count || 0} generic photo uploads.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {slots.map((slot, idx) => (
+                    <div key={slot.id} className="rounded-md border border-border bg-background p-2.5 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Slot {idx + 1}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-destructive"
+                          onClick={() => removeSlot(slot.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Input
+                          dir="ltr"
+                          placeholder="Title (EN) — e.g. Front door"
+                          value={slot.label.en}
+                          onChange={(e) => setSlot(slot.id, { label: { ...slot.label, en: e.target.value } })}
+                          className="text-sm"
+                        />
+                        <Input
+                          dir="rtl"
+                          placeholder="العنوان (AR) — مثال: الواجهة"
+                          value={slot.label.ar}
+                          onChange={(e) => setSlot(slot.id, { label: { ...slot.label, ar: e.target.value } })}
+                          className="text-sm font-ar"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Input
+                          dir="ltr"
+                          placeholder="Framing hint (EN) — optional"
+                          value={slot.hint?.en || ''}
+                          onChange={(e) =>
+                            setSlot(slot.id, { hint: { en: e.target.value, ar: slot.hint?.ar || '' } })
+                          }
+                          className="text-xs"
+                        />
+                        <Input
+                          dir="rtl"
+                          placeholder="تلميح التقاط الصورة (AR) — اختياري"
+                          value={slot.hint?.ar || ''}
+                          onChange={(e) =>
+                            setSlot(slot.id, { hint: { en: slot.hint?.en || '', ar: e.target.value } })
+                          }
+                          className="text-xs font-ar"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+
+
         <div className="space-y-2">
           <Label htmlFor="photoInstructions" className="text-xs text-muted-foreground">
             {t('questions_section.photo_instructions_general')}
