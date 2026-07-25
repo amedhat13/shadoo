@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload, X, Shield, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement } from '@/types';
+import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement, QuestionSection } from '@/types';
 import { QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -44,21 +44,75 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
   const { templates: dbTemplates, isLoading: templatesLoading } = useQuestionTemplates();
 
-  const addQuestion = () => {
+  // ===== Sections (required — at least one) =====
+  const sections: QuestionSection[] = data.question_sections && data.question_sections.length > 0
+    ? data.question_sections
+    : [{ id: `sec-default`, label: { en: 'General', ar: 'عام' } }];
+
+  // Ensure at least one section exists in form state on mount, and every question has a section_id.
+  useEffect(() => {
+    const hasSections = data.question_sections && data.question_sections.length > 0;
+    const firstSectionId = hasSections ? data.question_sections![0].id : 'sec-default';
+    const needsSectionFallback = data.questions.some((q) => !q.section_id);
+    if (!hasSections || needsSectionFallback) {
+      onChange({
+        question_sections: hasSections
+          ? data.question_sections
+          : [{ id: firstSectionId, label: { en: 'General', ar: 'عام' } }],
+        questions: data.questions.map((q) => (q.section_id ? q : { ...q, section_id: firstSectionId })),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateSections = (next: QuestionSection[]) => onChange({ question_sections: next });
+
+  const addSection = () => {
+    const newSection: QuestionSection = {
+      id: `sec-${Date.now()}`,
+      label: { en: '', ar: '' },
+    };
+    updateSections([...sections, newSection]);
+  };
+
+  const updateSection = (id: string, patch: Partial<QuestionSection>) => {
+    updateSections(sections.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+
+  const removeSection = (id: string) => {
+    if (sections.length <= 1) return; // must keep at least one
+    const remaining = sections.filter((s) => s.id !== id);
+    const fallbackId = remaining[0].id;
+    updateSections(remaining);
+    onChange({
+      questions: data.questions.map((q) => (q.section_id === id ? { ...q, section_id: fallbackId } : q)),
+    });
+  };
+
+  const addQuestion = (sectionId?: string) => {
+    const targetSection = sectionId || sections[0].id;
     const newQuestion: Question = {
       id: `q-${Date.now()}`,
       type: 'short_text',
       text: { en: '', ar: '' },
       required: true,
+      section_id: targetSection,
     };
     onChange({ questions: [...data.questions, newQuestion] });
     setEditingQuestionId(newQuestion.id);
   };
 
   const applyTemplate = (template: QuestionTemplate) => {
+    // Templates land in their own section named after the template.
+    const newSectionId = `sec-${Date.now()}`;
+    const newSection: QuestionSection = {
+      id: newSectionId,
+      label: { en: template.name, ar: (template as any).name_ar || template.name },
+    };
     const newQuestions: Question[] = template.questions.map((q, index) => ({
       ...q,
       id: `q-${Date.now()}-${index}`,
+      section_id: newSectionId,
       options: q.options?.map((opt, optIndex) => ({
         ...opt,
         id: `opt-${Date.now()}-${index}-${optIndex}`,
@@ -66,6 +120,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     }));
 
     onChange({
+      question_sections: [...sections, newSection],
       questions: [...data.questions, ...newQuestions],
       methodology: template.methodology || 'custom',
     });
@@ -307,29 +362,70 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
         </div>
       </div>
 
-      {/* Questions List */}
+      {/* Sections & Questions — at least one section is required */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-bold uppercase tracking-wide">
-            {t('questions_section.count', { count: data.questions.length })}
-          </Label>
-          <Button type="button" variant="outline" size="sm" onClick={addQuestion} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t('questions_section.add_question')}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div>
+            <Label className="text-xs font-bold uppercase tracking-wide">
+              Sections
+            </Label>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {t('questions_section.count', { count: data.questions.length })} · {sections.length} {sections.length === 1 ? 'section' : 'sections'} (at least one required)
+            </p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={addSection} className="gap-2">
+            <Plus className="h-4 w-4" /> Add section
           </Button>
         </div>
 
-        {data.questions.length === 0 ? (
-          <div className="border border-dashed border-border p-8 text-center">
-            <p className="text-muted-foreground text-sm">{t('questions_section.no_questions')}</p>
-            <Button type="button" variant="outline" size="sm" onClick={addQuestion} className="mt-4 gap-2">
-              <Plus className="h-4 w-4" />
-              {t('questions_section.add_question')}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {data.questions.map((question, index) => (
+        <div className="space-y-6">
+          {sections.map((section, sIdx) => {
+            const sectionQuestions = data.questions.filter((q) => (q.section_id || sections[0].id) === section.id);
+            return (
+              <div key={section.id} className="border border-border">
+                <div className="bg-muted/40 border-b border-border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Section {sIdx + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive"
+                      disabled={sections.length <= 1}
+                      title={sections.length <= 1 ? 'At least one section is required' : 'Remove section'}
+                      onClick={() => removeSection(section.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      dir="ltr"
+                      placeholder="Section name (EN) — e.g. Welcome & Greeting"
+                      value={section.label.en}
+                      onChange={(e) => updateSection(section.id, { label: { ...section.label, en: e.target.value } })}
+                    />
+                    <Input
+                      dir="rtl"
+                      placeholder="اسم القسم (AR) — مثال: الترحيب والاستقبال"
+                      value={section.label.ar}
+                      onChange={(e) => updateSection(section.id, { label: { ...section.label, ar: e.target.value } })}
+                      className="font-ar"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 space-y-3">
+                  {sectionQuestions.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic">
+                      No questions in this section yet.
+                    </p>
+                  )}
+                  {sectionQuestions.map((question) => {
+                    const index = data.questions.findIndex((q) => q.id === question.id);
+                    return (
               <div
                 key={question.id}
                 className={cn(
@@ -635,9 +731,23 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                   </Button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addQuestion(section.id)}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t('questions_section.add_question')}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* General Photo Requirements */}

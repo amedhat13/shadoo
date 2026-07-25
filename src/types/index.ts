@@ -69,6 +69,13 @@ export interface Question {
   max_rating?: number; // For rating (default 5)
   photoRequirement?: QuestionPhotoRequirement; // Per-question photo requirement
   attachment_config?: AttachmentConfig; // For attachment type
+  section_id?: string; // Which section this question belongs to
+}
+
+// Question sections — every mission must have at least one section.
+export interface QuestionSection {
+  id: string;
+  label: { en: string; ar: string };
 }
 
 // Photo Requirements (general/legacy)
@@ -205,6 +212,7 @@ export interface MissionFormData {
 
   // Questions & Photos
   questions: Question[];
+  question_sections?: QuestionSection[];
   photo_requirements: PhotoRequirements;
 
   // Visits & Funding

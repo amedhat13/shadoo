@@ -102,7 +102,12 @@ export default function MissionCreatePage() {
       case 1:
         return true; // brief is optional but recommended
       case 2:
-        return formData.questions.length > 0 && formData.questions.every(q => getBilingualText(q.text).trim() !== '');
+        return (
+          (formData.question_sections?.length || 0) >= 1 &&
+          (formData.question_sections || []).every((s) => (s.label.en || '').trim() !== '') &&
+          formData.questions.length > 0 &&
+          formData.questions.every((q) => getBilingualText(q.text).trim() !== '' && Boolean(q.section_id))
+        );
       case 3:
         return Boolean(formData.agent_tier);
       case 4:
