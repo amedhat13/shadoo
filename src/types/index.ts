@@ -72,9 +72,16 @@ export interface Question {
 }
 
 // Photo Requirements (general/legacy)
+export interface PhotoSlot {
+  id: string;
+  label: { en: string; ar: string };
+  hint?: { en: string; ar: string };
+}
+
 export interface PhotoRequirements {
   required_count: number;
   instructions?: string | { en: string; ar: string };
+  slots?: PhotoSlot[];
 }
 
 // Agent Tiers
