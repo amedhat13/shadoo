@@ -77,7 +77,7 @@ export default function AgentSectionRunner() {
             window.setTimeout(() => {
               if (nextSec) nav(`/agent-app/active/${visit.id}/section/${nextSec.id}`, { replace: true });
               else nav(`/agent-app/active/${visit.id}`);
-            }, 1600);
+            }, 1500);
           }}>
           {isLast ? 'Finish section' : 'Next'}
         </Button>
