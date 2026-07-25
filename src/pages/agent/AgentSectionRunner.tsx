@@ -64,7 +64,7 @@ export default function AgentSectionRunner() {
           onClick={() => {
             if (!isLast) {
               setIdx((i) => i + 1);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              document.getElementById('agent-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
               return;
             }
             // Section finished — show transition, then jump to next incomplete section (or hub).
