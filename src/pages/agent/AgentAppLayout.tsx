@@ -21,14 +21,16 @@ export function MobileFrame({ children }: { children: ReactNode }) {
 export function AgentTopBar({ title, showBack = false, right }: { title?: string; showBack?: boolean; right?: ReactNode }) {
   const nav = useNavigate();
   return (
-    <div className="sticky top-0 z-30 flex items-center gap-2 px-4 h-14 bg-background/95 backdrop-blur border-b">
-      {showBack && (
-        <button onClick={() => nav(-1)} aria-label="Back" className="-ml-2 p-2 rounded-full hover:bg-muted">
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-      )}
-      <div className="flex-1 font-bold uppercase tracking-wide text-sm truncate">{title}</div>
-      {right}
+    <div className="sticky top-0 z-30 grid grid-cols-[auto_1fr_auto] items-center gap-2 px-4 h-14 bg-background/95 backdrop-blur">
+      <div className="justify-self-start">
+        {showBack ? (
+          <button onClick={() => nav(-1)} aria-label="Back" className="-ml-2 p-2 rounded-full hover:bg-muted">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        ) : <span className="w-6" />}
+      </div>
+      <div className="justify-self-center text-center font-bold uppercase tracking-wide text-sm truncate">{title}</div>
+      <div className="justify-self-end">{right}</div>
     </div>
   );
 }
