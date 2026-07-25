@@ -258,6 +258,7 @@ export function CreateClientDialog() {
           fullName: data.fullName,
           phone: data.phone || undefined,
           industry: data.industry || undefined,
+          subCategory: data.subCategory || undefined,
           planId: data.isFreeTrial ? undefined : (data.planId || undefined),
           logoUrl,
           isFreeTrial: data.isFreeTrial,
