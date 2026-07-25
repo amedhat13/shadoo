@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
-import { Home, ClipboardList, Wallet, User, ChevronLeft } from 'lucide-react';
+import { Home, ClipboardList, Wallet, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import shadooLogo from '@/assets/shadoo-logo-white.png.asset.json';
+import shadooCap from '@/assets/shadoo-cap.png';
 
 export function MobileFrame({ children }: { children: ReactNode }) {
   return (
@@ -37,7 +38,7 @@ export function BottomTabs() {
     { to: '/agent-app', icon: Home, label: 'Home', end: true },
     { to: '/agent-app/my-missions', icon: ClipboardList, label: 'My missions' },
     { to: '/agent-app/wallet', icon: Wallet, label: 'Wallet' },
-    { to: '/agent-app/profile', icon: User, label: 'Profile' },
+    { to: '/agent-app/profile', icon: 'shadoo' as const, label: 'Profile' },
   ];
   return (
     <nav className="shrink-0 bg-background border-t grid grid-cols-4">
@@ -51,7 +52,9 @@ export function BottomTabs() {
               isActive ? 'text-primary' : 'text-muted-foreground')
           }
         >
-          <it.icon className="h-5 w-5" />
+          {it.icon === 'shadoo'
+            ? <img src={shadooCap} alt="" className="h-6 w-6 object-contain" />
+            : <it.icon className="h-5 w-5" />}
           {it.label}
         </NavLink>
       ))}
