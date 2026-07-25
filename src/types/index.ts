@@ -211,7 +211,9 @@ export interface MissionFormData {
   agent_custom_criteria?: AgentCustomCriteriaForm;
 
   // Questions & Photos
+  // Questions & Photos
   questions: Question[];
+  question_sections?: QuestionSection[];
   photo_requirements: PhotoRequirements;
 
   // Visits & Funding
