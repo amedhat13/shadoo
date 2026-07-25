@@ -46,21 +46,29 @@ export default function AgentMyMissions() {
           const m = getMission(v.missionId);
           if (!m) return null;
           const target = v.status === 'active' ? `/agent-app/active/${v.id}` : `/agent-app/my-missions/${v.id}`;
+          const payout = m.payoutBreakdown.reduce((s, p) => s + p.amount, 0);
+          const dateLabel = v.submittedAt
+            ? `Submitted ${format(new Date(v.submittedAt), 'MMM d')}`
+            : v.acceptedAt
+            ? `Accepted ${format(new Date(v.acceptedAt), 'MMM d')}`
+            : '';
           return (
             <button key={v.id} onClick={() => nav(target)}
-              className="w-full text-left rounded-2xl border overflow-hidden bg-card hover:bg-muted/30">
-              <div className="flex">
-                <img src={m.brandLogo || m.hero} className="w-24 h-24 object-contain bg-muted p-3 shrink-0" alt="" />
-                <div className="flex-1 p-3 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[10px] uppercase font-semibold text-muted-foreground truncate">{m.brand}</div>
+              className="w-full text-left rounded-2xl border bg-card overflow-hidden hover:border-primary/40 hover:shadow-sm transition">
+              <div className="flex items-stretch gap-3 p-3">
+                <div className="w-16 h-16 rounded-xl bg-muted shrink-0 flex items-center justify-center overflow-hidden">
+                  <img src={m.brandLogo || m.hero} className="w-full h-full object-contain p-2" alt="" />
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="text-[10px] uppercase font-semibold text-muted-foreground truncate flex-1">{m.brand}</div>
                     <StatusPill status={v.status} />
                   </div>
-                  <div className="font-semibold text-sm leading-tight mt-1 line-clamp-2">{m.title}</div>
-                  <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                    <span>{v.submittedAt ? format(new Date(v.submittedAt), 'MMM d') : v.acceptedAt ? 'Accepted ' + format(new Date(v.acceptedAt), 'MMM d') : ''}</span>
-                    <span className="flex items-center gap-1 font-semibold text-primary">
-                      {m.payoutBreakdown.reduce((s, p) => s + p.amount, 0)} EGP
+                  <div className="font-semibold text-sm leading-tight mt-0.5 line-clamp-2">{m.title}</div>
+                  <div className="mt-auto pt-2 flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground truncate">{dateLabel}</span>
+                    <span className="flex items-center gap-1 font-bold text-primary shrink-0">
+                      {payout} EGP
                       <ChevronRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
