@@ -36,7 +36,7 @@ export default function AgentSectionRunner() {
     (trig.ratingLte !== undefined && typeof answer === 'number' && answer > 0 && answer <= trig.ratingLte) ||
     (trig.ifAnswer !== undefined && answer === trig.ifAnswer)
   );
-  const isLast = idx === section.questions.length - 1;
+  const isLast = safeIdx === section.questions.length - 1;
   const answered = answer !== undefined && answer !== '';
   const canNext = (!q.required || answered) && (!needsPhoto || !!photos[`q:${q.id}`]);
 
@@ -48,16 +48,16 @@ export default function AgentSectionRunner() {
         <div className="flex justify-center gap-1.5">
           {section.questions.map((_, i) => (
             <span key={i} className={cn('h-1.5 rounded-full transition-all',
-              i === idx ? 'w-6 bg-primary' : i < idx ? 'w-4 bg-primary/60' : 'w-4 bg-muted')} />
+              i === safeIdx ? 'w-6 bg-primary' : i < safeIdx ? 'w-4 bg-primary/60' : 'w-4 bg-muted')} />
           ))}
         </div>
-        <div className="text-center text-xs text-muted-foreground">Question {idx + 1} of {section.questions.length}</div>
+        <div className="text-center text-xs text-muted-foreground">Question {safeIdx + 1} of {section.questions.length}</div>
 
         <QuestionCard question={q} value={answer} onChange={setAnswer} photo={photos[`q:${q.id}`]} onPhoto={setPhoto} />
       </div>
 
       <div className="sticky bottom-0 bg-background border-t p-3 flex gap-2">
-        <Button variant="outline" onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0}>Previous</Button>
+        <Button variant="outline" onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={safeIdx === 0}>Previous</Button>
         <Button className="flex-1" disabled={!canNext}
           onClick={() => {
             if (!isLast) {
