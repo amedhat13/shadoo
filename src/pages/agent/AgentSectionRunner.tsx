@@ -18,7 +18,9 @@ export default function AgentSectionRunner() {
   useEffect(() => { setIdx(0); }, [sectionId]);
   if (!visit || !mission || !section) return null;
 
-  const q = section.questions[idx];
+  const safeIdx = Math.min(idx, section.questions.length - 1);
+  const q = section.questions[safeIdx];
+  if (!q) return null;
   const answers = visit.answers || {};
   const photos = visit.photos || {};
   const setAnswer = (val: any) => updateVisit(visit.id, { answers: { ...answers, [q.id]: val } });
