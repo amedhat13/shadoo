@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { AgentTopBar } from './AgentAppLayout';
 import { getMission, getSlot, getBranch, acceptSlot, acceptMission } from '@/lib/agentAppMock';
@@ -41,10 +41,14 @@ export default function AgentMissionBrief() {
   const [maxReached, setMaxReached] = useState(0);
   const [accepted, setAccepted] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+  useEffect(() => {
+    tabRefs.current[tabIdx]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [tabIdx]);
 
   if (!mission) return null;
   const tab = TABS[tabIdx].key;
@@ -85,7 +89,11 @@ export default function AgentMissionBrief() {
               const locked = i > maxReached;
               const active = i === tabIdx;
               return (
-                <button key={t.key} onClick={() => gotoTab(i)} disabled={locked}
+                <button
+                  key={t.key}
+                  ref={(el) => (tabRefs.current[i] = el)}
+                  onClick={() => gotoTab(i)}
+                  disabled={locked}
                   className={cn('shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-1 transition',
                     active ? 'bg-primary text-primary-foreground'
                       : locked ? 'bg-muted/50 text-muted-foreground/50'

@@ -39,9 +39,7 @@ export default function AgentSectionRunner() {
 
   return (
     <>
-      <AgentTopBar title={section.title} showBack right={
-        <button className="text-xs text-primary font-semibold" onClick={() => nav(`/agent-app/active/${visit.id}`)}>Save & exit</button>
-      } />
+      <AgentTopBar title={section.title} showBack />
 
       <div className="p-4 space-y-4 pb-28">
         <div className="flex justify-center gap-1.5">
