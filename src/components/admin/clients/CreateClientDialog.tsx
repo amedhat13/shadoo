@@ -203,6 +203,7 @@ export function CreateClientDialog() {
     phone: '',
     planId: '',
     industry: '',
+    subCategory: '',
     logoFile: null,
     isFreeTrial: false,
     trialDays: 14,
