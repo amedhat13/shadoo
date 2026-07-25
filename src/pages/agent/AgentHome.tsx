@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShadooMark } from './AgentAppLayout';
+
 import { MissionCard } from '@/components/agent/MissionCard';
 import { NearYouMap } from '@/components/agent/NearYouMap';
 import { getMissions } from '@/lib/agentAppMock';
