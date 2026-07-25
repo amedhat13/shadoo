@@ -3,10 +3,14 @@ import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
 import { Home, ClipboardList, Wallet, User, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import shadooLogo from '@/assets/shadoo-logo-white.png.asset.json';
+
 export function MobileFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-muted/40 flex items-start justify-center py-4 sm:py-8">
-      <div className="w-full sm:w-[420px] min-h-[calc(100vh-4rem)] sm:min-h-[820px] bg-background sm:rounded-[2.5rem] sm:shadow-2xl sm:border-8 sm:border-foreground/90 sm:overflow-hidden flex flex-col relative">
+    <div className="min-h-screen bg-muted/40 flex items-start justify-center py-4 sm:py-6">
+      <div
+        className="w-full sm:w-[390px] h-[100vh] sm:h-[780px] bg-background sm:rounded-[2.5rem] sm:shadow-2xl sm:border-[10px] sm:border-foreground/90 sm:overflow-hidden flex flex-col relative"
+      >
         {children}
       </div>
     </div>
@@ -36,7 +40,7 @@ export function BottomTabs() {
     { to: '/agent-app/profile', icon: User, label: 'Profile' },
   ];
   return (
-    <nav className="sticky bottom-0 z-30 bg-background border-t grid grid-cols-4">
+    <nav className="shrink-0 bg-background border-t grid grid-cols-4">
       {items.map((it) => (
         <NavLink
           key={it.to}
@@ -52,6 +56,15 @@ export function BottomTabs() {
         </NavLink>
       ))}
     </nav>
+  );
+}
+
+/** Small inline Shadoo lockup for in-app headers */
+export function ShadooMark({ className }: { className?: string }) {
+  return (
+    <div className={cn('inline-flex items-center gap-1.5', className)}>
+      <img src={shadooLogo.url} alt="Shadoo" className="h-5 w-auto object-contain" />
+    </div>
   );
 }
 
