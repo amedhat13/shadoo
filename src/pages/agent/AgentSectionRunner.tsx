@@ -16,6 +16,7 @@ export default function AgentSectionRunner() {
   const mission = visit ? getMission(visit.missionId) : undefined;
   const section = mission?.sections.find((s) => s.id === sectionId);
   const [idx, setIdx] = useState(0);
+  const [transition, setTransition] = useState<null | { doneTitle: string; nextTitle?: string; nextId?: string }>(null);
   useEffect(() => { setIdx(0); }, [sectionId]);
   if (!visit || !mission || !section) return null;
 
