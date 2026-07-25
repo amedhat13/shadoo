@@ -80,7 +80,16 @@ export interface AgentVisit {
   timeline: { label: string; ts?: string; state: 'done' | 'current' | 'pending' }[];
 }
 
+import tbsLogoAsset from '@/assets/tbs-logo.png.asset.json';
+import vodafoneLogoAsset from '@/assets/vodafone-logo.png.asset.json';
+import cibLogoAsset from '@/assets/cib-logo.png.asset.json';
+import zaraLogoAsset from '@/assets/zara-logo.png.asset.json';
+
 const TAMARA_LOGO = '/tamara-demo/logo.png';
+const TBS_LOGO = tbsLogoAsset.url;
+const VODAFONE_LOGO = vodafoneLogoAsset.url;
+const CIB_LOGO = cibLogoAsset.url;
+const ZARA_LOGO = zaraLogoAsset.url;
 
 // ---- Sections (drawn from Tamara F&B template style)
 const tamaraSections: AgentSection[] = [
@@ -217,11 +226,11 @@ export const agentMissions: AgentMission[] = [
   {
     id: 'm-tbs-korba',
     brand: 'TBS — The Bakery Shop',
-    brandLogo: 'https://logo.clearbit.com/tbsholding.com',
+    brandLogo: TBS_LOGO,
     brandDomain: 'tbsholding.com',
     brandColor: '#5B2C1B',
     title: 'Service Review — TBS Korba',
-    hero: 'https://logo.clearbit.com/tbsholding.com',
+    hero: TBS_LOGO,
     category: 'F&B',
     distanceKm: 6.8,
     durationMin: 30,
@@ -255,11 +264,11 @@ export const agentMissions: AgentMission[] = [
   {
     id: 'm-vodafone',
     brand: 'Vodafone Egypt',
-    brandLogo: 'https://logo.clearbit.com/vodafone.com.eg',
+    brandLogo: VODAFONE_LOGO,
     brandDomain: 'vodafone.com.eg',
     brandColor: '#E60000',
     title: 'Store Experience — City Stars',
-    hero: 'https://logo.clearbit.com/vodafone.com.eg',
+    hero: VODAFONE_LOGO,
     category: 'Retail',
     distanceKm: 8.1,
     durationMin: 25,
@@ -286,11 +295,11 @@ export const agentMissions: AgentMission[] = [
   {
     id: 'm-cib',
     brand: 'CIB — Commercial International Bank',
-    brandLogo: 'https://logo.clearbit.com/cibeg.com',
+    brandLogo: CIB_LOGO,
     brandDomain: 'cibeg.com',
     brandColor: '#6E1E3A',
     title: 'Branch Visit — Zamalek',
-    hero: 'https://logo.clearbit.com/cibeg.com',
+    hero: CIB_LOGO,
     category: 'Banking',
     distanceKm: 3.4,
     durationMin: 35,
@@ -317,11 +326,11 @@ export const agentMissions: AgentMission[] = [
   {
     id: 'm-zara',
     brand: 'ZARA',
-    brandLogo: 'https://logo.clearbit.com/zara.com',
+    brandLogo: ZARA_LOGO,
     brandDomain: 'zara.com',
     brandColor: '#000000',
     title: 'Fitting Room Experience — Mall of Egypt',
-    hero: 'https://logo.clearbit.com/zara.com',
+    hero: ZARA_LOGO,
     category: 'Retail',
     distanceKm: 12.5,
     durationMin: 40,

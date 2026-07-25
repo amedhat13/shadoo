@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AgentTopBar } from './AgentAppLayout';
+import { ShadooMark } from './AgentAppLayout';
 import { MissionCard } from '@/components/agent/MissionCard';
 import { NearYouMap } from '@/components/agent/NearYouMap';
 import { getMissions } from '@/lib/agentAppMock';
@@ -13,22 +13,28 @@ const CATS: ('All' | 'F&B' | 'Retail' | 'Service')[] = ['All', 'F&B', 'Retail', 
 export default function AgentHome() {
   const nav = useNavigate();
   const [cat, setCat] = useState<'All' | 'F&B' | 'Retail' | 'Service'>('All');
-  const [sort, setSort] = useState<'recommended' | 'nearest' | 'reward'>('recommended');
+  const [sort, setSort] = useState<'nearest' | 'reward'>('nearest');
   const missions = getMissions()
     .filter((m) => cat === 'All' || m.category === cat)
-    .sort((a, b) => sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'reward' ? b.reward - a.reward : 0);
+    .sort((a, b) => (sort === 'nearest' ? a.distanceKm - b.distanceKm : b.reward - a.reward));
 
   return (
     <>
       <div className="sticky top-0 z-30 bg-background border-b">
-        <div className="px-4 pt-4 pb-3 flex items-center justify-between">
+        {/* Shadoo brand strip */}
+        <div className="bg-primary text-primary-foreground px-4 py-1.5 flex items-center justify-between">
+          <ShadooMark />
+          <span className="text-[10px] font-semibold uppercase tracking-widest opacity-90">Agent</span>
+        </div>
+
+        <div className="px-4 pt-3 pb-3 flex items-center justify-between">
           <div>
             <div className="text-xs text-muted-foreground">Good afternoon,</div>
             <div className="font-bold text-lg leading-tight">Ahmed <span className="text-primary text-sm">· Tier A</span></div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => nav('/agent-app/wallet')} className="flex items-center gap-1 bg-muted rounded-full px-2.5 py-1.5">
-              <Coins className="h-4 w-4 text-primary" />
+            <button onClick={() => nav('/agent-app/wallet')} className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-2.5 py-1.5">
+              <Coins className="h-4 w-4" />
               <span className="text-xs font-semibold">1,240 EGP</span>
             </button>
             <button onClick={() => nav('/agent-app/notifications')} className="p-2 rounded-full bg-muted relative">
@@ -61,11 +67,22 @@ export default function AgentHome() {
 
         <div className="flex items-center justify-between">
           <h2 className="font-bold uppercase text-sm tracking-wide">Available missions</h2>
-          <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="text-xs bg-muted rounded-full px-2 py-1 border-0">
-            <option value="recommended">Recommended</option>
-            <option value="nearest">Nearest</option>
-            <option value="reward">Highest reward</option>
-          </select>
+          <div className="flex items-center gap-1 rounded-full bg-muted p-0.5 text-[11px] font-semibold">
+            <button
+              onClick={() => setSort('nearest')}
+              className={cn('rounded-full px-2.5 py-1 transition',
+                sort === 'nearest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
+            >
+              Nearest
+            </button>
+            <button
+              onClick={() => setSort('reward')}
+              className={cn('rounded-full px-2.5 py-1 transition',
+                sort === 'reward' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
+            >
+              Highest reward
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -75,3 +92,4 @@ export default function AgentHome() {
     </>
   );
 }
+
