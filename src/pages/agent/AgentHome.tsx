@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 
 import { MissionCard } from '@/components/agent/MissionCard';
 import { NearYouMap } from '@/components/agent/NearYouMap';
-import { getMissions } from '@/lib/agentAppMock';
+import { getMissions, getSlots, getMission, getBranch, subscribe } from '@/lib/agentAppMock';
 import { Bell, Coins, Search, X, Clock, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -16,9 +16,11 @@ const RECENT_KEY = 'agent_recent_searches';
 export default function AgentHome() {
   const nav = useNavigate();
   const [cat, setCat] = useState<Cat>('All');
-  const [sort, setSort] = useState<'nearest' | 'reward'>('nearest');
+  const [sort, setSort] = useState<'nearest' | 'reward' | 'soonest'>('soonest');
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [, force] = useState(0);
+  useEffect(() => subscribe(() => force((x) => x + 1)), []);
   const [recent, setRecent] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch { return []; }
   });
@@ -27,20 +29,45 @@ export default function AgentHome() {
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
 
+  // Enrich available slots with mission + branch
+  const availableVisits = useMemo(() => {
+    return getSlots()
+      .map((slot) => {
+        const mission = getMission(slot.missionId);
+        const branch = getBranch(slot.missionId, slot.branchId);
+        if (!mission || !branch) return null;
+        return { slot, mission, branch };
+      })
+      .filter((v): v is { slot: NonNullable<ReturnType<typeof getSlots>>[number]; mission: NonNullable<ReturnType<typeof getMission>>; branch: NonNullable<ReturnType<typeof getBranch>> } => v !== null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allMissions.length, /* rerun on visit changes */ force]);
+
   const brandSuggestions = useMemo(() => {
     const map = new Map<string, { brand: string; logo?: string; count: number }>();
-    allMissions.forEach((m) => {
-      const key = m.brand;
-      const prev = map.get(key);
-      map.set(key, { brand: m.brand, logo: m.brandLogo, count: (prev?.count ?? 0) + 1 });
+    availableVisits.forEach(({ mission }) => {
+      const prev = map.get(mission.brand);
+      map.set(mission.brand, { brand: mission.brand, logo: mission.brandLogo, count: (prev?.count ?? 0) + 1 });
     });
     return Array.from(map.values());
-  }, [allMissions]);
+  }, [availableVisits]);
 
-  const missions = allMissions
-    .filter((m) => cat === 'All' || m.category === cat)
-    .filter((m) => !searching || [m.brand, m.title, m.category].join(' ').toLowerCase().includes(q))
-    .sort((a, b) => (sort === 'nearest' ? a.distanceKm - b.distanceKm : b.reward - a.reward));
+  const visits = availableVisits
+    .filter(({ mission }) => cat === 'All' || mission.category === cat)
+    .filter(({ mission, branch }) => !searching || [mission.brand, mission.title, mission.category, branch.name, branch.city].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => {
+      if (sort === 'nearest') return a.branch.distanceKm - b.branch.distanceKm;
+      if (sort === 'reward') return b.mission.reward - a.mission.reward;
+      return new Date(a.slot.startAt).getTime() - new Date(b.slot.startAt).getTime();
+    });
+
+  // Missions list for the "Near you" map (deduped by mission)
+  const mapMissions = useMemo(() => {
+    const seen = new Set<string>();
+    return visits.reduce<typeof allMissions>((acc, v) => {
+      if (!seen.has(v.mission.id)) { seen.add(v.mission.id); acc.push(v.mission); }
+      return acc;
+    }, []);
+  }, [visits, allMissions]);
 
   const commitSearch = (value: string) => {
     const v = value.trim();
@@ -61,6 +88,7 @@ export default function AgentHome() {
     setRecent([]);
     try { localStorage.removeItem(RECENT_KEY); } catch {}
   };
+
 
   return (
     <>
