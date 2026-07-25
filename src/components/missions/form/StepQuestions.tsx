@@ -44,21 +44,75 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
 
   const { templates: dbTemplates, isLoading: templatesLoading } = useQuestionTemplates();
 
-  const addQuestion = () => {
+  // ===== Sections (required — at least one) =====
+  const sections: QuestionSection[] = data.question_sections && data.question_sections.length > 0
+    ? data.question_sections
+    : [{ id: `sec-default`, label: { en: 'General', ar: 'عام' } }];
+
+  // Ensure at least one section exists in form state on mount, and every question has a section_id.
+  useEffect(() => {
+    const hasSections = data.question_sections && data.question_sections.length > 0;
+    const firstSectionId = hasSections ? data.question_sections![0].id : 'sec-default';
+    const needsSectionFallback = data.questions.some((q) => !q.section_id);
+    if (!hasSections || needsSectionFallback) {
+      onChange({
+        question_sections: hasSections
+          ? data.question_sections
+          : [{ id: firstSectionId, label: { en: 'General', ar: 'عام' } }],
+        questions: data.questions.map((q) => (q.section_id ? q : { ...q, section_id: firstSectionId })),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateSections = (next: QuestionSection[]) => onChange({ question_sections: next });
+
+  const addSection = () => {
+    const newSection: QuestionSection = {
+      id: `sec-${Date.now()}`,
+      label: { en: '', ar: '' },
+    };
+    updateSections([...sections, newSection]);
+  };
+
+  const updateSection = (id: string, patch: Partial<QuestionSection>) => {
+    updateSections(sections.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+
+  const removeSection = (id: string) => {
+    if (sections.length <= 1) return; // must keep at least one
+    const remaining = sections.filter((s) => s.id !== id);
+    const fallbackId = remaining[0].id;
+    updateSections(remaining);
+    onChange({
+      questions: data.questions.map((q) => (q.section_id === id ? { ...q, section_id: fallbackId } : q)),
+    });
+  };
+
+  const addQuestion = (sectionId?: string) => {
+    const targetSection = sectionId || sections[0].id;
     const newQuestion: Question = {
       id: `q-${Date.now()}`,
       type: 'short_text',
       text: { en: '', ar: '' },
       required: true,
+      section_id: targetSection,
     };
     onChange({ questions: [...data.questions, newQuestion] });
     setEditingQuestionId(newQuestion.id);
   };
 
   const applyTemplate = (template: QuestionTemplate) => {
+    // Templates land in their own section named after the template.
+    const newSectionId = `sec-${Date.now()}`;
+    const newSection: QuestionSection = {
+      id: newSectionId,
+      label: { en: template.name, ar: (template as any).name_ar || template.name },
+    };
     const newQuestions: Question[] = template.questions.map((q, index) => ({
       ...q,
       id: `q-${Date.now()}-${index}`,
+      section_id: newSectionId,
       options: q.options?.map((opt, optIndex) => ({
         ...opt,
         id: `opt-${Date.now()}-${index}-${optIndex}`,
@@ -66,6 +120,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     }));
 
     onChange({
+      question_sections: [...sections, newSection],
       questions: [...data.questions, ...newQuestions],
       methodology: template.methodology || 'custom',
     });
