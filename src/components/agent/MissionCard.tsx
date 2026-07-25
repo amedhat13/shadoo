@@ -93,9 +93,12 @@ export function MissionCard({ mission, slot, branch }: { mission: AgentMission; 
           <span className="inline-flex items-center gap-1 bg-muted rounded-full px-2 py-0.5 text-[10px] font-medium"><ClipboardList className="h-3 w-3" />{qCount} questions</span>
           <span className="inline-flex items-center gap-1 bg-muted rounded-full px-2 py-0.5 text-[10px] font-medium"><Camera className="h-3 w-3" />{mission.photoTasks.length} photos</span>
           {mission.requiresReceipt && (
-            <span className="inline-flex items-center gap-1 bg-muted rounded-full px-2 py-0.5 text-[10px] font-medium"><Receipt className="h-3 w-3" />Receipt · {mission.purchaseBudget} EGP</span>
+            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+              <Receipt className="h-3 w-3" />Pay up to {mission.purchaseBudget} EGP · refunded
+            </span>
           )}
         </div>
+
 
         <Button className="w-full" onClick={() => nav(`/agent-app/mission/${mission.id}?slot=${slot.id}`)}>View visit</Button>
       </div>
