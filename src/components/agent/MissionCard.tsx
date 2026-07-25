@@ -9,7 +9,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
   return (
     <div className="rounded-2xl overflow-hidden border bg-card shadow-sm">
       <div
-        className="relative aspect-video flex items-center justify-center"
+        className="relative aspect-[2/1] flex items-center justify-center"
         style={{
           background: mission.brandColor
             ? `linear-gradient(135deg, ${mission.brandColor}18, ${mission.brandColor}05)`
@@ -19,7 +19,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
         <img
           src={mission.brandLogo || mission.hero}
           alt={mission.brand}
-          className="max-h-[55%] max-w-[60%] object-contain drop-shadow-sm"
+          className="max-h-[80%] max-w-[85%] w-auto h-auto object-contain drop-shadow-sm"
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = 'none';
           }}
