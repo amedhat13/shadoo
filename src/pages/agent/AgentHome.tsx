@@ -262,37 +262,33 @@ export default function AgentHome() {
         <div className="p-4 space-y-4">
           <NearYouMap missions={mapMissions} />
 
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold uppercase text-sm tracking-wide">Available visits</h2>
-            <div className="flex items-center gap-1 rounded-full bg-muted p-0.5 text-[11px] font-semibold">
+          <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-1 px-1">
+            {([
+              { key: 'all', label: 'All' },
+              { key: 'soonest', label: 'Soonest' },
+              { key: 'nearest', label: 'Nearest' },
+              { key: 'reward', label: 'Highest reward' },
+            ] as const).map((t) => (
               <button
-                onClick={() => setSort('soonest')}
-                className={cn('rounded-full px-2.5 py-1 transition',
-                  sort === 'soonest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
+                key={t.key}
+                onClick={() => setSort(t.key)}
+                className={cn(
+                  'shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold border transition',
+                  sort === t.key
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background border-border text-foreground',
+                )}
               >
-                Soonest
+                {t.label}
               </button>
-              <button
-                onClick={() => setSort('nearest')}
-                className={cn('rounded-full px-2.5 py-1 transition',
-                  sort === 'nearest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
-              >
-                Nearest
-              </button>
-              <button
-                onClick={() => setSort('reward')}
-                className={cn('rounded-full px-2.5 py-1 transition',
-                  sort === 'reward' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
-              >
-                Highest reward
-              </button>
-            </div>
+            ))}
           </div>
 
           <div className="space-y-4">
             {visits.map((v) => <MissionCard key={v.slot.id} mission={v.mission} slot={v.slot} branch={v.branch} />)}
           </div>
         </div>
+
 
       )}
     </>
