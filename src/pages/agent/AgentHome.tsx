@@ -186,30 +186,32 @@ export default function AgentHome() {
 
           <div className="flex items-center justify-between">
             <h2 className="font-bold uppercase text-sm tracking-wide">
-              {missions.length} result{missions.length === 1 ? '' : 's'}
+              {visits.length} result{visits.length === 1 ? '' : 's'}
             </h2>
-            {missions.length > 0 && (
+            {visits.length > 0 && (
               <div className="flex items-center gap-1 rounded-full bg-muted p-0.5 text-[11px] font-semibold">
+                <button onClick={() => setSort('soonest')} className={cn('rounded-full px-2.5 py-1 transition', sort === 'soonest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}>Soonest</button>
                 <button onClick={() => setSort('nearest')} className={cn('rounded-full px-2.5 py-1 transition', sort === 'nearest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}>Nearest</button>
                 <button onClick={() => setSort('reward')} className={cn('rounded-full px-2.5 py-1 transition', sort === 'reward' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}>Highest</button>
               </div>
             )}
           </div>
 
-          {missions.length === 0 ? (
+          {visits.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-8 text-center space-y-2">
               <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                 <Search className="h-5 w-5 text-muted-foreground" />
               </div>
-              <div className="font-semibold text-sm">No missions match “{query}”</div>
+              <div className="font-semibold text-sm">No visits match “{query}”</div>
               <div className="text-xs text-muted-foreground">Try another brand, city, or category.</div>
               <button onClick={() => setQuery('')} className="mt-2 text-xs font-semibold text-primary">Clear search</button>
             </div>
           ) : (
             <div className="space-y-4">
-              {missions.map((m) => <MissionCard key={m.id} mission={m} />)}
+              {visits.map((v) => <MissionCard key={v.slot.id} mission={v.mission} slot={v.slot} branch={v.branch} />)}
             </div>
           )}
+
         </div>
       ) : focused && (recent.length > 0 || brandSuggestions.length > 0) ? (
         <div className="p-4 space-y-5">
