@@ -758,6 +758,50 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           className="text-xs font-ar"
                         />
                       </div>
+                      {/* Sample photo (optional) */}
+                      <div className="flex items-start gap-2 pt-1">
+                        {slot.sample_url ? (
+                          <div className="relative shrink-0">
+                            <img
+                              src={slot.sample_url}
+                              alt="Sample"
+                              className="h-16 w-16 rounded-md border border-border object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setSlot(slot.id, { sample_url: undefined } as any)}
+                              className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow"
+                              aria-label="Remove sample"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="h-16 w-16 shrink-0 rounded-md border border-dashed border-border bg-muted/30 flex flex-col items-center justify-center text-[9px] font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer hover:bg-muted/60 transition">
+                            <Plus className="h-3.5 w-3.5 mb-0.5" />
+                            Sample
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = () =>
+                                  setSlot(slot.id, { sample_url: String(reader.result) } as any);
+                                reader.readAsDataURL(file);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        )}
+                        <div className="text-[11px] text-muted-foreground leading-snug pt-0.5">
+                          <span className="font-semibold text-foreground">Sample photo</span> (optional)
+                          <br />
+                          Shown to the agent as a reference of the expected framing.
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

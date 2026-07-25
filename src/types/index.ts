@@ -76,6 +76,7 @@ export interface PhotoSlot {
   id: string;
   label: { en: string; ar: string };
   hint?: { en: string; ar: string };
+  sample_url?: string;
 }
 
 export interface PhotoRequirements {
