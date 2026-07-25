@@ -432,11 +432,19 @@ export function getVisit(id: string) { return mockVisits.find((v) => v.id === id
 export function getActiveVisit() { return mockVisits.find((v) => v.status === 'active'); }
 
 export function acceptMission(missionId: string): AgentVisit {
-  const existing = mockVisits.find((v) => v.missionId === missionId && v.status === 'active');
+  const slot = getSlots().find((s) => s.missionId === missionId);
+  return acceptSlot(slot?.id ?? `slot-${missionId}-0`);
+}
+
+export function acceptSlot(slotId: string): AgentVisit {
+  const existing = mockVisits.find((v) => v.slotId === slotId && v.status === 'active');
   if (existing) return existing;
+  const slot = allSlots.find((s) => s.id === slotId);
+  const missionId = slot?.missionId ?? slotId.replace(/^slot-/, '').replace(/-\d+$/, '');
   const visit: AgentVisit = {
     id: `v-${Date.now()}`,
     missionId,
+    slotId,
     status: 'active',
     acceptedAt: new Date().toISOString(),
     answers: {},
@@ -478,3 +486,87 @@ export function cancelVisit(id: string) {
   mockVisits = mockVisits.filter((v) => v.id !== id);
   emit();
 }
+
+// ---- Branches & Slots -------------------------------------------------------
+const HOUR = 3600_000;
+const DAY = 24 * HOUR;
+
+export const missionBranches: Record<string, Branch[]> = {
+  'm-tamara-almaza': [
+    { id: 'br-tamara-almaza', name: 'Almaza City Centre', address: 'Almaza City Centre, Heliopolis, Cairo', city: 'Cairo', distanceKm: 4.2 },
+    { id: 'br-tamara-waterway', name: 'Waterway', address: 'Waterway, New Cairo', city: 'Cairo', distanceKm: 8.6 },
+  ],
+  'm-tbs-korba': [
+    { id: 'br-tbs-korba', name: 'Korba', address: 'Korba, Heliopolis, Cairo', city: 'Cairo', distanceKm: 6.8 },
+    { id: 'br-tbs-zamalek', name: 'Zamalek', address: '26th July St., Zamalek, Cairo', city: 'Cairo', distanceKm: 3.9 },
+  ],
+  'm-vodafone': [
+    { id: 'br-vf-citystars', name: 'City Stars', address: 'City Stars Mall, Nasr City, Cairo', city: 'Cairo', distanceKm: 8.1 },
+    { id: 'br-vf-mallofegypt', name: 'Mall of Egypt', address: 'Mall of Egypt, 6th of October', city: 'Giza', distanceKm: 12.4 },
+  ],
+  'm-cib': [
+    { id: 'br-cib-zamalek', name: 'Zamalek', address: '26th July St., Zamalek, Cairo', city: 'Cairo', distanceKm: 3.4 },
+    { id: 'br-cib-maadi', name: 'Maadi', address: 'Road 9, Maadi, Cairo', city: 'Cairo', distanceKm: 9.1 },
+    { id: 'br-cib-nasrcity', name: 'Nasr City', address: 'Abbas El-Akkad, Nasr City, Cairo', city: 'Cairo', distanceKm: 7.7 },
+    { id: 'br-cib-5th', name: '5th Settlement', address: '90th St., 5th Settlement, New Cairo', city: 'Cairo', distanceKm: 11.2 },
+  ],
+  'm-zara': [
+    { id: 'br-zara-moe', name: 'Mall of Egypt', address: 'Mall of Egypt, 6th of October', city: 'Giza', distanceKm: 12.5 },
+    { id: 'br-zara-citystars', name: 'City Stars', address: 'City Stars Mall, Nasr City, Cairo', city: 'Cairo', distanceKm: 8.3 },
+  ],
+};
+
+const slotDefs: Record<string, { branchId: string; offsetMs: number }[]> = {
+  'm-tamara-almaza': [
+    { branchId: 'br-tamara-almaza', offsetMs: 3 * HOUR },
+    { branchId: 'br-tamara-almaza', offsetMs: 1 * DAY + 5 * HOUR },
+    { branchId: 'br-tamara-waterway', offsetMs: 2 * DAY + 3 * HOUR },
+  ],
+  'm-tbs-korba': [
+    { branchId: 'br-tbs-korba', offsetMs: 6 * HOUR },
+    { branchId: 'br-tbs-zamalek', offsetMs: 1 * DAY + 2 * HOUR },
+  ],
+  'm-vodafone': [
+    { branchId: 'br-vf-citystars', offsetMs: 8 * HOUR },
+    { branchId: 'br-vf-mallofegypt', offsetMs: 2 * DAY + 6 * HOUR },
+  ],
+  'm-cib': [
+    { branchId: 'br-cib-zamalek', offsetMs: 4 * HOUR },
+    { branchId: 'br-cib-maadi', offsetMs: 1 * DAY + 4 * HOUR },
+    { branchId: 'br-cib-nasrcity', offsetMs: 2 * DAY + 2 * HOUR },
+    { branchId: 'br-cib-5th', offsetMs: 3 * DAY + 3 * HOUR },
+  ],
+  'm-zara': [
+    { branchId: 'br-zara-moe', offsetMs: 1 * DAY + 6 * HOUR },
+    { branchId: 'br-zara-citystars', offsetMs: 2 * DAY + 4 * HOUR },
+  ],
+};
+
+const _now = Date.now();
+const allSlots: VisitSlot[] = Object.entries(slotDefs).flatMap(([missionId, arr]) =>
+  arr.map((s, i) => ({
+    id: `slot-${missionId}-${i}`,
+    missionId,
+    branchId: s.branchId,
+    startAt: new Date(_now + s.offsetMs).toISOString(),
+  })),
+);
+
+export function getSlots(): VisitSlot[] {
+  const taken = new Set(
+    mockVisits
+      .filter((v) => v.slotId && v.status !== 'rejected')
+      .map((v) => v.slotId as string),
+  );
+  return allSlots.filter((s) => !taken.has(s.id));
+}
+export function getSlot(id?: string) { return id ? allSlots.find((s) => s.id === id) : undefined; }
+export function getBranch(missionId: string, branchId?: string) {
+  if (!branchId) return undefined;
+  return missionBranches[missionId]?.find((b) => b.id === branchId);
+}
+export function getSlotBranch(slot?: VisitSlot) {
+  if (!slot) return undefined;
+  return getBranch(slot.missionId, slot.branchId);
+}
+
