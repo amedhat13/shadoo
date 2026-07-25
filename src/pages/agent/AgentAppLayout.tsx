@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
-import { Home, ClipboardList, Wallet, User, ChevronLeft } from 'lucide-react';
+import { Home, ClipboardList, Wallet, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import shadooLogo from '@/assets/shadoo-logo-white.png.asset.json';
+import shadooCap from '@/assets/shadoo-cap.png';
 
 export function MobileFrame({ children }: { children: ReactNode }) {
   return (
