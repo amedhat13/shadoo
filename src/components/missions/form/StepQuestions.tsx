@@ -362,29 +362,70 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
         </div>
       </div>
 
-      {/* Questions List */}
+      {/* Sections & Questions — at least one section is required */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-bold uppercase tracking-wide">
-            {t('questions_section.count', { count: data.questions.length })}
-          </Label>
-          <Button type="button" variant="outline" size="sm" onClick={addQuestion} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t('questions_section.add_question')}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div>
+            <Label className="text-xs font-bold uppercase tracking-wide">
+              Sections
+            </Label>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {t('questions_section.count', { count: data.questions.length })} · {sections.length} {sections.length === 1 ? 'section' : 'sections'} (at least one required)
+            </p>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={addSection} className="gap-2">
+            <Plus className="h-4 w-4" /> Add section
           </Button>
         </div>
 
-        {data.questions.length === 0 ? (
-          <div className="border border-dashed border-border p-8 text-center">
-            <p className="text-muted-foreground text-sm">{t('questions_section.no_questions')}</p>
-            <Button type="button" variant="outline" size="sm" onClick={addQuestion} className="mt-4 gap-2">
-              <Plus className="h-4 w-4" />
-              {t('questions_section.add_question')}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {data.questions.map((question, index) => (
+        <div className="space-y-6">
+          {sections.map((section, sIdx) => {
+            const sectionQuestions = data.questions.filter((q) => (q.section_id || sections[0].id) === section.id);
+            return (
+              <div key={section.id} className="border border-border">
+                <div className="bg-muted/40 border-b border-border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Section {sIdx + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive"
+                      disabled={sections.length <= 1}
+                      title={sections.length <= 1 ? 'At least one section is required' : 'Remove section'}
+                      onClick={() => removeSection(section.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Input
+                      dir="ltr"
+                      placeholder="Section name (EN) — e.g. Welcome & Greeting"
+                      value={section.label.en}
+                      onChange={(e) => updateSection(section.id, { label: { ...section.label, en: e.target.value } })}
+                    />
+                    <Input
+                      dir="rtl"
+                      placeholder="اسم القسم (AR) — مثال: الترحيب والاستقبال"
+                      value={section.label.ar}
+                      onChange={(e) => updateSection(section.id, { label: { ...section.label, ar: e.target.value } })}
+                      className="font-ar"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 space-y-3">
+                  {sectionQuestions.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic">
+                      No questions in this section yet.
+                    </p>
+                  )}
+                  {sectionQuestions.map((question) => {
+                    const index = data.questions.findIndex((q) => q.id === question.id);
+                    return (
               <div
                 key={question.id}
                 className={cn(
