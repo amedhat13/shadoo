@@ -64,9 +64,25 @@ export interface AgentMission {
   payoutTiming: string;
 }
 
+export interface Branch {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  distanceKm: number;
+}
+
+export interface VisitSlot {
+  id: string;
+  missionId: string;
+  branchId: string;
+  startAt: string; // ISO
+}
+
 export interface AgentVisit {
   id: string;
   missionId: string;
+  slotId?: string;
   status: AgentMissionStatus;
   acceptedAt?: string;
   submittedAt?: string;
