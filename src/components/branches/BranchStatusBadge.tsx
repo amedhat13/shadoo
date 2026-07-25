@@ -29,7 +29,7 @@ const statusConfig: Record<BranchStatus, { variant: 'default' | 'secondary' | 'd
 
 export function BranchStatusBadge({ status }: BranchStatusBadgeProps) {
   const { t } = useTranslation('branches');
-  const config = statusConfig[status];
+  const config = statusConfig[status] ?? statusConfig.pending_verification;
   const Icon = config.icon;
 
   return (
