@@ -116,40 +116,93 @@ export default function AgentHome() {
         </div>
 
         <div className="px-4 pt-3 pb-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') { commitSearch(query); (e.target as HTMLInputElement).blur(); }
-                if (e.key === 'Escape') { setQuery(''); setFocused(false); }
-              }}
-              placeholder="Search missions or brands"
-              className="pl-9 pr-9 h-10 rounded-full bg-muted border-0"
-            />
-            {(query || focused) && (
-              <button
-                onClick={() => { setQuery(''); setFocused(false); }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-background"
-                aria-label="Clear search"
-              >
-                <X className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-            )}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { commitSearch(query); (e.target as HTMLInputElement).blur(); }
+                  if (e.key === 'Escape') { setQuery(''); setFocused(false); }
+                }}
+                placeholder="Search missions or brands"
+                className="pl-9 pr-9 h-10 rounded-full bg-muted border-0"
+              />
+              {(query || focused) && (
+                <button
+                  onClick={() => { setQuery(''); setFocused(false); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-background"
+                  aria-label="Clear search"
+                >
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  className={cn(
+                    'shrink-0 h-10 w-10 rounded-full border flex items-center justify-center transition',
+                    cat === 'All' ? 'bg-background border-border text-foreground' : 'bg-primary text-primary-foreground border-primary'
+                  )}
+                  aria-label="Filter categories"
+                >
+                  <Filter className="h-4 w-4" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+                <SheetTitle className="sr-only">Filter by category</SheetTitle>
+                <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted" />
+                <div className="mt-4 flex items-center justify-between">
+                  <h3 className="font-bold text-base">Filter by category</h3>
+                  {cat !== 'All' && (
+                    <SheetClose asChild>
+                      <button onClick={() => setCat('All')} className="text-xs font-semibold text-muted-foreground">
+                        Reset
+                      </button>
+                    </SheetClose>
+                  )}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {CATS.map((c) => (
+                    <SheetClose asChild key={c}>
+                      <button
+                        onClick={() => setCat(c)}
+                        className={cn(
+                          'flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold border transition',
+                          cat === c
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border text-foreground'
+                        )}
+                      >
+                        {c}
+                        {cat === c && <Check className="h-4 w-4" />}
+                      </button>
+                    </SheetClose>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-start gap-2 rounded-xl bg-muted p-3">
+                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Pick one category to narrow the visits. Select “All” to see every available visit.
+                  </p>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
-        {!searching && (
-          <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-none">
-            {CATS.map((c) => (
-              <button key={c} onClick={() => setCat(c)}
-                className={cn('shrink-0 rounded-full px-3 py-1 text-xs font-semibold border',
-                  cat === c ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border')}>
-                {c}
+        {!searching && cat !== 'All' && (
+          <div className="px-4 pb-3 flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Filtered by</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-semibold">
+              {cat}
+              <button onClick={() => setCat('All')} aria-label="Clear category filter" className="hover:opacity-70">
+                <X className="h-3 w-3" />
               </button>
-            ))}
+            </span>
           </div>
         )}
       </div>
