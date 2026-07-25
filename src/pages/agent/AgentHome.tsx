@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-const CATS: ('All' | 'F&B' | 'Retail' | 'Service')[] = ['All', 'F&B', 'Retail', 'Service'];
+const CATS = ['All', 'F&B', 'Retail', 'Banking', 'Service', 'Telecom', 'Pharmacy', 'Fashion', 'Grocery', 'Automotive', 'Hospitality'] as const;
+type Cat = typeof CATS[number];
 
 export default function AgentHome() {
   const nav = useNavigate();
-  const [cat, setCat] = useState<'All' | 'F&B' | 'Retail' | 'Service'>('All');
+  const [cat, setCat] = useState<Cat>('All');
   const [sort, setSort] = useState<'nearest' | 'reward'>('nearest');
   const missions = getMissions()
     .filter((m) => cat === 'All' || m.category === cat)
@@ -20,31 +21,32 @@ export default function AgentHome() {
 
   return (
     <>
-      <div className="sticky top-0 z-30 bg-background border-b">
-        {/* Shadoo brand strip */}
-        <div className="bg-primary text-primary-foreground px-4 py-1.5 flex items-center justify-between">
-          <ShadooMark />
-          <span className="text-[10px] font-semibold uppercase tracking-widest opacity-90">Agent</span>
+      <div className="sticky top-0 z-40 bg-background border-b">
+        {/* Unified orange brand header */}
+        <div className="bg-primary text-primary-foreground px-4 pt-3 pb-4">
+          <div className="flex items-center justify-between mb-3">
+            <ShadooMark />
+            <span className="text-[10px] font-semibold uppercase tracking-widest opacity-90">Agent</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xs opacity-90">Good afternoon,</div>
+              <div className="font-bold text-lg leading-tight">Ahmed <span className="text-sm opacity-90">· Tier A</span></div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => nav('/agent-app/wallet')} className="flex items-center gap-1 bg-primary-foreground text-primary rounded-full px-2.5 py-1.5">
+                <Coins className="h-4 w-4" />
+                <span className="text-xs font-semibold">1,240 EGP</span>
+              </button>
+              <button onClick={() => nav('/agent-app/notifications')} className="p-2 rounded-full bg-primary-foreground/15 relative">
+                <Bell className="h-4 w-4" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary-foreground" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="px-4 pt-3 pb-3 flex items-center justify-between">
-          <div>
-            <div className="text-xs text-muted-foreground">Good afternoon,</div>
-            <div className="font-bold text-lg leading-tight">Ahmed <span className="text-primary text-sm">· Tier A</span></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => nav('/agent-app/wallet')} className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-2.5 py-1.5">
-              <Coins className="h-4 w-4" />
-              <span className="text-xs font-semibold">1,240 EGP</span>
-            </button>
-            <button onClick={() => nav('/agent-app/notifications')} className="p-2 rounded-full bg-muted relative">
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
-            </button>
-          </div>
-        </div>
-
-        <div className="px-4 pb-3">
+        <div className="px-4 pt-3 pb-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search missions or brands" className="pl-9 h-10 rounded-full bg-muted border-0" />
