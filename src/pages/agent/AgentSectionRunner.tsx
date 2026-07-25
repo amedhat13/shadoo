@@ -17,7 +17,7 @@ export default function AgentSectionRunner() {
   const section = mission?.sections.find((s) => s.id === sectionId);
   const [idx, setIdx] = useState(0);
   const [transition, setTransition] = useState<null | { doneTitle: string; nextTitle?: string; nextId?: string }>(null);
-  useEffect(() => { setIdx(0); }, [sectionId]);
+  useEffect(() => { setIdx(0); setTransition(null); }, [sectionId]);
   if (!visit || !mission || !section) return null;
 
   const safeIdx = Math.min(idx, section.questions.length - 1);
