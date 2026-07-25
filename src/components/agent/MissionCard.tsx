@@ -19,7 +19,7 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
         <img
           src={mission.brandLogo || mission.hero}
           alt={mission.brand}
-          className="max-h-[80%] max-w-[85%] w-auto h-auto object-contain drop-shadow-sm"
+          className="max-h-[95%] max-w-[95%] w-auto h-auto object-contain drop-shadow-sm"
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = 'none';
           }}
