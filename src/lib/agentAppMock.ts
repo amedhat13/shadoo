@@ -44,7 +44,7 @@ export interface AgentMission {
   brandColor?: string;
   title: string;
   hero: string;
-  category: 'F&B' | 'Retail' | 'Service' | 'Banking';
+  category: 'F&B' | 'Retail' | 'Service' | 'Banking' | 'Telecom' | 'Pharmacy' | 'Fashion' | 'Grocery' | 'Automotive' | 'Hospitality';
   distanceKm: number;
   durationMin: number;
   reward: number; // EGP
