@@ -50,7 +50,7 @@ export default function AgentMyMissions() {
             <button key={v.id} onClick={() => nav(target)}
               className="w-full text-left rounded-2xl border overflow-hidden bg-card hover:bg-muted/30">
               <div className="flex">
-                <img src={m.hero} className="w-24 h-24 object-cover shrink-0" alt="" />
+                <img src={m.brandLogo || m.hero} className="w-24 h-24 object-contain bg-muted p-3 shrink-0" alt="" />
                 <div className="flex-1 p-3 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <div className="text-[10px] uppercase font-semibold text-muted-foreground truncate">{m.brand}</div>

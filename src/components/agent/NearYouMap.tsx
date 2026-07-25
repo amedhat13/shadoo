@@ -124,7 +124,7 @@ export function NearYouMap({ missions }: { missions: AgentMission[] }) {
           onClick={() => nav(`/agent-app/mission/${sel.id}`)}
           className="absolute bottom-2 left-2 right-2 bg-background rounded-xl border shadow-lg p-2.5 z-30 flex items-center gap-2.5 text-left animate-in slide-in-from-bottom-2"
         >
-          <img src={sel.hero} alt="" className="h-12 w-12 rounded-lg object-cover shrink-0" />
+          <img src={sel.brandLogo || sel.hero} alt="" className="h-12 w-12 rounded-lg object-contain bg-muted p-1 shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-[10px] uppercase font-semibold text-muted-foreground truncate">{sel.brand}</div>
             <div className="font-bold text-sm truncate leading-tight">{sel.title}</div>

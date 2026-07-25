@@ -15,8 +15,20 @@ export default function AgentMissionDetail() {
     <>
       <AgentTopBar title="Mission details" showBack />
       <div className="pb-24">
-        <div className="relative aspect-video bg-muted">
-          <img src={mission.hero} alt="" className="w-full h-full object-cover" />
+        <div
+          className="relative aspect-video flex items-center justify-center"
+          style={{
+            background: mission.brandColor
+              ? `linear-gradient(135deg, ${mission.brandColor}22, ${mission.brandColor}08)`
+              : 'hsl(var(--muted))',
+          }}
+        >
+          <img
+            src={mission.brandLogo || mission.hero}
+            alt={mission.brand}
+            className="max-h-[60%] max-w-[65%] object-contain drop-shadow"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
         </div>
 
         <div className="p-4 space-y-5">
