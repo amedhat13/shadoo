@@ -31,18 +31,19 @@ export default function AgentMissionBrief() {
 
   return (
     <>
-      <AgentTopBar title="Mission brief" showBack />
-
-      <div className="sticky top-14 z-20 bg-background border-b overflow-x-auto scrollbar-none">
-        <div className="flex gap-1 px-3 py-2">
-          {TABS.map((t) => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              className={cn('shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-1',
-                tab === t.key ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground')}>
-              <t.icon className="h-3.5 w-3.5" />
-              {t.label}
-            </button>
-          ))}
+      <div className="sticky top-0 z-30 bg-background border-b">
+        <AgentTopBar title="Mission brief" showBack />
+        <div className="overflow-x-auto scrollbar-none border-t">
+          <div className="flex gap-1 px-3 py-2">
+            {TABS.map((t) => (
+              <button key={t.key} onClick={() => setTab(t.key)}
+                className={cn('shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-1',
+                  tab === t.key ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground')}>
+                <t.icon className="h-3.5 w-3.5" />
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
