@@ -57,7 +57,8 @@ export default function AgentHome() {
     .sort((a, b) => {
       if (sort === 'nearest') return a.branch.distanceKm - b.branch.distanceKm;
       if (sort === 'reward') return b.mission.reward - a.mission.reward;
-      return new Date(a.slot.startAt).getTime() - new Date(b.slot.startAt).getTime();
+      if (sort === 'soonest') return new Date(a.slot.startAt).getTime() - new Date(b.slot.startAt).getTime();
+      return 0;
     });
 
   // Missions list for the "Near you" map (deduped by mission)
