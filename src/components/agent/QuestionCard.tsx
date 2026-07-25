@@ -48,17 +48,45 @@ export function QuestionCard({ question, value, onChange, photo, onPhoto }: Prop
       </div>
 
       {question.type === 'rating' && (
-        <div className="flex justify-center gap-1.5">
-          {Array.from({ length: question.max_rating || 5 }).map((_, i) => {
-            const n = i + 1;
-            const active = value >= n;
-            return (
-              <button key={n} onClick={() => onChange(n)} className="p-1" aria-label={`${n} stars`}>
-                <Star className={cn('h-8 w-8 transition', active ? 'fill-primary text-primary' : 'text-muted-foreground/40')} />
-              </button>
-            );
-          })}
-        </div>
+        (question.max_rating || 5) > 5 ? (
+          <div className="space-y-2">
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {Array.from({ length: (question.max_rating || 5) + 1 }).map((_, i) => {
+                const n = i;
+                const active = value === n;
+                return (
+                  <button
+                    key={n}
+                    onClick={() => onChange(n)}
+                    className={cn(
+                      'h-9 min-w-[2.25rem] rounded-lg border px-2 text-sm font-semibold transition',
+                      active ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background text-foreground'
+                    )}
+                    aria-label={`${n} out of ${question.max_rating}`}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-center justify-between px-1 text-[10px] text-muted-foreground font-medium">
+              <span>Not likely</span>
+              <span>Very likely</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center gap-1.5">
+            {Array.from({ length: question.max_rating || 5 }).map((_, i) => {
+              const n = i + 1;
+              const active = value >= n;
+              return (
+                <button key={n} onClick={() => onChange(n)} className="p-1" aria-label={`${n} stars`}>
+                  <Star className={cn('h-8 w-8 transition', active ? 'fill-primary text-primary' : 'text-muted-foreground/40')} />
+                </button>
+              );
+            })}
+          </div>
+        )
       )}
 
       {question.type === 'yes_no' && (
