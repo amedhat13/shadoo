@@ -18,11 +18,23 @@ function ProgressRing({ value, size = 64 }: { value: number; size?: number }) {
   );
 }
 
+function formatMS(ms: number) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, '0')}`;
+}
+
 export default function AgentActive() {
   const { visitId } = useParams();
   const nav = useNavigate();
   const [, force] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => subscribe(() => force((x) => x + 1)), []);
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const visit = visitId ? getVisit(visitId) : undefined;
   const mission = visit ? getMission(visit.missionId) : undefined;
@@ -50,10 +62,33 @@ export default function AgentActive() {
   const completed = doneSections + donePhotos + (receiptDone ? 1 : 0);
   const allDone = completed === totalTasks;
 
+  const acceptedAt = visit.acceptedAt ? new Date(visit.acceptedAt).getTime() : now;
+  const cancelDeadline = acceptedAt + mission.cancelWindowMin * 60_000;
+  const missionDeadline = acceptedAt + mission.durationMin * 60_000;
+  const cancelLeft = cancelDeadline - now;
+  const missionLeft = missionDeadline - now;
+  const cancelActive = cancelLeft > 0;
+  const missionOverdue = missionLeft <= 0;
+
   return (
     <>
       <AgentTopBar title="Active mission" showBack />
       <div className="p-4 pb-28 space-y-5">
+        <div className="grid grid-cols-2 gap-2">
+          <div className={cn('rounded-xl border p-3', cancelActive ? 'bg-amber-50 border-amber-200' : 'bg-muted/40')}>
+            <div className="text-[10px] uppercase font-bold tracking-wide text-muted-foreground">Cancel window</div>
+            <div className={cn('font-bold text-lg tabular-nums mt-0.5', cancelActive ? 'text-amber-700' : 'text-muted-foreground')}>
+              {cancelActive ? formatMS(cancelLeft) : 'Closed'}
+            </div>
+          </div>
+          <div className={cn('rounded-xl border p-3', missionOverdue ? 'bg-rose-50 border-rose-200' : 'bg-primary/5 border-primary/20')}>
+            <div className="text-[10px] uppercase font-bold tracking-wide text-muted-foreground">Time to complete</div>
+            <div className={cn('font-bold text-lg tabular-nums mt-0.5', missionOverdue ? 'text-rose-700' : 'text-primary')}>
+              {missionOverdue ? 'Overdue' : formatMS(missionLeft)}
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-2xl border p-4 flex items-center gap-4">
           <ProgressRing value={(completed / totalTasks) * 100} />
           <div className="flex-1">
