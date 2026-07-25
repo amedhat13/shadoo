@@ -30,12 +30,26 @@ interface CreateClientFormData {
   companyName: string;
   fullName: string;
   phone: string;
+  industry: string;
   planId: string;
   logoFile: File | null;
   isFreeTrial: boolean;
   trialDays: number;
   trialVisits: number;
 }
+
+const INDUSTRY_OPTIONS = [
+  { value: 'fnb', label: 'Food & Beverage' },
+  { value: 'retail', label: 'Retail' },
+  { value: 'banking', label: 'Banking & Finance' },
+  { value: 'telecom', label: 'Telecom' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'automotive', label: 'Automotive' },
+  { value: 'hospitality', label: 'Hospitality & Hotels' },
+  { value: 'ecommerce', label: 'E-commerce' },
+  { value: 'education', label: 'Education' },
+  { value: 'other', label: 'Other' },
+];
 
 interface CreateClientResponse {
   success: boolean;
@@ -55,6 +69,7 @@ export function CreateClientDialog() {
     fullName: '',
     phone: '',
     planId: '',
+    industry: '',
     logoFile: null,
     isFreeTrial: false,
     trialDays: 14,
@@ -108,6 +123,7 @@ export function CreateClientDialog() {
           companyName: data.companyName,
           fullName: data.fullName,
           phone: data.phone || undefined,
+          industry: data.industry || undefined,
           planId: data.isFreeTrial ? undefined : (data.planId || undefined),
           logoUrl,
           isFreeTrial: data.isFreeTrial,
@@ -170,6 +186,7 @@ export function CreateClientDialog() {
       fullName: '',
       phone: '',
       planId: '',
+    industry: '',
       logoFile: null,
       isFreeTrial: false,
       trialDays: 14,
@@ -328,6 +345,29 @@ export function CreateClientDialog() {
                   placeholder="+20 123 456 7890"
                 />
               </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="industry">Industry / Category</Label>
+                <Select
+                  value={formData.industry}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, industry: value }))}
+                >
+                  <SelectTrigger id="industry">
+                    <SelectValue placeholder="Select an industry (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDUSTRY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Drives default mission templates and cover-story suggestions for this client.
+                </p>
+              </div>
+
 
               {/* Free Trial Toggle */}
               <div className="flex items-center justify-between rounded-lg border p-4">
