@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement } from '@/types';
+import { MissionFormData, Question, QuestionType, QuestionOption, QuestionPhotoRequirement, QuestionSection } from '@/types';
 import { QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
