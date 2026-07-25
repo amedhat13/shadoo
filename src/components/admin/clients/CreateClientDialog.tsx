@@ -31,6 +31,7 @@ interface CreateClientFormData {
   fullName: string;
   phone: string;
   industry: string;
+  subCategory: string;
   planId: string;
   logoFile: File | null;
   isFreeTrial: boolean;
@@ -38,18 +39,150 @@ interface CreateClientFormData {
   trialVisits: number;
 }
 
-const INDUSTRY_OPTIONS = [
-  { value: 'fnb', label: 'Food & Beverage' },
-  { value: 'retail', label: 'Retail' },
-  { value: 'banking', label: 'Banking & Finance' },
-  { value: 'telecom', label: 'Telecom' },
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'hospitality', label: 'Hospitality & Hotels' },
-  { value: 'ecommerce', label: 'E-commerce' },
-  { value: 'education', label: 'Education' },
-  { value: 'other', label: 'Other' },
+const INDUSTRY_OPTIONS: { value: string; label: string; subCategories: { value: string; label: string }[] }[] = [
+  {
+    value: 'fnb',
+    label: 'Food & Beverage',
+    subCategories: [
+      { value: 'qsr', label: 'Quick Service (QSR)' },
+      { value: 'casual_dining', label: 'Casual Dining' },
+      { value: 'fine_dining', label: 'Fine Dining' },
+      { value: 'cafe', label: 'Café & Bakery' },
+      { value: 'cloud_kitchen', label: 'Cloud Kitchen / Delivery' },
+      { value: 'food_truck', label: 'Food Truck' },
+    ],
+  },
+  {
+    value: 'retail',
+    label: 'Retail',
+    subCategories: [
+      { value: 'fashion', label: 'Fashion & Apparel' },
+      { value: 'electronics', label: 'Electronics' },
+      { value: 'grocery', label: 'Grocery & Supermarket' },
+      { value: 'furniture', label: 'Furniture & Home' },
+      { value: 'beauty', label: 'Beauty & Cosmetics' },
+      { value: 'pharmacy', label: 'Pharmacy' },
+      { value: 'jewelry', label: 'Jewelry & Watches' },
+      { value: 'toys', label: 'Toys & Kids' },
+    ],
+  },
+  {
+    value: 'banking',
+    label: 'Banking & Finance',
+    subCategories: [
+      { value: 'retail_bank', label: 'Retail Banking' },
+      { value: 'corporate_bank', label: 'Corporate Banking' },
+      { value: 'insurance', label: 'Insurance' },
+      { value: 'exchange', label: 'Currency Exchange' },
+      { value: 'fintech', label: 'Fintech / Digital Wallet' },
+      { value: 'microfinance', label: 'Microfinance' },
+    ],
+  },
+  {
+    value: 'telecom',
+    label: 'Telecom',
+    subCategories: [
+      { value: 'mobile_operator', label: 'Mobile Operator Store' },
+      { value: 'isp', label: 'Internet Service Provider' },
+      { value: 'device_retail', label: 'Device Retail' },
+      { value: 'call_center', label: 'Call Center / Support' },
+    ],
+  },
+  {
+    value: 'healthcare',
+    label: 'Healthcare',
+    subCategories: [
+      { value: 'hospital', label: 'Hospital' },
+      { value: 'clinic', label: 'Clinic / Polyclinic' },
+      { value: 'dental', label: 'Dental' },
+      { value: 'lab', label: 'Lab & Diagnostics' },
+      { value: 'pharmacy_chain', label: 'Pharmacy Chain' },
+      { value: 'wellness', label: 'Wellness & Spa' },
+    ],
+  },
+  {
+    value: 'automotive',
+    label: 'Automotive',
+    subCategories: [
+      { value: 'showroom', label: 'Showroom / Dealership' },
+      { value: 'service_center', label: 'Service Center' },
+      { value: 'spare_parts', label: 'Spare Parts' },
+      { value: 'car_rental', label: 'Car Rental' },
+      { value: 'fuel_station', label: 'Fuel Station' },
+    ],
+  },
+  {
+    value: 'hospitality',
+    label: 'Hospitality & Hotels',
+    subCategories: [
+      { value: 'hotel', label: 'Hotel' },
+      { value: 'resort', label: 'Resort' },
+      { value: 'serviced_apartment', label: 'Serviced Apartment' },
+      { value: 'travel_agency', label: 'Travel Agency' },
+      { value: 'tour_operator', label: 'Tour Operator' },
+    ],
+  },
+  {
+    value: 'ecommerce',
+    label: 'E-commerce',
+    subCategories: [
+      { value: 'marketplace', label: 'Marketplace' },
+      { value: 'd2c', label: 'D2C Brand' },
+      { value: 'q_commerce', label: 'Q-commerce / Groceries' },
+      { value: 'fulfillment', label: 'Fulfillment / Last-mile' },
+    ],
+  },
+  {
+    value: 'education',
+    label: 'Education',
+    subCategories: [
+      { value: 'k12', label: 'K-12 School' },
+      { value: 'university', label: 'University' },
+      { value: 'training_center', label: 'Training Center' },
+      { value: 'nursery', label: 'Nursery / Pre-K' },
+      { value: 'edtech', label: 'EdTech Platform' },
+    ],
+  },
+  {
+    value: 'real_estate',
+    label: 'Real Estate',
+    subCategories: [
+      { value: 'developer', label: 'Developer / Sales Office' },
+      { value: 'brokerage', label: 'Brokerage' },
+      { value: 'property_mgmt', label: 'Property Management' },
+      { value: 'coworking', label: 'Co-working Space' },
+    ],
+  },
+  {
+    value: 'entertainment',
+    label: 'Entertainment & Leisure',
+    subCategories: [
+      { value: 'cinema', label: 'Cinema' },
+      { value: 'gaming', label: 'Gaming / Arcade' },
+      { value: 'gym', label: 'Gym & Fitness' },
+      { value: 'theme_park', label: 'Theme Park' },
+      { value: 'events', label: 'Events & Venues' },
+    ],
+  },
+  {
+    value: 'government',
+    label: 'Government & Public Services',
+    subCategories: [
+      { value: 'service_center', label: 'Service Center' },
+      { value: 'utilities', label: 'Utilities (Water/Electricity)' },
+      { value: 'post', label: 'Postal Services' },
+      { value: 'transport', label: 'Public Transport' },
+    ],
+  },
+  {
+    value: 'other',
+    label: 'Other',
+    subCategories: [
+      { value: 'general', label: 'General / Custom' },
+    ],
+  },
 ];
+
 
 interface CreateClientResponse {
   success: boolean;
