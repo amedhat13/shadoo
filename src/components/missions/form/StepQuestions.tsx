@@ -731,9 +731,23 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                   </Button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addQuestion(section.id)}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t('questions_section.add_question')}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* General Photo Requirements */}
