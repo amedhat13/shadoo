@@ -5,6 +5,7 @@ import { getVisit, getMission, updateVisit, subscribe } from '@/lib/agentAppMock
 import { Button } from '@/components/ui/button';
 import { QuestionCard } from '@/components/agent/QuestionCard';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 export default function AgentSectionRunner() {
   const { visitId, sectionId } = useParams();
