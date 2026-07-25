@@ -346,6 +346,29 @@ export function CreateClientDialog() {
                 />
               </div>
 
+              <div className="grid gap-2">
+                <Label htmlFor="industry">Industry / Category</Label>
+                <Select
+                  value={formData.industry}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, industry: value }))}
+                >
+                  <SelectTrigger id="industry">
+                    <SelectValue placeholder="Select an industry (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDUSTRY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Drives default mission templates and cover-story suggestions for this client.
+                </p>
+              </div>
+
+
               {/* Free Trial Toggle */}
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
