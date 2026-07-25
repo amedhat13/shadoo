@@ -23,11 +23,7 @@ export default function AgentHome() {
     <>
       <div className="sticky top-0 z-40 bg-background border-b">
         {/* Unified orange brand header */}
-        <div className="bg-primary text-primary-foreground px-4 pt-3 pb-4">
-          <div className="flex items-center justify-between mb-3">
-            <ShadooMark />
-            <span className="text-[10px] font-semibold uppercase tracking-widest opacity-90">Agent</span>
-          </div>
+        <div className="bg-primary text-primary-foreground px-4 pt-4 pb-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs opacity-90">Good afternoon,</div>
