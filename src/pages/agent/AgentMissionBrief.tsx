@@ -68,7 +68,7 @@ export default function AgentMissionBrief() {
     const n = Math.min(tabIdx + 1, TABS.length - 1);
     setTabIdx(n);
     setMaxReached((m) => Math.max(m, n));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('agent-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const accept = () => {
