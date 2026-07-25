@@ -80,7 +80,16 @@ export interface AgentVisit {
   timeline: { label: string; ts?: string; state: 'done' | 'current' | 'pending' }[];
 }
 
+import tbsLogoAsset from '@/assets/tbs-logo.png.asset.json';
+import vodafoneLogoAsset from '@/assets/vodafone-logo.png.asset.json';
+import cibLogoAsset from '@/assets/cib-logo.png.asset.json';
+import zaraLogoAsset from '@/assets/zara-logo.png.asset.json';
+
 const TAMARA_LOGO = '/tamara-demo/logo.png';
+const TBS_LOGO = tbsLogoAsset.url;
+const VODAFONE_LOGO = vodafoneLogoAsset.url;
+const CIB_LOGO = cibLogoAsset.url;
+const ZARA_LOGO = zaraLogoAsset.url;
 
 // ---- Sections (drawn from Tamara F&B template style)
 const tamaraSections: AgentSection[] = [
