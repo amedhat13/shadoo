@@ -8,8 +8,22 @@ export function MissionCard({ mission }: { mission: AgentMission }) {
   const qCount = mission.sections.reduce((s, sec) => s + sec.questions.length, 0);
   return (
     <div className="rounded-2xl overflow-hidden border bg-card shadow-sm">
-      <div className="relative aspect-video bg-muted">
-        <img src={mission.hero} alt={mission.title} className="w-full h-full object-cover" />
+      <div
+        className="relative aspect-video flex items-center justify-center"
+        style={{
+          background: mission.brandColor
+            ? `linear-gradient(135deg, ${mission.brandColor}18, ${mission.brandColor}05)`
+            : 'hsl(var(--muted))',
+        }}
+      >
+        <img
+          src={mission.brandLogo || mission.hero}
+          alt={mission.brand}
+          className="max-h-[55%] max-w-[60%] object-contain drop-shadow-sm"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = 'none';
+          }}
+        />
         <div className="absolute top-2 left-2 bg-background/95 backdrop-blur rounded-full px-2 py-1 text-[10px] font-bold uppercase">
           {mission.category}
         </div>
