@@ -75,11 +75,15 @@ export function ShadooMark({ className }: { className?: string }) {
 
 export default function AgentAppLayout() {
   const location = useLocation();
+  const scrollRef = useRef<HTMLDivElement>(null);
   // Hide bottom tabs on immersive/task screens
   const hideTabs = /\/agent-app\/(active|mission)\//.test(location.pathname);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.pathname]);
   return (
     <MobileFrame>
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div ref={scrollRef} id="agent-scroll" className="flex-1 flex flex-col overflow-y-auto">
         <Outlet />
       </div>
       {!hideTabs && <BottomTabs />}
