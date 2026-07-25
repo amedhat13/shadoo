@@ -57,9 +57,9 @@ export default function AgentActive() {
 
   const doneSections = mission.sections.filter((s) => sectionDone(s.id)).length;
   const donePhotos = mission.photoTasks.filter((p) => photos[p.id]).length;
-  const receiptDone = !mission.requiresReceipt || !!visit.receiptPhoto;
+  const receiptDone = !!visit.receiptPhoto;
   const totalTasks = mission.sections.length + mission.photoTasks.length + (mission.requiresReceipt ? 1 : 0);
-  const completed = doneSections + donePhotos + (receiptDone ? 1 : 0);
+  const completed = doneSections + donePhotos + (mission.requiresReceipt && receiptDone ? 1 : 0);
   const allDone = completed === totalTasks;
 
   const acceptedAt = visit.acceptedAt ? new Date(visit.acceptedAt).getTime() : now;
