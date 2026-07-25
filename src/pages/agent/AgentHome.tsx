@@ -3,10 +3,11 @@ import { useMemo, useState, useEffect } from 'react';
 import { MissionCard } from '@/components/agent/MissionCard';
 import { NearYouMap } from '@/components/agent/NearYouMap';
 import { getMissions, getSlots, getMission, getBranch, subscribe } from '@/lib/agentAppMock';
-import { Bell, Coins, Search, X, Clock, TrendingUp } from 'lucide-react';
+import { Bell, Coins, Search, X, Clock, TrendingUp, Filter, SlidersHorizontal, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from '@/components/ui/sheet';
 
 const CATS = ['All', 'F&B', 'Retail', 'Banking', 'Service', 'Telecom', 'Pharmacy', 'Fashion', 'Grocery', 'Automotive', 'Hospitality'] as const;
 type Cat = typeof CATS[number];
