@@ -5,16 +5,34 @@ import { getVisit, getMission, subscribe } from '@/lib/agentAppMock';
 import { Button } from '@/components/ui/button';
 import { Camera, ClipboardList, Receipt, ChevronRight, CheckCircle2, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import shadooCap from '@/assets/shadoo-cap.png';
 
-function ProgressRing({ value, size = 64 }: { value: number; size?: number }) {
+function ProgressRing({ value, size = 72, complete = false }: { value: number; size?: number; complete?: boolean }) {
   const r = (size - 8) / 2;
   const c = 2 * Math.PI * r;
   return (
-    <svg width={size} height={size} className="-rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={6} className="stroke-muted" fill="none" />
-      <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={6} className="stroke-primary transition-all" fill="none"
-        strokeDasharray={c} strokeDashoffset={c - (c * value) / 100} strokeLinecap="round" />
-    </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={6} className="stroke-muted" fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={6}
+          className={cn('transition-all', complete ? 'stroke-emerald-500' : 'stroke-primary')}
+          fill="none"
+          strokeDasharray={c} strokeDashoffset={c - (c * value) / 100} strokeLinecap="round" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        {complete ? (
+          <img
+            src={shadooCap}
+            alt=""
+            className="h-8 w-8 object-contain animate-in zoom-in-50 duration-500"
+            style={{ animation: 'shadoo-bounce 1.6s ease-in-out infinite' }}
+          />
+        ) : (
+          <span className="text-[11px] font-bold tabular-nums text-foreground">{Math.round(value)}%</span>
+        )}
+      </div>
+      <style>{`@keyframes shadoo-bounce { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-3px) rotate(4deg); } }`}</style>
+    </div>
   );
 }
 
@@ -90,9 +108,9 @@ export default function AgentActive() {
         </div>
 
         <div className="rounded-2xl border p-4 flex items-center gap-4">
-          <ProgressRing value={(completed / totalTasks) * 100} />
+          <ProgressRing value={(completed / totalTasks) * 100} complete={allDone} />
           <div className="flex-1">
-            <div className="text-xs uppercase text-muted-foreground font-semibold">In progress</div>
+            <div className="text-xs uppercase text-muted-foreground font-semibold">{allDone ? 'Ready to submit' : 'In progress'}</div>
             <div className="font-bold text-sm leading-tight mt-0.5">{mission.title}</div>
             <div className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
               <Clock className="h-3 w-3" />
@@ -100,6 +118,7 @@ export default function AgentActive() {
             </div>
           </div>
         </div>
+
 
         <div>
           <h3 className="text-xs uppercase font-bold tracking-wide mb-2">Question sections</h3>

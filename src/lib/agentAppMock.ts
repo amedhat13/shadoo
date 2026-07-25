@@ -518,15 +518,18 @@ export const missionBranches: Record<string, Branch[]> = {
 
 const slotDefs: Record<string, { branchId: string; offsetMs: number }[]> = {
   'm-tamara-almaza': [
+    { branchId: 'br-tamara-almaza', offsetMs: -10 * 60_000 }, // available now
     { branchId: 'br-tamara-almaza', offsetMs: 3 * HOUR },
     { branchId: 'br-tamara-almaza', offsetMs: 1 * DAY + 5 * HOUR },
     { branchId: 'br-tamara-waterway', offsetMs: 2 * DAY + 3 * HOUR },
   ],
   'm-tbs-korba': [
+    { branchId: 'br-tbs-korba', offsetMs: -5 * 60_000 }, // available now
     { branchId: 'br-tbs-korba', offsetMs: 6 * HOUR },
     { branchId: 'br-tbs-zamalek', offsetMs: 1 * DAY + 2 * HOUR },
   ],
   'm-vodafone': [
+    { branchId: 'br-vf-citystars', offsetMs: -20 * 60_000 }, // available now
     { branchId: 'br-vf-citystars', offsetMs: 8 * HOUR },
     { branchId: 'br-vf-mallofegypt', offsetMs: 2 * DAY + 6 * HOUR },
   ],
@@ -537,6 +540,7 @@ const slotDefs: Record<string, { branchId: string; offsetMs: number }[]> = {
     { branchId: 'br-cib-5th', offsetMs: 3 * DAY + 3 * HOUR },
   ],
   'm-zara': [
+    { branchId: 'br-zara-moe', offsetMs: -2 * 60_000 }, // available now
     { branchId: 'br-zara-moe', offsetMs: 1 * DAY + 6 * HOUR },
     { branchId: 'br-zara-citystars', offsetMs: 2 * DAY + 4 * HOUR },
   ],
