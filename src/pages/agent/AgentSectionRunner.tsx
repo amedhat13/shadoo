@@ -57,8 +57,19 @@ export default function AgentSectionRunner() {
         <Button variant="outline" onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0}>Previous</Button>
         <Button className="flex-1" disabled={!canNext}
           onClick={() => {
-            if (isLast) nav(`/agent-app/active/${visit.id}`);
-            else setIdx((i) => i + 1);
+            if (!isLast) {
+              setIdx((i) => i + 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+            }
+            // Section finished — jump to next incomplete section, else back to active hub.
+            const currentAnswers = { ...answers };
+            const nextSec = mission.sections.find((s) => {
+              if (s.id === section.id) return false;
+              return s.questions.filter((q) => q.required).some((q) => currentAnswers[q.id] === undefined || currentAnswers[q.id] === '');
+            });
+            if (nextSec) nav(`/agent-app/active/${visit.id}/section/${nextSec.id}`, { replace: true });
+            else nav(`/agent-app/active/${visit.id}`);
           }}>
           {isLast ? 'Finish section' : 'Next'}
         </Button>

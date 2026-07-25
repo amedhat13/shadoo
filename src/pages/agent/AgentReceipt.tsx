@@ -90,7 +90,8 @@ export default function AgentReceipt() {
 
         <div>
           <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide">Amount spent (EGP)</label>
-          <Input type="number" value={amount || ''} onChange={(e) => setAmount(parseFloat(e.target.value) || 0)} className="mt-1" />
+          <Input type="number" inputMode="decimal" placeholder={`e.g. ${Math.round(budget * 0.6)}`} value={amount || ''} onChange={(e) => setAmount(parseFloat(e.target.value) || 0)} className="mt-1" />
+          <p className="text-[11px] text-muted-foreground mt-1">Budget: up to {budget} EGP · fully refunded.</p>
           {overBudget && <p className="text-xs text-destructive mt-1">Amount exceeds the {budget} EGP budget.</p>}
         </div>
 
