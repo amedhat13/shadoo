@@ -259,11 +259,18 @@ export default function AgentHome() {
         </div>
       ) : (
         <div className="p-4 space-y-4">
-          <NearYouMap missions={missions} />
+          <NearYouMap missions={mapMissions} />
 
           <div className="flex items-center justify-between">
-            <h2 className="font-bold uppercase text-sm tracking-wide">Available missions</h2>
+            <h2 className="font-bold uppercase text-sm tracking-wide">Available visits</h2>
             <div className="flex items-center gap-1 rounded-full bg-muted p-0.5 text-[11px] font-semibold">
+              <button
+                onClick={() => setSort('soonest')}
+                className={cn('rounded-full px-2.5 py-1 transition',
+                  sort === 'soonest' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground')}
+              >
+                Soonest
+              </button>
               <button
                 onClick={() => setSort('nearest')}
                 className={cn('rounded-full px-2.5 py-1 transition',
@@ -282,9 +289,10 @@ export default function AgentHome() {
           </div>
 
           <div className="space-y-4">
-            {missions.map((m) => <MissionCard key={m.id} mission={m} />)}
+            {visits.map((v) => <MissionCard key={v.slot.id} mission={v.mission} slot={v.slot} branch={v.branch} />)}
           </div>
         </div>
+
       )}
     </>
   );
