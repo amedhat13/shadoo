@@ -482,27 +482,53 @@ export function CreateClientDialog() {
                 />
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="industry">Industry / Category</Label>
-                <Select
-                  value={formData.industry}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, industry: value }))}
-                >
-                  <SelectTrigger id="industry">
-                    <SelectValue placeholder="Select an industry (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {INDUSTRY_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  Drives default mission templates and cover-story suggestions for this client.
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="industry">Category</Label>
+                  <Select
+                    value={formData.industry}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, industry: value, subCategory: '' }))
+                    }
+                  >
+                    <SelectTrigger id="industry">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INDUSTRY_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="subCategory">Sub-category</Label>
+                  <Select
+                    value={formData.subCategory}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, subCategory: value }))}
+                    disabled={!formData.industry}
+                  >
+                    <SelectTrigger id="subCategory">
+                      <SelectValue placeholder={formData.industry ? 'Select sub-category' : 'Pick a category first'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INDUSTRY_OPTIONS.find((o) => o.value === formData.industry)?.subCategories.map((sub) => (
+                        <SelectItem key={sub.value} value={sub.value}>
+                          {sub.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <p className="sm:col-span-2 text-xs text-muted-foreground">
+                  Drives default mission templates, cover-story suggestions, and industry benchmarks.
                 </p>
               </div>
+
 
 
               {/* Free Trial Toggle */}
