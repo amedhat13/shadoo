@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
 import { Home, ClipboardList, Wallet, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
