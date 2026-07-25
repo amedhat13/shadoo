@@ -17,7 +17,7 @@ export default function AgentVisitHistory() {
       <AgentTopBar title="Visit history" showBack />
       <div className="p-4 space-y-4 pb-8">
         <div className="rounded-2xl border overflow-hidden">
-          <img src={mission.hero} className="w-full aspect-video object-cover" alt="" />
+          <img src={mission.brandLogo || mission.hero} className="w-full aspect-video object-contain bg-muted p-6" alt="" />
           <div className="p-4">
             <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase font-semibold text-muted-foreground">{mission.brand}</div>
