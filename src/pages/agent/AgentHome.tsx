@@ -16,7 +16,7 @@ const RECENT_KEY = 'agent_recent_searches';
 export default function AgentHome() {
   const nav = useNavigate();
   const [cat, setCat] = useState<Cat>('All');
-  const [sort, setSort] = useState<'nearest' | 'reward' | 'soonest'>('soonest');
+  const [sort, setSort] = useState<'all' | 'nearest' | 'reward' | 'soonest'>('all');
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [, force] = useState(0);
