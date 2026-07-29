@@ -13,7 +13,9 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus, SlidersHorizontal } from 'lucide-react';
+import { ClipboardList, Search, MoreHorizontal, Eye, Pause, Play, Archive, Filter, Loader2, Plus, SlidersHorizontal, Copy, BookmarkPlus } from 'lucide-react';
+import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { SaveAsTemplateDialog, SaveAsTemplateSource } from '@/components/missions/SaveAsTemplateDialog';
 import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { useAdminMissions } from '@/hooks/useAdminData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,6 +35,7 @@ export default function AdminMissionsPage() {
   const { data: missions, isLoading } = useAdminMissions();
   const { data: agentTiers } = useActiveAgentTiers();
   const [searchQuery, setSearchQuery] = useState('');
+  const [templateSource, setTemplateSource] = useState<SaveAsTemplateSource | null>(null);
   const queryClient = useQueryClient();
   const { t } = useTranslation('admin');
   const { t: tc } = useTranslation('common');
@@ -62,6 +65,40 @@ export default function AdminMissionsPage() {
     onError: (error: Error) => { toast.error(error.message); },
   });
 
+  const duplicateMutation = useMutation({
+    mutationFn: async (mission: Record<string, any>) => {
+      const {
+        id, created_at, updated_at, published_at, branch, clientName, branchName,
+        visits_completed, visits_pending, budget_used, status, visit_schedules,
+        ...rest
+      } = mission;
+      const { error } = await supabase.from('missions').insert({
+        ...rest,
+        name: `${mission.name} (Copy)`,
+        name_ar: mission.name_ar ? `${mission.name_ar} (نسخة)` : null,
+        status: 'draft',
+        visit_schedules: [],
+        visits_completed: 0,
+        visits_pending: 0,
+        budget_used: 0,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t('missions.mission_duplicated'));
+      queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
+    },
+    onError: (error: Error) => { toast.error(error.message); },
+  });
+
+  const openTemplateDialog = (mission: Record<string, any>) => setTemplateSource({
+    name: mission.name,
+    name_ar: mission.name_ar,
+    methodology: mission.methodology,
+    category: mission.category,
+    questions: (mission.questions || []) as never,
+  });
+
   const handlePause = (id: string) => updateStatusMutation.mutate({ id, status: 'paused' });
   const handleResume = (id: string) => updateStatusMutation.mutate({ id, status: 'published' });
   const handleArchive = (id: string) => updateStatusMutation.mutate({ id, status: 'archived' });
@@ -86,6 +123,9 @@ export default function AdminMissionsPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-background border">
+              <DropdownMenuItem onClick={() => duplicateMutation.mutate(mission)}><Copy className="me-2 h-4 w-4" />{t('missions.duplicate')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openTemplateDialog(mission)}><BookmarkPlus className="me-2 h-4 w-4" />{t('missions.save_as_template')}</DropdownMenuItem>
+              <DropdownMenuSeparator />
               {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
               {mission.status === 'paused' && <DropdownMenuItem onClick={() => handleResume(mission.id)}><Play className="me-2 h-4 w-4" />{t('missions.resume')}</DropdownMenuItem>}
               <DropdownMenuItem onClick={() => handleArchive(mission.id)}><Archive className="me-2 h-4 w-4" />{t('missions.force_archive')}</DropdownMenuItem>
@@ -172,7 +212,13 @@ export default function AdminMissionsPage() {
                               <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="bg-background border">
                                 <DropdownMenuItem asChild><Link to={`/admin/missions/${mission.id}`}><Eye className="me-2 h-4 w-4" />{t('missions.view_details')}</Link></DropdownMenuItem>
-                                {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
+                                <DropdownMenuItem onClick={() => duplicateMutation.mutate(mission)}><Copy className="me-2 h-4 w-4" />{t('missions.duplicate')}</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openTemplateDialog(mission)}><BookmarkPlus className="me-2 h-4 w-4" />{t('missions.save_as_template')}</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => duplicateMutation.mutate(mission)}><Copy className="me-2 h-4 w-4" />{t('missions.duplicate')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openTemplateDialog(mission)}><BookmarkPlus className="me-2 h-4 w-4" />{t('missions.save_as_template')}</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
                                 {mission.status === 'paused' && <DropdownMenuItem onClick={() => handleResume(mission.id)}><Play className="me-2 h-4 w-4" />{t('missions.resume')}</DropdownMenuItem>}
                                 <DropdownMenuItem onClick={() => handleArchive(mission.id)}><Archive className="me-2 h-4 w-4" />{t('missions.force_archive')}</DropdownMenuItem>
                               </DropdownMenuContent>
@@ -189,6 +235,7 @@ export default function AdminMissionsPage() {
           </CardContent>
         </Card>
       </div>
+      <SaveAsTemplateDialog mission={templateSource} open={!!templateSource} onOpenChange={(o) => !o && setTemplateSource(null)} />
     </AdminLayout>
   );
 }
