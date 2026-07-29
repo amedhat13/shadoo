@@ -369,5 +369,21 @@
     "branches_help": "Select one or more branches. A separate mission will be created for each selected branch.",
     "missions_count_single": "1 mission will be created",
     "missions_count_multi": "{{count}} separate missions will be created (one per branch)"
+  },
+  "save_as_template": {
+    "action": "Save as template",
+    "title": "Save mission as template",
+    "description": "Reuse this mission's questions and sections in future missions.",
+    "questions_count": "{{count}} questions",
+    "sections_count": "{{count}} sections",
+    "name_en": "Template name (English)",
+    "name_ar": "Template name (Arabic)",
+    "description_en": "Description (English)",
+    "description_ar": "Description (Arabic)",
+    "share_label": "Share with my organization",
+    "share_helper": "Other users on your account can start missions from this template.",
+    "submit": "Save template",
+    "saved": "Template saved.",
+    "name_required": "A template name is required."
   }
 }

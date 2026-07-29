@@ -99,7 +99,10 @@
     "force_pause": "إيقاف إجباري",
     "resume": "استئناف",
     "force_archive": "أرشفة إجبارية",
-    "status_updated": "تم {{status}} المهمة بنجاح"
+    "status_updated": "تم {{status}} المهمة بنجاح",
+    "duplicate": "تكرار",
+    "save_as_template": "حفظ كقالب",
+    "mission_duplicated": "تم تكرار المهمة كمسودة."
   },
   "branches": {
     "title": "إدارة الفروع",

@@ -99,7 +99,10 @@
     "force_pause": "Force Pause",
     "resume": "Resume",
     "force_archive": "Force Archive",
-    "status_updated": "Mission {{status}} successfully"
+    "status_updated": "Mission {{status}} successfully",
+    "duplicate": "Duplicate",
+    "save_as_template": "Save as template",
+    "mission_duplicated": "Mission duplicated as a draft."
   },
   "branches": {
     "title": "Branch Management",
