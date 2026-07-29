@@ -35,7 +35,7 @@ interface SaveAsTemplateDialogProps {
 export function SaveAsTemplateDialog({ mission, open, onOpenChange }: SaveAsTemplateDialogProps) {
   const { t } = useTranslation('missions');
   const { t: tc } = useTranslation('common');
-  const { createTemplate } = useQuestionTemplates();
+  const { createTemplate, isCreating } = useQuestionTemplates();
 
   const [name, setName] = useState('');
   const [nameAr, setNameAr] = useState('');
@@ -63,7 +63,7 @@ export function SaveAsTemplateDialog({ mission, open, onOpenChange }: SaveAsTemp
   ).size;
 
   const handleSave = async () => {
-    await createTemplate.mutateAsync({
+    await createTemplate({
       name: name.trim(),
       name_ar: nameAr.trim() || undefined,
       description: description.trim() || undefined,
@@ -129,8 +129,8 @@ export function SaveAsTemplateDialog({ mission, open, onOpenChange }: SaveAsTemp
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{tc('cancel')}</Button>
-          <Button onClick={handleSave} disabled={!name.trim() || createTemplate.isPending} className="gap-2">
-            {createTemplate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookmarkPlus className="h-4 w-4" />}
+          <Button onClick={handleSave} disabled={!name.trim() || isCreating} className="gap-2">
+            {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <BookmarkPlus className="h-4 w-4" />}
             {t('save_as_template.submit')}
           </Button>
         </DialogFooter>
