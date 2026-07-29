@@ -81,7 +81,7 @@ export default function AdminMissionsPage() {
         visits_completed: 0,
         visits_pending: 0,
         budget_used: 0,
-      });
+      } as never);
       if (error) throw error;
     },
     onSuccess: () => {
