@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MissionTable } from '@/components/missions/MissionTable';
+import { SaveAsTemplateDialog } from '@/components/missions/SaveAsTemplateDialog';
 import { MissionFiltersComponent, MissionFilters } from '@/components/missions/MissionFilters';
 import { EmptyState } from '@/components/common/EmptyState';
 import { VisitsRemainingWidget } from '@/components/package/VisitsRemainingWidget';
@@ -22,6 +23,7 @@ export default function MissionsPage() {
   const { visitsRemaining, visitsTotal } = usePackage();
 
   const [filters, setFilters] = useState<MissionFilters>({ search: '', status: 'all', branch: 'all' });
+  const [templateSource, setTemplateSource] = useState<Mission | null>(null);
   const canCreateMission = visitsRemaining > 0;
 
   const filteredMissions = missions.filter((mission) => {
@@ -91,11 +93,23 @@ export default function MissionsPage() {
             {filteredMissions.length === 0 ? (
               <EmptyState title={t('no_missions_found')} description={t('no_missions_found_desc')} />
             ) : (
-              <MissionTable missions={filteredMissions} onPause={handlePause} onResume={handleResume} onArchive={handleArchive} onDuplicate={handleDuplicate} />
+              <MissionTable missions={filteredMissions} onPause={handlePause} onResume={handleResume} onArchive={handleArchive} onDuplicate={handleDuplicate} onSaveTemplate={setTemplateSource} />
             )}
           </>
         )}
       </div>
+
+      <SaveAsTemplateDialog
+        mission={templateSource ? {
+          name: templateSource.name,
+          name_ar: (templateSource as unknown as { name_ar?: string }).name_ar,
+          methodology: (templateSource as unknown as { methodology?: string }).methodology,
+          category: (templateSource as unknown as { category?: string }).category,
+          questions: templateSource.questions,
+        } : null}
+        open={!!templateSource}
+        onOpenChange={(o) => !o && setTemplateSource(null)}
+      />
     </DashboardLayout>
   );
 }
