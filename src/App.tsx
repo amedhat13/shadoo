@@ -62,6 +62,7 @@ import AgentVisitHistory from "./pages/agent/AgentVisitHistory";
 import AgentWallet from "./pages/agent/AgentWallet";
 import AgentNotifications from "./pages/agent/AgentNotifications";
 import AgentProfile from "./pages/agent/AgentProfile";
+import AgentSignup from "./pages/agent/AgentSignup";
 
 const queryClient = new QueryClient();
 
@@ -320,6 +321,7 @@ const App = () => (
             />
 
             {/* Agent App prototype */}
+            <Route path="/agent-app/signup" element={<AgentSignup />} />
             <Route path="/agent-app" element={<AgentAppLayout />}>
               <Route index element={<AgentHome />} />
               <Route path="mission/:id" element={<AgentMissionDetail />} />
