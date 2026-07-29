@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, Copy } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, Pause, Play, Archive, Copy, BookmarkPlus } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -31,9 +31,10 @@ interface MissionTableProps {
   onResume?: (mission: Mission) => void;
   onArchive?: (mission: Mission) => void;
   onDuplicate?: (mission: Mission) => void;
+  onSaveTemplate?: (mission: Mission) => void;
 }
 
-export function MissionTable({ missions, onPause, onResume, onArchive, onDuplicate }: MissionTableProps) {
+export function MissionTable({ missions, onPause, onResume, onArchive, onDuplicate, onSaveTemplate }: MissionTableProps) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { t } = useTranslation('missions');
@@ -96,6 +97,15 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                         }}>
                           <Copy className="me-2 h-4 w-4" />
                           {t('duplicate')}
+                        </DropdownMenuItem>
+                      )}
+                      {onSaveTemplate && (
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          onSaveTemplate(mission);
+                        }}>
+                          <BookmarkPlus className="me-2 h-4 w-4" />
+                          {t('save_as_template.action')}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -232,6 +242,15 @@ export function MissionTable({ missions, onPause, onResume, onArchive, onDuplica
                       }}>
                         <Copy className="me-2 h-4 w-4" />
                         {t('duplicate')}
+                      </DropdownMenuItem>
+                    )}
+                    {onSaveTemplate && (
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        onSaveTemplate(mission);
+                      }}>
+                        <BookmarkPlus className="me-2 h-4 w-4" />
+                        {t('save_as_template.action')}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />

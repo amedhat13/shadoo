@@ -2,7 +2,12 @@
   "super_admin": "Super Admin",
   "admin_email": "admin@shadoo.com",
   "search_placeholder": "Search...",
-  "notifications": "Notifications",
+  "notifications": {
+    "agent_shortage": "Agent Shortage",
+    "agent_shortage_message": "Mission '{{mission}}' has 0 matching agents. Consider recruiting.",
+    "no_matching_agents": "This mission has no matching agents",
+    "mark_read": "Mark as Read"
+  },
   "notification_agent_registration": "New agent registration",
   "notification_agent_registration_desc": "Ahmed Hassan requested approval",
   "notification_branch_pending": "Branch pending verification",
@@ -207,7 +212,22 @@
     "submitted": "Submitted",
     "status": "Status",
     "amount": "Amount",
-    "review": "Review"
+    "review": "Review",
+    "bulk": {
+      "select_all": "Select all reviewable visits",
+      "select_row": "Select visit",
+      "selected": "{{count}} selected",
+      "hint": "Only submitted visits can be bulk reviewed.",
+      "approve_action": "Approve {{count}}",
+      "reject_action": "Reject {{count}}",
+      "clear": "Clear selection",
+      "confirm_approve_title": "Approve {{count}} visits?",
+      "confirm_reject_title": "Reject {{count}} visits?",
+      "confirm_approve_desc": "Approved visits trigger automatic agent payouts and settlement.",
+      "confirm_reject_desc": "Rejected visits are re-queued for another agent. A reason is required.",
+      "reason_placeholder": "Reason applied to all selected visits.",
+      "confirm": "Confirm"
+    }
   },
   "finance": {
     "title": "Financial Management",
@@ -234,7 +254,21 @@
     "placeholder_subscriptions": "Subscription payments will be shown here.",
     "placeholder_topups": "Wallet topup transactions will be shown here.",
     "placeholder_payouts": "Agent payout history will be shown here.",
-    "placeholder_refunds": "Refund transactions will be shown here."
+    "placeholder_refunds": "Refund transactions will be shown here.",
+    "funding": {
+      "tab": "Funding requests",
+      "title": "Manual funding requests",
+      "description": "Review client bank transfers and credit wallets after verification.",
+      "request_col": "Request",
+      "reference_col": "Reference & proof",
+      "approve": "Approve",
+      "decline": "Decline",
+      "status_pending": "Pending",
+      "status_approved": "Approved",
+      "status_declined": "Declined",
+      "approved_toast": "Credited {{amount}} EGP to {{client}}.",
+      "declined_toast": "Funding request from {{client}} declined."
+    }
   },
   "create_client": {
     "title": "Create New Client",
@@ -359,12 +393,6 @@
     "view_recruitment": "Recruit Agents",
     "questionnaire_criteria": "Questionnaire Criteria",
     "no_questionnaire_configured": "No agent questionnaire configured yet."
-  },
-  "notifications": {
-    "agent_shortage": "Agent Shortage",
-    "agent_shortage_message": "Mission '{{mission}}' has 0 matching agents. Consider recruiting.",
-    "no_matching_agents": "This mission has no matching agents",
-    "mark_read": "Mark as Read"
   },
   "create_mission_dialog": {
     "title": "Create Mission for Client",
@@ -675,7 +703,7 @@
     "add_question": "Add Question",
     "no_questions": "No questions added yet. Click 'Add Question' to start building.",
     "question_placeholder": "Enter question text...",
-     "short_text": "Short Text",
+    "short_text": "Short Text",
     "multiple_choice": "Multiple Choice",
     "yes_no": "Yes / No",
     "rating": "Rating",

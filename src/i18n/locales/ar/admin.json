@@ -2,7 +2,12 @@
   "super_admin": "المدير العام",
   "admin_email": "admin@shadoo.com",
   "search_placeholder": "بحث...",
-  "notifications": "الإشعارات",
+  "notifications": {
+    "agent_shortage": "نقص في الوكلاء",
+    "agent_shortage_message": "المهمة '{{mission}}' ليس لديها وكلاء مطابقون. يُرجى التوظيف.",
+    "no_matching_agents": "هذه المهمة ليس لديها وكلاء مطابقون",
+    "mark_read": "تعيين كمقروء"
+  },
   "notification_agent_registration": "تسجيل وكيل جديد",
   "notification_agent_registration_desc": "أحمد حسن طلب الموافقة",
   "notification_branch_pending": "فرع بانتظار التحقق",
@@ -207,7 +212,22 @@
     "submitted": "تاريخ الإرسال",
     "status": "الحالة",
     "amount": "المبلغ",
-    "review": "مراجعة"
+    "review": "مراجعة",
+    "bulk": {
+      "select_all": "تحديد كل الزيارات القابلة للمراجعة",
+      "select_row": "تحديد الزيارة",
+      "selected": "تم تحديد {{count}}",
+      "hint": "يمكن مراجعة الزيارات المُرسلة فقط بشكل جماعي.",
+      "approve_action": "قبول {{count}}",
+      "reject_action": "رفض {{count}}",
+      "clear": "إلغاء التحديد",
+      "confirm_approve_title": "قبول {{count}} زيارة؟",
+      "confirm_reject_title": "رفض {{count}} زيارة؟",
+      "confirm_approve_desc": "قبول الزيارات يؤدي إلى صرف مستحقات الوكلاء تلقائياً.",
+      "confirm_reject_desc": "الزيارات المرفوضة يُعاد إتاحتها لوكيل آخر. السبب مطلوب.",
+      "reason_placeholder": "السبب المطبق على كل الزيارات المحددة.",
+      "confirm": "تأكيد"
+    }
   },
   "finance": {
     "title": "الإدارة المالية",
@@ -234,7 +254,21 @@
     "placeholder_subscriptions": "ستظهر مدفوعات الاشتراكات هنا.",
     "placeholder_topups": "ستظهر معاملات شحن المحافظ هنا.",
     "placeholder_payouts": "سيظهر سجل مدفوعات الوكلاء هنا.",
-    "placeholder_refunds": "ستظهر معاملات الاسترداد هنا."
+    "placeholder_refunds": "ستظهر معاملات الاسترداد هنا.",
+    "funding": {
+      "tab": "طلبات التمويل",
+      "title": "طلبات التمويل اليدوي",
+      "description": "راجع التحويلات البنكية للعملاء وأضف الرصيد بعد التحقق.",
+      "request_col": "الطلب",
+      "reference_col": "المرجع والإثبات",
+      "approve": "قبول",
+      "decline": "رفض",
+      "status_pending": "قيد الانتظار",
+      "status_approved": "مقبول",
+      "status_declined": "مرفوض",
+      "approved_toast": "تمت إضافة {{amount}} ج.م إلى {{client}}.",
+      "declined_toast": "تم رفض طلب التمويل من {{client}}."
+    }
   },
   "create_client": {
     "title": "إنشاء عميل جديد",
@@ -359,12 +393,6 @@
     "view_recruitment": "توظيف وكلاء",
     "questionnaire_criteria": "معايير الاستبيان",
     "no_questionnaire_configured": "لم يتم تكوين استبيان الوكيل بعد."
-  },
-  "notifications": {
-    "agent_shortage": "نقص في الوكلاء",
-    "agent_shortage_message": "المهمة '{{mission}}' ليس لديها وكلاء مطابقون. يُرجى التوظيف.",
-    "no_matching_agents": "هذه المهمة ليس لديها وكلاء مطابقون",
-    "mark_read": "تعيين كمقروء"
   },
   "create_mission_dialog": {
     "title": "إنشاء مهمة للعميل",
@@ -675,7 +703,7 @@
     "add_question": "إضافة سؤال",
     "no_questions": "لم تتم إضافة أسئلة بعد. انقر 'إضافة سؤال' للبدء.",
     "question_placeholder": "أدخل نص السؤال...",
-     "short_text": "نص قصير",
+    "short_text": "نص قصير",
     "multiple_choice": "اختيار متعدد",
     "yes_no": "نعم / لا",
     "rating": "تقييم",

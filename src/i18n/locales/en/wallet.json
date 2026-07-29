@@ -25,5 +25,23 @@
     "topup": "Top Up",
     "allocation": "Mission Allocation",
     "release": "Budget Released"
+  },
+  "funding": {
+    "method_label": "Funding method",
+    "instant_title": "Instant card payment",
+    "instant_subtitle": "Funds available immediately.",
+    "manual_title": "Manual funding request",
+    "manual_subtitle": "Bank transfer, reviewed by admin.",
+    "manual_helper": "Transfer the amount to the Shadoo account, then submit this request with your reference. An admin will confirm and credit your wallet.",
+    "reference_label": "Transfer reference",
+    "reference_placeholder": "e.g. CIB-88213004",
+    "note_label": "Note (optional)",
+    "note_placeholder": "Anything the finance team should know.",
+    "proof_label": "Transfer proof (optional)",
+    "proof_placeholder": "Upload receipt or screenshot.",
+    "submit_request": "Submit funding request",
+    "submitting": "Submitting your request...",
+    "requested_title": "Funding request submitted",
+    "requested_desc": "Your request for {{amount}} is pending admin approval. You will be notified once it is credited."
   }
 }

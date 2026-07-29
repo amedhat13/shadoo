@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWallet } from '@/hooks/useWallet';
 
 export default function WalletPage() {
-  const { wallet, transactions, topUp } = useWallet();
+  const { wallet, transactions, topUp, requestManualTopUp } = useWallet();
   const { t } = useTranslation('wallet');
 
   return (
@@ -17,7 +17,7 @@ export default function WalletPage() {
         <PageHeader
           title={t('title')}
           description={t('description')}
-          actions={<TopUpDialog onTopUp={topUp} />}
+          actions={<TopUpDialog onTopUp={topUp} onRequestFunding={requestManualTopUp} />}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">

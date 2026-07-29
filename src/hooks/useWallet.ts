@@ -67,6 +67,25 @@ export function useWallet() {
     setIsLoading(false);
   }, []);
 
+  const requestManualTopUp = useCallback(async (amount: number, reference?: string) => {
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    const newTransaction: Transaction = {
+      id: `tx-${Date.now()}`,
+      type: 'topup',
+      amount,
+      description: reference
+        ? `Manual funding request — awaiting admin approval (ref: ${reference})`
+        : 'Manual funding request — awaiting admin approval',
+      status: 'pending',
+      created_at: new Date().toISOString(),
+    };
+
+    setTransactions((prev) => [newTransaction, ...prev]);
+    setIsLoading(false);
+  }, []);
+
   const allocateBudget = useCallback(async (amount: number, missionName?: string) => {
     if (amount > wallet.available_balance) {
       throw new Error('Insufficient balance');
@@ -128,6 +147,7 @@ export function useWallet() {
     transactions,
     isLoading,
     topUp,
+    requestManualTopUp,
     allocateBudget,
     releaseBudget,
     canAllocate,
