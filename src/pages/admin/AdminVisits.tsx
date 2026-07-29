@@ -11,8 +11,14 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Eye, Search, CheckCircle, XCircle, Clock, Loader2, FileCheck, Calendar } from 'lucide-react';
-import { useAdminVisits, useVisitStats } from '@/hooks/useAdminVisits';
+import { Eye, Search, CheckCircle, XCircle, Clock, Loader2, FileCheck, Calendar, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useAdminVisits, useVisitStats, useApproveVisit, useRejectVisit } from '@/hooks/useAdminVisits';
 import { VisitReviewDialog } from '@/components/admin/visits/VisitReviewDialog';
 import { format, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +35,12 @@ export default function AdminVisitsPage() {
   const [activeTab, setActiveTab] = useState('submitted');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState<'approve' | 'reject' | null>(null);
+  const [bulkReason, setBulkReason] = useState('');
+  const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const approveVisit = useApproveVisit();
+  const rejectVisit = useRejectVisit();
   const { t } = useTranslation('admin');
   const { t: tc } = useTranslation('common');
 
@@ -45,6 +57,35 @@ export default function AdminVisitsPage() {
   }) || [];
 
   const selectedVisitData = visits?.find(v => v.id === selectedVisit);
+
+  const bulkEligible = filteredVisits.filter((v) => v.status === 'submitted');
+  const allSelected = bulkEligible.length > 0 && bulkEligible.every((v) => selectedIds.includes(v.id));
+
+  const toggleAll = (checked: boolean) => {
+    setSelectedIds(checked ? bulkEligible.map((v) => v.id) : []);
+  };
+
+  const toggleOne = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((x) => x !== id)));
+  };
+
+  const runBulk = async () => {
+    setIsBulkRunning(true);
+    try {
+      for (const id of selectedIds) {
+        if (bulkAction === 'approve') {
+          await approveVisit.mutateAsync(id);
+        } else {
+          await rejectVisit.mutateAsync({ visitId: id, reason: bulkReason });
+        }
+      }
+    } finally {
+      setIsBulkRunning(false);
+      setBulkAction(null);
+      setBulkReason('');
+      setSelectedIds([]);
+    }
+  };
 
   const VisitCard = ({ visit }: { visit: any }) => (
     <Card className="mb-3">
@@ -117,6 +158,14 @@ export default function AdminVisitsPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[40px]">
+                          <Checkbox
+                            checked={allSelected}
+                            onCheckedChange={(c) => toggleAll(!!c)}
+                            disabled={bulkEligible.length === 0}
+                            aria-label={t('visits.bulk.select_all')}
+                          />
+                        </TableHead>
                         <TableHead>{t('visits.mission_col')}</TableHead>
                         <TableHead>{t('visits.agent_col')}</TableHead>
                         <TableHead>{t('visits.client_col')}</TableHead>
@@ -129,7 +178,15 @@ export default function AdminVisitsPage() {
                     </TableHeader>
                     <TableBody>
                       {filteredVisits.map((visit) => (
-                        <TableRow key={visit.id}>
+                        <TableRow key={visit.id} data-state={selectedIds.includes(visit.id) ? 'selected' : undefined}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.includes(visit.id)}
+                              onCheckedChange={(c) => toggleOne(visit.id, !!c)}
+                              disabled={visit.status !== 'submitted'}
+                              aria-label={t('visits.bulk.select_row')}
+                            />
+                          </TableCell>
                           <TableCell className="font-medium">{visit.mission?.name || 'Unknown Mission'}</TableCell>
                           <TableCell><div><div className="font-medium">{visit.agent?.full_name || 'Unknown'}</div><div className="text-xs text-muted-foreground">Tier {visit.agent?.tier || 'C'}</div></div></TableCell>
                           <TableCell className="text-muted-foreground">{visit.client?.company_name || 'N/A'}</TableCell>
@@ -152,6 +209,59 @@ export default function AdminVisitsPage() {
           </CardContent>
         </Card>
       </div>
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 z-50 w-[min(680px,calc(100%-2rem))] -translate-x-1/2">
+          <div className="flex flex-wrap items-center gap-3 border border-border bg-card p-3 shadow-lg">
+            <Badge variant="secondary" className="text-sm">{t('visits.bulk.selected', { count: selectedIds.length })}</Badge>
+            <span className="text-xs text-muted-foreground hidden sm:inline">{t('visits.bulk.hint')}</span>
+            <div className="ms-auto flex items-center gap-2">
+              <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={() => setBulkAction('reject')}>
+                <XCircle className="h-4 w-4" />{t('visits.bulk.reject_action', { count: selectedIds.length })}
+              </Button>
+              <Button size="sm" className="gap-1" onClick={() => setBulkAction('approve')}>
+                <CheckCircle className="h-4 w-4" />{t('visits.bulk.approve_action', { count: selectedIds.length })}
+              </Button>
+              <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setSelectedIds([])} aria-label={t('visits.bulk.clear')}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <AlertDialog open={!!bulkAction} onOpenChange={(o) => { if (!o && !isBulkRunning) { setBulkAction(null); setBulkReason(''); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {bulkAction === 'approve'
+                ? t('visits.bulk.confirm_approve_title', { count: selectedIds.length })
+                : t('visits.bulk.confirm_reject_title', { count: selectedIds.length })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {bulkAction === 'approve' ? t('visits.bulk.confirm_approve_desc') : t('visits.bulk.confirm_reject_desc')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {bulkAction === 'reject' && (
+            <Textarea
+              rows={3}
+              value={bulkReason}
+              onChange={(e) => setBulkReason(e.target.value)}
+              placeholder={t('visits.bulk.reason_placeholder')}
+            />
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkRunning}>{tc('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); runBulk(); }}
+              disabled={isBulkRunning || (bulkAction === 'reject' && !bulkReason.trim())}
+            >
+              {isBulkRunning && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+              {t('visits.bulk.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <VisitReviewDialog visit={selectedVisitData || null} open={!!selectedVisit} onOpenChange={(open) => !open && setSelectedVisit(null)} />
     </AdminLayout>
   );
