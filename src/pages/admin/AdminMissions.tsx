@@ -215,10 +215,7 @@ export default function AdminMissionsPage() {
                                 <DropdownMenuItem onClick={() => duplicateMutation.mutate(mission)}><Copy className="me-2 h-4 w-4" />{t('missions.duplicate')}</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openTemplateDialog(mission)}><BookmarkPlus className="me-2 h-4 w-4" />{t('missions.save_as_template')}</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => duplicateMutation.mutate(mission)}><Copy className="me-2 h-4 w-4" />{t('missions.duplicate')}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => openTemplateDialog(mission)}><BookmarkPlus className="me-2 h-4 w-4" />{t('missions.save_as_template')}</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
+                                {mission.status === 'published' && <DropdownMenuItem onClick={() => handlePause(mission.id)}><Pause className="me-2 h-4 w-4" />{t('missions.force_pause')}</DropdownMenuItem>}
                                 {mission.status === 'paused' && <DropdownMenuItem onClick={() => handleResume(mission.id)}><Play className="me-2 h-4 w-4" />{t('missions.resume')}</DropdownMenuItem>}
                                 <DropdownMenuItem onClick={() => handleArchive(mission.id)}><Archive className="me-2 h-4 w-4" />{t('missions.force_archive')}</DropdownMenuItem>
                               </DropdownMenuContent>
