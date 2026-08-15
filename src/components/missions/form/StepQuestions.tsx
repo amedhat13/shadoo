@@ -668,19 +668,21 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
 
                       <div className="grid grid-cols-1 gap-3">
-                        {/* Allow N/A */}
-                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
-                          <Switch
-                            checked={question.allowNA ?? false}
-                            onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
-                          />
-                          <div>
-                            <div className="text-sm font-semibold">Allow "Not applicable"</div>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">
-                              N/A skips any photo or comment requirement on this question and excludes it from scoring.
-                            </p>
+                        {/* Allow N/A — not available for short_text or multiple_choice */}
+                        {question.type !== 'short_text' && question.type !== 'multiple_choice' && (
+                          <div className="flex items-start gap-3 rounded-md border border-border p-3">
+                            <Switch
+                              checked={question.allowNA ?? false}
+                              onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
+                            />
+                            <div>
+                              <div className="text-sm font-semibold">Allow "Not applicable"</div>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                N/A skips any photo or comment requirement on this question and excludes it from scoring.
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
 
