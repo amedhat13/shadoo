@@ -699,10 +699,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
                             />
                             <div>
-                              <div className="text-sm font-semibold">Allow "Not applicable"</div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">
-                                N/A skips any photo or comment requirement on this question and excludes it from scoring.
-                              </p>
+                              <div className="text-sm font-semibold flex items-center gap-1.5">Allow "Not applicable"<InfoHint label="N/A skips any photo or comment requirement on this question and excludes it from scoring." /></div>
                             </div>
                           </div>
                         )}
