@@ -81,10 +81,19 @@ export function StepFunding({
 
   const receipt: ReceiptConfig = data.receipt ?? {
     enabled: false,
-    capEGP: 0,
+    capEGP: budgetPerVisit,
     ruleText: { en: '', ar: '' },
   };
   const setReceipt = (patch: Partial<ReceiptConfig>) => onChange({ receipt: { ...receipt, ...patch } });
+
+  // Reimbursement cap always mirrors the total purchase budget per visit
+  useEffect(() => {
+    if (data.receipt && data.receipt.capEGP !== budgetPerVisit) {
+      onChange({ receipt: { ...data.receipt, capEGP: budgetPerVisit } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [budgetPerVisit, data.receipt?.capEGP]);
+
 
 
 
