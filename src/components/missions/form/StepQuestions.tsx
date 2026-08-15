@@ -895,12 +895,12 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                     {question.photoRequirement.ratingThreshold || 70}%
                                   </span>
                                 </div>
-                                <p className="text-xs text-muted-foreground">
-                                  {t('questions_section.trigger_stars', {
+                                <InfoHint
+                                  label={t('questions_section.trigger_stars', {
                                     max: question.max_rating || 5,
                                     threshold: Math.ceil(((question.photoRequirement.ratingThreshold || 70) / 100) * (question.max_rating || 5)),
                                   })}
-                                </p>
+                                />
                               </>
                             )}
                           </div>
