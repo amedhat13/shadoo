@@ -84,7 +84,7 @@ export interface Question {
   allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
   commentMode?: CommentMode; // Off / Optional (default) / Required
   suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
-  allowPhoto?: boolean; // Agent may attach a photo to any answer (independent of the below-x% rule)
+  
 }
 
 // Question sections — every mission must have at least one section.
