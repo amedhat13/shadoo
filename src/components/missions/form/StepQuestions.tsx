@@ -733,12 +733,10 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         <div className="space-y-2 rounded-md border border-dashed border-border p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                                 Suggested comments (max 4)
+                                <InfoHint label="One-tap chips shown above the keyboard in the app." />
                               </div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">
-                                One-tap chips shown above the keyboard in the app.
-                              </p>
                             </div>
                             <Button
                               type="button"
