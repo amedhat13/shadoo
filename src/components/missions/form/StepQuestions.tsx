@@ -952,6 +952,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                   </label>
                                 )}
                               </div>
+                            </div>
 
                             {/* Photo instructions - bilingual */}
                             <div className="space-y-2">
