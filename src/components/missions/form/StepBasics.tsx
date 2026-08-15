@@ -221,27 +221,8 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
         )}
       </div>
 
-      {/* Category — drives the badge and filters in the agent app */}
-      <div className="space-y-2">
-        <Label className="text-xs font-bold uppercase tracking-wide">
-          Category<span className="text-destructive">*</span>
-        </Label>
-        <Select value={data.category || ''} onValueChange={(value) => onChange({ category: value })}>
-          <SelectTrigger id="category">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {MISSION_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-muted-foreground">
-          Shown as a badge on the visit card in the shopper app and used in their category filter.
-        </p>
-      </div>
+
+
 
       {/* Timing */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
