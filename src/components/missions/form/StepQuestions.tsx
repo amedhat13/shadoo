@@ -572,7 +572,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                     <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 p-3 space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Why we ask?</span>
-                        <span className="text-[10px] text-muted-foreground">(shown to the agent — 2 lines max, bilingual)</span>
+                        <InfoHint label="Shown to the agent in the app. Keep it to 2 lines max, bilingual." />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Textarea
