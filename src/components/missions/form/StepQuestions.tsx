@@ -826,6 +826,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           <div className="flex items-center gap-2">
                             <Camera className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm">Photo attachment</span>
+                            <InfoHint label="Attach a photo based on the answer. If 'Not applicable' is allowed, choosing N/A skips this photo requirement." />
                           </div>
                         </div>
 
