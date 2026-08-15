@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { MissionFormData, canPublishMission } from '@/types';
+import { MissionFormData, canPublishMission, BRIEF_SECTION_KEYS, validateMissionOperations } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
 import { StepBrief } from '@/components/missions/form/StepBrief';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
