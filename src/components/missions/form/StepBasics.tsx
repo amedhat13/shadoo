@@ -17,7 +17,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { MissionFormData, Branch } from '@/types';
+
+const MISSION_CATEGORIES = [
+  'F&B',
+  'Retail',
+  'Service',
+  'Banking',
+  'Telecom',
+  'Pharmacy',
+  'Fashion',
+  'Grocery',
+  'Automotive',
+  'Hospitality',
+];
+
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
