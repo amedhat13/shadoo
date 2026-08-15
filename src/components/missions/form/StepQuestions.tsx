@@ -952,10 +952,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                   </label>
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground">
-                                {t('questions_section.show_agents_example')}
-                              </p>
-                            </div>
 
                             {/* Photo instructions - bilingual */}
                             <div className="space-y-2">
