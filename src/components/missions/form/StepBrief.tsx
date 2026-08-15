@@ -1,9 +1,10 @@
-import { Plus, Trash2, BookOpen, ListChecks, Sparkles } from 'lucide-react';
+import { Plus, Trash2, BookOpen, ListChecks, Sparkles, CheckSquare, ShieldCheck } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { MissionFormData } from '@/types';
+import { Switch } from '@/components/ui/switch';
+import { MissionFormData, BriefSectionKey, BRIEF_SECTION_KEYS } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface StepBriefProps {
@@ -19,6 +20,8 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
   const { t: tc } = useTranslation('common');
   const cover = data.cover_story || emptyBL();
   const rules = data.rules && data.rules.length > 0 ? data.rules : [emptyBL()];
+  const checklist = data.checklist && data.checklist.length > 0 ? data.checklist : [emptyBL()];
+  const briefSections = data.brief_sections ?? BRIEF_SECTION_KEYS;
 
   const setCover = (patch: Partial<BL>) => onChange({ cover_story: { ...cover, ...patch } });
   const setRule = (idx: number, patch: Partial<BL>) => {
@@ -28,6 +31,22 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
   };
   const addRule = () => onChange({ rules: [...rules, emptyBL()] });
   const removeRule = (idx: number) => onChange({ rules: rules.filter((_, i) => i !== idx) });
+
+  const setChecklist = (idx: number, patch: Partial<BL>) => {
+    const next = [...checklist];
+    next[idx] = { ...next[idx], ...patch };
+    onChange({ checklist: next });
+  };
+  const addChecklist = () => onChange({ checklist: [...checklist, emptyBL()] });
+  const removeChecklist = (idx: number) => onChange({ checklist: checklist.filter((_, i) => i !== idx) });
+
+  const toggleSection = (key: BriefSectionKey) =>
+    onChange({
+      brief_sections: briefSections.includes(key)
+        ? briefSections.filter((k) => k !== key)
+        : [...briefSections, key],
+    });
+
 
   return (
     <div className="space-y-8">
