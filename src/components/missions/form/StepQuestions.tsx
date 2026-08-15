@@ -997,20 +997,30 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                 <div className="space-y-2">
                   {slots.map((slot, idx) => (
                     <div key={slot.id} className="rounded-md border border-border bg-background p-2.5 space-y-2">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           Slot {idx + 1}
                         </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-destructive"
-                          onClick={() => removeSlot(slot.id)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            {slot.required === false ? 'Optional' : 'Required'}
+                          </span>
+                          <Switch
+                            checked={slot.required !== false}
+                            onCheckedChange={(checked) => setSlot(slot.id, { required: checked })}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive"
+                            onClick={() => removeSlot(slot.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Input
                           dir="ltr"
