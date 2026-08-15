@@ -49,7 +49,7 @@ export interface QuestionPhotoRequirement {
   enabled: boolean;
   triggerCondition?: 'low_rating' | 'negative_answer';
   ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
-  triggerAnswer?: 'yes' | 'no'; // For yes_no questions — which answer triggers the photo
+  triggerAnswer?: 'yes' | 'no' | 'any'; // Which answer triggers the photo ('any' = every answer / every rating)
   samplePhotoUrl?: string;
   instructions?: string | { en: string; ar: string };
 }
@@ -84,7 +84,7 @@ export interface Question {
   allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
   commentMode?: CommentMode; // Off / Optional (default) / Required
   suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
-  allowPhoto?: boolean; // Agent may attach a photo to any answer (independent of the below-x% rule)
+  
 }
 
 // Question sections — every mission must have at least one section.

@@ -440,9 +440,6 @@ export function StepReview({
             Comment off: {data.questions.filter((q) => q.commentMode === 'off').length}
           </Badge>
           <Badge variant="outline">
-            Photo allowed: {data.questions.filter((q) => q.allowPhoto).length}
-          </Badge>
-          <Badge variant="outline">
             Photo triggered: {data.questions.filter((q) => q.photoRequirement?.enabled).length}
           </Badge>
           <Badge variant="outline">

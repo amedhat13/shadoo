@@ -583,7 +583,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         Answer behaviour in the app
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3">
                         {/* Allow N/A */}
                         <div className="flex items-start gap-3 rounded-md border border-border p-3">
                           <Switch
@@ -597,21 +597,8 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             </p>
                           </div>
                         </div>
-
-                        {/* Allow photo attachment */}
-                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
-                          <Switch
-                            checked={question.allowPhoto ?? false}
-                            onCheckedChange={(checked) => updateQuestion(question.id, { allowPhoto: checked })}
-                          />
-                          <div>
-                            <div className="text-sm font-semibold">Allow photo attachment</div>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">
-                              The agent can attach a photo to any answer — independent of the trigger rule below.
-                            </p>
-                          </div>
-                        </div>
                       </div>
+
 
                       {/* Comment mode */}
                       <div className="flex flex-wrap items-center gap-3">
@@ -742,7 +729,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           />
                           <div className="flex items-center gap-2">
                             <Camera className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{getPhotoTriggerLabel(question)}</span>
+                            <span className="text-sm">Photo attachment</span>
                           </div>
                         </div>
 
@@ -753,15 +740,16 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             <Select
                               value={question.photoRequirement.triggerAnswer ?? 'no'}
                               onValueChange={(value) =>
-                                updatePhotoRequirement(question.id, { triggerAnswer: value as 'yes' | 'no' })
+                                updatePhotoRequirement(question.id, { triggerAnswer: value as 'yes' | 'no' | 'any' })
                               }
                             >
-                              <SelectTrigger className="w-[110px]">
+                              <SelectTrigger className="w-[150px]">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="no">No</SelectItem>
                                 <SelectItem value="yes">Yes</SelectItem>
+                                <SelectItem value="any">Any answer</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -773,38 +761,59 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           </p>
                         )}
 
-
-                        
-                        {/* Rating threshold slider for rating questions */}
+                        {/* Rating trigger — any rating or below a threshold */}
                         {question.photoRequirement?.enabled && question.type === 'rating' && (
                           <div className="pl-8 space-y-2">
-                            <Label className="text-xs text-muted-foreground">
-                              {t('questions_section.trigger_label')}
-                            </Label>
-                            <div className="flex items-center gap-4">
-                              <input
-                                type="range"
-                                min={10}
-                                max={90}
-                                step={10}
-                                value={question.photoRequirement.ratingThreshold || 70}
-                                onChange={(e) =>
-                                  updatePhotoRequirement(question.id, { ratingThreshold: parseInt(e.target.value) })
+                            <div className="flex flex-wrap items-center gap-3">
+                              <Label className="text-xs text-muted-foreground">Ask for a photo when the rating is</Label>
+                              <Select
+                                value={question.photoRequirement.triggerAnswer === 'any' ? 'any' : 'low'}
+                                onValueChange={(value) =>
+                                  updatePhotoRequirement(question.id, {
+                                    triggerAnswer: value === 'any' ? 'any' : undefined,
+                                    ratingThreshold: value === 'any' ? undefined : question.photoRequirement?.ratingThreshold || 70,
+                                  })
                                 }
-                                className="flex-1"
-                              />
-                              <span className="text-sm font-semibold w-12 text-right">
-                                {question.photoRequirement.ratingThreshold || 70}%
-                              </span>
+                              >
+                                <SelectTrigger className="w-[170px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="low">Below a threshold</SelectItem>
+                                  <SelectItem value="any">Any rating</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              {t('questions_section.trigger_stars', {
-                                max: question.max_rating || 5,
-                                threshold: Math.ceil(((question.photoRequirement.ratingThreshold || 70) / 100) * (question.max_rating || 5)),
-                              })}
-                            </p>
+
+                            {question.photoRequirement.triggerAnswer !== 'any' && (
+                              <>
+                                <div className="flex items-center gap-4">
+                                  <input
+                                    type="range"
+                                    min={10}
+                                    max={90}
+                                    step={10}
+                                    value={question.photoRequirement.ratingThreshold || 70}
+                                    onChange={(e) =>
+                                      updatePhotoRequirement(question.id, { ratingThreshold: parseInt(e.target.value) })
+                                    }
+                                    className="flex-1"
+                                  />
+                                  <span className="text-sm font-semibold w-12 text-right">
+                                    {question.photoRequirement.ratingThreshold || 70}%
+                                  </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {t('questions_section.trigger_stars', {
+                                    max: question.max_rating || 5,
+                                    threshold: Math.ceil(((question.photoRequirement.ratingThreshold || 70) / 100) * (question.max_rating || 5)),
+                                  })}
+                                </p>
+                              </>
+                            )}
                           </div>
                         )}
+
 
                         {question.photoRequirement?.enabled && (
                           <div className="pl-8 space-y-3">
