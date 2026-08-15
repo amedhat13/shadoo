@@ -97,7 +97,11 @@ export default function MissionCreatePage() {
     purchase_budget_per_visit: grandTotalBudget / grandTotalVisits || 0,
   };
 
-  const { canPublish, reason } = canPublishMission(mockFormDataForValidation, subscription, wallet);
+  const baseCheck = canPublishMission(mockFormDataForValidation, subscription, wallet);
+  const opsErrors = validateMissionOperations(formData);
+  const canPublish = baseCheck.canPublish && opsErrors.length === 0;
+  const reason = baseCheck.reason ?? opsErrors[0];
+
 
   const updateFormData = (updates: Partial<MissionFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
