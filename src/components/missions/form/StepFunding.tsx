@@ -219,6 +219,122 @@ export function StepFunding({
           <p className="text-xs text-muted-foreground mt-1">{t('geo.description')}</p>
         </div>
       </div>
+
+      {/* Timers shown to the agent */}
+      <div className="border border-border rounded-md p-4 space-y-4">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+          <Timer className="h-4 w-4" />
+          Agent timers
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="cancel-window" className="text-xs font-bold uppercase tracking-wide">
+              Free-cancel window (min)
+            </Label>
+            <Input
+              id="cancel-window"
+              type="number"
+              min={0}
+              value={data.cancel_window_min ?? 5}
+              onChange={(e) => onChange({ cancel_window_min: parseInt(e.target.value) || 0 })}
+            />
+            <p className="text-xs text-muted-foreground">
+              After accepting, the agent can drop out penalty-free within this window. Shown as a live countdown; past it, cancelling affects their tier.
+            </p>
+            {(data.cancel_window_min ?? 5) >= (data.completion_deadline_min ?? 120) && (
+              <p className="text-xs text-destructive">
+                Cancel window must be less than the completion deadline ({data.completion_deadline_min ?? 120} min).
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="review-sla" className="text-xs font-bold uppercase tracking-wide">
+              Review SLA (hours)
+            </Label>
+            <Input
+              id="review-sla"
+              type="number"
+              min={1}
+              value={data.review_sla_hours ?? 48}
+              onChange={(e) => onChange({ review_sla_hours: parseInt(e.target.value) || 0 })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Shown on the agent's "sent for review" screen and on in-review missions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Receipt & reimbursement */}
+      <div className="border border-border rounded-md p-4 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0">
+            <ReceiptText className="h-4 w-4" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="receipt-required" className="text-sm font-semibold cursor-pointer">
+                Receipt required
+              </Label>
+              <Switch
+                id="receipt-required"
+                checked={receipt.enabled}
+                onCheckedChange={(checked) => setReceipt({ enabled: checked })}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              The agent gets a receipt step capturing total paid, date, receipt number, items ordered and a photo.
+            </p>
+          </div>
+        </div>
+
+        {receipt.enabled && (
+          <div className="space-y-4 pl-0 sm:pl-11">
+            <div className="space-y-2">
+              <Label htmlFor="receipt-cap" className="text-xs font-bold uppercase tracking-wide">
+                Reimbursement cap ({CURRENCY.code})
+              </Label>
+              <Input
+                id="receipt-cap"
+                type="number"
+                min={0}
+                value={receipt.capEGP}
+                onChange={(e) => setReceipt({ capEGP: parseInt(e.target.value) || 0 })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Amounts over the cap show a warning in the app and are not reimbursed.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wide">Receipt rule text</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Input
+                  dir="ltr"
+                  className="text-sm"
+                  placeholder="e.g. Printed receipt only — a card slip alone is rejected."
+                  value={receipt.ruleText.en}
+                  onChange={(e) => setReceipt({ ruleText: { ...receipt.ruleText, en: e.target.value } })}
+                />
+                <Input
+                  dir="rtl"
+                  className="text-sm font-ar"
+                  placeholder="مثال: إيصال مطبوع فقط — إيصال البطاقة وحده مرفوض."
+                  value={receipt.ruleText.ar}
+                  onChange={(e) => setReceipt({ ruleText: { ...receipt.ruleText, ar: e.target.value } })}
+                />
+              </div>
+            </div>
+
+            {!data.purchase_items.some((i) => (i.budget || 0) > 0) && (
+              <p className="text-xs text-destructive">
+                Receipt required needs at least one purchase item with a budget.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
