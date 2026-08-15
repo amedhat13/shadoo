@@ -203,7 +203,12 @@
     "schedule_help": "Each visit must have a scheduled date, time, and expected duration. Minimum 2 hours from now.",
     "min_lead_time_error": "Visit time must be at least 2 hours from now. Please adjust the highlighted visits.",
     "urgent_mission_warning": "This mission has visits within 24 hours and will be flagged as Urgent.",
-    "urgent": "Urgent"
+    "urgent": "Urgent",
+    "start_time_all": "Start time",
+    "duration_all": "Duration",
+    "no_slots_branch": "No visit slots for this branch yet.",
+    "add_slot": "Add slot",
+    "per_branch_help": "Set how many visit slots each selected branch gets and when they start. Minimum 2 hours from now."
   },
   "review": {
     "mission_details": "Mission Details",
