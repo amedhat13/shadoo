@@ -709,7 +709,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       {/* Comment — not available for short_text */}
                       {question.type !== 'short_text' && (
                         <div className="flex flex-wrap items-center gap-3">
-                          <Label className="text-xs text-muted-foreground">Comment</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1">Comment<InfoHint label="The app shows an 'Add a comment' button under the answer. Choosing N/A skips a required comment." /></Label>
                           <Select
                             value={question.commentMode ?? 'optional'}
                             onValueChange={(value) =>
