@@ -988,17 +988,11 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
                     )}
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeQuestion(question.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
                     );
                   })}
