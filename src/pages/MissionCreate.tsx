@@ -39,7 +39,16 @@ const initialFormData: MissionFormData = {
   is_geo_tagged: false,
   cover_story: { en: '', ar: '' },
   rules: [{ en: '', ar: '' }],
+  checklist: [{ en: '', ar: '' }],
+  require_brief_ack: true,
+  brief_sections: [...BRIEF_SECTION_KEYS],
+  expected_minutes: 30,
+  completion_deadline_min: 120,
+  cancel_window_min: 5,
+  review_sla_hours: 48,
+  receipt: { enabled: false, capEGP: 0, ruleText: { en: '', ar: '' } },
 };
+
 
 const STEP_KEYS = ['basics', 'brief', 'questions', 'agent_tier', 'funding', 'review'] as const;
 
