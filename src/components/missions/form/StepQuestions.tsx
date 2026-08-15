@@ -725,16 +725,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               <SelectItem value="required">Required</SelectItem>
                             </SelectContent>
                           </Select>
-                          {(question.commentMode ?? 'optional') !== 'off' && (
-                            <span className="text-[11px] text-muted-foreground">
-                              The app shows an "Add a comment" button under the answer.
-                            </span>
-                          )}
-                          {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
-                            <span className="text-[11px] text-primary">
-                              Choosing N/A skips the required comment.
-                            </span>
-                          )}
                         </div>
                       )}
 
