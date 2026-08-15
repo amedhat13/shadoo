@@ -48,6 +48,15 @@ export function StepFunding({
     });
   };
 
+  const receipt: ReceiptConfig = data.receipt ?? {
+    enabled: false,
+    capEGP: 0,
+    ruleText: { en: '', ar: '' },
+  };
+  const setReceipt = (patch: Partial<ReceiptConfig>) => onChange({ receipt: { ...receipt, ...patch } });
+
+
+
   const handleSchedulesChange = (schedules: VisitSchedule[]) => {
     onChange({
       visit_schedules: schedules,
