@@ -390,10 +390,7 @@ export function StepReview({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Category</span>
-            <span className="font-semibold">{data.category || '—'}</span>
-          </div>
-          <div className="flex items-center justify-between">
+
             <span className="text-muted-foreground">Time on site</span>
             <span className="font-semibold">{data.expected_minutes ?? 30} min</span>
           </div>
