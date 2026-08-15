@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
 import { Users, AlertTriangle, Info, Calculator, Building2, Wallet, MapPin, Timer, ReceiptText } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MissionFormData, PurchaseItem, VisitSchedule, ReceiptConfig } from '@/types';
+import { MissionFormData, PurchaseItem, VisitSchedule, ReceiptConfig, Branch } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
 import { PurchaseItemsList } from './PurchaseItemsList';
 import { VisitScheduleEditor } from './VisitScheduleEditor';
@@ -16,6 +17,8 @@ interface StepFundingProps {
   visitsRemaining: number;
   walletBalance: number;
   branchCount: number;
+  /** Branches selected in step 1 */
+  branches?: Branch[];
   onSaveDraft?: () => void;
 }
 
@@ -25,16 +28,44 @@ export function StepFunding({
   visitsRemaining,
   walletBalance,
   branchCount,
+  branches = [],
   onSaveDraft,
 }: StepFundingProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('missions');
   
+  const perBranch = branches.length > 0;
+
+  // Keep slots in sync with the branches selected in step 1
+  useEffect(() => {
+    if (!perBranch) return;
+    const ids = branches.map((b) => b.id);
+    const first = ids[0];
+    let changed = false;
+    const next = data.visit_schedules
+      .filter((s) => {
+        const keep = !s.branch_id || ids.includes(s.branch_id);
+        if (!keep) changed = true;
+        return keep;
+      })
+      .map((s) => {
+        if (!s.branch_id) {
+          changed = true;
+          return { ...s, branch_id: first };
+        }
+        return s;
+      });
+    if (changed) {
+      onChange({ visit_schedules: next, number_of_visits: next.length });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branches.map((b) => b.id).join(',')]);
+
   const budgetPerVisit = data.purchase_items.reduce((sum, item) => sum + (item.budget || 0), 0);
   const numberOfVisits = data.visit_schedules.length;
-  const budgetPerMission = numberOfVisits * budgetPerVisit;
-  const totalVisitsAllMissions = numberOfVisits * branchCount;
-  const totalPurchaseBudget = budgetPerMission * branchCount;
+  const budgetPerMission = perBranch && branchCount > 0 ? (numberOfVisits / branchCount) * budgetPerVisit : numberOfVisits * budgetPerVisit;
+  const totalVisitsAllMissions = perBranch ? numberOfVisits : numberOfVisits * branchCount;
+  const totalPurchaseBudget = numberOfVisits * budgetPerVisit;
   const exceedsVisits = totalVisitsAllMissions > visitsRemaining;
   const exceedsBalance = totalPurchaseBudget > walletBalance;
 
@@ -95,7 +126,8 @@ export function StepFunding({
       <VisitScheduleEditor
         schedules={data.visit_schedules}
         onChange={handleSchedulesChange}
-        maxVisits={Math.floor(visitsRemaining / branchCount)}
+        maxVisits={perBranch ? visitsRemaining : Math.floor(visitsRemaining / branchCount)}
+        branches={branches}
       />
 
       {/* Visit Count Warning */}
