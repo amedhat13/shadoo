@@ -120,12 +120,118 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
         </div>
       </section>
 
+      {/* Checklist — what to do on site */}
+      <section className="space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="rounded-md bg-primary/10 p-2 text-primary shrink-0">
+            <CheckSquare className="h-4 w-4" />
+          </div>
+          <div className="flex-1">
+            <Label className="text-xs font-bold uppercase tracking-wide">Checklist — what to do on site</Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              The last thing the agent sees in the brief. One action per line, in order.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {checklist.map((c, idx) => (
+            <div key={idx} className="border border-border rounded-md p-3 space-y-2 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Step {idx + 1}</span>
+                {checklist.length > 1 && (
+                  <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeChecklist(idx)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <Input
+                  dir="ltr"
+                  value={c.en}
+                  onChange={(e) => setChecklist(idx, { en: e.target.value })}
+                  placeholder="e.g. Order one hot drink and pay by card"
+                  className="text-sm"
+                />
+                <Input
+                  dir="rtl"
+                  className="text-sm font-ar"
+                  value={c.ar}
+                  onChange={(e) => setChecklist(idx, { ar: e.target.value })}
+                  placeholder="مثال: اطلب مشروبًا ساخنًا وادفع بالبطاقة"
+                />
+              </div>
+            </div>
+          ))}
+
+          <Button variant="outline" size="sm" onClick={addChecklist} className="gap-2">
+            <Plus className="h-3.5 w-3.5" /> Add checklist item
+          </Button>
+        </div>
+      </section>
+
+      {/* Brief acknowledgement + sections shown in the app */}
+      <section className="space-y-3">
+        <div className="flex items-start gap-3 border border-border rounded-md p-4">
+          <div className="rounded-md bg-primary/10 p-2 text-primary shrink-0">
+            <ShieldCheck className="h-4 w-4" />
+          </div>
+          <div className="flex-1 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="brief-ack" className="text-sm font-semibold cursor-pointer">
+                Require brief acknowledgement
+              </Label>
+              <Switch
+                id="brief-ack"
+                checked={data.require_brief_ack ?? true}
+                onCheckedChange={(checked) => onChange({ require_brief_ack: checked })}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The agent must page through every enabled brief tab and tick a confirmation before accepting the visit.
+            </p>
+
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Brief sections shown in the app
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {BRIEF_SECTION_KEYS.map((key) => {
+                  const active = briefSections.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleSection(key)}
+                      className={
+                        'rounded-md border px-3 py-2 text-xs font-semibold capitalize transition ' +
+                        (active
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border text-muted-foreground')
+                      }
+                    >
+                      {key.replace('_', ' ')}
+                    </button>
+                  );
+                })}
+              </div>
+              {(data.require_brief_ack ?? true) && briefSections.length === 0 && (
+                <p className="text-xs text-destructive">
+                  Enable at least one brief section while acknowledgement is required.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="rounded-md border border-primary/30 bg-primary/5 p-3 flex gap-2">
         <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
         <p className="text-xs text-muted-foreground">
-          Both the cover story and rules will appear in the agent's mission brief in Arabic and English, and are attached to every visit report.
+          The cover story, rules and checklist all appear in the agent's mission brief in Arabic and English, and are attached to every visit report.
         </p>
       </div>
     </div>
   );
 }
+
