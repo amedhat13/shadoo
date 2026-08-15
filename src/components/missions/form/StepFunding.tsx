@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MissionFormData, PurchaseItem, VisitSchedule } from '@/types';
+import { MissionFormData, PurchaseItem, VisitSchedule, ReceiptConfig } from '@/types';
 import { CURRENCY, MESSAGES } from '@/lib/constants';
 import { PurchaseItemsList } from './PurchaseItemsList';
 import { VisitScheduleEditor } from './VisitScheduleEditor';
