@@ -719,7 +719,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       )}
 
                       {/* Suggested comments — up to 4 bilingual chips */}
-                      {(question.commentMode ?? 'optional') !== 'off' && (
+                      {question.type !== 'short_text' && (question.commentMode ?? 'optional') !== 'off' && (
                         <div className="space-y-2 rounded-md border border-dashed border-border p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div>
