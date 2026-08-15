@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { BilingualValue, ensureBilingual, getBilingualText, getLocalizedValue } from '@/i18n/utils';
 import { useQuestionTemplates, QuestionTemplate, TEMPLATE_GROUPS } from '@/hooks/useQuestionTemplates';
 import { LoadingState } from '@/components/common/LoadingState';
+import { InfoHint } from '@/components/common/InfoHint';
 
 interface StepQuestionsProps {
   data: MissionFormData;
@@ -571,7 +572,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                     <div className="rounded-md border border-dashed border-primary/30 bg-primary/5 p-3 space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Why we ask?</span>
-                        <span className="text-[10px] text-muted-foreground">(shown to the agent — 2 lines max, bilingual)</span>
+                        <InfoHint label="Shown to the agent in the app. Keep it to 2 lines max, bilingual." />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Textarea
@@ -698,10 +699,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
                             />
                             <div>
-                              <div className="text-sm font-semibold">Allow "Not applicable"</div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">
-                                N/A skips any photo or comment requirement on this question and excludes it from scoring.
-                              </p>
+                              <div className="text-sm font-semibold flex items-center gap-1.5">Allow "Not applicable"<InfoHint label="N/A skips any photo or comment requirement on this question and excludes it from scoring." /></div>
                             </div>
                           </div>
                         )}
@@ -711,7 +709,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       {/* Comment — not available for short_text */}
                       {question.type !== 'short_text' && (
                         <div className="flex flex-wrap items-center gap-3">
-                          <Label className="text-xs text-muted-foreground">Comment</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1">Comment<InfoHint label="The app shows an 'Add a comment' button under the answer. Choosing N/A skips a required comment." /></Label>
                           <Select
                             value={question.commentMode ?? 'optional'}
                             onValueChange={(value) =>
@@ -727,16 +725,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               <SelectItem value="required">Required</SelectItem>
                             </SelectContent>
                           </Select>
-                          {(question.commentMode ?? 'optional') !== 'off' && (
-                            <span className="text-[11px] text-muted-foreground">
-                              The app shows an "Add a comment" button under the answer.
-                            </span>
-                          )}
-                          {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
-                            <span className="text-[11px] text-primary">
-                              Choosing N/A skips the required comment.
-                            </span>
-                          )}
                         </div>
                       )}
 
@@ -745,12 +733,10 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         <div className="space-y-2 rounded-md border border-dashed border-border p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                                 Suggested comments (max 4)
+                                <InfoHint label="One-tap chips shown above the keyboard in the app." />
                               </div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">
-                                One-tap chips shown above the keyboard in the app.
-                              </p>
                             </div>
                             <Button
                               type="button"
@@ -840,6 +826,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           <div className="flex items-center gap-2">
                             <Camera className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm">Photo attachment</span>
+                            <InfoHint label="Attach a photo based on the answer. If 'Not applicable' is allowed, choosing N/A skips this photo requirement." />
                           </div>
                         </div>
 
@@ -865,11 +852,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           </div>
                         )}
 
-                        {question.photoRequirement?.enabled && question.allowNA && (
-                          <p className="pl-8 text-[11px] text-primary">
-                            Choosing "Not applicable" skips this photo requirement.
-                          </p>
-                        )}
 
                         {/* Rating trigger — any rating or below a threshold */}
                         {question.photoRequirement?.enabled && question.type === 'rating' && (
@@ -913,12 +895,12 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                     {question.photoRequirement.ratingThreshold || 70}%
                                   </span>
                                 </div>
-                                <p className="text-xs text-muted-foreground">
-                                  {t('questions_section.trigger_stars', {
+                                <InfoHint
+                                  label={t('questions_section.trigger_stars', {
                                     max: question.max_rating || 5,
                                     threshold: Math.ceil(((question.photoRequirement.ratingThreshold || 70) / 100) * (question.max_rating || 5)),
                                   })}
-                                </p>
+                                />
                               </>
                             )}
                           </div>
@@ -929,8 +911,9 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           <div className="pl-8 space-y-3">
                             {/* Sample photo upload */}
                             <div className="space-y-2">
-                              <Label className="text-xs text-muted-foreground">
+                              <Label className="text-xs text-muted-foreground flex items-center gap-1">
                                 {t('questions_section.sample_photo')}
+                                <InfoHint label={t('questions_section.show_agents_example')} />
                               </Label>
                               <div className="flex items-center gap-3">
                                 {question.photoRequirement.samplePhotoUrl ? (
@@ -969,9 +952,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                                   </label>
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground">
-                                {t('questions_section.show_agents_example')}
-                              </p>
                             </div>
 
                             {/* Photo instructions - bilingual */}
@@ -1044,10 +1024,9 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
         <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Camera className="h-4 w-4" />
           {t('questions_section.general_photo_req')}
+          <InfoHint label={t('questions_section.general_photo_desc')} />
         </Label>
-        <p className="text-xs text-muted-foreground">
-          {t('questions_section.general_photo_desc')}
-        </p>
+
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -1106,10 +1085,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
             <div className="space-y-3 rounded-md border border-dashed border-primary/30 bg-primary/5 p-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Named Photo Slots</div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Give each photo a title (e.g. "Front door", "Food plate", "Receipt"). The agent sees these as separate upload slots.
-                  </p>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">Named Photo Slots<InfoHint label='Give each photo a title (e.g. "Front door", "Food plate", "Receipt"). The agent sees these as separate upload slots.' /></div>
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={addSlot} className="gap-1 shrink-0">
                   <Plus className="h-3.5 w-3.5" /> Add slot
