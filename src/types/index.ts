@@ -198,6 +198,7 @@ export interface Wallet {
 // Visit Schedule for mission creation
 export interface VisitSchedule {
   id: string;
+  branch_id?: string; // Which selected branch this slot belongs to
   date: string; // ISO date string (YYYY-MM-DD)
   time: string; // Time string (HH:mm)
   duration: number; // Duration in minutes
