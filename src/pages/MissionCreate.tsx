@@ -86,10 +86,12 @@ export default function MissionCreatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const branchCount = formData.branch_ids.length || 1;
-  const totalVisitsPerMission = formData.number_of_visits;
-  const totalPurchaseBudgetPerMission = formData.number_of_visits * formData.purchase_budget_per_visit;
-  const grandTotalBudget = totalPurchaseBudgetPerMission * branchCount;
-  const grandTotalVisits = totalVisitsPerMission * branchCount;
+  const selectedBranches = branches.filter((b) => formData.branch_ids.includes(b.id));
+  // Slots carry a branch_id, so the schedule list is already the grand total
+  const schedulesForBranch = (branchId: string) =>
+    formData.visit_schedules.filter((s) => (s.branch_id ? s.branch_id === branchId : true));
+  const grandTotalVisits = formData.visit_schedules.length;
+  const grandTotalBudget = grandTotalVisits * formData.purchase_budget_per_visit;
 
   const mockFormDataForValidation = {
     ...formData,
@@ -161,8 +163,8 @@ export default function MissionCreatePage() {
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
-          number_of_visits: formData.visit_schedules.length,
-          visit_schedules: formData.visit_schedules,
+          number_of_visits: schedulesForBranch(branchId).length,
+          visit_schedules: schedulesForBranch(branchId),
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
           methodology: formData.methodology || 'custom',
@@ -207,8 +209,8 @@ export default function MissionCreatePage() {
           branch_id: branchId,
           questions: formData.questions,
           photo_requirements: formData.photo_requirements,
-          number_of_visits: formData.visit_schedules.length,
-          visit_schedules: formData.visit_schedules,
+          number_of_visits: schedulesForBranch(branchId).length,
+          visit_schedules: schedulesForBranch(branchId),
           purchase_budget_per_visit: formData.purchase_budget_per_visit,
           is_geo_tagged: formData.is_geo_tagged,
           methodology: formData.methodology || 'custom',
@@ -262,6 +264,7 @@ export default function MissionCreatePage() {
             visitsRemaining={visitsRemaining}
             walletBalance={wallet.available_balance}
             branchCount={branchCount}
+            branches={selectedBranches}
             onSaveDraft={handleSaveDraft}
           />
         );
