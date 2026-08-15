@@ -1085,10 +1085,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
             <div className="space-y-3 rounded-md border border-dashed border-primary/30 bg-primary/5 p-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Named Photo Slots</div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Give each photo a title (e.g. "Front door", "Food plate", "Receipt"). The agent sees these as separate upload slots.
-                  </p>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">Named Photo Slots<InfoHint label='Give each photo a title (e.g. "Front door", "Food plate", "Receipt"). The agent sees these as separate upload slots.' /></div>
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={addSlot} className="gap-1 shrink-0">
                   <Plus className="h-3.5 w-3.5" /> Add slot
