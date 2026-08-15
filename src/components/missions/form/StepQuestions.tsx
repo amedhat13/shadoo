@@ -966,11 +966,14 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
           const addSlot = () =>
             updateSlots([
               ...slots,
-              { id: crypto.randomUUID(), label: { en: '', ar: '' }, hint: { en: '', ar: '' } },
+              { id: crypto.randomUUID(), label: { en: '', ar: '' }, hint: { en: '', ar: '' }, required: true },
             ]);
           const removeSlot = (id: string) => updateSlots(slots.filter((s) => s.id !== id));
-          const setSlot = (id: string, patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string } }>) =>
-            updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+          const setSlot = (
+            id: string,
+            patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string }; required: boolean }>
+          ) => updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+
 
           return (
             <div className="space-y-3 rounded-md border border-dashed border-primary/30 bg-primary/5 p-3">
