@@ -347,13 +347,15 @@ export function StepFunding({
               <Input
                 id="receipt-cap"
                 type="number"
-                min={0}
-                value={receipt.capEGP}
-                onChange={(e) => setReceipt({ capEGP: parseInt(e.target.value) || 0 })}
+                readOnly
+                disabled
+                value={budgetPerVisit}
+                className="bg-muted/50 cursor-not-allowed"
               />
               <p className="text-xs text-muted-foreground">
-                Amounts over the cap show a warning in the app and are not reimbursed.
+                Set automatically from the total purchase budget per visit ({budgetPerVisit} {CURRENCY.code}). Amounts over the cap are not reimbursed.
               </p>
+
             </div>
 
             <div className="space-y-2">
