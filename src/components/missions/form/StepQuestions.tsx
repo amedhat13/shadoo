@@ -686,35 +686,37 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
 
 
-                      {/* Comment mode */}
-                      <div className="flex flex-wrap items-center gap-3">
-                        <Label className="text-xs text-muted-foreground">Comment</Label>
-                        <Select
-                          value={question.commentMode ?? 'optional'}
-                          onValueChange={(value) =>
-                            updateQuestion(question.id, { commentMode: value as 'off' | 'optional' | 'required' })
-                          }
-                        >
-                          <SelectTrigger className="w-[160px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="off">Off</SelectItem>
-                            <SelectItem value="optional">Optional (default)</SelectItem>
-                            <SelectItem value="required">Required</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {(question.commentMode ?? 'optional') !== 'off' && (
-                          <span className="text-[11px] text-muted-foreground">
-                            The app shows an "Add a comment" button under the answer.
-                          </span>
-                        )}
-                        {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
-                          <span className="text-[11px] text-primary">
-                            Choosing N/A skips the required comment.
-                          </span>
-                        )}
-                      </div>
+                      {/* Comment — not available for short_text */}
+                      {question.type !== 'short_text' && (
+                        <div className="flex flex-wrap items-center gap-3">
+                          <Label className="text-xs text-muted-foreground">Comment</Label>
+                          <Select
+                            value={question.commentMode ?? 'optional'}
+                            onValueChange={(value) =>
+                              updateQuestion(question.id, { commentMode: value as 'off' | 'optional' | 'required' })
+                            }
+                          >
+                            <SelectTrigger className="w-[160px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="off">Off</SelectItem>
+                              <SelectItem value="optional">Optional (default)</SelectItem>
+                              <SelectItem value="required">Required</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {(question.commentMode ?? 'optional') !== 'off' && (
+                            <span className="text-[11px] text-muted-foreground">
+                              The app shows an "Add a comment" button under the answer.
+                            </span>
+                          )}
+                          {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
+                            <span className="text-[11px] text-primary">
+                              Choosing N/A skips the required comment.
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {/* Suggested comments — up to 4 bilingual chips */}
                       {(question.commentMode ?? 'optional') !== 'off' && (
