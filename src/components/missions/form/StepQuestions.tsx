@@ -911,8 +911,9 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           <div className="pl-8 space-y-3">
                             {/* Sample photo upload */}
                             <div className="space-y-2">
-                              <Label className="text-xs text-muted-foreground">
+                              <Label className="text-xs text-muted-foreground flex items-center gap-1">
                                 {t('questions_section.sample_photo')}
+                                <InfoHint label={t('questions_section.show_agents_example')} />
                               </Label>
                               <div className="flex items-center gap-3">
                                 {question.photoRequirement.samplePhotoUrl ? (
