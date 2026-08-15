@@ -583,7 +583,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         Answer behaviour in the app
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3">
                         {/* Allow N/A */}
                         <div className="flex items-start gap-3 rounded-md border border-border p-3">
                           <Switch
@@ -597,21 +597,8 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             </p>
                           </div>
                         </div>
-
-                        {/* Allow photo attachment */}
-                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
-                          <Switch
-                            checked={question.allowPhoto ?? false}
-                            onCheckedChange={(checked) => updateQuestion(question.id, { allowPhoto: checked })}
-                          />
-                          <div>
-                            <div className="text-sm font-semibold">Allow photo attachment</div>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">
-                              The agent can attach a photo to any answer — independent of the trigger rule below.
-                            </p>
-                          </div>
-                        </div>
                       </div>
+
 
                       {/* Comment mode */}
                       <div className="flex flex-wrap items-center gap-3">
