@@ -852,11 +852,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           </div>
                         )}
 
-                        {question.photoRequirement?.enabled && question.allowNA && (
-                          <p className="pl-8 text-[11px] text-primary">
-                            Choosing "Not applicable" skips this photo requirement.
-                          </p>
-                        )}
 
                         {/* Rating trigger — any rating or below a threshold */}
                         {question.photoRequirement?.enabled && question.type === 'rating' && (
