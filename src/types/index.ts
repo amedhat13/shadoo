@@ -49,6 +49,7 @@ export interface QuestionPhotoRequirement {
   enabled: boolean;
   triggerCondition?: 'low_rating' | 'negative_answer';
   ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
+  triggerAnswer?: 'yes' | 'no'; // For yes_no questions — which answer triggers the photo
   samplePhotoUrl?: string;
   instructions?: string | { en: string; ar: string };
 }
@@ -57,6 +58,14 @@ export interface AttachmentConfig {
   allowed_types?: string[]; // e.g. ['image', 'pdf', 'document']
   max_files?: number; // max number of files (default 1)
   instructions?: string | { en: string; ar: string }; // guidance for the agent
+}
+
+export type CommentMode = 'off' | 'optional' | 'required';
+
+export interface SuggestedComment {
+  id: string;
+  en: string;
+  ar: string;
 }
 
 export interface Question {
@@ -70,6 +79,12 @@ export interface Question {
   photoRequirement?: QuestionPhotoRequirement; // Per-question photo requirement
   attachment_config?: AttachmentConfig; // For attachment type
   section_id?: string; // Which section this question belongs to
+
+  // Mobile-app answering behaviour
+  allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
+  commentMode?: CommentMode; // Off / Optional (default) / Required
+  suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
+  allowPhoto?: boolean; // Agent may attach a photo to any answer (independent of the below-x% rule)
 }
 
 // Question sections — every mission must have at least one section.
@@ -84,6 +99,7 @@ export interface PhotoSlot {
   label: { en: string; ar: string };
   hint?: { en: string; ar: string };
   sample_url?: string;
+  required?: boolean; // Some slots are optional
 }
 
 export interface PhotoRequirements {
@@ -91,6 +107,7 @@ export interface PhotoRequirements {
   instructions?: string | { en: string; ar: string };
   slots?: PhotoSlot[];
 }
+
 
 // Agent Tiers
 export type AgentTier = 'A' | 'B' | 'C';
@@ -193,6 +210,25 @@ export interface PurchaseItem {
   budget: number;
 }
 
+// Brief sections the agent must read before accepting (mobile app tabs)
+export type BriefSectionKey = 'overview' | 'cover_story' | 'rules' | 'checklist' | 'questions' | 'photos';
+
+export const BRIEF_SECTION_KEYS: BriefSectionKey[] = [
+  'overview',
+  'cover_story',
+  'rules',
+  'checklist',
+  'questions',
+  'photos',
+];
+
+// Receipt / reimbursement config
+export interface ReceiptConfig {
+  enabled: boolean;
+  capEGP: number;
+  ruleText: { en: string; ar: string };
+}
+
 // Form Data for Mission Creation
 export interface MissionFormData {
   // Step 1: Basics
@@ -200,10 +236,15 @@ export interface MissionFormData {
   name_ar?: string;
   branch_ids: string[];
   category?: string;
+  expected_minutes?: number; // Expected time on site
+  completion_deadline_min?: number; // Minutes from start to submit
 
   // Step 2: Agent Brief
   cover_story?: { en: string; ar: string };
   rules?: { en: string; ar: string }[];
+  checklist?: { en: string; ar: string }[]; // "What to do on site" — shown last in the brief
+  require_brief_ack?: boolean; // Agent must confirm reading the brief before accepting
+  brief_sections?: BriefSectionKey[]; // Which brief tabs are shown in the app
 
   // Agent Selection
   agent_selection_mode?: 'tier' | 'custom';
@@ -221,6 +262,9 @@ export interface MissionFormData {
   purchase_items: PurchaseItem[];
   purchase_budget_per_visit: number;
   purchase_item_name?: string;
+  cancel_window_min?: number; // Free-cancel window after accepting (default 5)
+  review_sla_hours?: number; // Review SLA shown to the agent (default 48)
+  receipt?: ReceiptConfig;
 
   // Geo Settings
   is_geo_tagged?: boolean;
@@ -228,6 +272,31 @@ export interface MissionFormData {
   // Methodology
   methodology?: string;
 }
+
+// ===== Mobile-app operational validation =====
+export function validateMissionOperations(data: MissionFormData): string[] {
+  const errors: string[] = [];
+  const cancelWindow = data.cancel_window_min ?? 5;
+  const deadline = data.completion_deadline_min ?? 120;
+
+  if (cancelWindow >= deadline) {
+    errors.push('Free-cancel window must be less than the completion deadline.');
+  }
+
+  if (data.receipt?.enabled) {
+    const hasFundedItem = (data.purchase_items || []).some((i) => (i.budget || 0) > 0);
+    if (!hasFundedItem) {
+      errors.push('Receipt required needs at least one purchase item with a budget.');
+    }
+  }
+
+  if (data.require_brief_ack && (data.brief_sections?.length || 0) === 0) {
+    errors.push('Brief acknowledgement is on — enable at least one brief section.');
+  }
+
+  return errors;
+}
+
 
 export interface AgentCustomCriteriaForm {
   gender?: 'male' | 'female' | null;

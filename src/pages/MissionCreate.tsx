@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { MissionFormData, canPublishMission } from '@/types';
+import { MissionFormData, canPublishMission, BRIEF_SECTION_KEYS, validateMissionOperations } from '@/types';
 import { StepBasics } from '@/components/missions/form/StepBasics';
 import { StepBrief } from '@/components/missions/form/StepBrief';
 import { StepAgentTier } from '@/components/missions/form/StepAgentTier';
@@ -39,7 +39,16 @@ const initialFormData: MissionFormData = {
   is_geo_tagged: false,
   cover_story: { en: '', ar: '' },
   rules: [{ en: '', ar: '' }],
+  checklist: [{ en: '', ar: '' }],
+  require_brief_ack: true,
+  brief_sections: [...BRIEF_SECTION_KEYS],
+  expected_minutes: 30,
+  completion_deadline_min: 120,
+  cancel_window_min: 5,
+  review_sla_hours: 48,
+  receipt: { enabled: false, capEGP: 0, ruleText: { en: '', ar: '' } },
 };
+
 
 const STEP_KEYS = ['basics', 'brief', 'questions', 'agent_tier', 'funding', 'review'] as const;
 
@@ -88,7 +97,11 @@ export default function MissionCreatePage() {
     purchase_budget_per_visit: grandTotalBudget / grandTotalVisits || 0,
   };
 
-  const { canPublish, reason } = canPublishMission(mockFormDataForValidation, subscription, wallet);
+  const baseCheck = canPublishMission(mockFormDataForValidation, subscription, wallet);
+  const opsErrors = validateMissionOperations(formData);
+  const canPublish = baseCheck.canPublish && opsErrors.length === 0;
+  const reason = baseCheck.reason ?? opsErrors[0];
+
 
   const updateFormData = (updates: Partial<MissionFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));

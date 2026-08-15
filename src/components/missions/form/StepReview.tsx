@@ -382,7 +382,80 @@ export function StepReview({
         </div>
       )}
 
+      {/* Operational settings summary */}
+      <div className="border border-border p-4 space-y-3">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
+          <Clock className="h-4 w-4" />
+          Operations & agent app
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Category</span>
+            <span className="font-semibold">{data.category || '—'}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Time on site</span>
+            <span className="font-semibold">{data.expected_minutes ?? 30} min</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Free-cancel window</span>
+            <span className="font-semibold">{data.cancel_window_min ?? 5} min</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Completion deadline</span>
+            <span className="font-semibold">{data.completion_deadline_min ?? 120} min</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Review SLA</span>
+            <span className="font-semibold">{data.review_sla_hours ?? 48} h</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Receipt</span>
+            <span className="font-semibold">
+              {data.receipt?.enabled
+                ? `Required · cap ${formatCurrency(data.receipt.capEGP || 0)}`
+                : 'Not required'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Brief acknowledgement</span>
+            <span className="font-semibold">
+              {(data.require_brief_ack ?? true) ? 'Required' : 'Off'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Checklist items</span>
+            <span className="font-semibold">
+              {(data.checklist || []).filter((c) => c.en || c.ar).length}
+            </span>
+          </div>
+        </div>
+
+        {/* Per-question flags */}
+        <div className="border-t border-border pt-3 flex flex-wrap gap-2">
+          <Badge variant="outline">
+            N/A allowed: {data.questions.filter((q) => q.allowNA).length}/{data.questions.length}
+          </Badge>
+          <Badge variant="outline">
+            Comment required: {data.questions.filter((q) => q.commentMode === 'required').length}
+          </Badge>
+          <Badge variant="outline">
+            Comment off: {data.questions.filter((q) => q.commentMode === 'off').length}
+          </Badge>
+          <Badge variant="outline">
+            Photo allowed: {data.questions.filter((q) => q.allowPhoto).length}
+          </Badge>
+          <Badge variant="outline">
+            Photo triggered: {data.questions.filter((q) => q.photoRequirement?.enabled).length}
+          </Badge>
+          <Badge variant="outline">
+            Optional photo slots: {(data.photo_requirements.slots || []).filter((s) => s.required === false).length}
+          </Badge>
+        </div>
+      </div>
+
       {/* Action Buttons */}
+
       <div className="flex justify-between pt-4 border-t border-border">
         <Button
           variant="outline"

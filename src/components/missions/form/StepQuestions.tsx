@@ -577,8 +577,155 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
                     )}
 
+                    {/* Answer behaviour in the agent app */}
+                    <div className="border-t border-border pt-3 mt-3 space-y-3">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Answer behaviour in the app
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Allow N/A */}
+                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
+                          <Switch
+                            checked={question.allowNA ?? false}
+                            onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
+                          />
+                          <div>
+                            <div className="text-sm font-semibold">Allow "Not applicable"</div>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                              N/A skips any photo or comment requirement on this question and excludes it from scoring.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Allow photo attachment */}
+                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
+                          <Switch
+                            checked={question.allowPhoto ?? false}
+                            onCheckedChange={(checked) => updateQuestion(question.id, { allowPhoto: checked })}
+                          />
+                          <div>
+                            <div className="text-sm font-semibold">Allow photo attachment</div>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                              The agent can attach a photo to any answer — independent of the trigger rule below.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Comment mode */}
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Label className="text-xs text-muted-foreground">Comment</Label>
+                        <Select
+                          value={question.commentMode ?? 'optional'}
+                          onValueChange={(value) =>
+                            updateQuestion(question.id, { commentMode: value as 'off' | 'optional' | 'required' })
+                          }
+                        >
+                          <SelectTrigger className="w-[160px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="off">Off</SelectItem>
+                            <SelectItem value="optional">Optional (default)</SelectItem>
+                            <SelectItem value="required">Required</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {(question.commentMode ?? 'optional') !== 'off' && (
+                          <span className="text-[11px] text-muted-foreground">
+                            The app shows an "Add a comment" button under the answer.
+                          </span>
+                        )}
+                        {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
+                          <span className="text-[11px] text-primary">
+                            Choosing N/A skips the required comment.
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Suggested comments — up to 4 bilingual chips */}
+                      {(question.commentMode ?? 'optional') !== 'off' && (
+                        <div className="space-y-2 rounded-md border border-dashed border-border p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                Suggested comments (max 4)
+                              </div>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                One-tap chips shown above the keyboard in the app.
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 shrink-0"
+                              disabled={(question.suggestedComments?.length || 0) >= 4}
+                              onClick={() =>
+                                updateQuestion(question.id, {
+                                  suggestedComments: [
+                                    ...(question.suggestedComments || []),
+                                    { id: `sc-${Date.now()}`, en: '', ar: '' },
+                                  ],
+                                })
+                              }
+                            >
+                              <Plus className="h-3.5 w-3.5" /> Add chip
+                            </Button>
+                          </div>
+
+                          {(question.suggestedComments || []).map((sc) => (
+                            <div key={sc.id} className="flex items-start gap-2">
+                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <Input
+                                  dir="ltr"
+                                  className="text-xs"
+                                  placeholder="e.g. Staff was friendly"
+                                  value={sc.en}
+                                  onChange={(e) =>
+                                    updateQuestion(question.id, {
+                                      suggestedComments: (question.suggestedComments || []).map((x) =>
+                                        x.id === sc.id ? { ...x, en: e.target.value } : x
+                                      ),
+                                    })
+                                  }
+                                />
+                                <Input
+                                  dir="rtl"
+                                  className="text-xs font-ar"
+                                  placeholder="مثال: الموظف كان ودودًا"
+                                  value={sc.ar}
+                                  onChange={(e) =>
+                                    updateQuestion(question.id, {
+                                      suggestedComments: (question.suggestedComments || []).map((x) =>
+                                        x.id === sc.id ? { ...x, ar: e.target.value } : x
+                                      ),
+                                    })
+                                  }
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive"
+                                onClick={() =>
+                                  updateQuestion(question.id, {
+                                    suggestedComments: (question.suggestedComments || []).filter((x) => x.id !== sc.id),
+                                  })
+                                }
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     {/* Photo Requirement for rating and yes/no questions only */}
                     {canHavePhotoRequirement(question.type) && (
+
                       <div className="border-t border-border pt-3 mt-3 space-y-3">
                         <div className="flex items-center gap-3">
                           <Switch
@@ -598,6 +745,35 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             <span className="text-sm">{getPhotoTriggerLabel(question)}</span>
                           </div>
                         </div>
+
+                        {/* Which answer triggers the photo (yes/no questions) */}
+                        {question.photoRequirement?.enabled && question.type === 'yes_no' && (
+                          <div className="pl-8 flex flex-wrap items-center gap-3">
+                            <Label className="text-xs text-muted-foreground">Ask for a photo when the answer is</Label>
+                            <Select
+                              value={question.photoRequirement.triggerAnswer ?? 'no'}
+                              onValueChange={(value) =>
+                                updatePhotoRequirement(question.id, { triggerAnswer: value as 'yes' | 'no' })
+                              }
+                            >
+                              <SelectTrigger className="w-[110px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="yes">Yes</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {question.photoRequirement?.enabled && question.allowNA && (
+                          <p className="pl-8 text-[11px] text-primary">
+                            Choosing "Not applicable" skips this photo requirement.
+                          </p>
+                        )}
+
+
                         
                         {/* Rating threshold slider for rating questions */}
                         {question.photoRequirement?.enabled && question.type === 'rating' && (
@@ -790,11 +966,14 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
           const addSlot = () =>
             updateSlots([
               ...slots,
-              { id: crypto.randomUUID(), label: { en: '', ar: '' }, hint: { en: '', ar: '' } },
+              { id: crypto.randomUUID(), label: { en: '', ar: '' }, hint: { en: '', ar: '' }, required: true },
             ]);
           const removeSlot = (id: string) => updateSlots(slots.filter((s) => s.id !== id));
-          const setSlot = (id: string, patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string } }>) =>
-            updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+          const setSlot = (
+            id: string,
+            patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string }; required: boolean }>
+          ) => updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+
 
           return (
             <div className="space-y-3 rounded-md border border-dashed border-primary/30 bg-primary/5 p-3">
@@ -818,20 +997,30 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                 <div className="space-y-2">
                   {slots.map((slot, idx) => (
                     <div key={slot.id} className="rounded-md border border-border bg-background p-2.5 space-y-2">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           Slot {idx + 1}
                         </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-destructive"
-                          onClick={() => removeSlot(slot.id)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            {slot.required === false ? 'Optional' : 'Required'}
+                          </span>
+                          <Switch
+                            checked={slot.required !== false}
+                            onCheckedChange={(checked) => setSlot(slot.id, { required: checked })}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive"
+                            onClick={() => removeSlot(slot.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Input
                           dir="ltr"
