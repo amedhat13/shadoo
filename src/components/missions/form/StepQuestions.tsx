@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload, X, Shield, Search } from 'lucide-react';
+import { Plus, Trash2, Camera, GripVertical, FileText, Image, Upload, X, Shield, Search, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -429,15 +429,99 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
               <div
                 key={question.id}
                 className={cn(
-                  'border border-border p-4 space-y-4',
+                  'border border-border',
                   editingQuestionId === question.id && 'ring-2 ring-primary'
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 space-y-3">
+                {(() => {
+                  const isEditing = editingQuestionId === question.id;
+                  const textEn = ensureBilingual(question.text).en;
+                  const textAr = ensureBilingual(question.text).ar;
+                  const preview =
+                    (lang === 'ar' && textAr ? textAr : textEn) || textAr || t('questions_section.enter_question');
+                  const typeLabel = QUESTION_TYPE_LABELS[question.type] || question.type;
+                  const tags: { label: string; tone?: 'primary' }[] = [];
+                  tags.push({
+                    label:
+                      question.type === 'rating'
+                        ? `${typeLabel} ${question.max_rating || 5}`
+                        : question.type === 'multiple_choice'
+                        ? `${typeLabel} · ${question.options?.length || 0}`
+                        : typeLabel,
+                  });
+                  if (!question.required) tags.push({ label: 'Optional' });
+                  if (question.allowNA) tags.push({ label: 'N/A', tone: 'primary' });
+                  const commentMode = question.commentMode ?? 'optional';
+                  if (commentMode === 'required') tags.push({ label: 'Comment req.', tone: 'primary' });
+                  if ((question.suggestedComments?.length || 0) > 0)
+                    tags.push({ label: `${question.suggestedComments!.length} suggested` });
+                  if (question.photoRequirement?.enabled) {
+                    if (question.type === 'yes_no') {
+                      tags.push({ label: `Photo on ${question.photoRequirement.triggerAnswer ?? 'no'}`, tone: 'primary' });
+                    } else if (question.type === 'rating') {
+                      tags.push({
+                        label:
+                          question.photoRequirement.triggerAnswer === 'any'
+                            ? 'Photo · any'
+                            : `Photo <${question.photoRequirement.ratingThreshold || 70}%`,
+                        tone: 'primary',
+                      });
+                    }
+                  }
+                  const descEn = (ensureBilingual(question.description || '').en || '').trim();
+                  const descAr = (ensureBilingual(question.description || '').ar || '').trim();
+                  if (descEn || descAr) tags.push({ label: 'Why we ask' });
+                  return (
+                    <>
+                      {/* Compact header — always visible */}
+                      <div className="flex items-center gap-3 p-3">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">
+                          {index + 1}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setEditingQuestionId(isEditing ? null : question.id)}
+                          className="flex-1 text-left min-w-0"
+                        >
+                          <div className="text-sm font-medium truncate">{preview}</div>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {tags.map((tag, i) => (
+                              <span
+                                key={i}
+                                className={cn(
+                                  'inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
+                                  tag.tone === 'primary'
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'bg-muted text-muted-foreground'
+                                )}
+                              >
+                                {tag.label}
+                              </span>
+                            ))}
+                          </div>
+                        </button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => setEditingQuestionId(isEditing ? null : question.id)}
+                        >
+                          <ChevronDown className={cn('h-4 w-4 transition-transform', isEditing && 'rotate-180')} />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
+                          onClick={() => removeQuestion(question.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {isEditing && (
+                        <div className="border-t border-border p-3">
+                          <div className="space-y-3">
                     {/* Question Text - Bilingual */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2" onFocus={() => setEditingQuestionId(question.id)}>
                       <div className="space-y-1">
@@ -904,17 +988,11 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
                     )}
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeQuestion(question.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
                     );
                   })}
