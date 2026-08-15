@@ -65,6 +65,27 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Photo slots default to the required photo count (e.g. 3 photos => 3 named slots)
+  useEffect(() => {
+    const count = data.photo_requirements.required_count || 0;
+    const current = data.photo_requirements.slots || [];
+    if (count > 0 && current.length === 0) {
+      onChange({
+        photo_requirements: {
+          ...data.photo_requirements,
+          slots: Array.from({ length: count }, () => ({
+            id: crypto.randomUUID(),
+            label: { en: '', ar: '' },
+            hint: { en: '', ar: '' },
+            required: true,
+          })),
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   const updateSections = (next: QuestionSection[]) => onChange({ question_sections: next });
 
   const addSection = () => {
@@ -1038,15 +1059,29 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
               type="number"
               min={0}
               value={data.photo_requirements.required_count}
-              onChange={(e) =>
+              onChange={(e) => {
+                const count = Math.max(0, parseInt(e.target.value) || 0);
+                const current = data.photo_requirements.slots || [];
+                const next = [...current];
+                while (next.length < count) {
+                  next.push({
+                    id: crypto.randomUUID(),
+                    label: { en: '', ar: '' },
+                    hint: { en: '', ar: '' },
+                    required: true,
+                  });
+                }
+                next.length = Math.max(count, 0);
                 onChange({
                   photo_requirements: {
                     ...data.photo_requirements,
-                    required_count: parseInt(e.target.value) || 0,
+                    required_count: count,
+                    slots: next,
                   },
-                })
-              }
+                });
+              }}
             />
+
           </div>
         </div>
 
