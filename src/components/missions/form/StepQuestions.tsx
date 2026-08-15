@@ -1038,15 +1038,29 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
               type="number"
               min={0}
               value={data.photo_requirements.required_count}
-              onChange={(e) =>
+              onChange={(e) => {
+                const count = Math.max(0, parseInt(e.target.value) || 0);
+                const current = data.photo_requirements.slots || [];
+                const next = [...current];
+                while (next.length < count) {
+                  next.push({
+                    id: crypto.randomUUID(),
+                    label: { en: '', ar: '' },
+                    hint: { en: '', ar: '' },
+                    required: true,
+                  });
+                }
+                next.length = Math.max(count, 0);
                 onChange({
                   photo_requirements: {
                     ...data.photo_requirements,
-                    required_count: parseInt(e.target.value) || 0,
+                    required_count: count,
+                    slots: next,
                   },
-                })
-              }
+                });
+              }}
             />
+
           </div>
         </div>
 
