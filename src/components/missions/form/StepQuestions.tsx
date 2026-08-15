@@ -1024,10 +1024,9 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
         <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Camera className="h-4 w-4" />
           {t('questions_section.general_photo_req')}
+          <InfoHint label={t('questions_section.general_photo_desc')} />
         </Label>
-        <p className="text-xs text-muted-foreground">
-          {t('questions_section.general_photo_desc')}
-        </p>
+
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
