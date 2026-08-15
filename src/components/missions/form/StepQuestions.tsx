@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { BilingualValue, ensureBilingual, getBilingualText, getLocalizedValue } from '@/i18n/utils';
 import { useQuestionTemplates, QuestionTemplate, TEMPLATE_GROUPS } from '@/hooks/useQuestionTemplates';
 import { LoadingState } from '@/components/common/LoadingState';
+import { InfoHint } from '@/components/common/InfoHint';
 
 interface StepQuestionsProps {
   data: MissionFormData;
