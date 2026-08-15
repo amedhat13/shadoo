@@ -745,6 +745,35 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                             <span className="text-sm">{getPhotoTriggerLabel(question)}</span>
                           </div>
                         </div>
+
+                        {/* Which answer triggers the photo (yes/no questions) */}
+                        {question.photoRequirement?.enabled && question.type === 'yes_no' && (
+                          <div className="pl-8 flex flex-wrap items-center gap-3">
+                            <Label className="text-xs text-muted-foreground">Ask for a photo when the answer is</Label>
+                            <Select
+                              value={question.photoRequirement.triggerAnswer ?? 'no'}
+                              onValueChange={(value) =>
+                                updatePhotoRequirement(question.id, { triggerAnswer: value as 'yes' | 'no' })
+                              }
+                            >
+                              <SelectTrigger className="w-[110px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="yes">Yes</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {question.photoRequirement?.enabled && question.allowNA && (
+                          <p className="pl-8 text-[11px] text-primary">
+                            Choosing "Not applicable" skips this photo requirement.
+                          </p>
+                        )}
+
+
                         
                         {/* Rating threshold slider for rating questions */}
                         {question.photoRequirement?.enabled && question.type === 'rating' && (
