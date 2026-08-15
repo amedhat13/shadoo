@@ -450,10 +450,11 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         : typeLabel,
                   });
                   if (!question.required) tags.push({ label: 'Optional' });
-                  if (question.allowNA) tags.push({ label: 'N/A', tone: 'primary' });
+                  const canHaveNA = question.type !== 'short_text' && question.type !== 'multiple_choice';
+                  if (canHaveNA && question.allowNA) tags.push({ label: 'N/A', tone: 'primary' });
                   const commentMode = question.commentMode ?? 'optional';
-                  if (commentMode === 'required') tags.push({ label: 'Comment req.', tone: 'primary' });
-                  if ((question.suggestedComments?.length || 0) > 0)
+                  if (question.type !== 'short_text' && commentMode === 'required') tags.push({ label: 'Comment req.', tone: 'primary' });
+                  if (question.type !== 'short_text' && (question.suggestedComments?.length || 0) > 0)
                     tags.push({ label: `${question.suggestedComments!.length} suggested` });
                   if (question.photoRequirement?.enabled) {
                     if (question.type === 'yes_no') {
@@ -668,54 +669,58 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                       </div>
 
                       <div className="grid grid-cols-1 gap-3">
-                        {/* Allow N/A */}
-                        <div className="flex items-start gap-3 rounded-md border border-border p-3">
-                          <Switch
-                            checked={question.allowNA ?? false}
-                            onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
-                          />
-                          <div>
-                            <div className="text-sm font-semibold">Allow "Not applicable"</div>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">
-                              N/A skips any photo or comment requirement on this question and excludes it from scoring.
-                            </p>
+                        {/* Allow N/A — not available for short_text or multiple_choice */}
+                        {question.type !== 'short_text' && question.type !== 'multiple_choice' && (
+                          <div className="flex items-start gap-3 rounded-md border border-border p-3">
+                            <Switch
+                              checked={question.allowNA ?? false}
+                              onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
+                            />
+                            <div>
+                              <div className="text-sm font-semibold">Allow "Not applicable"</div>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">
+                                N/A skips any photo or comment requirement on this question and excludes it from scoring.
+                              </p>
+                            </div>
                           </div>
+                        )}
+                      </div>
+
+
+                      {/* Comment — not available for short_text */}
+                      {question.type !== 'short_text' && (
+                        <div className="flex flex-wrap items-center gap-3">
+                          <Label className="text-xs text-muted-foreground">Comment</Label>
+                          <Select
+                            value={question.commentMode ?? 'optional'}
+                            onValueChange={(value) =>
+                              updateQuestion(question.id, { commentMode: value as 'off' | 'optional' | 'required' })
+                            }
+                          >
+                            <SelectTrigger className="w-[160px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="off">Off</SelectItem>
+                              <SelectItem value="optional">Optional (default)</SelectItem>
+                              <SelectItem value="required">Required</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {(question.commentMode ?? 'optional') !== 'off' && (
+                            <span className="text-[11px] text-muted-foreground">
+                              The app shows an "Add a comment" button under the answer.
+                            </span>
+                          )}
+                          {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
+                            <span className="text-[11px] text-primary">
+                              Choosing N/A skips the required comment.
+                            </span>
+                          )}
                         </div>
-                      </div>
-
-
-                      {/* Comment mode */}
-                      <div className="flex flex-wrap items-center gap-3">
-                        <Label className="text-xs text-muted-foreground">Comment</Label>
-                        <Select
-                          value={question.commentMode ?? 'optional'}
-                          onValueChange={(value) =>
-                            updateQuestion(question.id, { commentMode: value as 'off' | 'optional' | 'required' })
-                          }
-                        >
-                          <SelectTrigger className="w-[160px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="off">Off</SelectItem>
-                            <SelectItem value="optional">Optional (default)</SelectItem>
-                            <SelectItem value="required">Required</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {(question.commentMode ?? 'optional') !== 'off' && (
-                          <span className="text-[11px] text-muted-foreground">
-                            The app shows an "Add a comment" button under the answer.
-                          </span>
-                        )}
-                        {(question.commentMode ?? 'optional') === 'required' && question.allowNA && (
-                          <span className="text-[11px] text-primary">
-                            Choosing N/A skips the required comment.
-                          </span>
-                        )}
-                      </div>
+                      )}
 
                       {/* Suggested comments — up to 4 bilingual chips */}
-                      {(question.commentMode ?? 'optional') !== 'off' && (
+                      {question.type !== 'short_text' && (question.commentMode ?? 'optional') !== 'off' && (
                         <div className="space-y-2 rounded-md border border-dashed border-border p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div>
