@@ -49,6 +49,7 @@ export interface QuestionPhotoRequirement {
   enabled: boolean;
   triggerCondition?: 'low_rating' | 'negative_answer';
   ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
+  triggerAnswer?: 'yes' | 'no'; // For yes_no questions — which answer triggers the photo
   samplePhotoUrl?: string;
   instructions?: string | { en: string; ar: string };
 }
@@ -57,6 +58,14 @@ export interface AttachmentConfig {
   allowed_types?: string[]; // e.g. ['image', 'pdf', 'document']
   max_files?: number; // max number of files (default 1)
   instructions?: string | { en: string; ar: string }; // guidance for the agent
+}
+
+export type CommentMode = 'off' | 'optional' | 'required';
+
+export interface SuggestedComment {
+  id: string;
+  en: string;
+  ar: string;
 }
 
 export interface Question {
@@ -70,6 +79,12 @@ export interface Question {
   photoRequirement?: QuestionPhotoRequirement; // Per-question photo requirement
   attachment_config?: AttachmentConfig; // For attachment type
   section_id?: string; // Which section this question belongs to
+
+  // Mobile-app answering behaviour
+  allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
+  commentMode?: CommentMode; // Off / Optional (default) / Required
+  suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
+  allowPhoto?: boolean; // Agent may attach a photo to any answer (independent of the below-x% rule)
 }
 
 // Question sections — every mission must have at least one section.
@@ -84,6 +99,7 @@ export interface PhotoSlot {
   label: { en: string; ar: string };
   hint?: { en: string; ar: string };
   sample_url?: string;
+  required?: boolean; // Some slots are optional
 }
 
 export interface PhotoRequirements {
@@ -91,6 +107,7 @@ export interface PhotoRequirements {
   instructions?: string | { en: string; ar: string };
   slots?: PhotoSlot[];
 }
+
 
 // Agent Tiers
 export type AgentTier = 'A' | 'B' | 'C';
