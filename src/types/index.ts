@@ -49,7 +49,7 @@ export interface QuestionPhotoRequirement {
   enabled: boolean;
   triggerCondition?: 'low_rating' | 'negative_answer';
   ratingThreshold?: number; // Percentage threshold (e.g., 70 means trigger at <70%)
-  triggerAnswer?: 'yes' | 'no'; // For yes_no questions — which answer triggers the photo
+  triggerAnswer?: 'yes' | 'no' | 'any'; // Which answer triggers the photo ('any' = every answer / every rating)
   samplePhotoUrl?: string;
   instructions?: string | { en: string; ar: string };
 }
