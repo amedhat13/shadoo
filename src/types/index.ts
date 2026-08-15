@@ -210,6 +210,25 @@ export interface PurchaseItem {
   budget: number;
 }
 
+// Brief sections the agent must read before accepting (mobile app tabs)
+export type BriefSectionKey = 'overview' | 'cover_story' | 'rules' | 'checklist' | 'questions' | 'photos';
+
+export const BRIEF_SECTION_KEYS: BriefSectionKey[] = [
+  'overview',
+  'cover_story',
+  'rules',
+  'checklist',
+  'questions',
+  'photos',
+];
+
+// Receipt / reimbursement config
+export interface ReceiptConfig {
+  enabled: boolean;
+  capEGP: number;
+  ruleText: { en: string; ar: string };
+}
+
 // Form Data for Mission Creation
 export interface MissionFormData {
   // Step 1: Basics
@@ -217,10 +236,15 @@ export interface MissionFormData {
   name_ar?: string;
   branch_ids: string[];
   category?: string;
+  expected_minutes?: number; // Expected time on site
+  completion_deadline_min?: number; // Minutes from start to submit
 
   // Step 2: Agent Brief
   cover_story?: { en: string; ar: string };
   rules?: { en: string; ar: string }[];
+  checklist?: { en: string; ar: string }[]; // "What to do on site" — shown last in the brief
+  require_brief_ack?: boolean; // Agent must confirm reading the brief before accepting
+  brief_sections?: BriefSectionKey[]; // Which brief tabs are shown in the app
 
   // Agent Selection
   agent_selection_mode?: 'tier' | 'custom';
@@ -238,6 +262,9 @@ export interface MissionFormData {
   purchase_items: PurchaseItem[];
   purchase_budget_per_visit: number;
   purchase_item_name?: string;
+  cancel_window_min?: number; // Free-cancel window after accepting (default 5)
+  review_sla_hours?: number; // Review SLA shown to the agent (default 48)
+  receipt?: ReceiptConfig;
 
   // Geo Settings
   is_geo_tagged?: boolean;
@@ -245,6 +272,31 @@ export interface MissionFormData {
   // Methodology
   methodology?: string;
 }
+
+// ===== Mobile-app operational validation =====
+export function validateMissionOperations(data: MissionFormData): string[] {
+  const errors: string[] = [];
+  const cancelWindow = data.cancel_window_min ?? 5;
+  const deadline = data.completion_deadline_min ?? 120;
+
+  if (cancelWindow >= deadline) {
+    errors.push('Free-cancel window must be less than the completion deadline.');
+  }
+
+  if (data.receipt?.enabled) {
+    const hasFundedItem = (data.purchase_items || []).some((i) => (i.budget || 0) > 0);
+    if (!hasFundedItem) {
+      errors.push('Receipt required needs at least one purchase item with a budget.');
+    }
+  }
+
+  if (data.require_brief_ack && (data.brief_sections?.length || 0) === 0) {
+    errors.push('Brief acknowledgement is on — enable at least one brief section.');
+  }
+
+  return errors;
+}
+
 
 export interface AgentCustomCriteriaForm {
   gender?: 'male' | 'female' | null;
