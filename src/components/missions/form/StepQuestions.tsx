@@ -450,10 +450,11 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                         : typeLabel,
                   });
                   if (!question.required) tags.push({ label: 'Optional' });
-                  if (question.allowNA) tags.push({ label: 'N/A', tone: 'primary' });
+                  const canHaveNA = question.type !== 'short_text' && question.type !== 'multiple_choice';
+                  if (canHaveNA && question.allowNA) tags.push({ label: 'N/A', tone: 'primary' });
                   const commentMode = question.commentMode ?? 'optional';
-                  if (commentMode === 'required') tags.push({ label: 'Comment req.', tone: 'primary' });
-                  if ((question.suggestedComments?.length || 0) > 0)
+                  if (question.type !== 'short_text' && commentMode === 'required') tags.push({ label: 'Comment req.', tone: 'primary' });
+                  if (question.type !== 'short_text' && (question.suggestedComments?.length || 0) > 0)
                     tags.push({ label: `${question.suggestedComments!.length} suggested` });
                   if (question.photoRequirement?.enabled) {
                     if (question.type === 'yes_no') {
