@@ -1212,54 +1212,6 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
           );
         })()}
 
-
-
-        <div className="space-y-2">
-          <Label htmlFor="photoInstructions" className="text-xs text-muted-foreground">
-            {t('questions_section.photo_instructions_general')}
-          </Label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('english')}</span>
-              <Textarea
-                id="photoInstructions-en"
-                placeholder={t('questions_section.photo_instructions_general_placeholder')}
-                value={typeof data.photo_requirements.instructions === 'object' ? (data.photo_requirements.instructions as any).en || '' : data.photo_requirements.instructions || ''}
-                onChange={(e) => {
-                  const current = typeof data.photo_requirements.instructions === 'object' ? data.photo_requirements.instructions as any : { en: data.photo_requirements.instructions || '', ar: '' };
-                  onChange({
-                    photo_requirements: {
-                      ...data.photo_requirements,
-                      instructions: { ...current, en: e.target.value } as any,
-                    },
-                  });
-                }}
-                rows={2}
-                dir="ltr"
-              />
-            </div>
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{tc('arabic')}</span>
-              <Textarea
-                id="photoInstructions-ar"
-                placeholder={t('questions_section.photo_instructions_general_placeholder')}
-                value={typeof data.photo_requirements.instructions === 'object' ? (data.photo_requirements.instructions as any).ar || '' : ''}
-                onChange={(e) => {
-                  const current = typeof data.photo_requirements.instructions === 'object' ? data.photo_requirements.instructions as any : { en: data.photo_requirements.instructions || '', ar: '' };
-                  onChange({
-                    photo_requirements: {
-                      ...data.photo_requirements,
-                      instructions: { ...current, ar: e.target.value } as any,
-                    },
-                  });
-                }}
-                rows={2}
-                dir="rtl"
-                className="font-ar"
-              />
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
