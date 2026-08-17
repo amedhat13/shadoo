@@ -92,39 +92,13 @@ export default function MissionDetailsPage() {
   const inProgressCount = visits.filter(v => v.status === 'in_progress').length;
   const pendingCount = visits.filter(v => v.status === 'pending').length;
 
-  const completedVisitsForDialog: CompletedVisit[] = useMemo(() => {
-    if (!mission) return [];
-    const questionMap = new Map<string, any>();
-    (mission.questions || []).forEach((q: any) => questionMap.set(q.id, q));
-    return visits
-      .filter(v => v.status === 'approved' || v.status === 'submitted')
-      .map(v => {
-        const answersArr = Array.isArray(v.answers) ? v.answers : [];
-        const mappedAnswers = answersArr.map((a: any) => {
-          const q = questionMap.get(a.question_id);
-          const questionText = q
-            ? (typeof q.text === 'string' ? q.text : (q.text?.en || q.text?.ar || a.question_id))
-            : a.question_id;
-          return {
-            question: questionText,
-            type: q?.type || 'short_text',
-            answer: a.value,
-          };
-        });
-        return {
-          id: v.id,
-          agent_name: 'Mystery Shopper',
-          completed_at: v.submitted_at || v.started_at || v.created_at || new Date().toISOString(),
-          purchase_amount: Number(v.purchase_amount || 0),
-          photos: v.photos || [],
-          receipt_photo: v.receipt_photo ?? undefined,
-          answers: mappedAnswers,
-          client_rating: v.client_rating ?? undefined,
-          client_feedback: v.client_feedback ?? undefined,
-          rated_at: v.rated_at ?? undefined,
-        };
-      });
-  }, [visits, mission]);
+  const completedVisitsForDialog: CompletedVisit[] = useMemo(
+    () => buildCompletedVisits(mission as never, visits.filter(v => v.status === 'approved' || v.status === 'submitted')),
+    [visits, mission]
+  );
+  const photoSlots = getMissionPhotoSlots(mission as never);
+  const receiptCap = getMissionReceiptCap(mission as never);
+
 
   if (!mission) {
     return (
