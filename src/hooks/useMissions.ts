@@ -25,6 +25,17 @@ interface DbMission {
   category?: string | null;
   cover_story?: unknown;
   rules?: unknown;
+  checklist?: unknown;
+  question_sections?: unknown;
+  brief_sections?: unknown;
+  require_brief_ack?: boolean | null;
+  expected_minutes?: number | null;
+  completion_deadline_min?: number | null;
+  cancel_window_min?: number | null;
+  review_sla_hours?: number | null;
+  receipt?: unknown;
+  methodology?: string | null;
+  visit_schedules?: unknown;
   branches?: {
     id: string;
     name: string;
@@ -72,6 +83,17 @@ function mapDbMissionToMission(dbMission: DbMission): Mission {
     category: dbMission.category || undefined,
     cover_story: (dbMission.cover_story as { en: string; ar: string } | null) || undefined,
     rules: (dbMission.rules as { en: string; ar: string }[] | null) || undefined,
+    checklist: (dbMission.checklist as { en: string; ar: string }[] | null) || undefined,
+    question_sections: (dbMission.question_sections as Mission['question_sections']) || undefined,
+    brief_sections: (dbMission.brief_sections as Mission['brief_sections']) || undefined,
+    require_brief_ack: dbMission.require_brief_ack ?? undefined,
+    expected_minutes: dbMission.expected_minutes ?? undefined,
+    completion_deadline_min: dbMission.completion_deadline_min ?? undefined,
+    cancel_window_min: dbMission.cancel_window_min ?? undefined,
+    review_sla_hours: dbMission.review_sla_hours ?? undefined,
+    receipt: (dbMission.receipt as Mission['receipt']) || undefined,
+    methodology: dbMission.methodology || undefined,
+    visit_schedules: (dbMission.visit_schedules as Mission['visit_schedules']) || undefined,
     created_at: dbMission.created_at,
     updated_at: dbMission.updated_at,
     published_at: dbMission.published_at || undefined,
@@ -207,6 +229,15 @@ export function useMissions() {
     category?: string;
     cover_story?: { en: string; ar: string };
     rules?: { en: string; ar: string }[];
+    checklist?: { en: string; ar: string }[];
+    question_sections?: Mission['question_sections'];
+    brief_sections?: Mission['brief_sections'];
+    require_brief_ack?: boolean;
+    expected_minutes?: number;
+    completion_deadline_min?: number;
+    cancel_window_min?: number;
+    review_sla_hours?: number;
+    receipt?: Mission['receipt'];
   }): Promise<Mission> => {
     setIsLoading(true);
     try {
@@ -234,6 +265,15 @@ export function useMissions() {
           category: data.category || null,
           cover_story: data.cover_story ? JSON.parse(JSON.stringify(data.cover_story)) : null,
           rules: data.rules ? JSON.parse(JSON.stringify(data.rules)) : null,
+          checklist: data.checklist ? JSON.parse(JSON.stringify(data.checklist)) : null,
+          question_sections: data.question_sections ? JSON.parse(JSON.stringify(data.question_sections)) : null,
+          brief_sections: data.brief_sections ? JSON.parse(JSON.stringify(data.brief_sections)) : null,
+          require_brief_ack: data.require_brief_ack ?? true,
+          expected_minutes: data.expected_minutes ?? null,
+          completion_deadline_min: data.completion_deadline_min ?? null,
+          cancel_window_min: data.cancel_window_min ?? null,
+          review_sla_hours: data.review_sla_hours ?? null,
+          receipt: data.receipt ? JSON.parse(JSON.stringify(data.receipt)) : null,
         };
 
         const { data: mission, error } = await supabase

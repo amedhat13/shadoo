@@ -171,6 +171,15 @@ export default function MissionCreatePage() {
           category: formData.category,
           cover_story: formData.cover_story,
           rules: formData.rules,
+          checklist: formData.checklist,
+          question_sections: formData.question_sections,
+          brief_sections: formData.brief_sections,
+          require_brief_ack: formData.require_brief_ack,
+          expected_minutes: formData.expected_minutes,
+          completion_deadline_min: formData.completion_deadline_min,
+          cancel_window_min: formData.cancel_window_min,
+          review_sla_hours: formData.review_sla_hours,
+          receipt: formData.receipt,
         });
       }
       toast({
@@ -217,6 +226,15 @@ export default function MissionCreatePage() {
           category: formData.category,
           cover_story: formData.cover_story,
           rules: formData.rules,
+          checklist: formData.checklist,
+          question_sections: formData.question_sections,
+          brief_sections: formData.brief_sections,
+          require_brief_ack: formData.require_brief_ack,
+          expected_minutes: formData.expected_minutes,
+          completion_deadline_min: formData.completion_deadline_min,
+          cancel_window_min: formData.cancel_window_min,
+          review_sla_hours: formData.review_sla_hours,
+          receipt: formData.receipt,
         });
 
         await publishMission(mission.id);
