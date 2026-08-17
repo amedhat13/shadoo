@@ -268,27 +268,44 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                   <p className="text-muted-foreground text-sm">No photos submitted.</p>
                 ) : (
                   <div className="grid grid-cols-3 gap-2">
-                    {photos.map((photo: string, index: number) => (
-                      <a 
-                        key={index} 
-                        href={photo} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="aspect-square bg-muted rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
-                      >
-                        <img 
-                          src={photo} 
-                          alt={`Visit photo ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </a>
-                    ))}
+                    {photos.map((photo: string, index: number) => {
+                      const slots = ((visit.mission as any)?.photo_requirements?.slots || []) as any[];
+                      const slot = slots[index];
+                      const slotLabel = slot ? (slot.label?.en || slot.label?.ar) : null;
+                      return (
+                        <a
+                          key={index}
+                          href={photo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block hover:opacity-80 transition-opacity"
+                        >
+                          <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                            <img
+                              src={photo}
+                              alt={slotLabel || `Visit photo ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground truncate">
+                            <span className="truncate">{slotLabel || `Photo ${index + 1}`}</span>
+                            {slot && slot.required === false && <span className="italic">(optional)</span>}
+                          </div>
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
 
                 {visit.receipt_photo && (
                   <div className="mt-4">
-                    <p className="text-sm font-medium mb-2">Receipt Photo:</p>
+                    <p className="text-sm font-medium mb-2">
+                      Receipt Photo
+                      {(visit.mission as any)?.receipt?.enabled
+                        ? ` — cap ${Number((visit.mission as any).receipt.capEGP || 0).toLocaleString()} EGP`
+                        : ''}
+                      :
+                    </p>
                     <a 
                       href={visit.receipt_photo} 
                       target="_blank" 
