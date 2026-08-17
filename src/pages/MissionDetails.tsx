@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDirectionalIcons } from '@/i18n/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { buildCompletedVisits, getMissionPhotoSlots, getMissionReceiptCap } from '@/lib/visitAnswers';
 import {
   MissionBriefCard,
   MissionOperationsCard,
@@ -346,7 +347,7 @@ export default function MissionDetailsPage() {
         </div>
       </div>
 
-      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={completedVisitsForDialog} missionName={mission.name} />
+      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={completedVisitsForDialog} missionName={mission.name} photoSlots={photoSlots} receiptCap={receiptCap} />
 
       {/* Pause Block Dialog */}
       <AlertDialog open={showPauseBlockDialog} onOpenChange={setShowPauseBlockDialog}>
