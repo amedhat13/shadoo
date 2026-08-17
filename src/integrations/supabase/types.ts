@@ -486,10 +486,15 @@ export type Database = {
           agent_selection_mode: string | null
           agent_tier: string
           branch_id: string | null
+          brief_sections: Json | null
           budget_used: number
+          cancel_window_min: number | null
           category: string | null
+          checklist: Json | null
+          completion_deadline_min: number | null
           cover_story: Json | null
           created_at: string
+          expected_minutes: number | null
           id: string
           is_geo_tagged: boolean
           methodology: string | null
@@ -500,7 +505,11 @@ export type Database = {
           published_at: string | null
           purchase_budget_per_visit: number
           purchase_item_name: string | null
+          question_sections: Json | null
           questions: Json
+          receipt: Json | null
+          require_brief_ack: boolean
+          review_sla_hours: number | null
           rules: Json | null
           status: string
           total_purchase_budget: number
@@ -515,10 +524,15 @@ export type Database = {
           agent_selection_mode?: string | null
           agent_tier?: string
           branch_id?: string | null
+          brief_sections?: Json | null
           budget_used?: number
+          cancel_window_min?: number | null
           category?: string | null
+          checklist?: Json | null
+          completion_deadline_min?: number | null
           cover_story?: Json | null
           created_at?: string
+          expected_minutes?: number | null
           id?: string
           is_geo_tagged?: boolean
           methodology?: string | null
@@ -529,7 +543,11 @@ export type Database = {
           published_at?: string | null
           purchase_budget_per_visit?: number
           purchase_item_name?: string | null
+          question_sections?: Json | null
           questions?: Json
+          receipt?: Json | null
+          require_brief_ack?: boolean
+          review_sla_hours?: number | null
           rules?: Json | null
           status?: string
           total_purchase_budget?: number
@@ -544,10 +562,15 @@ export type Database = {
           agent_selection_mode?: string | null
           agent_tier?: string
           branch_id?: string | null
+          brief_sections?: Json | null
           budget_used?: number
+          cancel_window_min?: number | null
           category?: string | null
+          checklist?: Json | null
+          completion_deadline_min?: number | null
           cover_story?: Json | null
           created_at?: string
+          expected_minutes?: number | null
           id?: string
           is_geo_tagged?: boolean
           methodology?: string | null
@@ -558,7 +581,11 @@ export type Database = {
           published_at?: string | null
           purchase_budget_per_visit?: number
           purchase_item_name?: string | null
+          question_sections?: Json | null
           questions?: Json
+          receipt?: Json | null
+          require_brief_ack?: boolean
+          review_sla_hours?: number | null
           rules?: Json | null
           status?: string
           total_purchase_budget?: number
