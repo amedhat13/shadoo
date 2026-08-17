@@ -60,7 +60,14 @@ export function useAdminVisits(status?: string) {
             photo_requirements,
             purchase_budget_per_visit,
             user_id,
-            visit_schedules
+            visit_schedules,
+            question_sections,
+            receipt,
+            review_sla_hours,
+            cancel_window_min,
+            expected_minutes,
+            completion_deadline_min,
+            methodology
           ),
           agent:agents (
             id,
