@@ -35,6 +35,7 @@ import type { MissionStatus } from '@/types';
 import { CompletedVisitsDialog, CompletedVisit } from '@/components/missions/CompletedVisitsDialog';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { buildCompletedVisits, getMissionPhotoSlots, getMissionReceiptCap } from '@/lib/visitAnswers';
 import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
 import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
@@ -97,6 +98,25 @@ export default function AdminMissionDetailsPage() {
     },
     enabled: !!id,
   });
+
+  const { data: missionVisits = [] } = useQuery({
+    queryKey: ['admin-mission-visits', id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('visits')
+        .select('id, status, purchase_amount, submitted_at, started_at, created_at, answers, photos, receipt_photo, client_rating, client_feedback, rated_at')
+        .eq('mission_id', id!)
+        .order('submitted_at', { ascending: false, nullsFirst: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const completedVisitsForDialog: CompletedVisit[] = buildCompletedVisits(
+    mission as never,
+    (missionVisits as never[]).filter((v: { status?: string | null }) => v.status === 'approved' || v.status === 'submitted') as never
+  );
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ status }: { status: string }) => {
@@ -412,7 +432,14 @@ export default function AdminMissionDetailsPage() {
         </div>
       </div>
 
-      <CompletedVisitsDialog open={showCompletedVisits} onOpenChange={setShowCompletedVisits} visits={[]} missionName={mission.name} />
+      <CompletedVisitsDialog
+        open={showCompletedVisits}
+        onOpenChange={setShowCompletedVisits}
+        visits={completedVisitsForDialog}
+        missionName={mission.name}
+        photoSlots={getMissionPhotoSlots(mission as never)}
+        receiptCap={getMissionReceiptCap(mission as never)}
+      />
 
       <AlertDialog open={showPauseBlockDialog} onOpenChange={setShowPauseBlockDialog}>
         <AlertDialogContent>

@@ -105,7 +105,7 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
               <CardContent className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Name:</span>
-                  <span className="ml-2 font-medium">{visit.agent?.full_name}</span>
+                  <span className="ml-2 font-medium">{visit.agent?.full_name || 'Mystery Shopper'}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Tier:</span>
@@ -113,12 +113,13 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                 </div>
                 <div>
                   <span className="text-muted-foreground">Email:</span>
-                  <span className="ml-2">{visit.agent?.email}</span>
+                  <span className="ml-2">{visit.agent?.email || '—'}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Phone:</span>
-                  <span className="ml-2">{visit.agent?.phone}</span>
+                  <span className="ml-2">{visit.agent?.phone || '—'}</span>
                 </div>
+
               </CardContent>
             </Card>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2 } from 'lucide-react';
+import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,19 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+export interface CompletedVisitAnswer {
+  question: string;
+  question_ar?: string;
+  description?: string;
+  description_ar?: string;
+  section?: string;
+  type: string;
+  max_rating?: number;
+  answer: string | number | boolean;
+  not_applicable?: boolean;
+  comment?: string;
+}
+
 export interface CompletedVisit {
   id: string;
   agent_name: string;
@@ -23,11 +36,7 @@ export interface CompletedVisit {
   purchase_amount: number;
   photos: string[];
   receipt_photo?: string;
-  answers: {
-    question: string;
-    type: string;
-    answer: string | number | boolean;
-  }[];
+  answers: CompletedVisitAnswer[];
   rating?: number;
   client_rating?: number;
   client_feedback?: string;
@@ -39,8 +48,11 @@ interface CompletedVisitsDialogProps {
   onOpenChange: (open: boolean) => void;
   visits: CompletedVisit[];
   missionName: string;
+  photoSlots?: { id: string; label: { en?: string; ar?: string }; required?: boolean }[];
+  receiptCap?: number;
   onRateVisit?: (visitId: string, rating: number, feedback?: string) => Promise<void>;
 }
+
 
 function StarRating({ 
   value, 
@@ -82,11 +94,23 @@ function StarRating({
   );
 }
 
+function groupBySection(answers: CompletedVisitAnswer[]) {
+  const groups: { section?: string; answers: CompletedVisitAnswer[] }[] = [];
+  answers.forEach((a) => {
+    const last = groups[groups.length - 1];
+    if (last && last.section === a.section) last.answers.push(a);
+    else groups.push({ section: a.section, answers: [a] });
+  });
+  return groups;
+}
+
 export function CompletedVisitsDialog({
   open,
   onOpenChange,
   visits,
   missionName,
+  photoSlots,
+  receiptCap,
   onRateVisit,
 }: CompletedVisitsDialogProps) {
   const [selectedVisit, setSelectedVisit] = useState<CompletedVisit | null>(null);
@@ -253,30 +277,68 @@ export function CompletedVisitsDialog({
                     )}
                   </div>
 
-                  {/* Answers */}
+                  {/* Answers grouped by section */}
                   <div>
                     <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                       <MessageSquare className="h-4 w-4" />
-                      {t('details.answers')}
+                      {t('details.answers')} ({selectedVisit.answers.length})
                     </h4>
-                    <div className="space-y-3">
-                      {selectedVisit.answers.map((answer, idx) => (
-                        <div key={idx} className="border border-border p-3">
-                          <p className="text-sm font-medium">{answer.question}</p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            {QUESTION_TYPE_LABELS[answer.type] || answer.type}
-                          </p>
-                          <div className="bg-muted/50 p-2 text-sm">
-                            {typeof answer.answer === 'boolean'
-                              ? answer.answer ? tc('yes') : tc('no')
-                              : String(answer.answer)}
-                          </div>
+                    <div className="space-y-5">
+                      {groupBySection(selectedVisit.answers).map((group, gi) => (
+                        <div key={gi} className="space-y-3">
+                          {group.section && (
+                            <div className="flex items-center gap-2">
+                              <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                {group.section}
+                              </span>
+                            </div>
+                          )}
+                          {group.answers.map((answer, idx) => (
+                            <div key={idx} className="border border-border p-3">
+                              <p className="text-sm font-medium">{answer.question}</p>
+                              {answer.question_ar && (
+                                <p className="text-sm font-ar text-muted-foreground" dir="rtl">{answer.question_ar}</p>
+                              )}
+                              {(answer.description || answer.description_ar) && (
+                                <div className="mt-1 space-y-0.5">
+                                  {answer.description && (
+                                    <p className="text-xs text-muted-foreground">{answer.description}</p>
+                                  )}
+                                  {answer.description_ar && (
+                                    <p className="text-xs text-muted-foreground font-ar" dir="rtl">{answer.description_ar}</p>
+                                  )}
+                                </div>
+                              )}
+                              <p className="text-xs text-muted-foreground mb-2 mt-1">
+                                {QUESTION_TYPE_LABELS[answer.type] || answer.type}
+                                {answer.type === 'rating' && answer.max_rating ? ` · 0–${answer.max_rating}` : ''}
+                              </p>
+                              {answer.not_applicable ? (
+                                <Badge variant="outline" className="text-xs">{t('details.not_applicable', 'Not applicable')}</Badge>
+                              ) : (
+                                <div className="bg-muted/50 p-2 text-sm">
+                                  {typeof answer.answer === 'boolean'
+                                    ? answer.answer ? tc('yes') : tc('no')
+                                    : answer.type === 'rating' && answer.max_rating
+                                      ? `${answer.answer} / ${answer.max_rating}`
+                                      : String(answer.answer)}
+                                </div>
+                              )}
+                              {answer.comment && (
+                                <div className="mt-2 flex gap-2 text-xs text-muted-foreground">
+                                  <MessageSquare className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                  <span>{answer.comment}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Photos */}
+                  {/* Photos — labelled with the mission's named slots */}
                   {selectedVisit.photos.length > 0 && (
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
@@ -284,22 +346,34 @@ export function CompletedVisitsDialog({
                         {t('details.photos_label')} ({selectedVisit.photos.length})
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
-                        {selectedVisit.photos.map((photo, idx) => (
-                          <a
-                            key={idx}
-                            href={photo}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
-                          >
-                            <img
-                              src={photo}
-                              alt={`Visit photo ${idx + 1}`}
-                              loading="lazy"
-                              className="w-full h-auto max-h-96 object-contain bg-muted"
-                            />
-                          </a>
-                        ))}
+                        {selectedVisit.photos.map((photo, idx) => {
+                          const slot = photoSlots?.[idx];
+                          return (
+                            <div key={idx} className="space-y-1">
+                              {slot && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-semibold">{slot.label?.en || slot.label?.ar}</span>
+                                  {slot.required === false && (
+                                    <span className="text-[10px] uppercase text-muted-foreground">{tc('optional')}</span>
+                                  )}
+                                </div>
+                              )}
+                              <a
+                                href={photo}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
+                              >
+                                <img
+                                  src={photo}
+                                  alt={slot?.label?.en || `Visit photo ${idx + 1}`}
+                                  loading="lazy"
+                                  className="w-full h-auto max-h-96 object-contain bg-muted"
+                                />
+                              </a>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -310,6 +384,11 @@ export function CompletedVisitsDialog({
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
                         {tc('receipt') !== 'receipt' ? tc('receipt') : 'Receipt'}
+                        {receiptCap !== undefined && (
+                          <Badge variant="outline" className="text-xs font-normal">
+                            {t('details.reimbursement_cap', 'Cap')}: {formatCurrency(receiptCap)}
+                          </Badge>
+                        )}
                       </h4>
                       <a
                         href={selectedVisit.receipt_photo}
@@ -326,6 +405,7 @@ export function CompletedVisitsDialog({
                       </a>
                     </div>
                   )}
+
                 </div>
               </ScrollArea>
             ) : (
