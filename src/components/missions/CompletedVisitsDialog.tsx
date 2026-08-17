@@ -16,6 +16,19 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+export interface CompletedVisitAnswer {
+  question: string;
+  question_ar?: string;
+  description?: string;
+  description_ar?: string;
+  section?: string;
+  type: string;
+  max_rating?: number;
+  answer: string | number | boolean;
+  not_applicable?: boolean;
+  comment?: string;
+}
+
 export interface CompletedVisit {
   id: string;
   agent_name: string;
@@ -23,11 +36,7 @@ export interface CompletedVisit {
   purchase_amount: number;
   photos: string[];
   receipt_photo?: string;
-  answers: {
-    question: string;
-    type: string;
-    answer: string | number | boolean;
-  }[];
+  answers: CompletedVisitAnswer[];
   rating?: number;
   client_rating?: number;
   client_feedback?: string;
@@ -39,8 +48,11 @@ interface CompletedVisitsDialogProps {
   onOpenChange: (open: boolean) => void;
   visits: CompletedVisit[];
   missionName: string;
+  photoSlots?: { id: string; label: { en?: string; ar?: string }; required?: boolean }[];
+  receiptCap?: number;
   onRateVisit?: (visitId: string, rating: number, feedback?: string) => Promise<void>;
 }
+
 
 function StarRating({ 
   value, 
