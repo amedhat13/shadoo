@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2 } from 'lucide-react';
+import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -94,11 +94,23 @@ function StarRating({
   );
 }
 
+function groupBySection(answers: CompletedVisitAnswer[]) {
+  const groups: { section?: string; answers: CompletedVisitAnswer[] }[] = [];
+  answers.forEach((a) => {
+    const last = groups[groups.length - 1];
+    if (last && last.section === a.section) last.answers.push(a);
+    else groups.push({ section: a.section, answers: [a] });
+  });
+  return groups;
+}
+
 export function CompletedVisitsDialog({
   open,
   onOpenChange,
   visits,
   missionName,
+  photoSlots,
+  receiptCap,
   onRateVisit,
 }: CompletedVisitsDialogProps) {
   const [selectedVisit, setSelectedVisit] = useState<CompletedVisit | null>(null);
