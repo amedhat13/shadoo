@@ -196,16 +196,58 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                 ) : (
                   questions.map((question: any, index: number) => {
                     const answer = answers.find((a: any) => a.question_id === question.id);
+                    const text = typeof question.text === 'string' ? question.text : question.text?.en || question.text?.ar;
+                    const desc = typeof question.description === 'object' ? question.description : (question.description ? { en: question.description } : null);
+                    const sections = (visit.mission as any)?.question_sections;
+                    const section = Array.isArray(sections)
+                      ? sections.find((s: any) => s.id === question.section_id)
+                      : null;
+                    const isNA = answer?.na === true || answer?.value === 'N/A';
+                    const comment = answer?.comment;
                     return (
                       <div key={question.id} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                        {section && (
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                            {section.label?.en || section.label?.ar}
+                          </div>
+                        )}
                         <p className="text-sm font-medium">
-                          {index + 1}. {question.text}
+                          {index + 1}. {text}
                           {question.required && <span className="text-destructive ml-1">*</span>}
                         </p>
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {question.allowNA && (
+                            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">N/A allowed</span>
+                          )}
+                          {question.commentMode === 'required' && (
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">Comment req.</span>
+                          )}
+                          {question.photoRequirement?.enabled && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Photo rule</span>
+                          )}
+                        </div>
+                        {desc && (desc.en || desc.ar) && (
+                          <div className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-2.5 py-1.5">
+                            {desc.en && <p className="text-xs text-muted-foreground leading-relaxed">{desc.en}</p>}
+                            {desc.ar && <p className="text-xs text-muted-foreground leading-relaxed font-ar mt-0.5" dir="rtl">{desc.ar}</p>}
+                          </div>
+                        )}
                         <p className="text-sm text-muted-foreground mt-1">
                           <span className="font-medium text-foreground">Answer: </span>
-                          {answer?.value !== undefined ? String(answer.value) : <span className="italic">No answer provided</span>}
+                          {isNA ? (
+                            <span className="italic">Not applicable</span>
+                          ) : answer?.value !== undefined ? (
+                            String(answer.value)
+                          ) : (
+                            <span className="italic">No answer provided</span>
+                          )}
                         </p>
+                        {comment && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            <span className="font-medium text-foreground">Comment: </span>
+                            {String(comment)}
+                          </p>
+                        )}
                       </div>
                     );
                   })
