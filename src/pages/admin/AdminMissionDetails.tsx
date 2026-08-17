@@ -40,6 +40,12 @@ import { useTranslation } from 'react-i18next';
 import { useActiveAgentTiers } from '@/hooks/useAgentTiers';
 import { toast } from 'sonner';
 import type { AgentCustomCriteria } from '@/lib/agentHelpers';
+import {
+  MissionBriefCard,
+  MissionOperationsCard,
+  MissionPhotosCard,
+  MissionQuestionsCard,
+} from '@/components/missions/MissionSetupDetails';
 
 export default function AdminMissionDetailsPage() {
   const navigate = useNavigate();
@@ -300,113 +306,48 @@ export default function AdminMissionDetailsPage() {
               </CardContent>
             </Card>
 
-            {/* Agent Brief */}
             {(() => {
               const m = mission as any;
-              const cover = m?.cover_story as { en?: string; ar?: string } | null;
-              const rules = (Array.isArray(m?.rules) ? m.rules : []) as Array<{ en?: string; ar?: string }>;
-              const category = typeof m?.category === 'string' ? m.category : '';
-              const hasBrief = category || (cover && (cover.en || cover.ar)) || rules.some(r => r?.en || r?.ar);
-              if (!hasBrief) return null;
               return (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm font-bold uppercase tracking-wide">Agent Brief</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {category && (
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Category</div>
-                        <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">{category}</div>
-                      </div>
-                    )}
-                    {cover && (cover.en || cover.ar) && (
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Cover Story</div>
-                        {cover.en && <p className="text-sm leading-relaxed">{cover.en}</p>}
-                        {cover.ar && <p className="text-sm leading-relaxed font-ar mt-1" dir="rtl">{cover.ar}</p>}
-                      </div>
-                    )}
-                    {rules.some(r => r?.en || r?.ar) && (
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Rules</div>
-                        <ol className="space-y-2">
-                          {rules.filter(r => r?.en || r?.ar).map((r, i) => (
-                            <li key={i} className="flex gap-2 text-sm">
-                              <span className="shrink-0 h-5 w-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
-                              <div className="flex-1">
-                                {r.en && <div>{r.en}</div>}
-                                {r.ar && <div className="font-ar text-muted-foreground" dir="rtl">{r.ar}</div>}
-                              </div>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <>
+                  <MissionBriefCard
+                    category={typeof m.category === 'string' ? m.category : undefined}
+                    coverStory={m.cover_story}
+                    rules={Array.isArray(m.rules) ? m.rules : []}
+                    checklist={Array.isArray(m.checklist) ? m.checklist : []}
+                    briefSections={Array.isArray(m.brief_sections) ? m.brief_sections : []}
+                    requireBriefAck={m.require_brief_ack ?? undefined}
+                  />
+
+                  <MissionQuestionsCard
+                    questions={(m.questions || []) as any}
+                    sections={Array.isArray(m.question_sections) ? m.question_sections : undefined}
+                    requiredLabel={tc('required')}
+                    emptyLabel={tm('details.no_questions')}
+                    titleLabel={tm('details.questions_count', { count: questions.length })}
+                  />
+
+                  <MissionPhotosCard
+                    photoRequirements={photoReqs as any}
+                    titleLabel={tm('details.photo_requirements')}
+                    countLabel={tm('details.photos_required', { count: photoReqs?.required_count || 0 })}
+                  />
+                </>
               );
             })()}
-
-
-
-            {/* Questions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm font-bold uppercase tracking-wide">
-                  {tm('details.questions_count', { count: questions.length })}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {questions.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">{tm('details.no_questions')}</p>
-                ) : (
-                  questions.map((q, i) => {
-                    const desc = (q as any).description as { en?: string; ar?: string } | string | undefined;
-                    const descEn = typeof desc === 'object' ? desc?.en : (typeof desc === 'string' ? desc : '');
-                    const descAr = typeof desc === 'object' ? desc?.ar : '';
-                    return (
-                      <div key={q.id} className="flex items-start gap-3 border border-border p-3">
-                        <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{i + 1}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">{typeof q.text === 'string' ? q.text : q.text.en || q.text.ar}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {QUESTION_TYPE_LABELS[q.type] || q.type}
-                            {q.required && ` • ${tc('required')}`}
-                          </p>
-                          {(descEn || descAr) && (
-                            <div className="mt-2 rounded-md border-l-2 border-primary/40 bg-primary/5 px-2.5 py-1.5">
-                              <div className="text-[10px] font-bold uppercase tracking-wider text-primary mb-0.5">Why we ask</div>
-                              {descEn && <p className="text-xs text-muted-foreground leading-relaxed">{descEn}</p>}
-                              {descAr && <p className="text-xs text-muted-foreground leading-relaxed font-ar mt-0.5" dir="rtl">{descAr}</p>}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Photo Requirements */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
-                  <Camera className="h-4 w-4" />
-                  {tm('details.photo_requirements')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2 border border-border px-3 py-2">
-                  <Camera className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-semibold">{tm('details.photos_required', { count: photoReqs?.required_count || 0 })}</span>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           <div className="space-y-6">
+            <MissionOperationsCard
+              methodology={(mission as any).methodology || undefined}
+              expectedMinutes={(mission as any).expected_minutes ?? undefined}
+              completionDeadlineMin={(mission as any).completion_deadline_min ?? undefined}
+              cancelWindowMin={(mission as any).cancel_window_min ?? undefined}
+              reviewSlaHours={(mission as any).review_sla_hours ?? undefined}
+              receipt={(mission as any).receipt || undefined}
+              currencyCode={tc('currency_code')}
+            />
+
             {/* Budget Card */}
             <Card>
               <CardHeader>
