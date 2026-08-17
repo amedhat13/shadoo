@@ -147,14 +147,28 @@ export interface Mission {
   cover_story?: { en: string; ar: string };
   rules?: { en: string; ar: string }[];
 
+  checklist?: { en: string; ar: string }[];
+  brief_sections?: BriefSectionKey[];
+  require_brief_ack?: boolean;
+
   // Questions & Photos
   questions: Question[];
+  question_sections?: QuestionSection[];
   photo_requirements: PhotoRequirements;
+
+  // Operations & timing
+  methodology?: string;
+  expected_minutes?: number;
+  completion_deadline_min?: number;
+  cancel_window_min?: number;
+  review_sla_hours?: number;
+  receipt?: ReceiptConfig;
 
   // Visits & Funding
   number_of_visits: number;
   purchase_budget_per_visit: number;
   total_purchase_budget: number;
+  visit_schedules?: VisitSchedule[];
 
   // Stats
   visits_completed: number;
