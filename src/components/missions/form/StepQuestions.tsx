@@ -698,8 +698,34 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               checked={question.allowNA ?? false}
                               onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
                             />
-                            <div>
+                            <div className="flex-1 space-y-2">
                               <div className="text-sm font-semibold flex items-center gap-1.5">Allow "Not applicable"<InfoHint label="N/A skips any photo or comment requirement on this question and excludes it from scoring." /></div>
+                              {question.allowNA && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  <Input
+                                    dir="ltr"
+                                    placeholder='N/A chip label (EN) — e.g. Restroom was closed'
+                                    value={question.naLabel?.en || ''}
+                                    onChange={(e) =>
+                                      updateQuestion(question.id, {
+                                        naLabel: { en: e.target.value, ar: question.naLabel?.ar || '' },
+                                      })
+                                    }
+                                    className="text-xs"
+                                  />
+                                  <Input
+                                    dir="rtl"
+                                    placeholder="نص زر غير منطبق (AR)"
+                                    value={question.naLabel?.ar || ''}
+                                    onChange={(e) =>
+                                      updateQuestion(question.id, {
+                                        naLabel: { en: question.naLabel?.en || '', ar: e.target.value },
+                                      })
+                                    }
+                                    className="text-xs font-ar"
+                                  />
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -1077,7 +1103,15 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
           const removeSlot = (id: string) => updateSlots(slots.filter((s) => s.id !== id));
           const setSlot = (
             id: string,
-            patch: Partial<{ label: { en: string; ar: string }; hint: { en: string; ar: string }; required: boolean }>
+            patch: Partial<{
+              label: { en: string; ar: string };
+              hint: { en: string; ar: string };
+              frame_hint: { en: string; ar: string };
+              dos: { en: string; ar: string }[];
+              donts: { en: string; ar: string }[];
+              sample_url: string;
+              required: boolean;
+            }>
           ) => updateSlots(slots.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
 
@@ -1160,6 +1194,94 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           className="text-xs font-ar"
                         />
                       </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Input
+                          dir="ltr"
+                          placeholder='Frame label (EN) — e.g. Shoot from above'
+                          value={slot.frame_hint?.en || ''}
+                          onChange={(e) =>
+                            setSlot(slot.id, {
+                              frame_hint: { en: e.target.value, ar: slot.frame_hint?.ar || '' },
+                            } as any)
+                          }
+                          className="text-xs"
+                        />
+                        <Input
+                          dir="rtl"
+                          placeholder="وصف الإطار (AR)"
+                          value={slot.frame_hint?.ar || ''}
+                          onChange={(e) =>
+                            setSlot(slot.id, {
+                              frame_hint: { en: slot.frame_hint?.en || '', ar: e.target.value },
+                            } as any)
+                          }
+                          className="text-xs font-ar"
+                        />
+                      </div>
+
+                      {/* Capture Do / Don't guidance */}
+                      {(['dos', 'donts'] as const).map((kind) => {
+                        const list = (slot as any)[kind] as { en: string; ar: string }[] | undefined;
+                        const items = list || [];
+                        const setList = (next: { en: string; ar: string }[]) =>
+                          setSlot(slot.id, { [kind]: next } as any);
+                        const isDo = kind === 'dos';
+                        return (
+                          <div key={kind} className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span
+                                className={
+                                  'text-[10px] font-bold uppercase tracking-wider ' +
+                                  (isDo ? 'text-primary' : 'text-destructive')
+                                }
+                              >
+                                {isDo ? 'Do' : "Don't"}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 gap-1 text-[10px]"
+                                onClick={() => setList([...items, { en: '', ar: '' }])}
+                              >
+                                <Plus className="h-3 w-3" /> Add
+                              </Button>
+                            </div>
+                            {items.map((it, i) => (
+                              <div key={i} className="flex items-center gap-1.5">
+                                <Input
+                                  dir="ltr"
+                                  placeholder={isDo ? 'e.g. Keep the whole plate in frame' : 'e.g. No faces of staff'}
+                                  value={it.en}
+                                  onChange={(e) =>
+                                    setList(items.map((x, j) => (j === i ? { ...x, en: e.target.value } : x)))
+                                  }
+                                  className="text-xs"
+                                />
+                                <Input
+                                  dir="rtl"
+                                  placeholder="بالعربية"
+                                  value={it.ar}
+                                  onChange={(e) =>
+                                    setList(items.map((x, j) => (j === i ? { ...x, ar: e.target.value } : x)))
+                                  }
+                                  className="text-xs font-ar"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 shrink-0 text-destructive"
+                                  onClick={() => setList(items.filter((_, j) => j !== i))}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+
                       {/* Sample photo (optional) */}
                       <div className="flex items-start gap-2 pt-1">
                         {slot.sample_url ? (

@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { MissionFormData, BriefSectionKey, BRIEF_SECTION_KEYS } from '@/types';
+import { MissionFormData, BriefSectionKey, BRIEF_SECTION_KEYS, RuleItem } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 interface StepBriefProps {
@@ -19,17 +19,18 @@ const emptyBL = (): BL => ({ en: '', ar: '' });
 export function StepBrief({ data, onChange }: StepBriefProps) {
   const { t: tc } = useTranslation('common');
   const cover = data.cover_story || emptyBL();
-  const rules = data.rules && data.rules.length > 0 ? data.rules : [emptyBL()];
+  const rules: RuleItem[] =
+    data.rules && data.rules.length > 0 ? data.rules : [{ en: '', ar: '', kind: 'do' as const }];
   const checklist = data.checklist && data.checklist.length > 0 ? data.checklist : [emptyBL()];
   const briefSections = data.brief_sections ?? BRIEF_SECTION_KEYS;
 
   const setCover = (patch: Partial<BL>) => onChange({ cover_story: { ...cover, ...patch } });
-  const setRule = (idx: number, patch: Partial<BL>) => {
+  const setRule = (idx: number, patch: Partial<RuleItem>) => {
     const next = [...rules];
     next[idx] = { ...next[idx], ...patch };
     onChange({ rules: next });
   };
-  const addRule = () => onChange({ rules: [...rules, emptyBL()] });
+  const addRule = (kind: 'do' | 'dont') => onChange({ rules: [...rules, { en: '', ar: '', kind }] });
   const removeRule = (idx: number) => onChange({ rules: rules.filter((_, i) => i !== idx) });
 
   const setChecklist = (idx: number, patch: Partial<BL>) => {
@@ -98,7 +99,7 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
           <div className="flex-1">
             <Label className="text-xs font-bold uppercase tracking-wide">Rules & Do's / Don'ts</Label>
             <p className="text-xs text-muted-foreground mt-1">
-              One rule per line. Shown to the agent in the mission brief before they accept.
+              One rule per line. The app shows them in two columns — Do (green ticks) and Don't (red crosses) — on the Rules tab of the brief.
             </p>
           </div>
         </div>
@@ -107,7 +108,30 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
           {rules.map((r, idx) => (
             <div key={idx} className="border border-border rounded-md p-3 space-y-2 relative bg-muted/20">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Rule {idx + 1}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Rule {idx + 1}
+                  </span>
+                  <div className="flex rounded-md border border-border overflow-hidden">
+                    {(['do', 'dont'] as const).map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => setRule(idx, { kind: k })}
+                        className={
+                          'px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition ' +
+                          ((r.kind ?? 'do') === k
+                            ? k === 'do'
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-destructive text-destructive-foreground'
+                            : 'text-muted-foreground')
+                        }
+                      >
+                        {k === 'do' ? 'Do' : "Don't"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {rules.length > 1 && (
                   <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeRule(idx)}>
                     <Trash2 className="h-3.5 w-3.5" />
@@ -133,9 +157,14 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
             </div>
           ))}
 
-          <Button variant="outline" size="sm" onClick={addRule} className="gap-2">
-            <Plus className="h-3.5 w-3.5" /> Add rule
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => addRule('do')} className="gap-2">
+              <Plus className="h-3.5 w-3.5" /> Add "Do" rule
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => addRule('dont')} className="gap-2">
+              <Plus className="h-3.5 w-3.5" /> Add "Don't" rule
+            </Button>
+          </div>
         </div>
       </section>
 
