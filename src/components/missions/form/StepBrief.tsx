@@ -16,6 +16,10 @@ type BL = { en: string; ar: string };
 
 const emptyBL = (): BL => ({ en: '', ar: '' });
 
+// Purchase & payout are derived automatically (purchase budget per visit / duration × tier price).
+const AUTO_SECTIONS: BriefSectionKey[] = ['purchase', 'payout'];
+
+
 export function StepBrief({ data, onChange }: StepBriefProps) {
   const { t: tc } = useTranslation('common');
   const cover = data.cover_story || emptyBL();
