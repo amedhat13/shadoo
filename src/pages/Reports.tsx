@@ -49,6 +49,7 @@ import {
   CheckCircle, Clock, Building2, FileQuestion, Wallet, AlertTriangle,
 } from 'lucide-react';
 import { BranchComparisonTab } from '@/components/reports/BranchComparisonTab';
+import { MetricsOverview } from '@/components/reports/MetricsOverview';
 
 const COLORS = ['#F97316', '#22C55E', '#F59E0B', '#06B6D4', '#A855F7', '#EF4444', '#6366F1', '#14B8A6'];
 const METHODOLOGY_LABELS: Record<string, string> = {
@@ -353,12 +354,6 @@ export default function ReportsPage() {
               <BarChart3 className="h-4 w-4" />
               {t('tab_overview') || 'Overview'}
             </TabsTrigger>
-            {showMethodologyTab && (
-              <TabsTrigger value="methodology" className="gap-2">
-                <Activity className="h-4 w-4" />
-                {t('tab_methodology') || 'Methodology Dashboard'}
-              </TabsTrigger>
-            )}
             <TabsTrigger value="questions" className="gap-2">
               <FileQuestion className="h-4 w-4" />
               {t('tab_questions') || 'Question Analytics'}
@@ -376,7 +371,15 @@ export default function ReportsPage() {
           {/* Overview Tab */}
           <TabsContent value="overview">
             <div className="space-y-4">
-              {/* Metric Cards */}
+              {/* Configurable metrics */}
+              <MetricsOverview
+                missions={relevantMissions}
+                visits={completedVisits}
+                branches={branches}
+                language={language}
+              />
+
+              {/* Operational cards */}
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                 {selectedMission && (
                   <MetricCard
@@ -507,18 +510,6 @@ export default function ReportsPage() {
               </div>
             </div>
           </TabsContent>
-
-          {/* Methodology Dashboard Tab */}
-          {showMethodologyTab && (
-            <TabsContent value="methodology">
-              <MethodologyDashboard
-                mission={selectedMission!}
-                visits={completedVisits}
-                branches={branches}
-                language={language}
-              />
-            </TabsContent>
-          )}
 
           {/* Question Analytics Tab */}
           <TabsContent value="questions">
