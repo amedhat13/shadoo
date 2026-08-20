@@ -58,14 +58,14 @@ export function useReportMetrics(ownerId?: string) {
         description_ar: metric.description_ar ?? null,
         applies_to: metric.applies_to ?? ['rating'],
         formula: metric.formula ?? 'average',
-        config: (metric.config ?? {}) as never,
+        config: (metric.config ?? {}) as unknown as Record<string, unknown>,
         is_active: metric.is_active ?? true,
         is_system: metric.is_system ?? false,
         sort_order: metric.sort_order ?? 100,
       };
       const { error } = await supabase
         .from('report_metrics')
-        .upsert(payload, { onConflict: 'user_id,metric_key' });
+        .upsert(payload as never, { onConflict: 'user_id,metric_key' });
       if (error) throw error;
     },
     onSuccess: invalidate,
