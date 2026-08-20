@@ -86,6 +86,10 @@ export interface Question {
   photo_slot_id?: string; // Link this question's photo to one of the named photo slots
   commentMode?: CommentMode; // Off / Optional (default) / Required
   suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
+
+  /** Which report metric this answer feeds (rating / yes-no questions only). See Settings → Reports. */
+  metric_key?: string;
+
   
 }
 
