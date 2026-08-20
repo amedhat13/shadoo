@@ -63,6 +63,7 @@ import AgentWallet from "./pages/agent/AgentWallet";
 import AgentNotifications from "./pages/agent/AgentNotifications";
 import AgentProfile from "./pages/agent/AgentProfile";
 import AgentSignup from "./pages/agent/AgentSignup";
+import MobileFlowPrototype from "./pages/MobileFlowPrototype";
 
 const queryClient = new QueryClient();
 
@@ -338,6 +339,10 @@ const App = () => (
               <Route path="notifications" element={<AgentNotifications />} />
               <Route path="profile" element={<AgentProfile />} />
             </Route>
+
+            {/* Design handoff prototype (static HTML) */}
+            <Route path="/mobile-flow" element={<MobileFlowPrototype />} />
+
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
