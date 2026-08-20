@@ -91,25 +91,19 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">Category</Label>
-        <Select
-          value={data.category || ''}
-          onValueChange={(value) => onChange({ category: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {MISSION_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+          <Badge variant="secondary" className="uppercase tracking-wide">
+            {clientCategory}
+          </Badge>
+          <span className="text-xs text-muted-foreground">
+            Inherited from your account category ({industryLabel(clientIndustry)}).
+          </span>
+        </div>
         <p className="text-xs text-muted-foreground">
-          Shown as the category badge on the mission card in the agent app, and used by the home-feed filter.
+          Shown as the category badge on the mission card in the agent app. Change it in Settings → Account.
         </p>
       </div>
+
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">
