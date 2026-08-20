@@ -110,7 +110,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
       <Card>
         <CardContent className="p-6">
           <EmptyState
-            icon={BarChart3}
+            icon={<BarChart3 className="h-7 w-7 text-muted-foreground" />}
             title="No metrics activated"
             description="Activate the metrics you want to track in Settings → Reports. Each active metric gets its own card and charts here."
           />
