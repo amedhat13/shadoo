@@ -63,6 +63,7 @@ import AgentWallet from "./pages/agent/AgentWallet";
 import AgentNotifications from "./pages/agent/AgentNotifications";
 import AgentProfile from "./pages/agent/AgentProfile";
 import AgentSignup from "./pages/agent/AgentSignup";
+import MobileFlowPrototype from "./pages/MobileFlowPrototype";
 
 const queryClient = new QueryClient();
 
