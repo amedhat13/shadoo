@@ -49,6 +49,7 @@ import {
   CheckCircle, Clock, Building2, FileQuestion, Wallet, AlertTriangle,
 } from 'lucide-react';
 import { BranchComparisonTab } from '@/components/reports/BranchComparisonTab';
+import { MetricsOverview } from '@/components/reports/MetricsOverview';
 
 const COLORS = ['#F97316', '#22C55E', '#F59E0B', '#06B6D4', '#A855F7', '#EF4444', '#6366F1', '#14B8A6'];
 const METHODOLOGY_LABELS: Record<string, string> = {
@@ -353,12 +354,6 @@ export default function ReportsPage() {
               <BarChart3 className="h-4 w-4" />
               {t('tab_overview') || 'Overview'}
             </TabsTrigger>
-            {showMethodologyTab && (
-              <TabsTrigger value="methodology" className="gap-2">
-                <Activity className="h-4 w-4" />
-                {t('tab_methodology') || 'Methodology Dashboard'}
-              </TabsTrigger>
-            )}
             <TabsTrigger value="questions" className="gap-2">
               <FileQuestion className="h-4 w-4" />
               {t('tab_questions') || 'Question Analytics'}
@@ -376,17 +371,16 @@ export default function ReportsPage() {
           {/* Overview Tab */}
           <TabsContent value="overview">
             <div className="space-y-4">
-              {/* Metric Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-                {selectedMission && (
-                  <MetricCard
-                    title={overviewMetrics.primaryScore.label}
-                    value={`${overviewMetrics.primaryScore.score}`}
-                    subtitle={overviewMetrics.primaryScore.benchmark || ''}
-                    icon={<Target className="h-4 w-4" />}
-                    className={overviewMetrics.primaryScore.color}
-                  />
-                )}
+              {/* Configurable metrics */}
+              <MetricsOverview
+                missions={relevantMissions}
+                visits={completedVisits}
+                branches={branches}
+                language={language}
+              />
+
+              {/* Operational cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                 <MetricCard
                   title={t('metrics.visit_completion')}
                   value={`${overviewMetrics.completionRate}%`}
@@ -405,22 +399,6 @@ export default function ReportsPage() {
                   subtitle={`${overviewMetrics.totalUsed.toLocaleString()} / ${overviewMetrics.totalAllocated.toLocaleString()}`}
                   icon={<DollarSign className="h-4 w-4" />}
                 />
-                {/* NPS card (if any NPS-like question exists) */}
-                {overviewMetrics.npsScore !== null && (
-                  <MetricCard
-                    title="NPS Score"
-                    value={`${overviewMetrics.npsScore}`}
-                    subtitle={`${overviewMetrics.npsTotal} responses`}
-                    icon={<TrendingUp className="h-4 w-4" />}
-                  />
-                )}
-                {/* Overall Score */}
-                <MetricCard
-                  title="Overall Score"
-                  value={`${overviewMetrics.overallScore.toFixed(1)} / 10`}
-                  subtitle={`${overviewMetrics.overallPercent}% (${overviewMetrics.overallCount} answers)`}
-                  icon={<Activity className="h-4 w-4" />}
-                />
                 <MetricCard
                   title={t('metrics.active_missions')}
                   value={`${overviewMetrics.activeMissions}`}
@@ -435,90 +413,8 @@ export default function ReportsPage() {
                 />
               </div>
 
-              {/* Charts */}
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* NPS Breakdown */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">
-                      NPS Breakdown
-                      {npsBreakdown && (
-                        <span className="ms-2 text-muted-foreground font-normal normal-case">
-                          (Score: {npsBreakdown.score} · {npsBreakdown.total} responses)
-                        </span>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {npsBreakdown && npsBreakdown.total > 0 ? (
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={npsBreakdown.data}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={50}
-                              outerRadius={80}
-                              dataKey="value"
-                              nameKey="name"
-                              label={({ name, value }) => `${name}: ${value}`}
-                            >
-                              {npsBreakdown.data.map((entry, i) => (
-                                <Cell key={i} fill={entry.color} />
-                              ))}
-                            </Pie>
-                            <RechartsTooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center py-8">{tc('no_data') || 'No data'}</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Overall Score by Branch */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">
-                      Overall Score by Branch
-                      <span className="ms-2 text-muted-foreground font-normal normal-case">(out of 10)</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {overallByBranch.length > 0 ? (
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={overallByBranch}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" fontSize={10} />
-                            <YAxis domain={[0, 10]} />
-                            <RechartsTooltip />
-                            <Bar dataKey="score" fill={COLORS[0]} name="Overall Score" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center py-8">{tc('no_data') || 'No data'}</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
             </div>
           </TabsContent>
-
-          {/* Methodology Dashboard Tab */}
-          {showMethodologyTab && (
-            <TabsContent value="methodology">
-              <MethodologyDashboard
-                mission={selectedMission!}
-                visits={completedVisits}
-                branches={branches}
-                language={language}
-              />
-            </TabsContent>
-          )}
 
           {/* Question Analytics Tab */}
           <TabsContent value="questions">

@@ -29,6 +29,8 @@ import { BilingualValue, ensureBilingual, getBilingualText, getLocalizedValue } 
 import { useQuestionTemplates, QuestionTemplate, TEMPLATE_GROUPS } from '@/hooks/useQuestionTemplates';
 import { LoadingState } from '@/components/common/LoadingState';
 import { InfoHint } from '@/components/common/InfoHint';
+import { useReportMetrics } from '@/hooks/useReportMetrics';
+import { metricName } from '@/lib/reportMetrics';
 
 interface StepQuestionsProps {
   data: MissionFormData;
@@ -44,6 +46,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
   const lang = i18n.language;
 
   const { templates: dbTemplates, isLoading: templatesLoading } = useQuestionTemplates();
+  const { activeMetrics: metrics } = useReportMetrics();
 
   // ===== Sections (required — at least one) =====
   const sections: QuestionSection[] = data.question_sections && data.question_sections.length > 0
@@ -634,7 +637,38 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                           </Select>
                         </div>
                       )}
+
+                      {/* Report metric mapping — measurable questions only */}
+                      {(question.type === 'rating' || question.type === 'yes_no') && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            {t('questions_section.metric_label', 'Measures')}
+                            <InfoHint label={t('questions_section.metric_hint', 'Pick the report metric this answer feeds. Active metrics are configured in Settings → Reports.')} />
+                          </span>
+                          <Select
+                            value={question.metric_key || 'none'}
+                            onValueChange={(value) =>
+                              updateQuestion(question.id, { metric_key: value === 'none' ? undefined : value })
+                            }
+                          >
+                            <SelectTrigger className="w-[190px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">{t('questions_section.metric_none', 'Not measured')}</SelectItem>
+                              {metrics
+                                .filter((m) => (m.applies_to || []).includes(question.type))
+                                .map((m) => (
+                                  <SelectItem key={m.metric_key} value={m.metric_key}>
+                                    {metricName(m, lang)}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                     </div>
+
 
                     {/* Multiple Choice Options */}
                     {question.type === 'multiple_choice' && (

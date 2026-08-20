@@ -812,6 +812,60 @@ export type Database = {
         }
         Relationships: []
       }
+      report_metrics: {
+        Row: {
+          applies_to: string[]
+          config: Json
+          created_at: string
+          description: string | null
+          description_ar: string | null
+          formula: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          metric_key: string
+          name: string
+          name_ar: string | null
+          sort_order: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          applies_to?: string[]
+          config?: Json
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          formula?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          metric_key: string
+          name: string
+          name_ar?: string | null
+          sort_order?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          applies_to?: string[]
+          config?: Json
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          formula?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          metric_key?: string
+          name?: string
+          name_ar?: string | null
+          sort_order?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sales_call_requests: {
         Row: {
           admin_notes: string | null
