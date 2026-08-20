@@ -1,4 +1,4 @@
-import { Plus, Trash2, BookOpen, ListChecks, Sparkles, CheckSquare, ShieldCheck } from 'lucide-react';
+import { Plus, Trash2, BookOpen, ListChecks, Sparkles, CheckSquare, ShieldCheck, Ban } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
