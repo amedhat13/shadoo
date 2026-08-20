@@ -5,11 +5,8 @@ import { Label } from '@/components/ui/label';
 import { CURRENCY } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
 
-export interface PurchaseItem {
-  id: string;
-  name: string;
-  budget: number;
-}
+export type { PurchaseItem } from '@/types';
+import type { PurchaseItem } from '@/types';
 
 interface PurchaseItemsListProps {
   items: PurchaseItem[];
@@ -24,6 +21,7 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
     const newItem: PurchaseItem = {
       id: crypto.randomUUID(),
       name: '',
+      name_ar: '',
       budget: 0,
     };
     onChange([...items, newItem]);
@@ -69,11 +67,19 @@ export function PurchaseItemsList({ items, onChange }: PurchaseItemsListProps) {
             key={item.id}
             className="flex gap-3 items-start p-3 border border-border rounded-md bg-muted/30"
           >
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Input
+                dir="ltr"
                 placeholder={t('funding.item_placeholder', { index: index + 1 })}
                 value={item.name}
                 onChange={(e) => updateItem(item.id, { name: e.target.value })}
+              />
+              <Input
+                dir="rtl"
+                placeholder="اسم العنصر (AR)"
+                value={item.name_ar || ''}
+                onChange={(e) => updateItem(item.id, { name_ar: e.target.value })}
+                className="font-ar"
               />
             </div>
             <div className="relative w-32">

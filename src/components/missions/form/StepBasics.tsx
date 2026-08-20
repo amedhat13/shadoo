@@ -18,7 +18,14 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
-import { MissionFormData, Branch } from '@/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { MissionFormData, Branch, MISSION_CATEGORIES } from '@/types';
 
 
 import { cn } from '@/lib/utils';
@@ -79,6 +86,28 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
         />
         <p className="text-xs text-muted-foreground">
           {t('form.mission_name_help')}
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-xs font-bold uppercase tracking-wide">Category</Label>
+        <Select
+          value={data.category || ''}
+          onValueChange={(value) => onChange({ category: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            {MISSION_CATEGORIES.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Shown as the category badge on the mission card in the agent app, and used by the home-feed filter.
         </p>
       </div>
 
