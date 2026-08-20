@@ -339,6 +339,10 @@ const App = () => (
               <Route path="profile" element={<AgentProfile />} />
             </Route>
 
+            {/* Design handoff prototype (static HTML) */}
+            <Route path="/mobile-flow" element={<MobileFlowPrototype />} />
+
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
