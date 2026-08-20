@@ -49,6 +49,17 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation('missions');
 
+  const clientIndustry = getClientIndustry();
+  const clientCategory = industryToMissionCategory(clientIndustry);
+
+  // The mission always inherits the client account's category.
+  useEffect(() => {
+    if (data.category !== clientCategory) {
+      onChange({ category: clientCategory });
+    }
+  }, [clientCategory, data.category]);
+
+
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const allSelected = data.branch_ids.length === branches.length && branches.length > 0;
 
