@@ -53,15 +53,20 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
       const questions = taggedQuestions(missions, metric.metric_key);
       const overall = computeMetric(metric, questions, visits);
 
-      // Per question
-      const perQuestion = questions.map((q) => {
-        const r = computeMetric(metric, [q], visits);
-        return {
-          label: getLocalizedValue(q.text, language) || 'Question',
-          value: r.value,
-          n: r.sampleSize,
-        };
-      }).filter(r => r.n > 0);
+      // Per question — the same question can exist in several missions, so group by label
+      const grouped = new Map<string, { qs: any[]; missionIds: Set<string> }>();
+      for (const q of questions) {
+        const label = getLocalizedValue(q.text, language) || 'Question';
+        if (!grouped.has(label)) grouped.set(label, { qs: [], missionIds: new Set() });
+        const entry = grouped.get(label)!;
+        entry.qs.push(q);
+        entry.missionIds.add(q.__missionId);
+      }
+      const perQuestion = Array.from(grouped.entries()).map(([label, entry]) => {
+        const scoped = (visits || []).filter((v: any) => entry.missionIds.has(v.mission_id));
+        const r = computeMetric(metric, entry.qs, scoped);
+        return { label, value: r.value, n: r.sampleSize };
+      }).filter(r => r.n > 0).sort((a, b) => (a.value ?? 0) - (b.value ?? 0));
 
       // Per branch (visit → mission → branch)
       const missionBranch = new Map<string, string | null>();
