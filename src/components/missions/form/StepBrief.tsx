@@ -108,68 +108,82 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
           </div>
         </div>
 
-        <div className="space-y-3">
-          {rules.map((r, idx) => (
-            <div key={idx} className="border border-border rounded-md p-3 space-y-2 relative bg-muted/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Rule {idx + 1}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {(['do', 'dont'] as const).map((kind) => {
+            const isDo = kind === 'do';
+            const entries = rules
+              .map((r, idx) => ({ r, idx }))
+              .filter(({ r }) => (r.kind ?? 'do') === kind);
+            return (
+              <div
+                key={kind}
+                className={
+                  'rounded-md border p-3 space-y-3 ' +
+                  (isDo ? 'border-success/40 bg-success/5' : 'border-destructive/40 bg-destructive/5')
+                }
+              >
+                <div className="flex items-center gap-2">
+                  {isDo ? (
+                    <CheckSquare className="h-4 w-4 text-success" />
+                  ) : (
+                    <Ban className="h-4 w-4 text-destructive" />
+                  )}
+                  <span className="text-xs font-bold uppercase tracking-wide">
+                    {isDo ? 'Do' : "Don't"}
                   </span>
-                  <div className="flex rounded-md border border-border overflow-hidden">
-                    {(['do', 'dont'] as const).map((k) => (
-                      <button
-                        key={k}
-                        type="button"
-                        onClick={() => setRule(idx, { kind: k })}
-                        className={
-                          'px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition ' +
-                          ((r.kind ?? 'do') === k
-                            ? k === 'do'
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-destructive text-destructive-foreground'
-                            : 'text-muted-foreground')
-                        }
-                      >
-                        {k === 'do' ? 'Do' : "Don't"}
-                      </button>
-                    ))}
-                  </div>
+                  <span className="text-[10px] text-muted-foreground">({entries.length})</span>
                 </div>
-                {rules.length > 1 && (
-                  <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeRule(idx)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <Input
-                  dir="ltr"
-                  value={r.en}
-                  onChange={(e) => setRule(idx, { en: e.target.value })}
-                  placeholder="e.g. Do not reveal you are a mystery shopper"
-                  className="text-sm"
-                />
-                <Input
-                  dir="rtl"
-                  className="text-sm font-ar"
-                  value={r.ar}
-                  onChange={(e) => setRule(idx, { ar: e.target.value })}
-                  placeholder="مثال: لا تكشف أنك متسوق سري"
-                />
-              </div>
-            </div>
-          ))}
 
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={() => addRule('do')} className="gap-2">
-              <Plus className="h-3.5 w-3.5" /> Add "Do" rule
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => addRule('dont')} className="gap-2">
-              <Plus className="h-3.5 w-3.5" /> Add "Don't" rule
-            </Button>
-          </div>
+                {entries.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    No {isDo ? '"Do"' : '"Don\'t"'} rules yet.
+                  </p>
+                )}
+
+                {entries.map(({ r, idx }, position) => (
+                  <div key={idx} className="rounded-md border border-border bg-background p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {isDo ? 'Do' : "Don't"} {position + 1}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-destructive"
+                        onClick={() => removeRule(idx)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <Input
+                      dir="ltr"
+                      value={r.en}
+                      onChange={(e) => setRule(idx, { en: e.target.value })}
+                      placeholder={
+                        isDo
+                          ? 'e.g. Pay by card and keep the receipt'
+                          : 'e.g. Do not reveal you are a mystery shopper'
+                      }
+                      className="text-sm"
+                    />
+                    <Input
+                      dir="rtl"
+                      className="text-sm font-ar"
+                      value={r.ar}
+                      onChange={(e) => setRule(idx, { ar: e.target.value })}
+                      placeholder={isDo ? 'مثال: ادفع بالبطاقة واحتفظ بالفاتورة' : 'مثال: لا تكشف أنك متسوق سري'}
+                    />
+                  </div>
+                ))}
+
+                <Button variant="outline" size="sm" onClick={() => addRule(kind)} className="gap-2 w-full">
+                  <Plus className="h-3.5 w-3.5" /> Add {isDo ? '"Do"' : '"Don\'t"'} rule
+                </Button>
+              </div>
+            );
+          })}
         </div>
+
       </section>
 
       {/* Checklist — what to do on site */}
