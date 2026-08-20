@@ -82,6 +82,8 @@ export interface Question {
 
   // Mobile-app answering behaviour
   allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
+  naLabel?: { en: string; ar: string }; // Custom wording of the N/A chip in the app (e.g. "Restroom was closed")
+  photo_slot_id?: string; // Link this question's photo to one of the named photo slots
   commentMode?: CommentMode; // Off / Optional (default) / Required
   suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
   
@@ -100,6 +102,9 @@ export interface PhotoSlot {
   hint?: { en: string; ar: string };
   sample_url?: string;
   required?: boolean; // Some slots are optional
+  frame_hint?: { en: string; ar: string }; // Short framing label shown over the camera ("Shoot from above")
+  dos?: { en: string; ar: string }[]; // Green "Do" bullets on the capture screen
+  donts?: { en: string; ar: string }[]; // Red "Don't" bullets on the capture screen
 }
 
 export interface PhotoRequirements {
@@ -145,7 +150,7 @@ export interface Mission {
   // Agent Brief
   category?: string;
   cover_story?: { en: string; ar: string };
-  rules?: { en: string; ar: string }[];
+  rules?: RuleItem[];
 
   checklist?: { en: string; ar: string }[];
   brief_sections?: BriefSectionKey[];
@@ -222,11 +227,20 @@ export interface VisitSchedule {
 export interface PurchaseItem {
   id: string;
   name: string;
+  name_ar?: string; // Agent-facing Arabic name
   budget: number;
 }
 
 // Brief sections the agent must read before accepting (mobile app tabs)
-export type BriefSectionKey = 'overview' | 'cover_story' | 'rules' | 'checklist' | 'questions' | 'photos';
+export type BriefSectionKey =
+  | 'overview'
+  | 'cover_story'
+  | 'rules'
+  | 'checklist'
+  | 'questions'
+  | 'photos'
+  | 'purchase'
+  | 'payout';
 
 export const BRIEF_SECTION_KEYS: BriefSectionKey[] = [
   'overview',
@@ -235,7 +249,30 @@ export const BRIEF_SECTION_KEYS: BriefSectionKey[] = [
   'checklist',
   'questions',
   'photos',
+  'purchase',
+  'payout',
 ];
+
+// Brief rule line — split into Do / Don't columns in the agent app
+export interface RuleItem {
+  en: string;
+  ar: string;
+  kind?: 'do' | 'dont';
+}
+
+// Mission categories — drive the category badge and the home-feed filter in the agent app
+export const MISSION_CATEGORIES = [
+  'F&B',
+  'Retail',
+  'Service',
+  'Banking',
+  'Telecom',
+  'Pharmacy',
+  'Fashion',
+  'Grocery',
+  'Automotive',
+  'Hospitality',
+] as const;
 
 // Receipt / reimbursement config
 export interface ReceiptConfig {
@@ -256,7 +293,7 @@ export interface MissionFormData {
 
   // Step 2: Agent Brief
   cover_story?: { en: string; ar: string };
-  rules?: { en: string; ar: string }[];
+  rules?: RuleItem[];
   checklist?: { en: string; ar: string }[]; // "What to do on site" — shown last in the brief
   require_brief_ack?: boolean; // Agent must confirm reading the brief before accepting
   brief_sections?: BriefSectionKey[]; // Which brief tabs are shown in the app
