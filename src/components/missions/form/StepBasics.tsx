@@ -25,11 +25,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MissionFormData, Branch, MISSION_CATEGORIES } from '@/types';
+import { MissionFormData, Branch } from '@/types';
+import {
+  getClientIndustry,
+  industryLabel,
+  industryToMissionCategory,
+} from '@/lib/clientCategory';
 
 
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { BilingualInput } from '@/components/common/BilingualInput';
 
@@ -42,6 +48,17 @@ interface StepBasicsProps {
 export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation('missions');
+
+  const clientIndustry = getClientIndustry();
+  const clientCategory = industryToMissionCategory(clientIndustry);
+
+  // The mission always inherits the client account's category.
+  useEffect(() => {
+    if (data.category !== clientCategory) {
+      onChange({ category: clientCategory });
+    }
+  }, [clientCategory, data.category]);
+
 
   const selectedBranches = branches.filter((b) => data.branch_ids.includes(b.id));
   const allSelected = data.branch_ids.length === branches.length && branches.length > 0;
@@ -91,25 +108,19 @@ export function StepBasics({ data, onChange, branches }: StepBasicsProps) {
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">Category</Label>
-        <Select
-          value={data.category || ''}
-          onValueChange={(value) => onChange({ category: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {MISSION_CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+          <Badge variant="secondary" className="uppercase tracking-wide">
+            {clientCategory}
+          </Badge>
+          <span className="text-xs text-muted-foreground">
+            Inherited from your account category ({industryLabel(clientIndustry)}).
+          </span>
+        </div>
         <p className="text-xs text-muted-foreground">
-          Shown as the category badge on the mission card in the agent app, and used by the home-feed filter.
+          Shown as the category badge on the mission card in the agent app. Change it in Settings → Account.
         </p>
       </div>
+
 
       <div className="space-y-2">
         <Label className="text-xs font-bold uppercase tracking-wide">

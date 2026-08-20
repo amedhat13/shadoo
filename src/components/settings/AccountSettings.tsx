@@ -13,6 +13,7 @@ import { seedTLabDemo } from '@/lib/seedTLabDemo';
 import { seedTamaraDemo } from '@/lib/seedTamaraDemo';
 import { seedAIDemo } from '@/lib/seedAIDemo';
 import { seedTBSDemo } from '@/lib/seedTBSDemo';
+import { INDUSTRY_OPTIONS, getClientIndustry, setClientIndustry, industryToMissionCategory } from '@/lib/clientCategory';
 
 
 interface AccountData {
@@ -24,25 +25,13 @@ interface AccountData {
   avatar_url?: string;
 }
 
-const INDUSTRY_OPTIONS = [
-  { value: 'fnb', label: 'Food & Beverage' },
-  { value: 'retail', label: 'Retail' },
-  { value: 'banking', label: 'Banking & Finance' },
-  { value: 'telecom', label: 'Telecom' },
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'hospitality', label: 'Hospitality & Hotels' },
-  { value: 'ecommerce', label: 'E-commerce' },
-  { value: 'education', label: 'Education' },
-  { value: 'other', label: 'Other' },
-];
 
 const mockAccount: AccountData = {
   full_name: 'Ahmed Hassan',
   email: 'ahmed@shadoo.com',
   phone: '+20 100 123 4567',
   company_name: 'Shadoo Inc.',
-  industry: 'fnb',
+  industry: getClientIndustry(),
   avatar_url: '',
 };
 
@@ -158,6 +147,7 @@ export function AccountSettings() {
   const handleSaveProfile = async () => {
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
+    setClientIndustry(account.industry || 'other');
     setIsLoading(false);
     toast.success(t('account.profile_updated'));
   };
@@ -281,7 +271,7 @@ export function AccountSettings() {
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              <p className="text-xs text-muted-foreground">Drives default mission templates and cover-story suggestions.</p>
+              <p className="text-xs text-muted-foreground">Every mission this account creates inherits this category — the agent app shows it as the "{industryToMissionCategory(account.industry || 'other')}" badge.</p>
             </div>
           </div>
 

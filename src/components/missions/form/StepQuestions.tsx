@@ -698,37 +698,15 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
                               checked={question.allowNA ?? false}
                               onCheckedChange={(checked) => updateQuestion(question.id, { allowNA: checked })}
                             />
-                            <div className="flex-1 space-y-2">
+                            <div className="flex-1 space-y-1">
                               <div className="text-sm font-semibold flex items-center gap-1.5">Allow "Not applicable"<InfoHint label="N/A skips any photo or comment requirement on this question and excludes it from scoring." /></div>
-                              {question.allowNA && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                  <Input
-                                    dir="ltr"
-                                    placeholder='N/A chip label (EN) — e.g. Restroom was closed'
-                                    value={question.naLabel?.en || ''}
-                                    onChange={(e) =>
-                                      updateQuestion(question.id, {
-                                        naLabel: { en: e.target.value, ar: question.naLabel?.ar || '' },
-                                      })
-                                    }
-                                    className="text-xs"
-                                  />
-                                  <Input
-                                    dir="rtl"
-                                    placeholder="نص زر غير منطبق (AR)"
-                                    value={question.naLabel?.ar || ''}
-                                    onChange={(e) =>
-                                      updateQuestion(question.id, {
-                                        naLabel: { en: question.naLabel?.en || '', ar: e.target.value },
-                                      })
-                                    }
-                                    className="text-xs font-ar"
-                                  />
-                                </div>
-                              )}
+                              <p className="text-xs text-muted-foreground">
+                                The app shows a standard "Not applicable" chip. The wording is fixed across all missions.
+                              </p>
                             </div>
                           </div>
                         )}
+
                       </div>
 
 
