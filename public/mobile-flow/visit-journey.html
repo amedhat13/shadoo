@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin:0; padding:0; background:#161311; }
+  * { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+  a { color:#F2661F; text-decoration:none; }
+  a:hover { color:#C74E12; }
+  @keyframes shd-pop { 0%{transform:scale(.6);opacity:0} 60%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
+  @keyframes shd-up { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes shd-sheet { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  @keyframes shd-fade { from{opacity:0} to{opacity:1} }
+  @keyframes shd-bounce { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-10px)} 70%{transform:translateY(-4px)} }
+  ::-webkit-scrollbar { width:0; height:0; }
+</style>
+</helmet>
+
+<div style="min-height:100vh; background:#161311; font-family:Poppins, sans-serif; display:flex; align-items:flex-start; gap:0;">
+
+  <div style="width:268px; flex:0 0 268px; height:100vh; position:sticky; top:0; overflow-y:auto; background:#1E1A17; border-right:1px solid #2C2622; padding:22px 18px 40px;">
+    <div style="display:flex; align-items:center; gap:9px; margin-bottom:4px;">
+      <img src="logos/shadoo-icon.png" alt="Shadoo" style="height:30px; width:auto; object-fit:contain;" />
+      <div style="color:#FFF; font-size:15px; font-weight:700; letter-spacing:-0.01em;">Shadoo</div>
+    </div>
+    <div style="color:#8A807A; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:20px;">Visit journey · v2</div>
+
+    <div style="color:#6E655F; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Language</div>
+    <div style="display:flex; gap:6px; margin-bottom:18px;">
+      <div onClick="{{ on.langEn }}" style="{{ st.langEn }}">English</div>
+      <div onClick="{{ on.langAr }}" style="{{ st.langAr }}">العربية · RTL</div>
+    </div>
+
+    <div style="color:#6E655F; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Home card</div>
+    <div style="display:flex; gap:6px; margin-bottom:18px;">
+      <div onClick="{{ on.cardA }}" style="{{ st.cardA }}">A · Compact</div>
+      <div onClick="{{ on.cardB }}" style="{{ st.cardB }}">B · Visual</div>
+    </div>
+
+    <div style="color:#6E655F; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Active hub</div>
+    <div style="display:flex; gap:6px; margin-bottom:22px;">
+      <div onClick="{{ on.hubA }}" style="{{ st.hubA }}">A · Ring</div>
+      <div onClick="{{ on.hubB }}" style="{{ st.hubB }}">B · Track</div>
+    </div>
+
+    <div style="color:#6E655F; font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Screens</div>
+    <sc-for list="{{ rail }}" as="row" hint-placeholder-count="14">
+      <div onClick="{{ row.on }}" style="{{ row.style }}">
+        <span style="font-variant-numeric:tabular-nums; opacity:.55; font-size:10px; min-width:16px;">{{ row.num }}</span>
+        <span>{{ row.label }}</span>
+      </div>
+    </sc-for>
+
+    <div style="margin-top:22px; padding:12px; border-radius:12px; background:#241F1B; border:1px solid #322B26;">
+      <div style="color:#C9C0B9; font-size:11px; line-height:1.55;">Rail jumps seed demo state, so every screen shows a realistic moment — not an empty shell.</div>
+    </div>
+  </div>
+
+  <div style="flex:1; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:30px 24px 60px; background:radial-gradient(1100px 600px at 50% -10%, #241E1A 0%, #161311 62%);">
+
+    <div style="position:relative; width:390px; height:844px; border-radius:46px; border:11px solid #0D0B0A; background:#FAF8F6; box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px #35302B; overflow:hidden;">
+
+      <div style="position:absolute; top:0; left:0; right:0; height:44px; z-index:60; display:flex; align-items:center; justify-content:space-between; padding:0 26px; pointer-events:none;">
+        <div style="font-size:12px; font-weight:600; color:#14100D;">9:41</div>
+        <div style="display:flex; gap:5px; align-items:center;">
+          <div style="width:16px; height:9px; border-radius:2px; background:#14100D;"></div>
+          <div style="width:22px; height:10px; border-radius:3px; border:1.5px solid #14100D;"></div>
+        </div>
+      </div>
+
+      <sc-if value="{{ isEn }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute; inset:0; display:flex; flex-direction:column;">
+
+        <!-- ============ HOME ============ -->
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0;">
+          <div style="padding:52px 20px 14px; background:#FFF; border-bottom:1px solid #F0EBE6;">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:14px;">
+              <div style="flex:0 0 auto; white-space:nowrap;">
+                <div style="font-size:12px; color:#8B827B; font-weight:500;">Good afternoon</div>
+                <div style="font-size:20px; font-weight:700; color:#14100D; letter-spacing:-0.02em;">Ahmed</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="display:flex; align-items:center; gap:6px; height:34px; padding:0 12px; border-radius:17px; background:#FFF1E8;">
+                  <span style="font-size:13px; font-weight:700; color:#C74E12;">1,240</span>
+                  <span style="font-size:10px; font-weight:600; color:#E08A55;">EGP</span>
+                </div>
+                <div style="position:relative; width:34px; height:34px; border-radius:17px; background:#F5F1ED; display:flex; align-items:center; justify-content:center;">
+                  <div style="width:11px; height:12px; border:2px solid #6B625B; border-radius:5px 5px 2px 2px;"></div>
+                  <div style="position:absolute; top:6px; right:7px; width:7px; height:7px; border-radius:4px; background:#F2661F; border:1.5px solid #FFF;"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; gap:9px;">
+              <div style="flex:1; height:44px; border-radius:14px; background:#F5F1ED; display:flex; align-items:center; gap:9px; padding:0 14px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A928B" stroke-width="2.2" stroke-linecap="round" style="flex:0 0 auto;">
+                  <circle cx="11" cy="11" r="6.5"></circle>
+                  <path d="M16 16l4.5 4.5"></path>
+                </svg>
+                <div style="font-size:13.5px; color:#9A928B;">Search brand, branch or area</div>
+              </div>
+              <div onClick="{{ on.openFilter }}" style="{{ st.filterBtn }}">
+                <div style="display:flex; flex-direction:column; gap:3px; align-items:center;">
+                  <div style="width:15px; height:2px; border-radius:1px; background:currentColor;"></div>
+                  <div style="width:10px; height:2px; border-radius:1px; background:currentColor;"></div>
+                  <div style="width:5px; height:2px; border-radius:1px; background:currentColor;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1; overflow-y:auto; padding:0 0 96px;">
+            <div onClick="{{ on.openMap }}" style="margin:12px 20px 0; height:56px; border-radius:14px; border:1px solid #ECE7E2; background:linear-gradient(90deg,#FFF 0%,#FFF 55%,#F6F2EE 100%); display:flex; align-items:center; padding:0 8px 0 12px; gap:11px; cursor:pointer;">
+              <div style="width:40px; height:40px; border-radius:10px; background-color:#EAF1EC; background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.85) 0 3px, rgba(0,0,0,0) 3px 7px); position:relative;">
+                <div style="position:absolute; top:15px; left:16px; width:9px; height:9px; border-radius:5px; background:#F2661F; box-shadow:0 0 0 3px rgba(242,102,31,.22);"></div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600; color:#14100D;">5 visits near you</div>
+                <div style="font-size:11.5px; color:#8B827B;">Cairo · within 30 km</div>
+              </div>
+              <div style="height:30px; padding:0 12px; border-radius:15px; background:#FFF1E8; color:#C74E12; font-size:11.5px; font-weight:600; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">View map</div>
+            </div>
+
+            <div style="display:flex; gap:7px; padding:14px 20px 6px; overflow-x:auto;">
+              <sc-for list="{{ sorts }}" as="s" hint-placeholder-count="4">
+                <div onClick="{{ s.on }}" style="{{ s.style }}">{{ s.label }}</div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex; align-items:baseline; justify-content:space-between; padding:8px 20px 10px;">
+              <div style="font-size:12px; color:#8B827B; font-weight:500; white-space:nowrap;">{{ feedCount }}</div>
+              <sc-if value="{{ hasCategory }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ on.clearCategory }}" style="font-size:11.5px; font-weight:600; color:#C74E12; cursor:pointer;">{{ categoryLabel }} ✕</div>
+              </sc-if>
+            </div>
+
+            <!-- Card variant A -->
+            <sc-if value="{{ isCardA }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:12px; padding:0 20px;">
+              <sc-for list="{{ feed }}" as="v" hint-placeholder-count="4">
+                <div style="border-radius:20px; background:#FFF; border:1px solid #EEE9E4; box-shadow:0 2px 10px rgba(20,16,13,.04); overflow:hidden;">
+                  <div style="display:flex; gap:13px; padding:14px 14px 0;">
+                    <div style="{{ v.logoStyle }}"></div>
+                    <div style="flex:1; min-width:0;">
+                      <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                        <div style="font-size:10px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#8B827B; white-space:nowrap;">{{ v.category }}</div>
+                        <sc-if value="{{ v.needsPurchase }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex; align-items:center; gap:4px; height:19px; padding:0 7px; border-radius:6px; background:#FFF6E0; color:#8A5B02; font-size:9.5px; font-weight:600; letter-spacing:0.04em; white-space:nowrap;">RECEIPT NEEDED</div>
+                        </sc-if>
+                      </div>
+                      <div style="font-size:16px; font-weight:700; color:#14100D; line-height:1.25; letter-spacing:-0.015em;">{{ v.brand }}</div>
+                      <div style="font-size:13px; color:#4A423C; line-height:1.35; margin-top:2px; text-wrap:pretty;">{{ v.title }}</div>
+                      <div style="font-size:12px; color:#8B827B; margin-top:3px;">{{ v.branch }}</div>
+                    </div>
+                    <div style="text-align:right; flex:0 0 auto;">
+                      <div style="font-size:17px; font-weight:700; color:#F2661F; letter-spacing:-0.02em;">{{ v.reward }}</div>
+                      <div style="font-size:10px; font-weight:600; color:#E08A55; letter-spacing:0.06em;">EGP</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:14px; padding:11px 14px 12px 14px; margin-top:11px;">
+                    <div style="font-size:11.5px; color:#6B625B;">{{ v.distance }}</div>
+                    <div style="font-size:11.5px; color:#6B625B;">{{ v.duration }}</div>
+                    <div style="font-size:11.5px; color:#6B625B;">{{ v.taskCount }}</div>
+                  </div>
+                  <div style="{{ v.footStyle }}">
+                    <div style="font-size:12px; font-weight:500; color:#6B625B; white-space:nowrap; flex:0 0 auto;">{{ v.window }}</div>
+                    <div onClick="{{ v.on }}" style="{{ v.ctaStyle }}">{{ v.cta }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+
+            <!-- Card variant B -->
+            <sc-if value="{{ isCardB }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:14px; padding:0 20px;">
+              <sc-for list="{{ feed }}" as="v" hint-placeholder-count="4">
+                <div onClick="{{ v.on }}" style="border-radius:22px; background:#FFF; border:1px solid #EEE9E4; box-shadow:0 3px 14px rgba(20,16,13,.05); overflow:hidden; cursor:pointer;">
+                  <div style="{{ v.heroStyle }}">
+                    <div style="position:absolute; top:12px; left:12px; display:flex; gap:6px;">
+                      <div style="height:24px; padding:0 10px; border-radius:8px; background:rgba(255,255,255,.94); color:#14100D; font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; display:flex; align-items:center;">{{ v.category }}</div>
+                      <sc-if value="{{ v.needsPurchase }}" hint-placeholder-val="{{ true }}">
+                        <div style="height:24px; padding:0 10px; border-radius:8px; background:#FFE9B0; color:#7A5000; font-size:10px; font-weight:700; letter-spacing:0.05em; display:flex; align-items:center;">RECEIPT</div>
+                      </sc-if>
+                    </div>
+                    <div style="position:absolute; top:12px; right:12px; height:28px; padding:0 11px; border-radius:9px; background:#14100D; color:#FFF; font-size:13px; font-weight:700; display:flex; align-items:center; gap:4px;">{{ v.reward }} <span style="font-size:9.5px; opacity:.7; font-weight:600;">EGP</span></div>
+                    <div style="{{ v.logoStyleB }}"></div>
+                    <div style="position:absolute; bottom:8px; right:12px; font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:0.06em; color:rgba(20,16,13,.42);">{{ v.shotLabel }}</div>
+                  </div>
+                  <div style="padding:30px 15px 0;">
+                    <div style="font-size:16.5px; font-weight:700; color:#14100D; line-height:1.25; letter-spacing:-0.02em;">{{ v.brand }}</div>
+                    <div style="font-size:13.5px; color:#4A423C; line-height:1.35; margin-top:2px; text-wrap:pretty;">{{ v.title }}</div>
+                    <div style="font-size:12px; color:#8B827B; margin-top:4px;">{{ v.branch }} · {{ v.distance }}</div>
+                  </div>
+                  <div style="{{ v.footStyleB }}">
+                    <div style="font-size:12px; font-weight:500; color:#6B625B; white-space:nowrap; flex:0 0 auto;">{{ v.window }} · {{ v.duration }}</div>
+                    <div onClick="{{ v.on }}" style="{{ v.ctaStyle }}">{{ v.cta }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ VISIT DETAIL ============ -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF;">
+          <div style="padding:50px 18px 12px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #F0EBE6;">
+            <div onClick="{{ on.goHome }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+            <div style="font-size:15px; font-weight:600; color:#14100D;">Visit details</div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding-bottom:104px;">
+            <div style="height:150px; background-color:#F4EFEA; background-image:repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 13px); display:flex; align-items:flex-end; padding:14px; position:relative;">
+              <div style="{{ d.logoStyle }}"></div>
+              <div style="position:absolute; top:12px; right:14px; font-family:'IBM Plex Mono', monospace; font-size:9.5px; color:rgba(20,16,13,.4); letter-spacing:0.05em;">{{ d.shot }} photo</div>
+            </div>
+            <div style="padding:16px 20px 0;">
+              <div style="display:flex; gap:7px; margin-bottom:9px;">
+                <div style="height:22px; padding:0 9px; border-radius:7px; background:#FFF1E8; color:#C74E12; font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; display:flex; align-items:center; white-space:nowrap;">{{ d.category }}</div>
+                <sc-if value="{{ d.purchase }}" hint-placeholder-val="{{ true }}">
+                  <div style="height:22px; padding:0 9px; border-radius:7px; background:#FFF6E0; color:#8A5B02; font-size:10px; font-weight:600; letter-spacing:0.05em; display:flex; align-items:center; white-space:nowrap;">RECEIPT NEEDED</div>
+                </sc-if>
+              </div>
+              <div style="font-size:24px; font-weight:700; color:#14100D; letter-spacing:-0.03em; line-height:1.15;">{{ d.brand }}</div>
+              <div style="font-size:15px; color:#4A423C; line-height:1.4; margin-top:3px; text-wrap:pretty;">{{ d.title }}</div>
+              <div style="font-size:12.5px; color:#8B827B; margin-top:3px;">{{ d.sub }}</div>
+
+              <sc-if value="{{ d.locked }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:14px; display:flex; align-items:center; gap:11px; padding:12px 14px; border-radius:15px; background:#FFF9E9; border:1px solid #F5E4B5;">
+                  <div style="width:34px; height:34px; border-radius:11px; background:#F7E3AE; flex:0 0 auto;"></div>
+                  <div style="flex:1;">
+                    <div style="font-size:13.5px; font-weight:600; color:#7A5000;">{{ d.window }}</div>
+                    <div style="font-size:12px; color:#9A7420; line-height:1.4;">Read the brief now — accepting unlocks when the window opens.</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:16px;">
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Reward</div>
+                  <div style="font-size:16px; font-weight:700; color:#F2661F; margin-top:2px;">{{ d.reward }} EGP</div>
+                </div>
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">On site</div>
+                  <div style="font-size:16px; font-weight:700; color:#14100D; margin-top:2px;">{{ d.duration }}</div>
+                </div>
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Spend limit</div>
+                  <div style="font-size:16px; font-weight:700; color:#14100D; margin-top:2px;">{{ d.spend }}</div>
+                </div>
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Window</div>
+                  <div style="font-size:16px; font-weight:700; color:#14100D; margin-top:2px;">{{ d.window }}</div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px; border:1px solid #EEE9E4; border-radius:16px; overflow:hidden;">
+                <div style="display:flex; gap:11px; padding:13px;">
+                  <div style="width:42px; height:42px; border-radius:12px; background-color:#EAF1EC; background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.85) 0 3px, rgba(0,0,0,0) 3px 7px); flex:0 0 auto;"></div>
+                  <div style="flex:1;">
+                    <div style="font-size:14px; font-weight:600; color:#14100D;">{{ d.branch }}</div>
+                    <div style="font-size:12px; color:#8B827B; line-height:1.45;">{{ d.distance }} away</div>
+                  </div>
+                </div>
+                <div style="border-top:1px solid #F0EBE6; padding:10px 13px; display:flex; gap:8px;">
+                  <div style="flex:1; height:38px; border-radius:12px; background:#FFF1E8; color:#C74E12; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Navigate</div>
+                  <div style="flex:1; height:38px; border-radius:12px; background:#F5F1ED; color:#6B625B; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Branch hours</div>
+                </div>
+              </div>
+
+              <div style="font-size:11px; font-weight:600; letter-spacing:0.09em; color:#9A928B; text-transform:uppercase; margin:20px 0 9px;">What you'll do</div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <sc-for list="{{ whatYoullDo }}" as="w" hint-placeholder-count="4">
+                  <div style="display:flex; gap:10px; align-items:center; padding:11px 13px; border-radius:13px; background:#FAF8F6;">
+                    <div style="width:24px; height:24px; border-radius:8px; background:#FFF1E8; color:#C74E12; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 auto;">{{ w.n }}</div>
+                    <div style="font-size:13px; color:#3A332E; line-height:1.4;">{{ w.text }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="margin-top:16px; padding:12px 14px; border-radius:14px; background:#FAF8F6; border:1px solid #EEE9E4;">
+                <div style="font-size:12.5px; color:#6B625B; line-height:1.55;">Accepting reserves this slot for you. You can cancel free within 5 minutes — after that, dropping out affects your tier.</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6;">
+            <div onClick="{{ on.openBrief }}" style="height:52px; border-radius:16px; background:#F2661F; color:#FFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 18px rgba(242,102,31,.32);" style-hover="background:#DD5A17;">Read full brief</div>
+            <div style="text-align:center; font-size:11.5px; color:#9A928B; margin-top:8px;">6 short steps · about 1 minute</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ BRIEF ============ -->
+        <sc-if value="{{ isBrief }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF;">
+          <div style="padding:50px 18px 0;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+              <div onClick="{{ on.briefBack }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+              <div style="flex:1;">
+                <div style="font-size:15px; font-weight:600; color:#14100D;">{{ briefTitle }}</div>
+                <div style="font-size:11.5px; color:#9A928B;">{{ briefStepLabel }}</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:4px; padding-bottom:14px;">
+              <sc-for list="{{ briefBars }}" as="b" hint-placeholder-count="6">
+                <div onClick="{{ b.on }}" style="{{ b.style }}"></div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="flex:1; overflow-y:auto; padding:4px 20px 120px;">
+            <sc-if value="{{ brief.isOverview }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:14px 16px; border-radius:16px; background:#FFF6F0; border:1px solid #FBD9C2;">
+                <div style="font-size:10.5px; font-weight:600; letter-spacing:0.09em; color:#C74E12; text-transform:uppercase; margin-bottom:6px;">Your cover story</div>
+                <div style="font-size:14.5px; color:#3A332E; line-height:1.55;">Visit as a normal customer around lunch or dinner. Order a main course and a drink, take your time, and judge the experience honestly.</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:14px;">
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">On site</div>
+                  <div style="font-size:15px; font-weight:700; color:#14100D; margin-top:2px;">45 min</div>
+                </div>
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Free cancel</div>
+                  <div style="font-size:15px; font-weight:700; color:#14100D; margin-top:2px;">5 min</div>
+                </div>
+              </div>
+              <div style="margin-top:9px; border:1px solid #EEE9E4; border-radius:16px; padding:13px;">
+                <div style="display:flex; gap:11px; align-items:center;">
+                  <div style="width:42px; height:42px; border-radius:12px; background-color:#EAF1EC; background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.85) 0 3px, rgba(0,0,0,0) 3px 7px);"></div>
+                  <div style="flex:1;">
+                    <div style="font-size:14px; font-weight:600; color:#14100D;">Almaza City Centre</div>
+                    <div style="font-size:12px; color:#8B827B;">Heliopolis, Cairo · 4.2 km</div>
+                  </div>
+                  <div style="height:34px; padding:0 13px; border-radius:11px; background:#FFF1E8; color:#C74E12; font-size:12.5px; font-weight:600; display:flex; align-items:center; cursor:pointer;">Navigate</div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ brief.isRules }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:11px; font-weight:600; letter-spacing:0.09em; color:#1B9A6B; text-transform:uppercase;">Do</div>
+                <sc-for list="{{ rulesDo }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; gap:10px; padding:11px 13px; border-radius:13px; background:#F1F9F5; border:1px solid #D5EDE2;">
+                    <div style="color:#1B9A6B; font-size:13px; font-weight:700;">✓</div>
+                    <div style="font-size:13px; color:#245A45; line-height:1.45;">{{ r.text }}</div>
+                  </div>
+                </sc-for>
+                <div style="font-size:11px; font-weight:600; letter-spacing:0.09em; color:#C43F3F; text-transform:uppercase; margin-top:8px;">Don't</div>
+                <sc-for list="{{ rulesDont }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; gap:10px; padding:11px 13px; border-radius:13px; background:#FEF3F3; border:1px solid #F6D8D8;">
+                    <div style="color:#C43F3F; font-size:13px; font-weight:700;">✕</div>
+                    <div style="font-size:13px; color:#7A2E2E; line-height:1.45;">{{ r.text }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ brief.isQuestions }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:13px; color:#6B625B; line-height:1.55; margin-bottom:12px;">12 questions across 5 sections. You answer them inside the branch — nothing is asked from memory.</div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <sc-for list="{{ sectionPreview }}" as="s" hint-placeholder-count="5">
+                  <div style="border:1px solid #EEE9E4; border-radius:14px; padding:12px 13px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                      <div style="font-size:14px; font-weight:600; color:#14100D;">{{ s.name }}</div>
+                      <div style="font-size:11px; font-weight:600; color:#9A928B;">{{ s.count }}</div>
+                    </div>
+                    <div style="font-size:12px; color:#8B827B; margin-top:4px; line-height:1.45;">{{ s.sample }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ brief.isPhotos }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:13px; color:#6B625B; line-height:1.55; margin-bottom:12px;">3 photos plus your receipt. Each slot shows a reference shot when you get there.</div>
+              <div style="display:flex; flex-direction:column; gap:9px;">
+                <sc-for list="{{ photoBrief }}" as="p" hint-placeholder-count="4">
+                  <div style="display:flex; gap:11px; align-items:center; border:1px solid #EEE9E4; border-radius:14px; padding:10px;">
+                    <div style="{{ p.thumbStyle }}"><span style="font-family:'IBM Plex Mono', monospace; font-size:8px; color:rgba(20,16,13,.45); letter-spacing:0.04em;">{{ p.slug }}</span></div>
+                    <div style="flex:1;">
+                      <div style="font-size:13.5px; font-weight:600; color:#14100D;">{{ p.title }}</div>
+                      <div style="font-size:12px; color:#8B827B; line-height:1.4;">{{ p.hint }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ brief.isPurchase }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:14px 16px; border-radius:16px; background:#FFF9E9; border:1px solid #F5E4B5;">
+                <div style="font-size:10.5px; font-weight:600; letter-spacing:0.09em; color:#8A5B02; text-transform:uppercase; margin-bottom:6px;">You must buy</div>
+                <div style="font-size:14.5px; color:#5C3E00; line-height:1.55;">One main course and one non-alcoholic drink. Dine in — takeaway orders are not accepted for this visit.</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:12px;">
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Reimbursed up to</div>
+                  <div style="font-size:16px; font-weight:700; color:#14100D; margin-top:2px;">150 EGP</div>
+                </div>
+                <div style="border:1px solid #EEE9E4; border-radius:14px; padding:11px 13px;">
+                  <div style="font-size:10px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase;">Pay with</div>
+                  <div style="font-size:16px; font-weight:700; color:#14100D; margin-top:2px;">Your money</div>
+                </div>
+              </div>
+              <div style="margin-top:12px; font-size:13px; color:#6B625B; line-height:1.6;">Anything above 150 EGP is on you. Keep the printed receipt — a photo of the card slip alone will be rejected.</div>
+            </sc-if>
+
+            <sc-if value="{{ brief.isPayout }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; gap:0;">
+                <sc-for list="{{ payoutSteps }}" as="p" hint-placeholder-count="4">
+                  <div style="display:flex; gap:12px;">
+                    <div style="display:flex; flex-direction:column; align-items:center; width:24px;">
+                      <div style="{{ p.dotStyle }}"></div>
+                      <div style="{{ p.lineStyle }}"></div>
+                    </div>
+                    <div style="padding-bottom:16px; flex:1;">
+                      <div style="font-size:14px; font-weight:600; color:#14100D;">{{ p.title }}</div>
+                      <div style="font-size:12.5px; color:#8B827B; line-height:1.5; margin-top:2px;">{{ p.body }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin-top:6px; padding:13px 15px; border-radius:15px; background:#F1F9F5; border:1px solid #D5EDE2;">
+                <div style="font-size:13px; color:#245A45; line-height:1.55;">Reward 250 EGP + up to 150 EGP reimbursed lands in your Shadoo wallet. Withdraw any time above 200 EGP.</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6;">
+            <sc-if value="{{ brief.isLast }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ on.toggleAgree }}" style="display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border-radius:14px; background:#FAF8F6; margin-bottom:10px; cursor:pointer;">
+                <div style="{{ st.checkbox }}">✓</div>
+                <div style="font-size:12.5px; color:#3A332E; line-height:1.45;">I read the brief and I'll follow the rules for this visit.</div>
+              </div>
+            </sc-if>
+            <div onClick="{{ on.briefNext }}" style="{{ st.briefCta }}">{{ briefCtaLabel }}</div>
+            <sc-if value="{{ brief.isLast }}" hint-placeholder-val="{{ true }}">
+              <div style="text-align:center; font-size:11.5px; color:#9A928B; margin-top:8px;">{{ acceptNote }}</div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ ACTIVE HUB ============ -->
+        <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FAF8F6;">
+          <div style="padding:50px 18px 12px; background:#FFF; border-bottom:1px solid #F0EBE6;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-size:10.5px; font-weight:600; letter-spacing:0.09em; color:#C74E12; text-transform:uppercase;">Visit in progress</div>
+                <div style="font-size:16px; font-weight:700; color:#14100D; letter-spacing:-0.015em;">Tamara — Almaza City Centre</div>
+              </div>
+              <div onClick="{{ on.openHelp }}" style="width:32px; height:32px; border-radius:11px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:#6B625B; cursor:pointer;">?</div>
+            </div>
+            <div style="display:flex; gap:9px; margin-top:12px;">
+              <div style="{{ st.deadlineChip }}">
+                <div style="font-size:9.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; opacity:.75;">Time left on site</div>
+                <div style="font-size:21px; font-weight:700; letter-spacing:-0.02em; font-variant-numeric:tabular-nums;">{{ deadlineText }}</div>
+              </div>
+              <div style="{{ st.cancelChip }}">
+                <div style="font-size:9.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; opacity:.8;">Free cancel ends</div>
+                <div style="display:flex; align-items:baseline; gap:8px;">
+                  <div style="font-size:17px; font-weight:700; font-variant-numeric:tabular-nums;">{{ cancelText }}</div>
+                </div>
+                <div onClick="{{ on.openCancel }}" style="{{ st.cancelBtn }}">Cancel visit</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1; overflow-y:auto; padding:14px 20px 110px;">
+            <!-- Hub variant A: ring -->
+            <sc-if value="{{ isHubA }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#FFF; border:1px solid #EEE9E4; border-radius:20px; padding:16px; display:flex; align-items:center; gap:16px;">
+                <div style="position:relative; width:78px; height:78px; flex:0 0 auto;">
+                  <svg viewBox="0 0 80 80" width="78" height="78">
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="#F0EBE6" stroke-width="9"></circle>
+                    <circle cx="40" cy="40" r="34" fill="none" stroke="#F2661F" stroke-width="9" stroke-linecap="round" stroke-dasharray="{{ ringDash }}" transform="rotate(-90 40 40)"></circle>
+                  </svg>
+                  <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:#14100D;">{{ progressPct }}</div>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:15px; font-weight:600; color:#14100D;">{{ doneLabel }}</div>
+                  <div style="font-size:12.5px; color:#8B827B; line-height:1.5; margin-top:3px;">{{ nextUpLabel }}</div>
+                  <div style="display:inline-flex; align-items:center; gap:5px; margin-top:8px; height:24px; padding:0 9px; border-radius:8px; background:#F1F9F5;">
+                    <div style="width:6px; height:6px; border-radius:3px; background:#1B9A6B;"></div>
+                    <div style="font-size:10.5px; font-weight:600; color:#1B7A55;">Saved automatically</div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- Hub variant B: track -->
+            <sc-if value="{{ isHubB }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#14100D; border-radius:20px; padding:16px;">
+                <div style="display:flex; align-items:baseline; justify-content:space-between;">
+                  <div style="font-size:15px; font-weight:600; color:#FFF;">{{ doneLabel }}</div>
+                  <div style="font-size:22px; font-weight:700; color:#F2661F; letter-spacing:-0.02em;">{{ progressPct }}</div>
+                </div>
+                <div style="height:8px; border-radius:4px; background:#2E2823; margin-top:11px; overflow:hidden;">
+                  <div style="{{ st.trackFill }}"></div>
+                </div>
+                <div style="display:flex; gap:4px; margin-top:9px;">
+                  <sc-for list="{{ trackDots }}" as="d" hint-placeholder-count="9">
+                    <div style="{{ d.style }}"></div>
+                  </sc-for>
+                </div>
+                <div style="font-size:12px; color:#A79E97; margin-top:10px; line-height:1.5;">{{ nextUpLabel }} · progress saves itself</div>
+              </div>
+            </sc-if>
+
+            <div style="font-size:11px; font-weight:600; letter-spacing:0.09em; color:#9A928B; text-transform:uppercase; margin:20px 0 9px;">Questions</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ hubSections }}" as="s" hint-placeholder-count="5">
+                <div onClick="{{ s.on }}" style="{{ s.rowStyle }}">
+                  <div style="{{ s.badgeStyle }}">{{ s.badge }}</div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:#14100D;">{{ s.name }}</div>
+                    <div style="font-size:11.5px; color:#8B827B; margin-top:1px;">{{ s.meta }}</div>
+                  </div>
+                  <div style="font-size:16px; color:#C4BCB5;">›</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:11px; font-weight:600; letter-spacing:0.09em; color:#9A928B; text-transform:uppercase; margin:20px 0 9px;">Photos &amp; receipt</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ hubPhotos }}" as="p" hint-placeholder-count="4">
+                <div onClick="{{ p.on }}" style="{{ p.rowStyle }}">
+                  <div style="{{ p.thumbStyle }}">{{ p.thumbLabel }}</div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:14px; font-weight:600; color:#14100D;">{{ p.title }}</div>
+                    <div style="font-size:11.5px; color:#8B827B; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.hint }}</div>
+                  </div>
+                  <div style="{{ p.statusStyle }}">{{ p.status }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6;">
+            <div onClick="{{ on.review }}" style="{{ st.submitCta }}">{{ submitLabel }}</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ QUESTION RUNNER ============ -->
+        <sc-if value="{{ isQuestion }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF;">
+          <div style="padding:50px 18px 10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div onClick="{{ on.goHub }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+              <div style="flex:1;">
+                <div style="font-size:14.5px; font-weight:600; color:#14100D;">{{ q.sectionName }}</div>
+                <div style="font-size:11.5px; color:#9A928B;">{{ q.counter }}</div>
+              </div>
+              <div style="font-size:11.5px; font-weight:600; color:#1B7A55;">Auto-saved</div>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:12px;">
+              <sc-for list="{{ qBars }}" as="b" hint-placeholder-count="3">
+                <div style="{{ b.style }}"></div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="flex:1; overflow-y:auto; padding:18px 20px 130px;">
+            <div style="font-size:20px; font-weight:600; color:#14100D; line-height:1.35; letter-spacing:-0.015em; text-wrap:pretty;">{{ q.text }}</div>
+            <sc-if value="{{ q.hasWhy }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ on.toggleWhy }}" style="display:inline-flex; align-items:center; gap:5px; margin-top:9px; font-size:12.5px; font-weight:600; color:#C74E12; cursor:pointer;">Why we ask {{ q.whyCaret }}</div>
+              <sc-if value="{{ showWhy }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:8px; padding:11px 13px; border-radius:13px; background:#FFF6F0; font-size:12.5px; color:#7A4318; line-height:1.55;">{{ q.why }}</div>
+              </sc-if>
+            </sc-if>
+
+            <div style="margin-top:22px;">
+              <sc-if value="{{ q.isChoice }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:9px;">
+                  <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
+                    <div onClick="{{ o.on }}" style="{{ o.style }}">
+                      <div style="{{ o.dotStyle }}"></div>
+                      <div style="font-size:14.5px; font-weight:500;">{{ o.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ q.isRating }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; gap:9px;">
+                  <sc-for list="{{ q.stars }}" as="s" hint-placeholder-count="5">
+                    <div onClick="{{ s.on }}" style="{{ s.style }}">
+                      <div style="font-size:24px; line-height:1;">{{ s.glyph }}</div>
+                      <div style="font-size:10px; font-weight:600; margin-top:4px; opacity:.7;">{{ s.n }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:9px; font-size:11.5px; color:#9A928B;">
+                  <div>Poor</div><div>Excellent</div>
+                </div>
+                <sc-if value="{{ q.allowNa }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ on.markNa }}" style="{{ q.naStyle }}">
+                    <div style="{{ q.naDotStyle }}"></div>
+                    <div style="{{ q.naTextStyle }}">{{ q.naLabel }}</div>
+                  </div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ q.isNps }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:7px;">
+                  <sc-for list="{{ q.npsCells }}" as="c" hint-placeholder-count="11">
+                    <div onClick="{{ c.on }}" style="{{ c.style }}">{{ c.n }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:11.5px; color:#9A928B;">
+                  <div>Not likely</div><div>Very likely</div>
+                </div>
+                <sc-if value="{{ q.allowNa }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ on.markNa }}" style="{{ q.naStyle }}">
+                    <div style="{{ q.naDotStyle }}"></div>
+                    <div style="{{ q.naTextStyle }}">{{ q.naLabel }}</div>
+                  </div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ q.isText }}" hint-placeholder-val="{{ true }}">
+                <div style="border:1px solid #E3DCD5; border-radius:16px; padding:13px; min-height:130px; background:#FCFBFA;">
+                  <div style="font-size:14px; color:#3A332E; line-height:1.55; white-space:pre-wrap;">{{ q.textValue }}</div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                  <div onClick="{{ on.fillSample }}" style="height:38px; padding:0 14px; border-radius:12px; background:#F5F1ED; color:#3A332E; font-size:12.5px; font-weight:600; display:flex; align-items:center; cursor:pointer;">Use sample text (demo)</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ qPhoto.show }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ qPhoto.wrapStyle }}">
+                  <div style="{{ qPhoto.thumbStyle }}"></div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:7px;">
+                      <div style="font-size:13.5px; font-weight:600; color:#14100D;">{{ qPhoto.title }}</div>
+                      <div style="{{ qPhoto.badgeStyle }}">{{ qPhoto.badge }}</div>
+                    </div>
+                    <div style="font-size:12px; color:#6B625B; line-height:1.45; margin-top:2px;">{{ qPhoto.caption }}</div>
+                  </div>
+                  <div onClick="{{ on.qPhoto }}" style="{{ qPhoto.ctaStyle }}">{{ qPhoto.cta }}</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ note.show }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ note.wrapStyle }}">
+                  <sc-if value="{{ note.collapsed }}" hint-placeholder-val="{{ true }}">
+                    <div onClick="{{ on.openNote }}" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B827B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;">
+                        <path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5V6.5A2.5 2.5 0 0 1 7.5 4h10A2.5 2.5 0 0 1 20 6.5z"></path>
+                      </svg>
+                      <div style="font-size:13px; font-weight:600; color:#6B625B;">Add a comment</div>
+                      <div style="font-size:12px; color:#A79E97;">optional</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ note.expanded }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                      <div style="font-size:12.5px; font-weight:600; color:#3A332E;">{{ note.label }}</div>
+                      <div style="font-size:11px; font-weight:600; color:#9A928B;">{{ note.badge }}</div>
+                    </div>
+                    <div style="{{ note.fieldStyle }}">{{ note.value }}</div>
+                    <sc-if value="{{ note.empty }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex; gap:7px; margin-top:9px; flex-wrap:wrap;">
+                        <sc-for list="{{ note.chips }}" as="c" hint-placeholder-count="2">
+                          <div onClick="{{ c.on }}" style="height:32px; padding:0 12px; border-radius:11px; background:#FFF; border:1px solid #E3DCD5; font-size:12px; font-weight:600; color:#3A332E; display:flex; align-items:center; cursor:pointer; white-space:nowrap;">{{ c.label }}</div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ note.filled }}" hint-placeholder-val="{{ true }}">
+                      <div onClick="{{ on.clearNote }}" style="margin-top:9px; font-size:12px; font-weight:600; color:#C74E12; cursor:pointer;">Clear comment</div>
+                    </sc-if>
+                    <sc-if value="{{ note.hint }}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top:9px; font-size:12px; color:#7A5000; line-height:1.5;">{{ note.hintText }}</div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ q.isPhoto }}" hint-placeholder-val="{{ true }}">
+                <div style="border:1px dashed #E3DCD5; border-radius:16px; padding:20px; text-align:center; background:#FCFBFA;">
+                  <div style="font-size:13px; color:#6B625B; line-height:1.55;">This answer needs a photo. Tap below and we'll take you to the guided camera, then bring you straight back here.</div>
+                  <div onClick="{{ on.routeToPhoto }}" style="margin:14px auto 0; height:44px; width:200px; border-radius:14px; background:#F2661F; color:#FFF; font-size:14px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Open camera</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <sc-if value="{{ showUndo }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute; left:20px; right:20px; bottom:92px; height:46px; border-radius:14px; background:#14100D; display:flex; align-items:center; justify-content:space-between; padding:0 8px 0 14px; gap:10px; animation:shd-up .18s ease both; z-index:20;">
+              <div style="font-size:12.5px; color:#EDE8E3; white-space:nowrap;">Answer saved</div>
+              <div style="display:flex; align-items:center; gap:4px; flex:0 0 auto;">
+                <div onClick="{{ on.commentLast }}" style="display:flex; align-items:center; gap:6px; height:32px; padding:0 11px; border-radius:10px; background:#2C2521; cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFC79E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5V6.5A2.5 2.5 0 0 1 7.5 4h10A2.5 2.5 0 0 1 20 6.5z"></path>
+                  </svg>
+                  <span style="font-size:12.5px; font-weight:600; color:#FFC79E; white-space:nowrap;">Add comment</span>
+                </div>
+                <div onClick="{{ on.undo }}" style="height:32px; padding:0 11px; border-radius:10px; display:flex; align-items:center; font-size:12.5px; font-weight:600; color:#C4BCB5; cursor:pointer; white-space:nowrap;">Undo</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6; display:flex; gap:9px;">
+            <div onClick="{{ on.prevQ }}" style="{{ st.prevBtn }}">Back</div>
+            <div onClick="{{ on.nextQ }}" style="{{ st.nextBtn }}">{{ nextQLabel }}</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ PHOTO ============ -->
+        <sc-if value="{{ isPhoto }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF;">
+          <div style="padding:50px 18px 10px; display:flex; align-items:center; gap:12px;">
+            <div onClick="{{ on.goHub }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+            <div style="flex:1;">
+              <div style="font-size:15px; font-weight:600; color:#14100D;">{{ photo.title }}</div>
+              <div style="font-size:11.5px; color:#9A928B;">{{ photo.counter }}</div>
+            </div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:8px 20px 130px;">
+            <div style="{{ photo.frameStyle }}">
+              <div style="position:absolute; inset:14px; border:2px dashed rgba(255,255,255,.85); border-radius:12px;"></div>
+              <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(20,16,13,.72); color:#FFF; font-size:12px; font-weight:600; padding:6px 12px; border-radius:9px;">{{ photo.frameLabel }}</div>
+              <div style="position:absolute; bottom:10px; left:12px; font-family:'IBM Plex Mono', monospace; font-size:9px; letter-spacing:0.05em; color:rgba(255,255,255,.85);">{{ photo.slug }}</div>
+            </div>
+            <div style="font-size:13px; color:#6B625B; line-height:1.55; margin-top:14px;">{{ photo.hint }}</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:14px;">
+              <div style="padding:11px 13px; border-radius:14px; background:#F1F9F5; border:1px solid #D5EDE2;">
+                <div style="font-size:10px; font-weight:700; letter-spacing:0.08em; color:#1B7A55; text-transform:uppercase; margin-bottom:5px;">Do</div>
+                <sc-for list="{{ photo.dos }}" as="d" hint-placeholder-count="2">
+                  <div style="font-size:12px; color:#245A45; line-height:1.5;">{{ d.text }}</div>
+                </sc-for>
+              </div>
+              <div style="padding:11px 13px; border-radius:14px; background:#FEF3F3; border:1px solid #F6D8D8;">
+                <div style="font-size:10px; font-weight:700; letter-spacing:0.08em; color:#C43F3F; text-transform:uppercase; margin-bottom:5px;">Don't</div>
+                <sc-for list="{{ photo.donts }}" as="d" hint-placeholder-count="2">
+                  <div style="font-size:12px; color:#7A2E2E; line-height:1.5;">{{ d.text }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6; display:flex; flex-direction:column; gap:9px;">
+            <div onClick="{{ on.capture }}" style="height:52px; border-radius:16px; background:#F2661F; color:#FFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 18px rgba(242,102,31,.3);">{{ photo.cta }}</div>
+            <div onClick="{{ on.capture }}" style="height:44px; border-radius:14px; border:1px solid #E3DCD5; color:#3A332E; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Use sample (demo)</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ RECEIPT ============ -->
+        <sc-if value="{{ isReceipt }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF;">
+          <div style="padding:50px 18px 10px; display:flex; align-items:center; gap:12px;">
+            <div onClick="{{ on.goHub }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+            <div style="flex:1;">
+              <div style="font-size:15px; font-weight:600; color:#14100D;">Receipt</div>
+              <div style="font-size:11.5px; color:#9A928B;">Reimbursed up to 150 EGP</div>
+            </div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:8px 20px 130px;">
+            <div style="{{ st.receiptShot }}">
+              <div style="font-family:'IBM Plex Mono', monospace; font-size:9.5px; letter-spacing:0.05em; color:rgba(20,16,13,.45);">{{ receiptShotLabel }}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
+              <div>
+                <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; color:#9A928B; text-transform:uppercase; margin-bottom:5px;">Total paid</div>
+                <div style="{{ st.field }}">{{ receipt.amount }}</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; color:#9A928B; text-transform:uppercase; margin-bottom:5px;">Date</div>
+                  <div style="{{ st.field }}">{{ receipt.date }}</div>
+                </div>
+                <div>
+                  <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; color:#9A928B; text-transform:uppercase; margin-bottom:5px;">Receipt no.</div>
+                  <div style="{{ st.field }}">{{ receipt.number }}</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:600; letter-spacing:0.07em; color:#9A928B; text-transform:uppercase; margin-bottom:5px;">What you ordered</div>
+                <div style="{{ st.fieldTall }}">{{ receipt.items }}</div>
+              </div>
+            </div>
+            <sc-if value="{{ receipt.over }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:12px; padding:11px 13px; border-radius:13px; background:#FFF9E9; border:1px solid #F5E4B5; font-size:12.5px; color:#7A5000; line-height:1.5;">Above the 150 EGP limit — the difference stays on you.</div>
+            </sc-if>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6; display:flex; flex-direction:column; gap:9px;">
+            <div onClick="{{ on.saveReceipt }}" style="{{ st.receiptCta }}">{{ receiptCta }}</div>
+            <div onClick="{{ on.sampleReceipt }}" style="height:44px; border-radius:14px; border:1px solid #E3DCD5; color:#3A332E; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Use sample receipt (demo)</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ REVIEW ============ -->
+        <sc-if value="{{ isReview }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FAF8F6;">
+          <div style="padding:50px 18px 12px; background:#FFF; border-bottom:1px solid #F0EBE6; display:flex; align-items:center; gap:12px;">
+            <div onClick="{{ on.goHub }}" style="width:34px; height:34px; border-radius:12px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:16px; color:#14100D; cursor:pointer;">‹</div>
+            <div style="flex:1;">
+              <div style="font-size:15px; font-weight:600; color:#14100D;">Check before you send</div>
+              <div style="font-size:11.5px; color:#9A928B;">12 answers · 3 photos · 1 receipt</div>
+            </div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:14px 20px 110px;">
+            <sc-for list="{{ reviewGroups }}" as="g" hint-placeholder-count="5">
+              <div style="background:#FFF; border:1px solid #EEE9E4; border-radius:16px; padding:13px; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:9px;">
+                  <div style="font-size:13.5px; font-weight:600; color:#14100D;">{{ g.name }}</div>
+                  <div onClick="{{ g.on }}" style="font-size:11.5px; font-weight:600; color:#C74E12; cursor:pointer;">Edit</div>
+                </div>
+                <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+                  <div style="padding:8px 0; border-top:1px solid #F5F1ED;">
+                    <div style="font-size:12px; color:#8B827B; line-height:1.4;">{{ r.q }}</div>
+                    <div style="font-size:13.5px; font-weight:600; color:#14100D; margin-top:2px;">{{ r.a }}</div>
+                    <sc-if value="{{ r.hasComment }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex; gap:7px; margin-top:6px; padding:8px 10px; border-radius:10px; background:#FAF8F6;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A79E97" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto; margin-top:2px;">
+                          <path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5V6.5A2.5 2.5 0 0 1 7.5 4h10A2.5 2.5 0 0 1 20 6.5z"></path>
+                        </svg>
+                        <div style="font-size:12.5px; color:#4A423C; line-height:1.5;">{{ r.comment }}</div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; padding:12px 20px 26px; background:#FFF; border-top:1px solid #F0EBE6;">
+            <div onClick="{{ on.submit }}" style="height:52px; border-radius:16px; background:#F2661F; color:#FFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 18px rgba(242,102,31,.32);">Submit visit</div>
+            <div style="text-align:center; font-size:11.5px; color:#9A928B; margin-top:8px;">You can't edit after sending</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ SUBMITTED ============ -->
+        <sc-if value="{{ isSubmitted }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FFF; padding:0 24px; align-items:center; justify-content:center; text-align:center;">
+          <div style="width:110px; height:110px; border-radius:36px; background:#FFF1E8; display:flex; align-items:center; justify-content:center; animation:shd-pop .5s cubic-bezier(.2,.9,.3,1.4) both;">
+            <img src="logos/shadoo-icon.png" alt="" style="width:72px; height:auto; object-fit:contain; animation:shd-bounce 1.6s ease-in-out .5s infinite;" />
+          </div>
+          <div style="font-size:23px; font-weight:700; color:#14100D; letter-spacing:-0.025em; margin-top:22px;">Sent for review</div>
+          <div style="font-size:14px; color:#6B625B; line-height:1.6; margin-top:8px; max-width:280px;">Tamara usually reviews within 48 hours. We'll notify you, and 250 EGP plus your receipt lands in your wallet once approved.</div>
+          <div style="display:flex; gap:9px; margin-top:22px; width:100%;">
+            <div onClick="{{ on.goMissions }}" style="flex:1; height:50px; border-radius:16px; background:#F2661F; color:#FFF; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">My missions</div>
+            <div onClick="{{ on.goHome }}" style="flex:1; height:50px; border-radius:16px; border:1px solid #E3DCD5; color:#3A332E; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Find another</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ MY MISSIONS ============ -->
+        <sc-if value="{{ isMissions }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; flex-direction:column; min-height:0; background:#FAF8F6;">
+          <div style="padding:52px 20px 0; background:#FFF; border-bottom:1px solid #F0EBE6;">
+            <div style="font-size:20px; font-weight:700; color:#14100D; letter-spacing:-0.02em;">My missions</div>
+            <div style="display:flex; gap:7px; margin-top:12px; padding-bottom:11px; overflow-x:auto;">
+              <sc-for list="{{ missionTabs }}" as="t" hint-placeholder-count="4">
+                <div onClick="{{ t.on }}" style="{{ t.style }}">{{ t.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:14px 20px 96px;">
+            <sc-for list="{{ missionList }}" as="m" hint-placeholder-count="2">
+              <div style="background:#FFF; border:1px solid #EEE9E4; border-radius:18px; padding:13px; margin-bottom:10px;">
+                <div style="display:flex; gap:11px;">
+                  <div style="{{ m.logoStyle }}"></div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:14.5px; font-weight:600; color:#14100D; line-height:1.3;">{{ m.title }}</div>
+                    <div style="font-size:12px; color:#8B827B; margin-top:2px;">{{ m.sub }}</div>
+                  </div>
+                  <div style="text-align:right; flex:0 0 auto; white-space:nowrap;">
+                    <div style="{{ m.badgeStyle }}"><span style="{{ m.dotStyle }}"></span>{{ m.status }}</div>
+                    <div style="font-size:13px; font-weight:700; color:#14100D; margin-top:6px;">{{ m.reward }}</div>
+                  </div>
+                </div>
+                <sc-if value="{{ m.isActive }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ on.goHub }}" style="margin-top:11px; height:40px; border-radius:13px; background:#F2661F; color:#FFF; font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Continue visit · {{ deadlineText }} left</div>
+                </sc-if>
+                <sc-if value="{{ m.isReview }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:11px; display:flex; gap:8px;">
+                    <div style="flex:1; height:38px; border-radius:12px; background:#F1F9F5; color:#1B7A55; font-size:12.5px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">WhatsApp support</div>
+                    <div style="flex:1; height:38px; border-radius:12px; background:#F5F1ED; color:#3A332E; font-size:12.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Email us</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m.isRejected }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:11px; padding:10px 12px; border-radius:12px; background:#FEF3F3; border:1px solid #F6D8D8;">
+                    <div style="font-size:12px; color:#7A2E2E; line-height:1.5;">{{ m.reason }} This visit is closed and won't return to your feed.</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ missionsEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:56px 20px; text-align:center;">
+                <div style="width:56px; height:56px; border-radius:18px; background:#F0EBE6; margin:0 auto 14px;"></div>
+                <div style="font-size:15px; font-weight:600; color:#14100D;">Nothing here yet</div>
+                <div style="font-size:13px; color:#8B827B; margin-top:5px; line-height:1.5;">Visits you accept will show up in this tab.</div>
+                <div onClick="{{ on.goHome }}" style="margin:16px auto 0; width:180px; height:44px; border-radius:14px; background:#F2661F; color:#FFF; font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Browse visits</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ BOTTOM NAV ============ -->
+        <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute; bottom:0; left:0; right:0; height:76px; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-top:1px solid #F0EBE6; display:flex; align-items:flex-start; padding-top:10px; z-index:30;">
+          <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+            <div onClick="{{ n.on }}" style="{{ n.style }}">
+              <sc-if value="{{ n.isHome }}" hint-placeholder-val="{{ true }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 10.4 12 3.5l9 6.9V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path>
+                </svg>
+              </sc-if>
+              <sc-if value="{{ n.isMissions }}" hint-placeholder-val="{{ true }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="4" width="16" height="17" rx="2.5"></rect>
+                  <path d="M9 3h6v3H9z"></path>
+                  <path d="M8.5 12h7M8.5 16h4.5"></path>
+                </svg>
+              </sc-if>
+              <sc-if value="{{ n.isWallet }}" hint-placeholder-val="{{ true }}">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="6" width="18" height="13" rx="3"></rect>
+                  <path d="M3 10h18"></path>
+                  <circle cx="17" cy="14.5" r="1.2" fill="currentColor" stroke="none"></circle>
+                </svg>
+              </sc-if>
+              <sc-if value="{{ n.isCap }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ n.capStyle }}"></div>
+              </sc-if>
+              <div style="font-size:10px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ n.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAYS ============ -->
+        <sc-if value="{{ showTransition }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute; inset:0; background:rgba(20,16,13,.88); backdrop-filter:blur(3px); z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center; animation:shd-fade .18s ease both;">
+          <div style="width:76px; height:76px; border-radius:26px; background:#1B9A6B; display:flex; align-items:center; justify-content:center; animation:shd-pop .45s cubic-bezier(.2,.9,.3,1.4) both;">
+            <div style="color:#FFF; font-size:32px; font-weight:700; line-height:1;">✓</div>
+          </div>
+          <div style="color:#FFF; font-size:17px; font-weight:600; line-height:1.35; margin-top:18px; max-width:260px; text-align:center; text-wrap:pretty;">{{ transitionDone }}</div>
+          <div style="color:#A79E97; font-size:13px; line-height:1.4; margin-top:10px; max-width:260px; text-align:center;">{{ transitionNext }}</div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetFilter }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ on.closeSheet }}" style="position:absolute; inset:0; background:rgba(20,16,13,.5); z-index:90; animation:shd-fade .15s ease both;"></div>
+        <div style="position:absolute; left:0; right:0; bottom:0; background:#FFF; border-radius:26px 26px 0 0; z-index:91; padding:14px 20px 28px; animation:shd-sheet .24s cubic-bezier(.2,.8,.3,1) both;">
+          <div style="width:38px; height:4px; border-radius:2px; background:#E3DCD5; margin:0 auto 14px;"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div style="font-size:17px; font-weight:700; color:#14100D; letter-spacing:-0.02em;">Filter</div>
+            <div onClick="{{ on.clearCategory }}" style="font-size:12.5px; font-weight:600; color:#C74E12; cursor:pointer;">Reset</div>
+          </div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; color:#9A928B; text-transform:uppercase; margin-bottom:9px;">Category</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ categories }}" as="c" hint-placeholder-count="9">
+              <div onClick="{{ c.on }}" style="{{ c.style }}">{{ c.label }}<span style="{{ c.countStyle }}">{{ c.count }}</span></div>
+            </sc-for>
+          </div>
+          <div onClick="{{ on.closeSheet }}" style="margin-top:20px; height:50px; border-radius:16px; background:#F2661F; color:#FFF; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">{{ filterCta }}</div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetMap }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ on.closeSheet }}" style="position:absolute; inset:0; background:rgba(20,16,13,.5); z-index:90; animation:shd-fade .15s ease both;"></div>
+        <div style="position:absolute; left:0; right:0; bottom:0; top:96px; background:#FFF; border-radius:26px 26px 0 0; z-index:91; overflow:hidden; animation:shd-sheet .26s cubic-bezier(.2,.8,.3,1) both; display:flex; flex-direction:column;">
+          <div style="padding:12px 20px 10px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-size:16px; font-weight:700; color:#14100D;">5 visits near you</div>
+            <div onClick="{{ on.closeSheet }}" style="width:32px; height:32px; border-radius:11px; background:#F5F1ED; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer;">✕</div>
+          </div>
+          <div style="flex:1; position:relative; background-color:#EAF1EC; background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.8) 0 5px, rgba(0,0,0,0) 5px 11px);">
+            <div style="position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:8px; background:#2C7BE5; box-shadow:0 0 0 6px rgba(44,123,229,.2);"></div>
+            <sc-for list="{{ mapPins }}" as="p" hint-placeholder-count="5">
+              <div onClick="{{ p.on }}" style="{{ p.style }}">
+                <span style="{{ p.logoStyle }}"></span>
+                <span>{{ p.label }}</span>
+              </div>
+            </sc-for>
+            <div style="position:absolute; bottom:10px; left:12px; font-family:'IBM Plex Mono', monospace; font-size:9px; color:rgba(20,16,13,.45);">map tiles</div>
+
+            <sc-if value="{{ hasMapSel }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute; left:12px; right:12px; bottom:12px; background:#FFF; border-radius:20px; box-shadow:0 12px 34px rgba(20,16,13,.24); overflow:hidden; animation:shd-up .2s ease both;">
+                <div style="display:flex; gap:12px; padding:13px 13px 0;">
+                  <div style="{{ mapSel.logoStyle }}"></div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <div style="font-size:10px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#8B827B; white-space:nowrap;">{{ mapSel.category }}</div>
+                      <sc-if value="{{ mapSel.purchase }}" hint-placeholder-val="{{ true }}">
+                        <div style="height:18px; padding:0 6px; border-radius:6px; background:#FFF6E0; color:#8A5B02; font-size:9px; font-weight:700; display:flex; align-items:center; white-space:nowrap;">RECEIPT</div>
+                      </sc-if>
+                    </div>
+                    <div style="font-size:15.5px; font-weight:700; color:#14100D; letter-spacing:-0.015em; line-height:1.2; margin-top:2px;">{{ mapSel.brand }}</div>
+                    <div style="font-size:12px; color:#6B625B; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ mapSel.branch }}</div>
+                  </div>
+                  <div style="text-align:right; flex:0 0 auto;">
+                    <div style="font-size:17px; font-weight:700; color:#F2661F; letter-spacing:-0.02em;">{{ mapSel.reward }}</div>
+                    <div style="font-size:9.5px; font-weight:600; color:#E08A55; letter-spacing:0.06em;">EGP</div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:13px; padding:10px 13px 0;">
+                  <div style="font-size:11.5px; color:#6B625B;">{{ mapSel.distance }}</div>
+                  <div style="font-size:11.5px; color:#6B625B;">{{ mapSel.duration }}</div>
+                  <div style="font-size:11.5px; color:#6B625B;">{{ mapSel.taskCount }}</div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 13px; margin-top:10px; border-top:1px solid #F0EBE6; background:#FCFBFA;">
+                  <div style="font-size:12px; font-weight:500; color:#6B625B; white-space:nowrap; flex:0 0 auto;">{{ mapSel.window }}</div>
+                  <div onClick="{{ on.openSelected }}" style="height:38px; padding:0 18px; border-radius:13px; background:#F2661F; color:#FFF; font-size:13px; font-weight:600; display:flex; align-items:center; cursor:pointer;">View visit</div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noMapSel }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute; left:12px; right:12px; bottom:12px; padding:13px 15px; border-radius:16px; background:rgba(255,255,255,.95); box-shadow:0 8px 24px rgba(20,16,13,.16);">
+                <div style="font-size:13px; color:#6B625B; line-height:1.5;">Tap any pin to see that visit.</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetCancel }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ on.closeSheet }}" style="position:absolute; inset:0; background:rgba(20,16,13,.5); z-index:90; animation:shd-fade .15s ease both;"></div>
+        <div style="position:absolute; left:0; right:0; bottom:0; background:#FFF; border-radius:26px 26px 0 0; z-index:91; padding:20px 20px 28px; animation:shd-sheet .24s cubic-bezier(.2,.8,.3,1) both;">
+          <div style="width:38px; height:4px; border-radius:2px; background:#E3DCD5; margin:0 auto 16px;"></div>
+          <div style="font-size:18px; font-weight:700; color:#14100D; letter-spacing:-0.02em;">Cancel this visit?</div>
+          <div style="font-size:13.5px; color:#6B625B; line-height:1.6; margin-top:8px;">{{ cancelCopy }}</div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:18px;">
+            <div onClick="{{ on.confirmCancel }}" style="height:50px; border-radius:16px; background:#FEF3F3; color:#C43F3F; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid #F6D8D8;">Yes, cancel the visit</div>
+            <div onClick="{{ on.closeSheet }}" style="height:50px; border-radius:16px; background:#14100D; color:#FFF; font-size:14.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Keep going</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetHelp }}" hint-placeholder-val="{{ true }}">
+        <div onClick="{{ on.closeSheet }}" style="position:absolute; inset:0; background:rgba(20,16,13,.5); z-index:90; animation:shd-fade .15s ease both;"></div>
+        <div style="position:absolute; left:0; right:0; bottom:0; background:#FFF; border-radius:26px 26px 0 0; z-index:91; padding:20px 20px 28px; animation:shd-sheet .24s cubic-bezier(.2,.8,.3,1) both;">
+          <div style="width:38px; height:4px; border-radius:2px; background:#E3DCD5; margin:0 auto 16px;"></div>
+          <div style="font-size:18px; font-weight:700; color:#14100D; letter-spacing:-0.02em;">Stuck on site?</div>
+          <div style="font-size:13.5px; color:#6B625B; line-height:1.6; margin-top:8px;">Branch closed, staff suspicious, or the app misbehaving? Reach us and we'll pause the timer.</div>
+          <div style="display:flex; gap:9px; margin-top:18px;">
+            <div style="flex:1; height:48px; border-radius:15px; background:#F1F9F5; color:#1B7A55; font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">WhatsApp</div>
+            <div style="flex:1; height:48px; border-radius:15px; background:#F5F1ED; color:#3A332E; font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Email</div>
+          </div>
+          <div onClick="{{ on.closeSheet }}" style="margin-top:10px; height:48px; border-radius:15px; border:1px solid #E3DCD5; color:#6B625B; font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; cursor:pointer;">Close</div>
+        </div>
+        </sc-if>
+
+      </div>
+      </sc-if>
+
+      <!-- ============ ARABIC / RTL ============ -->
+      <sc-if value="{{ isAr }}" hint-placeholder-val="{{ true }}">
+      <div dir="rtl" style="position:absolute; inset:0; display:flex; flex-direction:column; font-family:Cairo, sans-serif; background:#FAF8F6;">
+        <div style="padding:52px 20px 14px; background:#FFF; border-bottom:1px solid #F0EBE6;">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:14px;">
+            <div>
+              <div style="font-size:12px; color:#8B827B; font-weight:500;">مساء الخير</div>
+              <div style="font-size:20px; font-weight:700; color:#14100D;">أحمد</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="display:flex; align-items:center; gap:6px; height:34px; padding:0 12px; border-radius:17px; background:#FFF1E8;">
+                <span style="font-size:13px; font-weight:700; color:#C74E12;">١٬٢٤٠</span>
+                <span style="font-size:10px; font-weight:600; color:#E08A55;">ج.م</span>
+              </div>
+              <div style="width:34px; height:34px; border-radius:17px; background:#F5F1ED;"></div>
+            </div>
+          </div>
+          <div style="display:flex; gap:9px;">
+            <div style="flex:1; height:44px; border-radius:14px; background:#F5F1ED; display:flex; align-items:center; gap:9px; padding:0 14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A928B" stroke-width="2.2" stroke-linecap="round" style="flex:0 0 auto;">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="M16 16l4.5 4.5"></path>
+              </svg>
+              <div style="font-size:13.5px; color:#9A928B;">ابحث عن علامة أو فرع أو منطقة</div>
+            </div>
+            <div style="width:44px; height:44px; border-radius:14px; border:1px solid #E3DCD5; display:flex; align-items:center; justify-content:center;">
+              <div style="display:flex; flex-direction:column; gap:3px; align-items:center;">
+                <div style="width:15px; height:2px; border-radius:1px; background:#6B625B;"></div>
+                <div style="width:10px; height:2px; border-radius:1px; background:#6B625B;"></div>
+                <div style="width:5px; height:2px; border-radius:1px; background:#6B625B;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1; overflow-y:auto; padding:0 0 96px;">
+          <div style="margin:12px 20px 0; height:56px; border-radius:14px; border:1px solid #ECE7E2; background:#FFF; display:flex; align-items:center; padding:0 12px 0 8px; gap:11px;">
+            <div style="width:40px; height:40px; border-radius:10px; background-color:#EAF1EC; background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.85) 0 3px, rgba(0,0,0,0) 3px 7px);"></div>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:600; color:#14100D;">٥ زيارات قريبة منك</div>
+              <div style="font-size:11.5px; color:#8B827B;">القاهرة · في نطاق ٣٠ كم</div>
+            </div>
+            <div style="height:30px; padding:0 12px; border-radius:15px; background:#FFF1E8; color:#C74E12; font-size:11.5px; font-weight:600; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">عرض الخريطة</div>
+          </div>
+
+          <div style="display:flex; gap:7px; padding:14px 20px 6px;">
+            <div style="height:34px; padding:0 15px; border-radius:17px; background:#14100D; color:#FFF; font-size:12.5px; font-weight:600; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">الكل</div>
+            <div style="height:34px; padding:0 15px; border-radius:17px; background:#FFF; border:1px solid #E3DCD5; color:#3A332E; font-size:12.5px; font-weight:500; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">الأقرب</div>
+            <div style="height:34px; padding:0 15px; border-radius:17px; background:#FFF; border:1px solid #E3DCD5; color:#3A332E; font-size:12.5px; font-weight:500; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">الأعلى مكافأة</div>
+          </div>
+
+          <div style="padding:8px 20px 10px; font-size:12px; color:#8B827B;">٥ زيارات متاحة</div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; padding:0 20px;">
+            <div style="border-radius:20px; background:#FFF; border:1px solid #EEE9E4; box-shadow:0 2px 10px rgba(20,16,13,.04); overflow:hidden;">
+              <div style="display:flex; gap:13px; padding:14px 14px 0;">
+                <div style="width:52px; height:52px; border-radius:16px; background:#FFF; border:1px solid #EEE9E4; background-image:url(logos/tamara.png); background-size:34px auto; background-position:center; background-repeat:no-repeat; flex:0 0 auto;"></div>
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:7px; margin-bottom:3px;">
+                    <div style="font-size:10.5px; font-weight:600; color:#8B827B;">مأكولات ومشروبات</div>
+                    <div style="height:19px; padding:0 7px; border-radius:6px; background:#FFF6E0; color:#8A5B02; font-size:9.5px; font-weight:600; display:flex; align-items:center;">إيصال مطلوب</div>
+                  </div>
+                  <div style="font-size:15.5px; font-weight:600; color:#14100D; line-height:1.4;">تقييم الخدمة — ألماظة سيتي سنتر</div>
+                  <div style="font-size:12.5px; color:#6B625B; margin-top:3px;">ألماظة سيتي سنتر · مصر الجديدة</div>
+                </div>
+                <div style="text-align:left; flex:0 0 auto;">
+                  <div style="font-size:17px; font-weight:700; color:#F2661F;">٢٥٠</div>
+                  <div style="font-size:10px; font-weight:600; color:#E08A55;">ج.م</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:14px; padding:11px 14px 12px; margin-top:11px;">
+                <div style="font-size:11.5px; color:#6B625B;">٤٫٢ كم</div>
+                <div style="font-size:11.5px; color:#6B625B;">٤٥ دقيقة</div>
+                <div style="font-size:11.5px; color:#6B625B;">١٢ سؤال · ٤ صور</div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-top:1px solid #F0EBE6; background:#FCFBFA;">
+                <div style="font-size:12px; font-weight:500; color:#6B625B; white-space:nowrap; flex:0 0 auto;">متاحة الآن</div>
+                <div style="height:38px; padding:0 18px; border-radius:13px; background:#F2661F; color:#FFF; font-size:13px; font-weight:600; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">عرض الزيارة</div>
+              </div>
+            </div>
+
+            <div style="border-radius:20px; background:#FFF; border:1px solid #EEE9E4; overflow:hidden;">
+              <div style="display:flex; gap:13px; padding:14px 14px 0;">
+                <div style="width:52px; height:52px; border-radius:16px; background:#FFF; border:1px solid #EEE9E4; background-image:url(logos/cib.png); background-size:34px auto; background-position:center; background-repeat:no-repeat; flex:0 0 auto;"></div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:10.5px; font-weight:600; color:#8B827B; margin-bottom:3px;">بنوك</div>
+                  <div style="font-size:15.5px; font-weight:600; color:#14100D; line-height:1.4;">تقييم فرع — مدينة نصر</div>
+                  <div style="font-size:12.5px; color:#6B625B; margin-top:3px;">عباس العقاد · مدينة نصر</div>
+                </div>
+                <div style="text-align:left; flex:0 0 auto;">
+                  <div style="font-size:17px; font-weight:700; color:#F2661F;">٣٠٠</div>
+                  <div style="font-size:10px; font-weight:600; color:#E08A55;">ج.م</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:14px; padding:11px 14px 12px; margin-top:11px;">
+                <div style="font-size:11.5px; color:#6B625B;">٦٫٨ كم</div>
+                <div style="font-size:11.5px; color:#6B625B;">٣٠ دقيقة</div>
+                <div style="font-size:11.5px; color:#6B625B;">٩ أسئلة · ٢ صورة</div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-top:1px solid #F0EBE6; background:#FCFBFA;">
+                <div style="font-size:12px; font-weight:500; color:#6B625B; white-space:nowrap; flex:0 0 auto;">تبدأ بعد ساعتين و١٥ دقيقة</div>
+                <div style="height:38px; padding:0 18px; border-radius:13px; background:#FFF1E8; color:#C74E12; font-size:13px; font-weight:600; display:flex; align-items:center; white-space:nowrap; flex:0 0 auto;">عرض الزيارة</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin:18px 20px 0; padding:13px 15px; border-radius:15px; background:#FFF6F0; border:1px solid #FBD9C2;">
+            <div style="font-size:12.5px; color:#7A4318; line-height:1.7;">النسخة العربية تعكس التخطيط بالكامل: الشريط الجانبي للأزرار، اتجاه الأيقونات، والأرقام العربية. الخط: Cairo.</div>
+          </div>
+        </div>
+
+        <div style="position:absolute; bottom:0; left:0; right:0; height:76px; background:rgba(255,255,255,.96); border-top:1px solid #F0EBE6; display:flex; align-items:flex-start; padding-top:10px;">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#F2661F;">
+            <div style="width:20px; height:20px; border-radius:6px; background:#F2661F;"></div>
+            <div style="font-size:10px; font-weight:600;">الرئيسية</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#9A928B;">
+            <div style="width:20px; height:20px; border-radius:6px; background:#C4BCB5;"></div>
+            <div style="font-size:10px; font-weight:600;">مهامي</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#9A928B;">
+            <div style="width:20px; height:20px; border-radius:6px; background:#C4BCB5;"></div>
+            <div style="font-size:10px; font-weight:600;">المحفظة</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#9A928B;">
+            <div style="width:20px; height:20px; border-radius:6px; background:#C4BCB5;"></div>
+            <div style="font-size:10px; font-weight:600;">حسابي</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:940},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;ar&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;homeCard&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a&quot;,&quot;b&quot;],&quot;default&quot;:&quot;a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variants&quot;},&quot;hubStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a&quot;,&quot;b&quot;],&quot;default&quot;:&quot;a&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variants&quot;}}">
+const ORANGE = '#F2661F';
+
+const VISITS = [
+  { id:'tamara', logo:'logos/tamara.png', brand:'Tamara', sub:'Lebanese Bistro', title:'Service review — lunch or dinner', branch:'Almaza City Centre · Heliopolis',
+    category:'F&B', cat:'fnb', reward:250, distance:'4.2 km', duration:'45 min', taskCount:'12 questions · 4 photos',
+    purchase:true, window:'Available now', locked:false, shot:'branch exterior' },
+  { id:'cib', logo:'logos/cib.png', brand:'CIB', sub:'Commercial International Bank', title:'Branch service check — teller queue', branch:'Abbas El Akkad · Nasr City',
+    category:'Banking', cat:'banking', reward:300, distance:'6.8 km', duration:'30 min', taskCount:'9 questions · 2 photos',
+    purchase:false, window:'Starts in 2h 15m', locked:true, shot:'branch facade' },
+  { id:'vodafone', logo:'logos/vodafone.png', brand:'Vodafone', sub:'Retail store', title:'Store review — plan upgrade enquiry', branch:'City Stars · Nasr City',
+    category:'Telecom', cat:'telecom', reward:180, distance:'7.1 km', duration:'25 min', taskCount:'8 questions · 3 photos',
+    purchase:false, window:'Available now', locked:false, shot:'store front' },
+  { id:'tbs', logo:'logos/tbs.png', brand:'TBS', sub:'The Bakery Shop', title:'Counter service & freshness check', branch:'Road 9 · Maadi',
+    category:'F&B', cat:'fnb', reward:160, distance:'11.4 km', duration:'20 min', taskCount:'7 questions · 2 photos',
+    purchase:true, window:'Available now', locked:false, shot:'bakery counter' },
+  { id:'tamara2', logo:'logos/tamara.png', brand:'Tamara', sub:'Lebanese Bistro', title:'Service review — second branch slot', branch:'Mall of Arabia · 6th October',
+    category:'F&B', cat:'fnb', reward:230, distance:'18.2 km', duration:'45 min', taskCount:'12 questions · 4 photos',
+    purchase:true, window:'Starts in 45m', locked:true, shot:'branch exterior' }
+];
+
+const SECTIONS = [
+  { id:'greeting', name:'Greeting & welcome', questions:[
+    { id:'g1', type:'choice', text:'Were you greeted within 30 seconds of entering?', options:['Yes','No'],
+      why:'Speed of welcome is the single strongest driver of a first impression, so we time it rather than ask how it felt.' },
+    { id:'g2', type:'rating', text:'How warm was the greeting?', photoOptional:'entrance',
+      notes:['Server smiled and used my name','Greeted but no eye contact','Nobody at the host stand'] }
+  ]},
+  { id:'order', name:'Order experience', questions:[
+    { id:'o1', type:'rating', text:'How well did the server know the menu?', commentRequired:true,
+      notes:['Explained every dish without checking','Had to ask the kitchen twice','Could not describe the specials'] },
+    { id:'o2', type:'choice', text:'Were you offered a drink or dessert?', options:['Yes, both','Only one','No'] },
+    { id:'o3', type:'choice', text:'How long did you wait for your food?', options:['Under 10 min','10–20 min','Over 20 min'] }
+  ]},
+  { id:'food', name:'Food quality', questions:[
+    { id:'f1', type:'rating', text:'Temperature of the food on arrival' },
+    { id:'f2', type:'rating', text:'Taste and seasoning', notes:['Well seasoned, cooked right','Under-seasoned','Too salty'] },
+    { id:'f3', type:'photo', text:'Photograph your main course before eating', photoSlot:'food' }
+  ]},
+  { id:'clean', name:'Cleanliness', questions:[
+    { id:'c1', type:'rating', text:'Cleanliness of the dining area' },
+    { id:'c2', type:'rating', text:'Cleanliness of the restroom', photoRequired:'restroom', allowNa:true,
+      naLabel:'Restroom was closed or unavailable',
+      notes:['Clean, stocked, dry floor','Bin overflowing','No soap or paper towels'] }
+  ]},
+  { id:'overall', name:'Overall experience', questions:[
+    { id:'v1', type:'nps', text:'How likely are you to recommend Tamara to a friend?', allowNa:true,
+      notes:['Food and service both strong','Good food, slow service','Would not come back'] },
+    { id:'v2', type:'text', text:'Anything the branch manager should know?' }
+  ]}
+];
+
+const PHOTOS = [
+  { id:'storefront', title:'Storefront', slug:'storefront_ref.jpg', hint:'A clear shot of the branch entrance from outside, sign readable.',
+    frameLabel:'Frame like this', dos:['Whole storefront in frame','Shoot in daylight'], donts:['No faces','No blur'] },
+  { id:'food', title:'Your main course', slug:'main_course_ref.jpg', hint:'Top-down shot of the plate as it arrived, before you eat.',
+    frameLabel:'Shoot from above', dos:['Whole plate visible','Natural light'], donts:['No half-eaten food','No flash'] },
+  { id:'dining', title:'Dining area', slug:'dining_area_ref.jpg', hint:'Wide shot showing tables, floor and seating condition.',
+    frameLabel:'Wide, from the corner', dos:['Show the floor','Include 3+ tables'], donts:['No customer faces','No zoom'] }
+];
+
+// photo slots attached to a single question rather than the hub list
+const Q_PHOTOS = {
+  entrance: { id:'entrance', title:'Entrance', slug:'entrance_ref.jpg', hint:'The host stand as you saw it on arrival.',
+    frameLabel:'Shoot from the door', dos:['Show the host stand','Keep it quick'], donts:['No staff faces','No flash'] },
+  restroom: { id:'restroom', title:'Restroom', slug:'restroom_ref.jpg', hint:'Wide shot of the restroom, floor and basin visible.',
+    frameLabel:'Wide, from the door', dos:['Basin and floor visible','Lights on'], donts:['No people','No mirror selfies'] }
+};
+
+const RECEIPT_SAMPLE = { amount:'132 EGP', date:'Sat 1 Aug, 21:40', number:'TB-448210', items:'Chicken shish tawook, lentil soup, fresh lemon mint' };
+
+const CATEGORIES = [
+  { id:'all', label:'All' }, { id:'fnb', label:'F&B' }, { id:'banking', label:'Banking' },
+  { id:'telecom', label:'Telecom' }, { id:'pharmacy', label:'Pharmacy' }, { id:'fashion', label:'Fashion' },
+  { id:'retail', label:'Retail' }, { id:'grocery', label:'Grocery' }, { id:'automotive', label:'Automotive' }
+];
+
+const BRIEF_STEPS = ['Overview','Rules','Questions','Photos','Purchase','Payout'];
+
+class Component extends DCLogic {
+  state = {
+    screen: 'home', sheet: null,
+    lang: this.props.lang || 'en',
+    cardVariant: this.props.homeCard || 'a',
+    hubVariant: this.props.hubStyle || 'a',
+    sort: 'all', category: 'all',
+    briefStep: 0, briefMax: 0, agreed: false,
+    secIdx: 0, qIdx: 0, showWhy: false, showUndo: false,
+    answers: {}, comments: {}, noteOpen: null, lastAnswered: null, photos: {}, receipt: null,
+    transition: null, missionsTab: 'active',
+    cancelSec: 299, deadlineSec: 2699, running: false,
+    returnTo: null, photoId: 'storefront',
+    selected: 'tamara', mapSel: null
+  };
+
+  componentDidMount() {
+    this._t = setInterval(() => {
+      if (!this.state.running) return;
+      this.setState(s => ({ cancelSec: Math.max(0, s.cancelSec - 1), deadlineSec: Math.max(0, s.deadlineSec - 1) }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this._t); if (this._u) clearTimeout(this._u); if (this._x) clearTimeout(this._x); }
+
+  fmt(n) { const m = Math.floor(n / 60), s = n % 60; return m + ':' + String(s).padStart(2, '0'); }
+
+  set(patch) { this.setState(patch); }
+
+  seedAnswers(upTo) {
+    const a = {};
+    const long = 'The team was quick and friendly, but the restroom needed attention around 9pm.';
+    SECTIONS.slice(0, upTo).forEach(sec => sec.questions.forEach(q => {
+      if (q.type === 'choice') a[q.id] = q.options[0];
+      else if (q.type === 'rating') a[q.id] = 4;
+      else if (q.type === 'nps') a[q.id] = 9;
+      else if (q.type === 'text') a[q.id] = long;
+      else if (q.type === 'photo') a[q.id] = 'captured';
+    }));
+    return a;
+  }
+
+  seedComments(upTo) {
+    const c = {};
+    SECTIONS.slice(0, upTo).forEach(sec => sec.questions.forEach(q => {
+      if (q.commentRequired && q.notes) c[q.id] = q.notes[0];
+    }));
+    return c;
+  }
+
+  goto(id) {
+    const full = { answers: this.seedAnswers(5), comments: this.seedComments(5),
+      photos: { storefront:1, food:1, dining:1 }, receipt: RECEIPT_SAMPLE };
+    const m = {
+      home: { screen:'home', sheet:null },
+      filter: { screen:'home', sheet:'filter' },
+      map: { screen:'home', sheet:'map', mapSel:'tamara' },
+      detail: { screen:'detail', sheet:null, selected:'tamara' },
+      detailLocked: { screen:'detail', sheet:null, selected:'cib' },
+      briefLocked: { screen:'brief', sheet:null, selected:'cib', briefStep:5, briefMax:5, agreed:true },
+      brief0: { screen:'brief', briefStep:0, briefMax:0, agreed:false, sheet:null },
+      brief2: { screen:'brief', briefStep:2, briefMax:2, sheet:null },
+      brief5: { screen:'brief', briefStep:5, briefMax:5, agreed:false, sheet:null },
+      hub0: { screen:'hub', running:true, answers:{}, comments:{}, photos:{}, receipt:null, sheet:null },
+      question: { screen:'question', secIdx:0, qIdx:0, running:true, noteOpen:null, sheet:null },
+      comment: { screen:'question', secIdx:1, qIdx:0, running:true, noteOpen:'o1', comments:{},
+        answers: Object.assign(this.seedAnswers(1), { o1: 3 }), sheet:null },
+      na: { screen:'question', secIdx:3, qIdx:1, running:true, noteOpen:null, sheet:null,
+        answers: this.seedAnswers(3), comments:{} },
+      nps: { screen:'question', secIdx:4, qIdx:0, running:true, answers:this.seedAnswers(4), comments:this.seedComments(4), sheet:null },
+      photo: { screen:'photo', photoId:'storefront', running:true, sheet:null },
+      receipt: { screen:'receipt', running:true, sheet:null },
+      hubdone: Object.assign({ screen:'hub', running:true, sheet:null }, full),
+      cancel: { screen:'hub', sheet:'cancel', running:true },
+      review: Object.assign({ screen:'review', running:false, sheet:null }, full),
+      submitted: { screen:'submitted', running:false, sheet:null },
+      mActive: { screen:'missions', missionsTab:'active', running:true, sheet:null },
+      mReview: { screen:'missions', missionsTab:'review', sheet:null },
+      mRejected: { screen:'missions', missionsTab:'rejected', sheet:null }
+    }[id];
+    if (m) this.setState(m);
+  }
+
+  // A comment is expected when the client asked for one, or when the score is low
+  // enough that "why" is the only useful part of the answer.
+  noteExpected() { return false; }
+
+  answer(q, val) {
+    const expected = this.noteExpected(q, val);
+    this.setState(s => ({
+      answers: Object.assign({}, s.answers, { [q.id]: val }),
+      showUndo: true,
+      lastAnswered: { qid: q.id, secIdx: s.secIdx, qIdx: s.qIdx },
+      noteOpen: expected ? q.id : s.noteOpen
+    }));
+    if (this._u) clearTimeout(this._u);
+    this._u = setTimeout(() => this.setState({ showUndo: false }), 4200);
+    if (expected) return;
+    // nothing was observed, so a photo of it cannot be required
+    if (val === 'na') { setTimeout(() => this.advance(), 620); return; }
+    // a required question photo takes priority over auto-advance
+    if (q.photoRequired && !this.state.photos[q.photoRequired]) {
+      setTimeout(() => this.setState({ screen:'photo', photoId: q.photoRequired, returnTo:'question' }), 380);
+      return;
+    }
+    // an optional photo slot needs to stay tappable — never auto-advance past it
+    if (q.photoOptional) return;
+    if (q.type === 'choice' || q.type === 'rating' || q.type === 'nps') {
+      setTimeout(() => {
+        // a comment typed in the meantime means the agent is still writing
+        if (this.state.noteOpen === q.id) return;
+        this.advance();
+      }, 620);
+    }
+  }
+
+  setComment(q, text) {
+    this.setState(s => {
+      const c = Object.assign({}, s.comments);
+      if (text) c[q.id] = text; else delete c[q.id];
+      return { comments: c };
+    });
+  }
+
+  advance() {
+    const sec = SECTIONS[this.state.secIdx];
+    if (this.state.qIdx < sec.questions.length - 1) {
+      this.setState(s => ({ qIdx: s.qIdx + 1, showWhy: false, noteOpen: null }));
+    } else {
+      this.finishSection();
+    }
+  }
+
+  finishSection() {
+    const next = SECTIONS[this.state.secIdx + 1];
+    this.setState({ transition: { done: SECTIONS[this.state.secIdx].name, next: next ? 'Up next: ' + next.name : 'All questions done' }, showUndo: false });
+    if (this._x) clearTimeout(this._x);
+    this._x = setTimeout(() => {
+      if (next) this.setState(s => ({ transition:null, secIdx: s.secIdx + 1, qIdx: 0, showWhy: false, noteOpen: null }));
+      else this.setState({ transition:null, screen:'hub' });
+    }, 1500);
+  }
+
+  sectionDone(sec) {
+    return sec.questions.every(q => this.state.answers[q.id] !== undefined &&
+      !(q.photoRequired && this.state.answers[q.id] !== 'na' && !this.state.photos[q.photoRequired]));
+  }
+
+  totals() {
+    const done = SECTIONS.filter(s => this.sectionDone(s)).length + PHOTOS.filter(p => this.state.photos[p.id]).length + (this.state.receipt ? 1 : 0);
+    return { done, total: SECTIONS.length + PHOTOS.length + 1 };
+  }
+
+  pill(active) {
+    return { height:'34px', padding:'0 15px', borderRadius:'17px', display:'flex', alignItems:'center', fontSize:'12.5px',
+      fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', flex:'0 0 auto',
+      background: active ? '#14100D' : '#FFF', color: active ? '#FFF' : '#3A332E',
+      border: active ? '1px solid #14100D' : '1px solid #E3DCD5' };
+  }
+
+  railBtn(active) {
+    return { padding:'6px 9px', borderRadius:'8px', fontSize:'10.5px', fontWeight:600, cursor:'pointer', flex:1, textAlign:'center',
+      background: active ? ORANGE : '#2A2420', color: active ? '#FFF' : '#A79E97' };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const isEn = s.lang === 'en';
+    const t = this.totals();
+    const sec = SECTIONS[s.secIdx];
+    const q = sec.questions[s.qIdx];
+    const ans = s.answers[q ? q.id : ''];
+    const sel = VISITS.find(v => v.id === s.selected) || VISITS[0];
+
+    // rail
+    const railDefs = [
+      ['home','Home feed'], ['filter','Filter sheet'], ['map','Map · pin selected'], ['detail','Visit detail'],
+      ['detailLocked','Visit detail · upcoming'], ['briefLocked','Brief · locked accept'],
+      ['brief0','Brief · overview'], ['brief2','Brief · questions'], ['brief5','Brief · accept'],
+      ['hub0','Active hub · empty'], ['question','Question · yes-no'],
+      ['comment','Question · with comment'], ['na','Question · N/A option'], ['nps','Question · NPS'],
+      ['photo','Photo guidance'], ['receipt','Receipt'], ['hubdone','Active hub · complete'],
+      ['cancel','Cancel confirm'], ['review','Review answers'], ['submitted','Submitted'],
+      ['mActive','My missions · active'], ['mReview','My missions · in review'], ['mRejected','My missions · rejected']
+    ];
+    const activeRail = (() => {
+      if (s.sheet === 'filter') return 'filter'; if (s.sheet === 'map') return 'map'; if (s.sheet === 'cancel') return 'cancel';
+      if (s.screen === 'detail') return sel.locked ? 'detailLocked' : 'detail';
+      if (s.screen === 'brief') return sel.locked ? 'briefLocked' : (s.briefStep === 0 ? 'brief0' : (s.briefStep === 5 ? 'brief5' : 'brief2'));
+      if (s.screen === 'hub') return t.done === 0 ? 'hub0' : 'hubdone';
+      if (s.screen === 'question') {
+        if (s.secIdx === 4) return 'nps';
+        if (s.secIdx === 3 && s.qIdx === 1) return 'na';
+        if (s.secIdx === 1 && s.qIdx === 0) return 'comment';
+        return 'question';
+      }
+      if (s.screen === 'missions') return s.missionsTab === 'active' ? 'mActive' : (s.missionsTab === 'review' ? 'mReview' : 'mRejected');
+      return s.screen;
+    })();
+    const rail = railDefs.map((r, i) => ({
+      num: String(i + 1).padStart(2, '0'), label: r[1], on: () => this.goto(r[0]),
+      style: { display:'flex', gap:'8px', alignItems:'center', padding:'7px 9px', borderRadius:'9px', fontSize:'11.5px',
+        cursor:'pointer', marginBottom:'2px', fontWeight: activeRail === r[0] ? 600 : 500,
+        background: activeRail === r[0] ? '#33291F' : 'transparent', color: activeRail === r[0] ? '#FFD9BF' : '#948A83' }
+    }));
+
+    // feed
+    let feed = VISITS.filter(v => s.category === 'all' || v.cat === s.category);
+    if (s.sort === 'nearest') feed = feed.slice().sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+    if (s.sort === 'reward') feed = feed.slice().sort((a, b) => b.reward - a.reward);
+    if (s.sort === 'soonest') feed = feed.slice().sort((a, b) => (a.locked ? 1 : 0) - (b.locked ? 1 : 0));
+
+    const feedRows = feed.map(v => ({
+      initials: v.initials, category: v.category, title: v.title, branch: v.branch, reward: String(v.reward),
+      distance: v.distance, duration: v.duration, taskCount: v.taskCount, needsPurchase: v.purchase,
+      brand: v.brand, logo: v.logo,
+      window: v.window, shotLabel: v.shot, cta: 'View visit',
+      on: () => this.setState({ screen:'detail', selected:v.id, sheet:null }),
+      logoStyle: { width:'52px', height:'52px', borderRadius:'16px', background:'#FFF', border:'1px solid #EEE9E4',
+        backgroundImage:'url(' + v.logo + ')', backgroundSize:'34px auto', backgroundPosition:'center', backgroundRepeat:'no-repeat',
+        flex:'0 0 auto' },
+      logoStyleB: { position:'absolute', left:'14px', bottom:'-22px', width:'52px', height:'52px', borderRadius:'16px',
+        background:'#FFF', border:'1px solid #EEE9E4', backgroundImage:'url(' + v.logo + ')', backgroundSize:'34px auto',
+        backgroundPosition:'center', backgroundRepeat:'no-repeat' },
+      heroStyle: { position:'relative', height:'112px', backgroundColor:'#F4EFEA',
+        backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 13px)' },
+      footStyle: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 14px', borderTop:'1px solid #F0EBE6', background:'#FCFBFA' },
+      footStyleB: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 15px', marginTop:'12px', borderTop:'1px solid #F0EBE6', background:'#FCFBFA' },
+      ctaStyle: { height:'38px', padding:'0 18px', borderRadius:'13px', fontSize:'13px', fontWeight:600, display:'flex',
+        alignItems:'center', cursor:'pointer', whiteSpace:'nowrap', background: v.locked ? '#FFF1E8' : ORANGE, color: v.locked ? '#C74E12' : '#FFF' }
+    }));
+
+    const detail = { logoStyle: { width:'62px', height:'62px', borderRadius:'18px', background:'#FFF', border:'1px solid #EEE9E4',
+        backgroundImage:'url(' + sel.logo + ')', backgroundSize:'40px auto', backgroundPosition:'center', backgroundRepeat:'no-repeat' },
+      brand: sel.brand, sub: sel.sub, title: sel.title, branch: sel.branch,
+      category: sel.category, purchase: sel.purchase, locked: sel.locked, reward: String(sel.reward),
+      duration: sel.duration, distance: sel.distance, window: sel.window, shot: sel.shot,
+      spend: sel.purchase ? '150 EGP' : 'None' };
+
+    const mapPinData = [
+      { id:'tamara', x:'26%', y:'30%' }, { id:'cib', x:'62%', y:'22%' }, { id:'vodafone', x:'72%', y:'56%' },
+      { id:'tbs', x:'34%', y:'70%' }, { id:'tamara2', x:'16%', y:'52%' }
+    ];
+    const mapSelVisit = VISITS.find(v => v.id === s.mapSel);
+
+    const sorts = [['all','All'],['soonest','Soonest'],['nearest','Nearest'],['reward','Highest reward']].map(x => ({
+      label: x[1], on: () => this.setState({ sort: x[0] }), style: this.pill(s.sort === x[0])
+    }));
+
+    const catCounts = {};
+    VISITS.forEach(v => { catCounts[v.cat] = (catCounts[v.cat] || 0) + 1; });
+    const categories = CATEGORIES.map(c => {
+      const active = s.category === c.id;
+      const n = c.id === 'all' ? VISITS.length : (catCounts[c.id] || 0);
+      return { label: c.label, count: n, on: () => this.setState({ category: c.id }),
+        style: { display:'flex', alignItems:'center', gap:'7px', height:'38px', padding:'0 14px', borderRadius:'13px', fontSize:'13.5px',
+          fontWeight:600, cursor:'pointer', background: active ? '#FFF1E8' : '#FFF', color: active ? '#C74E12' : '#3A332E',
+          border: active ? '1px solid ' + ORANGE : '1px solid #E3DCD5', opacity: n === 0 ? 0.45 : 1 },
+        countStyle: { fontSize:'11px', fontWeight:600, opacity:.55 } };
+    });
+
+    const mapPins = mapPinData.map(p => {
+      const v = VISITS.find(x => x.id === p.id);
+      const active = s.mapSel === p.id;
+      return { label: v.reward + ' EGP', on: () => this.setState({ mapSel: p.id }),
+        logoStyle: { width:'18px', height:'18px', flex:'0 0 auto', backgroundImage:'url(' + v.logo + ')',
+          backgroundSize:'contain', backgroundPosition:'center', backgroundRepeat:'no-repeat' },
+        style: { position:'absolute', left:p.x, top:p.y, transform: active ? 'translate(-50%,-50%) scale(1.08)' : 'translate(-50%,-50%)',
+          height:'34px', padding:'0 11px 0 7px', gap:'6px', borderRadius:'12px', cursor:'pointer',
+          background: active ? '#14100D' : '#FFF', color: active ? '#FFF' : '#14100D',
+          boxShadow: active ? '0 6px 18px rgba(20,16,13,.32)' : '0 3px 10px rgba(20,16,13,.18)',
+          display:'flex', alignItems:'center', fontSize:'12px', fontWeight:700, whiteSpace:'nowrap',
+          transition:'transform .15s ease' } };
+    });
+
+    // brief
+    const briefBars = BRIEF_STEPS.map((label, i) => ({
+      on: () => { if (i <= s.briefMax) this.setState({ briefStep: i }); },
+      style: { flex:1, height:'5px', borderRadius:'3px', cursor: i <= s.briefMax ? 'pointer' : 'default',
+        background: i < s.briefStep ? '#FBBF97' : (i === s.briefStep ? ORANGE : '#F0EBE6') }
+    }));
+    const isLast = s.briefStep === 5;
+
+    // hub
+    const hubSections = SECTIONS.map((sc, i) => {
+      const done = this.sectionDone(sc);
+      const answered = sc.questions.filter(qq => s.answers[qq.id] !== undefined).length;
+      return { name: sc.name, badge: done ? '✓' : String(i + 1),
+        meta: done ? 'Done · ' + sc.questions.length + ' answers' : answered + ' of ' + sc.questions.length + ' answered',
+        on: () => this.setState({ screen:'question', secIdx:i, qIdx:0, showWhy:false, running:true }),
+        rowStyle: { display:'flex', gap:'12px', alignItems:'center', padding:'13px', borderRadius:'16px', background:'#FFF',
+          border: done ? '1px solid #D5EDE2' : '1px solid #EEE9E4', cursor:'pointer' },
+        badgeStyle: { width:'28px', height:'28px', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:'12px', fontWeight:700, flex:'0 0 auto',
+          background: done ? '#1B9A6B' : '#F5F1ED', color: done ? '#FFF' : '#6B625B' }
+      };
+    });
+
+    const hubPhotos = PHOTOS.map(p => {
+      const done = !!s.photos[p.id];
+      return { title: p.title, hint: p.hint, status: done ? 'Done' : 'Add', thumbLabel: done ? '' : '',
+        on: () => this.setState({ screen:'photo', photoId:p.id, running:true }),
+        rowStyle: { display:'flex', gap:'12px', alignItems:'center', padding:'11px 13px', borderRadius:'16px', background:'#FFF',
+          border: done ? '1px solid #D5EDE2' : '1px solid #EEE9E4', cursor:'pointer' },
+        thumbStyle: { width:'40px', height:'40px', borderRadius:'12px', flex:'0 0 auto',
+          backgroundColor: done ? '#DCE9E1' : '#F4EFEA',
+          backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 4px, rgba(0,0,0,0) 4px 9px)' },
+        statusStyle: { height:'26px', padding:'0 10px', borderRadius:'9px', fontSize:'11px', fontWeight:600, display:'flex',
+          alignItems:'center', background: done ? '#E8F6F0' : '#FFF1E8', color: done ? '#1B7A55' : '#C74E12' } };
+    }).concat([{
+      title:'Receipt', hint: s.receipt ? s.receipt.amount + ' · ' + s.receipt.number : 'Photo of the printed receipt',
+      status: s.receipt ? 'Done' : 'Add', thumbLabel:'',
+      on: () => this.setState({ screen:'receipt', running:true }),
+      rowStyle: { display:'flex', gap:'12px', alignItems:'center', padding:'11px 13px', borderRadius:'16px', background:'#FFF',
+        border: s.receipt ? '1px solid #D5EDE2' : '1px solid #EEE9E4', cursor:'pointer' },
+      thumbStyle: { width:'40px', height:'40px', borderRadius:'12px', flex:'0 0 auto',
+        backgroundColor: s.receipt ? '#DCE9E1' : '#F4EFEA',
+        backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 4px, rgba(0,0,0,0) 4px 9px)' },
+      statusStyle: { height:'26px', padding:'0 10px', borderRadius:'9px', fontSize:'11px', fontWeight:600, display:'flex',
+        alignItems:'center', background: s.receipt ? '#E8F6F0' : '#FFF1E8', color: s.receipt ? '#1B7A55' : '#C74E12' }
+    }]);
+
+    const pct = Math.round((t.done / t.total) * 100);
+    const circ = 2 * Math.PI * 34;
+
+    const nextIncomplete = SECTIONS.find(sc => !this.sectionDone(sc));
+    const nextPhoto = PHOTOS.find(p => !s.photos[p.id]);
+    const nextUp = nextIncomplete ? 'Next: ' + nextIncomplete.name : (nextPhoto ? 'Next: photo of ' + nextPhoto.title.toLowerCase() : (!s.receipt ? 'Next: add the receipt' : 'Everything is done — review and send'));
+
+    // question view
+    const photoDef = PHOTOS.find(p => p.id === s.photoId) || Q_PHOTOS[s.photoId] || PHOTOS[0];
+    const qView = q ? {
+      sectionName: sec.name, counter: 'Question ' + (s.qIdx + 1) + ' of ' + sec.questions.length,
+      text: q.text, hasWhy: !!q.why, why: q.why || '', whyCaret: s.showWhy ? '⌃' : '⌄',
+      isChoice: q.type === 'choice', isRating: q.type === 'rating', isNps: q.type === 'nps',
+      isText: q.type === 'text', isPhoto: q.type === 'photo',
+      textValue: ans || 'Tap “Use sample text” to fill this in…',
+      options: (q.options || []).map(o => ({ label:o, on: () => this.answer(q, o),
+        style: { display:'flex', alignItems:'center', gap:'11px', padding:'15px 15px', borderRadius:'16px', cursor:'pointer',
+          background: ans === o ? '#FFF6F0' : '#FFF', border: ans === o ? '1.5px solid ' + ORANGE : '1.5px solid #E9E3DD',
+          color: ans === o ? '#14100D' : '#3A332E' },
+        dotStyle: { width:'20px', height:'20px', borderRadius:'11px', flex:'0 0 auto',
+          border: ans === o ? '6px solid ' + ORANGE : '2px solid #D6CEC7', background:'#FFF' } })),
+      allowNa: !!q.allowNa, isNa: ans === 'na',
+      naLabel: q.naLabel || 'Not applicable',
+      naStyle: { display:'flex', alignItems:'center', gap:'10px', marginTop:'12px', padding:'13px 14px', borderRadius:'14px',
+        cursor:'pointer',
+        background: ans === 'na' ? '#EEF3FB' : '#FFF',
+        border: ans === 'na' ? '1.5px solid #6A8FD0' : '1.5px solid #E9E3DD' },
+      naDotStyle: { width:'20px', height:'20px', borderRadius:'11px', flex:'0 0 auto', background:'#FFF',
+        border: ans === 'na' ? '6px solid #3A62A8' : '2px solid #D6CEC7' },
+      naTextStyle: { fontSize:'13.5px', fontWeight:500, color: ans === 'na' ? '#2A4880' : '#6B625B', lineHeight:1.4 },
+      stars: [1,2,3,4,5].map(n => ({ n:String(n), glyph: (ans >= n ? '★' : '☆'), on: () => this.answer(q, n),
+        style: { flex:1, height:'64px', borderRadius:'16px', display:'flex', flexDirection:'column', alignItems:'center',
+          justifyContent:'center', cursor:'pointer', color: ans >= n ? ORANGE : '#C4BCB5',
+          opacity: ans === 'na' ? 0.45 : 1,
+          background: ans >= n ? '#FFF6F0' : '#FFF', border: ans >= n ? '1.5px solid #FBD9C2' : '1.5px solid #E9E3DD' } })),
+      npsCells: [0,1,2,3,4,5,6,7,8,9,10].map(n => ({ n:String(n), on: () => this.answer(q, n),
+        style: { height:'46px', borderRadius:'13px', display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:'15px', fontWeight:600, cursor:'pointer',
+          opacity: ans === 'na' ? 0.45 : 1,
+          background: ans === n ? ORANGE : '#FFF', color: ans === n ? '#FFF' : '#3A332E',
+          border: ans === n ? '1.5px solid ' + ORANGE : '1.5px solid #E9E3DD' } }))
+    } : { sectionName:'', counter:'', text:'', options:[], stars:[], npsCells:[] };
+
+    const qBars = sec.questions.map((qq, i) => ({
+      style: { flex:1, height:'4px', borderRadius:'2px',
+        background: i < s.qIdx ? '#FBBF97' : (i === s.qIdx ? ORANGE : '#F0EBE6') }
+    }));
+
+    // optional commentary, promoted to required when the client asked or the score is low
+    const comment = q ? s.comments[q.id] : undefined;
+    const noteShow = !!q && q.type !== 'text' && q.type !== 'photo' && ans !== undefined;
+    const noteMust = false;
+    const noteExpanded = noteShow && (s.noteOpen === q.id || !!comment);
+    const noteChips = (q && q.notes ? q.notes : ['Nothing worth flagging','Staff were helpful','Needed attention'])
+      .map(txt => ({ label: txt, on: () => this.setComment(q, txt) }));
+    const note = {
+      show: noteShow, collapsed: noteShow && !noteExpanded, expanded: noteExpanded,
+      label: 'Your comment', badge: 'Optional',
+      value: comment || 'Pick a starter below or type your own…',
+      empty: !comment, filled: !!comment,
+      hint: false, hintText: '',
+      chips: noteChips,
+      wrapStyle: { marginTop:'18px', padding:'13px 14px', borderRadius:'16px', background:'#FAF8F6', border:'1px solid #EEE9E4' },
+      fieldStyle: { minHeight:'54px', borderRadius:'12px', border:'1px solid #E3DCD5', background:'#FFF', padding:'10px 12px',
+        fontSize:'13.5px', lineHeight:1.5, color: comment ? '#14100D' : '#B4ACA5' }
+    };
+
+    // a photo the client attached to this specific question
+    const qPhotoId = q ? (q.photoRequired || q.photoOptional) : null;
+    const qPhotoDef = qPhotoId ? Q_PHOTOS[qPhotoId] : null;
+    const qPhotoTaken = qPhotoId ? !!s.photos[qPhotoId] : false;
+    const qPhotoMust = !!(q && q.photoRequired) && ans !== undefined && ans !== 'na';
+    const qPhoto = {
+      show: !!qPhotoDef && ans !== undefined && ans !== 'na',
+      title: qPhotoDef ? qPhotoDef.title : '',
+      badge: qPhotoMust ? 'Required' : 'Optional',
+      caption: qPhotoTaken ? 'Photo attached' : (qPhotoDef ? qPhotoDef.hint : ''),
+      cta: qPhotoTaken ? 'Retake' : 'Open camera',
+      taken: qPhotoTaken,
+      wrapStyle: { marginTop:'14px', display:'flex', gap:'12px', alignItems:'center', padding:'12px 13px', borderRadius:'16px',
+        background: qPhotoMust && !qPhotoTaken ? '#FFF9E9' : '#FAF8F6',
+        border: qPhotoMust && !qPhotoTaken ? '1px solid #F5E4B5' : '1px solid #EEE9E4' },
+      thumbStyle: { width:'52px', height:'52px', borderRadius:'13px', flex:'0 0 auto',
+        backgroundColor: qPhotoTaken ? '#DCE9E1' : '#EDE7E1',
+        backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 5px, rgba(0,0,0,0) 5px 11px)' },
+      badgeStyle: { height:'19px', padding:'0 7px', borderRadius:'6px', fontSize:'9.5px', fontWeight:700, letterSpacing:'0.04em',
+        display:'flex', alignItems:'center', whiteSpace:'nowrap',
+        background: qPhotoMust ? '#FFF1E8' : '#F0EBE6', color: qPhotoMust ? '#C74E12' : '#8B827B' },
+      ctaStyle: { height:'36px', padding:'0 14px', borderRadius:'12px', fontSize:'12.5px', fontWeight:600, display:'flex',
+        alignItems:'center', cursor:'pointer', flex:'0 0 auto', whiteSpace:'nowrap',
+        background: qPhotoTaken ? '#FFF' : ORANGE, color: qPhotoTaken ? '#3A332E' : '#FFF',
+        border: qPhotoTaken ? '1px solid #E3DCD5' : '1px solid ' + ORANGE }
+    };
+
+    const isLastQ = q && s.qIdx === sec.questions.length - 1;
+    const canNext = ans !== undefined && !(qPhotoMust && !qPhotoTaken);
+
+    // review
+    const reviewGroups = SECTIONS.map((sc, i) => ({
+      name: sc.name, on: () => this.setState({ screen:'question', secIdx:i, qIdx:0 }),
+      rows: sc.questions.map(qq => {
+        const a = s.answers[qq.id];
+        let text = '—';
+        if (a === 'na') text = 'Not applicable';
+        else if (qq.type === 'rating') text = a ? a + ' of 5' : '—';
+        else if (qq.type === 'nps') text = a !== undefined ? a + ' / 10' : '—';
+        else if (qq.type === 'photo') text = a ? 'Photo attached' : '—';
+        else if (a) text = String(a);
+        const c = s.comments[qq.id];
+        return { q: qq.text, a: text, hasComment: !!c, comment: c || '' };
+      })
+    }));
+
+    // missions
+    const allMissions = [
+      { key:'active', logo:'logos/tamara.png', title:'Tamara — Almaza City Centre', sub:'Service review · started 14 min ago',
+        status:'Active', reward:'250 EGP', color:'#F2661F', bg:'#FFF1E8', isActive:true },
+      { key:'review', logo:'logos/vodafone.png', title:'Vodafone — City Stars', sub:'Store review · sent 2 days ago',
+        status:'In review', reward:'180 EGP', color:'#8A5B02', bg:'#FFF6E0', isReview:true },
+      { key:'review', logo:'logos/tbs.png', title:'TBS — Road 9, Maadi', sub:'Counter service · sent 4 days ago',
+        status:'In review', reward:'160 EGP', color:'#8A5B02', bg:'#FFF6E0', isReview:true },
+      { key:'approved', logo:'logos/cib.png', title:'CIB — Abbas El Akkad', sub:'Branch check · paid 12 Jul',
+        status:'Approved', reward:'300 EGP', color:'#1B7A55', bg:'#E8F6F0' },
+      { key:'rejected', logo:'logos/tamara.png', title:'Tamara — Mall of Arabia', sub:'Service review · 3 Jul',
+        status:'Rejected', reward:'0 EGP', color:'#C43F3F', bg:'#FDECEC', isRejected:true,
+        reason:'Storefront photo was taken after closing time.' }
+    ];
+    const missionList = allMissions.filter(m => m.key === s.missionsTab).map(m => Object.assign({}, m, {
+      logoStyle: { width:'44px', height:'44px', borderRadius:'14px', background:'#FFF', border:'1px solid #EEE9E4', flex:'0 0 auto',
+        backgroundImage:'url(' + m.logo + ')', backgroundSize:'28px auto', backgroundPosition:'center', backgroundRepeat:'no-repeat' },
+      badgeStyle: { display:'inline-flex', alignItems:'center', gap:'5px', height:'24px', padding:'0 9px', borderRadius:'8px',
+        fontSize:'11px', fontWeight:600, background:m.bg, color:m.color, whiteSpace:'nowrap' },
+      dotStyle: { width:'6px', height:'6px', borderRadius:'3px', background:m.color, display:'inline-block' }
+    }));
+    const missionTabs = [['active','Active'],['review','In review'],['approved','Approved'],['rejected','Rejected']].map(x => ({
+      label:x[1], on: () => this.setState({ missionsTab:x[0] }), style: this.pill(s.missionsTab === x[0])
+    }));
+
+    const navItems = [['home','Home'],['missions','My missions'],['wallet','Wallet'],['profile','Profile']].map(x => {
+      const active = (x[0] === 'home' && s.screen === 'home') || (x[0] === 'missions' && s.screen === 'missions');
+      return { label:x[1],
+        isHome: x[0] === 'home', isMissions: x[0] === 'missions', isWallet: x[0] === 'wallet', isCap: x[0] === 'profile',
+        capStyle: { width:'26px', height:'21px', backgroundImage:'url(logos/shadoo-cap.png)', backgroundSize:'contain',
+          backgroundPosition:'center', backgroundRepeat:'no-repeat', opacity: active ? 1 : 0.55 },
+        on: () => { if (x[0] === 'home') this.setState({ screen:'home' }); if (x[0] === 'missions') this.setState({ screen:'missions' }); },
+        style: { flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:'5px', cursor:'pointer',
+          color: active ? ORANGE : '#9A928B' },
+        iconStyle: { width:'20px', height:'20px', borderRadius:'6px', background: active ? ORANGE : '#C4BCB5' } };
+    });
+
+    const cancelable = s.cancelSec > 0;
+
+    return {
+      isEn, isAr: !isEn, rail,
+      isHome: s.screen === 'home', isDetail: s.screen === 'detail', isBrief: s.screen === 'brief',
+      isHub: s.screen === 'hub', isQuestion: s.screen === 'question', isPhoto: s.screen === 'photo',
+      isReceipt: s.screen === 'receipt', isReview: s.screen === 'review', isSubmitted: s.screen === 'submitted',
+      isMissions: s.screen === 'missions',
+      showNav: s.screen === 'home' || s.screen === 'missions',
+      isCardA: s.cardVariant === 'a', isCardB: s.cardVariant === 'b',
+      isHubA: s.hubVariant === 'a', isHubB: s.hubVariant === 'b',
+      sheetFilter: s.sheet === 'filter', sheetMap: s.sheet === 'map', sheetCancel: s.sheet === 'cancel', sheetHelp: s.sheet === 'help',
+
+      feed: feedRows, sorts, categories, mapPins,
+      d: detail,
+      hasMapSel: !!mapSelVisit, noMapSel: !mapSelVisit,
+      mapSel: mapSelVisit ? { brand: mapSelVisit.brand, branch: mapSelVisit.branch,
+        logoStyle: { width:'50px', height:'50px', borderRadius:'15px', background:'#FFF', border:'1px solid #EEE9E4', flex:'0 0 auto',
+          backgroundImage:'url(' + mapSelVisit.logo + ')', backgroundSize:'32px auto', backgroundPosition:'center', backgroundRepeat:'no-repeat' },
+        category: mapSelVisit.category, purchase: mapSelVisit.purchase, reward: String(mapSelVisit.reward),
+        distance: mapSelVisit.distance, duration: mapSelVisit.duration, taskCount: mapSelVisit.taskCount,
+        window: mapSelVisit.window } : {},
+      feedCount: feed.length + (feed.length === 1 ? ' visit available' : ' visits available'),
+      hasCategory: s.category !== 'all',
+      categoryLabel: (CATEGORIES.find(c => c.id === s.category) || {}).label || '',
+      filterCta: 'Show ' + feed.length + ' visits',
+
+      whatYoullDo: [
+        { n:'1', text:'Arrive as a normal customer and start the timer' },
+        { n:'2', text:'Answer 12 questions across 5 sections while on site' },
+        { n:'3', text:'Take 3 guided photos plus the receipt' },
+        { n:'4', text:'Submit before the 45-minute timer runs out' }
+      ],
+
+      briefTitle: BRIEF_STEPS[s.briefStep],
+      briefStepLabel: 'Step ' + (s.briefStep + 1) + ' of 6 · ' + (isLast ? 'last one' : 'next: ' + BRIEF_STEPS[s.briefStep + 1]),
+      briefBars,
+      brief: { isOverview: s.briefStep === 0, isRules: s.briefStep === 1, isQuestions: s.briefStep === 2,
+        isPhotos: s.briefStep === 3, isPurchase: s.briefStep === 4, isPayout: s.briefStep === 5, isLast },
+      briefCtaLabel: isLast ? (sel.locked ? 'Unlocks ' + sel.window.replace('Starts ', '') : 'Accept & start visit') : 'Next: ' + BRIEF_STEPS[s.briefStep + 1],
+      acceptNote: sel.locked
+        ? 'We will notify you the moment this slot opens'
+        : 'Starts the ' + sel.duration + ' timer · free cancel for 5 minutes',
+      rulesDo: [{text:'Behave like a first-time customer'},{text:'Note times discreetly on your phone'},{text:'Pay the way a normal guest would'},{text:'Keep the printed receipt'}],
+      rulesDont: [{text:'Do not say you are a mystery shopper'},{text:'Do not photograph staff faces'},{text:'Do not visit outside the booked window'},{text:'Do not answer from memory after leaving'}],
+      sectionPreview: SECTIONS.map(sc => ({ name: sc.name, count: sc.questions.length + ' questions', sample: sc.questions[0].text })),
+      photoBrief: PHOTOS.concat([{ id:'receipt', title:'Receipt', slug:'receipt_ref.jpg', hint:'Printed receipt, all lines readable.' }]).map(p => ({
+        title:p.title, hint:p.hint, slug:p.slug,
+        thumbStyle: { width:'54px', height:'54px', borderRadius:'12px', flex:'0 0 auto', display:'flex', alignItems:'flex-end',
+          padding:'4px', backgroundColor:'#F4EFEA', backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 4px, rgba(0,0,0,0) 4px 9px)' } })),
+      payoutSteps: [
+        { title:'You submit', body:'The visit locks and goes to Tamara for review.' },
+        { title:'Client reviews', body:'Usually within 48 hours. You get a notification either way.' },
+        { title:'Wallet credited', body:'Reward plus approved reimbursement appear in your Shadoo wallet.' },
+        { title:'You withdraw', body:'Instapay or bank transfer, any balance above 200 EGP.' }
+      ].map((p, i, arr) => Object.assign({}, p, {
+        dotStyle: { width:'11px', height:'11px', borderRadius:'6px', background: i === 0 ? ORANGE : '#E3DCD5', marginTop:'5px', flex:'0 0 auto' },
+        lineStyle: { width:'2px', flex:1, background: i === arr.length - 1 ? 'transparent' : '#F0EBE6', marginTop:'3px' }
+      })),
+
+      deadlineText: this.fmt(s.deadlineSec), cancelText: cancelable ? this.fmt(s.cancelSec) : 'closed',
+      progressPct: pct + '%', ringDash: (circ * t.done / t.total) + ' ' + circ,
+      doneLabel: t.done + ' of ' + t.total + ' tasks done', nextUpLabel: nextUp,
+      hubSections, hubPhotos,
+      trackDots: Array.from({ length: t.total }).map((_, i) => ({
+        style: { flex:1, height:'4px', borderRadius:'2px', background: i < t.done ? ORANGE : '#3A322C' } })),
+      submitLabel: t.done === t.total ? 'Review & submit' : (t.total - t.done) + ' tasks left',
+
+      q: qView, qBars, showWhy: s.showWhy, showUndo: s.showUndo, note, qPhoto,
+      nextQLabel: (qPhotoMust && !qPhotoTaken) ? 'Photo needed' : (isLastQ ? 'Finish section' : 'Next'),
+      showTransition: !!s.transition,
+      transitionDone: s.transition ? s.transition.done + ' complete' : '',
+      transitionNext: s.transition ? s.transition.next : '',
+
+      photo: { title: photoDef.title, hint: photoDef.hint, slug: photoDef.slug, frameLabel: photoDef.frameLabel,
+        counter: s.photos[photoDef.id] ? 'Captured · tap to retake' : 'Reference shot below',
+        cta: s.photos[photoDef.id] ? 'Retake photo' : 'Take photo',
+        dos: photoDef.dos.map(x => ({ text:'· ' + x })), donts: photoDef.donts.map(x => ({ text:'· ' + x })),
+        frameStyle: { position:'relative', height:'250px', borderRadius:'18px', overflow:'hidden',
+          backgroundColor:'#8E8378', backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.16) 0 8px, rgba(0,0,0,.06) 8px 17px)' } },
+
+      receipt: s.receipt || { amount:'Tap to enter', date:'—', number:'—', items:'—', over:false },
+      receiptCta: s.receipt ? 'Save receipt' : 'Take photo of receipt',
+      receiptShotLabel: s.receipt ? 'receipt_TB-448210.jpg' : 'receipt photo goes here',
+
+      reviewGroups, missionList, missionTabs, navItems,
+      missionsEmpty: missionList.length === 0,
+      cancelCopy: cancelable
+        ? 'You are still inside the free window (' + this.fmt(s.cancelSec) + ' left). Cancelling now costs you nothing and the slot goes back to other agents.'
+        : 'The free window has closed. Cancelling now counts as a drop-out and lowers your tier score.',
+
+      st: {
+        langEn: this.railBtn(isEn), langAr: this.railBtn(!isEn),
+        cardA: this.railBtn(s.cardVariant === 'a'), cardB: this.railBtn(s.cardVariant === 'b'),
+        hubA: this.railBtn(s.hubVariant === 'a'), hubB: this.railBtn(s.hubVariant === 'b'),
+        filterBtn: { width:'44px', height:'44px', borderRadius:'14px', display:'flex', alignItems:'center', justifyContent:'center',
+          cursor:'pointer', background: s.category !== 'all' ? '#FFF1E8' : '#FFF',
+          border: s.category !== 'all' ? '1px solid ' + ORANGE : '1px solid #E3DCD5',
+          color: s.category !== 'all' ? '#C74E12' : '#6B625B' },
+        checkbox: { width:'21px', height:'21px', borderRadius:'7px', flex:'0 0 auto', display:'flex', alignItems:'center',
+          justifyContent:'center', fontSize:'12px', fontWeight:700,
+          background: s.agreed ? ORANGE : '#FFF', color: s.agreed ? '#FFF' : 'transparent',
+          border: s.agreed ? '1.5px solid ' + ORANGE : '1.5px solid #D6CEC7' },
+        briefCta: (() => {
+          const on = !isLast || (s.agreed && !sel.locked);
+          return { height:'52px', borderRadius:'16px', fontSize:'15px', fontWeight:600, display:'flex', alignItems:'center',
+            justifyContent:'center', cursor: on ? 'pointer' : 'not-allowed',
+            background: on ? ORANGE : '#F0EBE6', color: on ? '#FFF' : '#B4ACA5',
+            boxShadow: on ? '0 6px 18px rgba(242,102,31,.32)' : 'none' };
+        })(),
+        deadlineChip: { flex:1, padding:'10px 13px', borderRadius:'15px',
+          background: s.deadlineSec < 300 ? '#FDECEC' : '#FFF6F0', color: s.deadlineSec < 300 ? '#C43F3F' : '#C74E12',
+          border: s.deadlineSec < 300 ? '1px solid #F6D8D8' : '1px solid #FBD9C2' },
+        cancelChip: { flex:1, padding:'10px 13px', borderRadius:'15px', background:'#FAF8F6', color:'#6B625B', border:'1px solid #EEE9E4' },
+        cancelBtn: { marginTop:'6px', height:'28px', borderRadius:'9px', display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:'11.5px', fontWeight:600, cursor:'pointer', background:'#FFF', border:'1px solid #E3DCD5', color:'#C43F3F' },
+        trackFill: { height:'100%', width: pct + '%', borderRadius:'4px', background:ORANGE, transition:'width .4s ease' },
+        submitCta: (() => {
+          const on = t.done === t.total;
+          return { height:'52px', borderRadius:'16px', fontSize:'15px', fontWeight:600, display:'flex', alignItems:'center',
+            justifyContent:'center', cursor: on ? 'pointer' : 'not-allowed',
+            background: on ? ORANGE : '#F0EBE6', color: on ? '#FFF' : '#B4ACA5',
+            boxShadow: on ? '0 6px 18px rgba(242,102,31,.32)' : 'none' };
+        })(),
+        prevBtn: { width:'96px', height:'52px', borderRadius:'16px', border:'1px solid #E3DCD5', color:'#6B625B', fontSize:'14px',
+          fontWeight:600, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' },
+        nextBtn: { flex:1, height:'52px', borderRadius:'16px', fontSize:'15px', fontWeight:600, display:'flex', alignItems:'center',
+          justifyContent:'center', cursor: canNext ? 'pointer' : 'not-allowed',
+          background: canNext ? ORANGE : '#F0EBE6', color: canNext ? '#FFF' : '#B4ACA5' },
+        field: { height:'48px', borderRadius:'14px', border:'1px solid #E3DCD5', background:'#FCFBFA', display:'flex',
+          alignItems:'center', padding:'0 14px', fontSize:'14px', fontWeight:600, color: s.receipt ? '#14100D' : '#B4ACA5' },
+        fieldTall: { minHeight:'72px', borderRadius:'14px', border:'1px solid #E3DCD5', background:'#FCFBFA', padding:'12px 14px',
+          fontSize:'13.5px', lineHeight:1.5, color: s.receipt ? '#14100D' : '#B4ACA5' },
+        receiptShot: { height:'180px', borderRadius:'18px', display:'flex', alignItems:'flex-end', padding:'12px',
+          backgroundColor:'#F4EFEA', backgroundImage:'repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 13px)' },
+        receiptCta: { height:'52px', borderRadius:'16px', background:ORANGE, color:'#FFF', fontSize:'15px', fontWeight:600,
+          display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 6px 18px rgba(242,102,31,.3)' }
+      },
+
+      on: {
+        langEn: () => this.setState({ lang:'en' }), langAr: () => this.setState({ lang:'ar' }),
+        cardA: () => this.setState({ cardVariant:'a' }), cardB: () => this.setState({ cardVariant:'b' }),
+        hubA: () => this.setState({ hubVariant:'a' }), hubB: () => this.setState({ hubVariant:'b' }),
+        openFilter: () => this.setState({ sheet:'filter' }), openMap: () => this.setState({ sheet:'map', mapSel:null }),
+        openCancel: () => this.setState({ sheet:'cancel' }), openHelp: () => this.setState({ sheet:'help' }),
+        closeSheet: () => this.setState({ sheet:null }),
+        clearCategory: () => this.setState({ category:'all' }),
+        goHome: () => this.setState({ screen:'home', sheet:null }),
+        goHub: () => this.setState({ screen:'hub', sheet:null }),
+        goMissions: () => this.setState({ screen:'missions', missionsTab:'review', sheet:null }),
+        openBrief: () => this.setState({ screen:'brief', briefStep:0, briefMax:0, agreed:false }),
+        briefBack: () => this.setState(st => st.briefStep === 0 ? { screen:'detail' } : { briefStep: st.briefStep - 1 }),
+        openSelected: () => this.setState(st => ({ screen:'detail', selected: st.mapSel, sheet:null })),
+        briefNext: () => {
+          if (isLast) { if (s.agreed && !sel.locked) this.setState({ screen:'hub', running:true, cancelSec:299, deadlineSec:2699 }); }
+          else this.setState(st => ({ briefStep: st.briefStep + 1, briefMax: Math.max(st.briefMax, st.briefStep + 1) }));
+        },
+        toggleAgree: () => this.setState(st => ({ agreed: !st.agreed })),
+        toggleWhy: () => this.setState(st => ({ showWhy: !st.showWhy })),
+        markNa: () => {
+          if (!q) return;
+          if (ans === 'na') {
+            this.setState(st => { const a = Object.assign({}, st.answers); delete a[q.id]; return { answers:a, showUndo:false }; });
+          } else {
+            this.answer(q, 'na');
+          }
+        },
+        openNote: () => this.setState({ noteOpen: q ? q.id : null }),
+        clearNote: () => q && this.setComment(q, ''),
+        undo: () => this.setState(st => {
+          const L = st.lastAnswered; if (!L) return { showUndo:false };
+          const a = Object.assign({}, st.answers); delete a[L.qid];
+          const c = Object.assign({}, st.comments); delete c[L.qid];
+          return { answers:a, comments:c, showUndo:false, secIdx:L.secIdx, qIdx:L.qIdx, noteOpen:null };
+        }),
+        // reopens the question that was just answered, with its comment box expanded
+        commentLast: () => this.setState(st => {
+          const L = st.lastAnswered; if (!L) return { showUndo:false };
+          return { screen:'question', secIdx:L.secIdx, qIdx:L.qIdx, noteOpen:L.qid, showUndo:false, showWhy:false };
+        }),
+        prevQ: () => this.setState(st => st.qIdx > 0 ? { qIdx: st.qIdx - 1, showWhy:false, noteOpen:null } : { screen:'hub' }),
+        nextQ: () => { if (canNext) { if (isLastQ) this.finishSection(); else this.advance(); } },
+        fillSample: () => q && this.answer(q, 'The team was quick and friendly, but the restroom needed attention around 9pm.'),
+        routeToPhoto: () => this.setState({ screen:'photo', photoId: q.photoSlot, returnTo:'question' }),
+        qPhoto: () => qPhotoId && this.setState({ screen:'photo', photoId: qPhotoId, returnTo:'question' }),
+        capture: () => {
+          const st = this.state;
+          const photos = Object.assign({}, st.photos, { [st.photoId]: 1 });
+          const answers = Object.assign({}, st.answers);
+          // only a dedicated photo-type question stores the capture as its answer;
+          // attached slots are tracked by state.photos so the rating survives
+          if (st.returnTo === 'question' && q && q.type === 'photo') answers[q.id] = 'captured';
+          const shot = PHOTOS.find(p => p.id === st.photoId) || PHOTOS[0];
+          if (st.returnTo === 'question') { this.setState({ photos, answers, screen:'question', returnTo:null, showUndo:false }); return; }
+          const nextP = PHOTOS.find(p => !photos[p.id]);
+          const nextLabel = nextP ? 'Up next: ' + nextP.title : (!st.receipt ? 'Up next: the receipt' : 'Photos done');
+          this.setState({ photos, answers, transition: { done: shot.title, next: nextLabel } });
+          if (this._x) clearTimeout(this._x);
+          this._x = setTimeout(() => {
+            if (nextP) this.setState({ transition:null, screen:'photo', photoId: nextP.id });
+            else if (!this.state.receipt) this.setState({ transition:null, screen:'receipt' });
+            else this.setState({ transition:null, screen:'hub' });
+          }, 1400);
+        },
+        saveReceipt: () => this.setState({ receipt: RECEIPT_SAMPLE, screen:'hub' }),
+        sampleReceipt: () => this.setState({ receipt: RECEIPT_SAMPLE }),
+        review: () => { if (t.done === t.total) this.setState({ screen:'review', running:false }); },
+        submit: () => this.setState({ screen:'submitted', running:false })
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
