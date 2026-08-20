@@ -81,8 +81,8 @@ export interface Question {
   section_id?: string; // Which section this question belongs to
 
   // Mobile-app answering behaviour
-  allowNA?: boolean; // Agent gets a "Not applicable" chip — skips photo/comment rules, excluded from scoring
-  naLabel?: { en: string; ar: string }; // Custom wording of the N/A chip in the app (e.g. "Restroom was closed")
+  allowNA?: boolean; // Agent gets a standard "Not applicable" chip — skips photo/comment rules, excluded from scoring
+
   photo_slot_id?: string; // Link this question's photo to one of the named photo slots
   commentMode?: CommentMode; // Off / Optional (default) / Required
   suggestedComments?: SuggestedComment[]; // Up to 4 one-tap comment chips (EN/AR)
