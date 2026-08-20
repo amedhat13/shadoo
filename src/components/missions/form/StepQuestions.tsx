@@ -29,6 +29,8 @@ import { BilingualValue, ensureBilingual, getBilingualText, getLocalizedValue } 
 import { useQuestionTemplates, QuestionTemplate, TEMPLATE_GROUPS } from '@/hooks/useQuestionTemplates';
 import { LoadingState } from '@/components/common/LoadingState';
 import { InfoHint } from '@/components/common/InfoHint';
+import { useReportMetrics } from '@/hooks/useReportMetrics';
+import { metricName } from '@/lib/reportMetrics';
 
 interface StepQuestionsProps {
   data: MissionFormData;
@@ -44,6 +46,7 @@ export function StepQuestions({ data, onChange }: StepQuestionsProps) {
   const lang = i18n.language;
 
   const { templates: dbTemplates, isLoading: templatesLoading } = useQuestionTemplates();
+  const { activeMetrics: metrics } = useReportMetrics();
 
   // ===== Sections (required — at least one) =====
   const sections: QuestionSection[] = data.question_sections && data.question_sections.length > 0
