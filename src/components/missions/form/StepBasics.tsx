@@ -25,11 +25,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MissionFormData, Branch, MISSION_CATEGORIES } from '@/types';
+import { MissionFormData, Branch } from '@/types';
+import {
+  getClientIndustry,
+  industryLabel,
+  industryToMissionCategory,
+} from '@/lib/clientCategory';
 
 
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { BilingualInput } from '@/components/common/BilingualInput';
 
