@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MetricsOverview } from '@/components/reports/MetricsOverview';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -228,12 +229,6 @@ export function ClientReportView({ clientId, clientName }: ClientReportViewProps
             <BarChart3 className="h-4 w-4" />
             {t('tab_overview') || 'Overview'}
           </TabsTrigger>
-          {showMethodologyTab && (
-            <TabsTrigger value="methodology" className="gap-2">
-              <Activity className="h-4 w-4" />
-              {t('tab_methodology') || 'Methodology Dashboard'}
-            </TabsTrigger>
-          )}
           <TabsTrigger value="questions" className="gap-2">
             <FileQuestion className="h-4 w-4" />
             {t('tab_questions') || 'Question Analytics'}
@@ -251,16 +246,17 @@ export function ClientReportView({ clientId, clientName }: ClientReportViewProps
         {/* Overview Tab */}
         <TabsContent value="overview">
           <div className="space-y-4">
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-              {selectedMission && (
-                <MetricCard
-                  title={overviewMetrics.primaryScore.label}
-                  value={`${overviewMetrics.primaryScore.score}`}
-                  subtitle={overviewMetrics.primaryScore.benchmark || ''}
-                  icon={<Target className="h-4 w-4" />}
-                  className={overviewMetrics.primaryScore.color}
-                />
-              )}
+            {/* Client's configured metrics */}
+            <MetricsOverview
+              missions={relevantMissions}
+              visits={completedVisits}
+              branches={branches}
+              language={language}
+              ownerId={clientId}
+              hideSettingsLink
+            />
+
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
               <MetricCard
                 title={t('metrics.visit_completion')}
                 value={`${overviewMetrics.completionRate}%`}
