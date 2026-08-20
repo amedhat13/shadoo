@@ -245,30 +245,38 @@ export function StepBrief({ data, onChange }: StepBriefProps) {
               </span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {BRIEF_SECTION_KEYS.map((key) => {
-                  const active = briefSections.includes(key);
+                  const auto = AUTO_SECTIONS.includes(key);
+                  const active = auto || briefSections.includes(key);
                   return (
                     <button
                       key={key}
                       type="button"
-                      onClick={() => toggleSection(key)}
+                      disabled={auto}
+                      onClick={() => !auto && toggleSection(key)}
                       className={
                         'rounded-md border px-3 py-2 text-xs font-semibold capitalize transition ' +
                         (active
                           ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-border text-muted-foreground')
+                          : 'border-border text-muted-foreground') +
+                        (auto ? ' opacity-90 cursor-default' : '')
                       }
                     >
                       {key.replace('_', ' ')}
+                      {auto && <span className="ms-1 text-[9px] font-bold uppercase">auto</span>}
                     </button>
                   );
                 })}
               </div>
+              <p className="text-xs text-muted-foreground">
+                Purchase and Payout are generated automatically — Purchase from the total purchase budget per visit, and Payout from the visit duration and the agent tier price. They are always shown to the agent.
+              </p>
               {(data.require_brief_ack ?? true) && briefSections.length === 0 && (
                 <p className="text-xs text-destructive">
                   Enable at least one brief section while acknowledgement is required.
                 </p>
               )}
             </div>
+
           </div>
         </div>
       </section>
