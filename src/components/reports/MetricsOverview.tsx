@@ -302,6 +302,19 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
                     const pct = Math.max(0, Math.min(100, ((q.value ?? 0) - (metricFormat(metric) === 'score' ? -100 : 0)) / (max - (metricFormat(metric) === 'score' ? -100 : 0)) * 100));
                     return (
                       <div key={i} className="flex items-center gap-3">
+                        {canPin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            title={isPinned(q.key) ? 'Unpin from overview' : 'Pin to overview'}
+                            onClick={() => togglePin({ question_key: q.key, label: q.label })}
+                          >
+                            {isPinned(q.key)
+                              ? <PinOff className="h-3.5 w-3.5 text-primary" />
+                              : <Pin className="h-3.5 w-3.5 text-muted-foreground" />}
+                          </Button>
+                        )}
                         <span className="text-xs flex-1 truncate">{q.label}</span>
                         <Progress value={pct} className="h-2 w-32" />
                         <span className={`text-xs font-bold w-16 text-end ${healthColor(metric, q.value)}`}>
@@ -310,6 +323,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
                         <span className="text-[10px] text-muted-foreground w-14 text-end">{q.n} ans.</span>
                       </div>
                     );
+
                   })}
                   {perQuestion.length === 0 && (
                     <p className="text-xs text-muted-foreground">No tagged questions have answers yet.</p>
