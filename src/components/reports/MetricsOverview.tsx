@@ -9,10 +9,16 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell,
   Tooltip as RechartsTooltip, LineChart, Line, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { BarChart3, Settings2, Target, TrendingUp } from 'lucide-react';
+import { BarChart3, Pin, PinOff, Settings2, Target, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getLocalizedValue } from '@/i18n/utils';
 import { useReportMetrics } from '@/hooks/useReportMetrics';
+import { useReportPins } from '@/hooks/useReportPins';
+import { buildBranchMatrix, questionKey } from '@/lib/reportInsights';
+import { BranchHeatMap } from '@/components/reports/BranchHeatMap';
+import { TopBranchCard } from '@/components/reports/TopBranchCard';
+import { BranchRadarComparison } from '@/components/reports/BranchRadarComparison';
+import { PinnedQuestionCards } from '@/components/reports/PinnedQuestionCards';
 import {
   ReportMetric, computeMetric, formatMetricValue, healthColor, metricDescription,
   metricFormat, metricMaxForGauge, metricName,
