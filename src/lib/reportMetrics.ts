@@ -3,11 +3,23 @@
 // client tags with that metric. Everything in the Reports overview is derived
 // from these definitions — no hardcoded methodology rules.
 
-export type MetricFormula = 'nps' | 'top_2_box' | 'top_box' | 'average' | 'yes_percent';
+export type MetricFormula = 'nps' | 'top_2_box' | 'top_box' | 'average' | 'yes_percent' | 'expression';
 
 export type MetricFormat = 'score' | 'percent' | 'average';
 
 export interface MetricConfig {
+  /** Weight per question (key = question slug from questionSlug()). Default 1. */
+  weights?: Record<string, number>;
+  /** Weight per mission section title (lowercased). Applied on top of the question weight. */
+  sectionWeights?: Record<string, number>;
+  /** How "Not applicable" answers are treated. */
+  naHandling?: 'exclude' | 'zero';
+  /** Minimum number of answers before a score is shown. */
+  minSample?: number;
+  /** Custom formula (used when formula = 'expression'). */
+  expression?: string;
+  /** Colour band cut-offs, on the metric's own output scale. */
+  bands?: { fair?: number; good?: number; excellent?: number };
   scale?: number; // rating scale the metric expects (answers are normalised to it)
   promoterMin?: number; // nps
   detractorMax?: number; // nps
@@ -41,7 +53,32 @@ export const METRIC_FORMULAS: { value: MetricFormula; label: string; description
   { value: 'top_box', label: 'Top box only (%)', description: '% of answers at the maximum point of the scale.', format: 'percent' },
   { value: 'average', label: 'Average score', description: 'Mean of all answers, normalised to the metric scale.', format: 'average' },
   { value: 'yes_percent', label: 'Yes rate (%)', description: '% of yes/no answers marked Yes.', format: 'percent' },
+  { value: 'expression', label: 'Custom formula', description: 'Combine other metrics, e.g. 0.5*service + 0.3*cleanliness + 0.2*speed.', format: 'percent' },
 ];
+
+/** Stable slug for a question, based on its English label. Used as the weight key. */
+export function questionSlug(q: any): string {
+  const t = q?.text;
+  const raw = (typeof t === 'object' && t ? (t.en ?? t.ar ?? '') : t) || String(q?.id || '');
+  return String(raw).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+}
+
+/** Weight applied to one question inside a metric (question weight x section weight). */
+export function questionWeight(metric: ReportMetric, q: any): number {
+  const cfg = metric.config || {};
+  const own = cfg.weights?.[questionSlug(q)];
+  const sectionTitle = typeof q?.section === 'object' ? (q.section?.en ?? '') : (q?.section ?? q?.section_title ?? '');
+  const sec = sectionTitle ? cfg.sectionWeights?.[String(sectionTitle).toLowerCase()] : undefined;
+  const w = (own === undefined || own === null || Number.isNaN(Number(own)) ? 1 : Number(own))
+    * (sec === undefined || sec === null || Number.isNaN(Number(sec)) ? 1 : Number(sec));
+  return w > 0 ? w : 0;
+}
+
+export function hasWeights(metric: ReportMetric): boolean {
+  const cfg = metric.config || {};
+  const vals = [...Object.values(cfg.weights || {}), ...Object.values(cfg.sectionWeights || {})];
+  return vals.some(v => Number(v) !== 1);
+}
 
 // Only measurable question types can be tagged with a metric.
 export const MEASURABLE_QUESTION_TYPES = ['rating', 'yes_no'] as const;
@@ -74,8 +111,9 @@ export function metricMaxForGauge(m: ReportMetric): number {
 }
 
 /** Normalise a single raw answer to the metric scale (0..scale). */
-function normaliseAnswer(raw: any, questionType: string, questionMax: number, scale: number): number | null {
-  if (raw === null || raw === undefined || raw === 'na' || raw === 'N/A') return null;
+function normaliseAnswer(raw: any, questionType: string, questionMax: number, scale: number, naHandling: 'exclude' | 'zero' = 'exclude'): number | null {
+  const isNA = raw === null || raw === undefined || raw === 'na' || raw === 'N/A' || raw === 'n/a';
+  if (isNA) return naHandling === 'zero' ? 0 : null;
   if (questionType === 'yes_no') {
     const yes = raw === true || raw === 'true' || raw === 'yes' || raw === 'Yes';
     const no = raw === false || raw === 'false' || raw === 'no' || raw === 'No';
@@ -91,6 +129,10 @@ function normaliseAnswer(raw: any, questionType: string, questionMax: number, sc
 export interface MetricResult {
   value: number | null;
   sampleSize: number;
+  /** Set when the value is hidden on purpose (e.g. not enough answers). */
+  reason?: 'low_sample' | 'no_data' | 'formula_error';
+  /** Total weight behind the value (equals sampleSize when no weights are set). */
+  totalWeight?: number;
   target?: number;
   /** Buckets used for the supporting chart (NPS split, box split, scale spread…) */
   buckets: { label: string; count: number; percent: number; color: string }[];
