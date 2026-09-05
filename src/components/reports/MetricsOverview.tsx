@@ -409,7 +409,7 @@ function MetricsOverviewInner({ missions, visits, branches, language, ownerId, h
               {/* Answer split */}
               <div>
                 <p className="text-xs font-medium mb-2 text-muted-foreground">Answer split</p>
-                <AnswerSplitBar metric={metric} result={overall} />
+                <AnswerSplitBar result={overall} />
               </div>
 
               {/* Trend */}
