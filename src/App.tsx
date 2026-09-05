@@ -41,6 +41,7 @@ import AdminTemplatesPage from "./pages/admin/AdminTemplates";
 import AdminPlansPage from "./pages/admin/AdminPlans";
 import AdminFinancePage from "./pages/admin/AdminFinance";
 import AdminReportsPage from "./pages/admin/AdminReports";
+import AdminReportMetricsPage from "./pages/admin/AdminReportMetrics";
 import AdminConfigPage from "./pages/admin/AdminConfig";
 import AdminAuditPage from "./pages/admin/AdminAudit";
 import AdminAdminsPage from "./pages/admin/AdminAdmins";
@@ -285,6 +286,14 @@ const App = () => (
               element={
                 <AdminProtectedRoute>
                   <AdminReportsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/report-metrics"
+              element={
+                <AdminProtectedRoute>
+                  <AdminReportMetricsPage />
                 </AdminProtectedRoute>
               }
             />

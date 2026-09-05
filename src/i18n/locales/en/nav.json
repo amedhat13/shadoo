@@ -33,6 +33,7 @@
       "finances": "FINANCES",
       "sales_requests": "SALES REQUESTS",
       "reports": "REPORTS",
+      "report_metrics": "REPORT METRICS",
       "config": "CONFIGURATION",
       "audit": "AUDIT LOGS",
       "admins": "ADMIN USERS"

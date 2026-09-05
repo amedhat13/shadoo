@@ -11,11 +11,14 @@ import { ReportMetric } from '@/lib/reportMetrics';
  *
  * Pass `ownerId` to read another account's configuration (admin per-client view).
  */
-export function useReportMetrics(ownerId?: string) {
+export function useReportMetrics(ownerId?: string | null) {
   const { user } = useAuth();
-  const effectiveOwner = ownerId ?? user?.id ?? null;
+  /** `null` explicitly targets the platform defaults; `undefined` falls back to the signed-in user. */
+  const platformScope = ownerId === null;
+  const effectiveOwner = platformScope ? null : (ownerId ?? user?.id ?? null);
   const queryClient = useQueryClient();
-  const isOwnConfig = !ownerId || ownerId === user?.id;
+  const isOwnConfig = ownerId === undefined || ownerId === user?.id;
+
 
   const query = useQuery({
     queryKey: ['report-metrics', effectiveOwner],
@@ -48,7 +51,7 @@ export function useReportMetrics(ownerId?: string) {
   /** Saves a metric for the current owner (creates a per-client override of a default). */
   const saveMetric = useMutation({
     mutationFn: async (metric: Partial<ReportMetric> & { metric_key: string }) => {
-      if (!effectiveOwner) throw new Error('Not signed in');
+      if (!platformScope && !effectiveOwner) throw new Error('Not signed in');
       const payload = {
         user_id: effectiveOwner,
         metric_key: metric.metric_key,
@@ -63,10 +66,20 @@ export function useReportMetrics(ownerId?: string) {
         is_system: metric.is_system ?? false,
         sort_order: metric.sort_order ?? 100,
       };
+      if (platformScope) {
+        // The unique index for defaults is partial (user_id IS NULL), so upsert can't target it.
+        const existing = (query.data || []).find(r => r.user_id === null && r.metric_key === metric.metric_key);
+        const { error } = existing
+          ? await supabase.from('report_metrics').update(payload as never).eq('id', existing.id)
+          : await supabase.from('report_metrics').insert(payload as never);
+        if (error) throw error;
+        return;
+      }
       const { error } = await supabase
         .from('report_metrics')
         .upsert(payload as never, { onConflict: 'user_id,metric_key' });
       if (error) throw error;
+
     },
     onSuccess: invalidate,
   });
@@ -74,7 +87,7 @@ export function useReportMetrics(ownerId?: string) {
   /** Removes a client's own metric (custom metric deleted, override reverts to default). */
   const removeMetric = useMutation({
     mutationFn: async (metric: ReportMetric) => {
-      if (!effectiveOwner) throw new Error('Not signed in');
+      if (!effectiveOwner) throw new Error('Cannot delete a platform default here.');
       const { error } = await supabase
         .from('report_metrics')
         .delete()

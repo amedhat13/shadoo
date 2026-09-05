@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Building2, ClipboardList, ClipboardCheck,
   UserCheck, Award, FileQuestion, CreditCard, DollarSign, Wallet,
-  BarChart3, Settings, ScrollText, ShieldCheck, Menu, Phone,
+  BarChart3, SlidersHorizontal, Settings, ScrollText, ShieldCheck, Menu, Phone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,6 +38,7 @@ const navSections = [
     { id: 'finance', labelKey: 'admin.items.finances', href: '/admin/finance', icon: DollarSign },
     { id: 'sales-requests', labelKey: 'admin.items.sales_requests', href: '/admin/sales-requests', icon: Phone },
     { id: 'reports', labelKey: 'admin.items.reports', href: '/admin/reports', icon: BarChart3 },
+    { id: 'report-metrics', labelKey: 'admin.items.report_metrics', href: '/admin/report-metrics', icon: SlidersHorizontal },
   ]},
   { titleKey: 'admin.sections.system', items: [
     { id: 'config', labelKey: 'admin.items.config', href: '/admin/config', icon: Settings },
