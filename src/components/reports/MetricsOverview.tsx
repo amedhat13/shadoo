@@ -152,11 +152,30 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
   return (
     <div className="space-y-4">
+      {/* Pinned questions */}
+      <PinnedQuestionCards
+        missions={missions}
+        visits={visits}
+        branches={branches}
+        language={language}
+        ownerId={ownerId}
+      />
+
+      {/* Top branch */}
+      <TopBranchCard matrix={matrix} />
+
+      {/* Location heat map */}
+      <BranchHeatMap matrix={matrix} focusBranchId={focusBranchId} onFocusBranch={setFocusBranchId} />
+
+      {/* Branch comparison */}
+      <BranchRadarComparison matrix={matrix} metrics={activeMetrics} language={language} />
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wide">Your metrics</h3>
           <p className="text-xs text-muted-foreground">
             Calculated from every question tagged with each metric. {withData.length} of {activeMetrics.length} active metrics have tagged questions.
+            {focusedBranchName && ` Focused on ${focusedBranchName}.`}
           </p>
         </div>
         {!hideSettingsLink && (
@@ -167,6 +186,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
           </Button>
         )}
       </div>
+
 
       {/* Metric scorecards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
