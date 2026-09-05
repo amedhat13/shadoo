@@ -9,10 +9,16 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell,
   Tooltip as RechartsTooltip, LineChart, Line, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { BarChart3, Settings2, Target, TrendingUp } from 'lucide-react';
+import { BarChart3, Pin, PinOff, Settings2, Target, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getLocalizedValue } from '@/i18n/utils';
 import { useReportMetrics } from '@/hooks/useReportMetrics';
+import { useReportPins } from '@/hooks/useReportPins';
+import { buildBranchMatrix, questionKey } from '@/lib/reportInsights';
+import { BranchHeatMap } from '@/components/reports/BranchHeatMap';
+import { TopBranchCard } from '@/components/reports/TopBranchCard';
+import { BranchRadarComparison } from '@/components/reports/BranchRadarComparison';
+import { PinnedQuestionCards } from '@/components/reports/PinnedQuestionCards';
 import {
   ReportMetric, computeMetric, formatMetricValue, healthColor, metricDescription,
   metricFormat, metricMaxForGauge, metricName,
@@ -47,11 +53,30 @@ function monthKey(iso?: string | null) {
 export function MetricsOverview({ missions, visits, branches, language, ownerId, hideSettingsLink }: MetricsOverviewProps) {
   const { activeMetrics, isLoading } = useReportMetrics(ownerId);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [focusBranchId, setFocusBranchId] = useState<string | null>(null);
+  const { isPinned, toggle: togglePin, canEdit: canPin } = useReportPins(ownerId);
+
+  // Branch matrix always uses every visit so the heat map / comparison stay complete.
+  const matrix = useMemo(
+    () => buildBranchMatrix(activeMetrics, missions, visits, branches, language),
+    [activeMetrics, missions, visits, branches, language],
+  );
+
+  // The metric blocks below respect the focused branch (heat-map tile click).
+  const scopedVisits = useMemo(() => {
+    if (!focusBranchId) return visits || [];
+    const missionBranch = new Map<string, string | null>();
+    for (const m of missions || []) missionBranch.set(m.id, m.branch_id ?? null);
+    return (visits || []).filter((v: any) => (v.branch_id ?? missionBranch.get(v.mission_id)) === focusBranchId);
+  }, [visits, missions, focusBranchId]);
+
+  const focusedBranchName = focusBranchId ? matrix.branches.find(b => b.id === focusBranchId)?.name : null;
 
   const results = useMemo(() => {
+    const visitsScope = scopedVisits;
     return activeMetrics.map((metric) => {
       const questions = taggedQuestions(missions, metric.metric_key);
-      const overall = computeMetric(metric, questions, visits);
+      const overall = computeMetric(metric, questions, visitsScope);
 
       // Per question — the same question can exist in several missions, so group by label
       const grouped = new Map<string, { qs: any[]; missionIds: Set<string> }>();
@@ -63,16 +88,17 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
         entry.missionIds.add(q.__missionId);
       }
       const perQuestion = Array.from(grouped.entries()).map(([label, entry]) => {
-        const scoped = (visits || []).filter((v: any) => entry.missionIds.has(v.mission_id));
+        const scoped = (visitsScope || []).filter((v: any) => entry.missionIds.has(v.mission_id));
         const r = computeMetric(metric, entry.qs, scoped);
-        return { label, value: r.value, n: r.sampleSize };
+        return { label, value: r.value, n: r.sampleSize, key: questionKey(entry.qs[0]) };
       }).filter(r => r.n > 0).sort((a, b) => (a.value ?? 0) - (b.value ?? 0));
+
 
       // Per branch (visit → mission → branch)
       const missionBranch = new Map<string, string | null>();
       for (const m of missions || []) missionBranch.set(m.id, m.branch_id ?? null);
       const byBranch = (branches || []).map((b: any) => {
-        const bVisits = (visits || []).filter((v: any) => {
+        const bVisits = (visitsScope || []).filter((v: any) => {
           const bid = v.branch_id ?? missionBranch.get(v.mission_id);
           return bid === b.id;
         });
@@ -87,7 +113,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
       // Trend by month
       const monthMap = new Map<string, any[]>();
-      for (const v of visits || []) {
+      for (const v of visitsScope || []) {
         const key = monthKey(v.submitted_at || v.created_at);
         if (!key) continue;
         if (!monthMap.has(key)) monthMap.set(key, []);
@@ -104,7 +130,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
       return { metric, overall, perQuestion, byBranch, trend, questionCount: questions.length };
     });
-  }, [activeMetrics, missions, visits, branches, language]);
+  }, [activeMetrics, missions, scopedVisits, branches, language]);
 
   if (isLoading) return null;
 
@@ -126,11 +152,30 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
   return (
     <div className="space-y-4">
+      {/* Pinned questions */}
+      <PinnedQuestionCards
+        missions={missions}
+        visits={visits}
+        branches={branches}
+        language={language}
+        ownerId={ownerId}
+      />
+
+      {/* Top branch */}
+      <TopBranchCard matrix={matrix} />
+
+      {/* Location heat map */}
+      <BranchHeatMap matrix={matrix} focusBranchId={focusBranchId} onFocusBranch={setFocusBranchId} />
+
+      {/* Branch comparison */}
+      <BranchRadarComparison matrix={matrix} metrics={activeMetrics} language={language} />
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wide">Your metrics</h3>
           <p className="text-xs text-muted-foreground">
             Calculated from every question tagged with each metric. {withData.length} of {activeMetrics.length} active metrics have tagged questions.
+            {focusedBranchName && ` Focused on ${focusedBranchName}.`}
           </p>
         </div>
         {!hideSettingsLink && (
@@ -141,6 +186,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
           </Button>
         )}
       </div>
+
 
       {/* Metric scorecards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -256,6 +302,19 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
                     const pct = Math.max(0, Math.min(100, ((q.value ?? 0) - (metricFormat(metric) === 'score' ? -100 : 0)) / (max - (metricFormat(metric) === 'score' ? -100 : 0)) * 100));
                     return (
                       <div key={i} className="flex items-center gap-3">
+                        {canPin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            title={isPinned(q.key) ? 'Unpin from overview' : 'Pin to overview'}
+                            onClick={() => togglePin({ question_key: q.key, label: q.label })}
+                          >
+                            {isPinned(q.key)
+                              ? <PinOff className="h-3.5 w-3.5 text-primary" />
+                              : <Pin className="h-3.5 w-3.5 text-muted-foreground" />}
+                          </Button>
+                        )}
                         <span className="text-xs flex-1 truncate">{q.label}</span>
                         <Progress value={pct} className="h-2 w-32" />
                         <span className={`text-xs font-bold w-16 text-end ${healthColor(metric, q.value)}`}>
@@ -264,6 +323,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
                         <span className="text-[10px] text-muted-foreground w-14 text-end">{q.n} ans.</span>
                       </div>
                     );
+
                   })}
                   {perQuestion.length === 0 && (
                     <p className="text-xs text-muted-foreground">No tagged questions have answers yet.</p>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MetricsOverview } from '@/components/reports/MetricsOverview';
+import { QuestionPinToggle } from '@/components/reports/QuestionPinToggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -362,6 +363,7 @@ export function ClientReportView({ clientId, clientName }: ClientReportViewProps
             missions={relevantMissions}
             visits={completedVisits}
             language={language}
+            pinOwnerId={clientId}
           />
         </TabsContent>
 
@@ -536,7 +538,7 @@ function MethodologyDashboard({ mission, visits, branches, language }: { mission
   );
 }
 
-function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string }) {
+function QuestionAnalyticsTab({ mission, missions, visits, language, pinOwnerId }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string; pinOwnerId?: string }) {
   const { t } = useTranslation('reports');
 
   if (!mission) {
@@ -568,7 +570,10 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">{qText}</CardTitle>
-                <Badge variant="outline" className="text-xs">{q.type}</Badge>
+                <div className="flex items-center gap-1.5">
+                  <Badge variant="outline" className="text-xs">{q.type}</Badge>
+                  <QuestionPinToggle question={q} language={language} ownerId={pinOwnerId} />
+                </div>
               </div>
               <CardDescription>{answers.length} responses</CardDescription>
             </CardHeader>

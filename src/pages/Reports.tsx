@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { BranchComparisonTab } from '@/components/reports/BranchComparisonTab';
 import { MetricsOverview } from '@/components/reports/MetricsOverview';
+import { QuestionPinToggle } from '@/components/reports/QuestionPinToggle';
 
 const COLORS = ['#F97316', '#22C55E', '#F59E0B', '#06B6D4', '#A855F7', '#EF4444', '#6366F1', '#14B8A6'];
 const METHODOLOGY_LABELS: Record<string, string> = {
@@ -608,7 +609,7 @@ function MethodologyDashboard({ mission, visits, branches, language }: { mission
   );
 }
 
-function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string }) {
+function QuestionAnalyticsTab({ mission, missions, visits, language, pinOwnerId }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string; pinOwnerId?: string }) {
   const { t } = useTranslation('reports');
 
   if (!mission) {
@@ -645,6 +646,7 @@ function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission
                     <Badge className="text-[10px] bg-primary/15 text-primary border-primary/30 hover:bg-primary/15">NPS</Badge>
                   )}
                   <Badge variant="outline" className="text-xs">{q.type}</Badge>
+                  <QuestionPinToggle question={q} language={language} ownerId={pinOwnerId} />
                 </div>
               </div>
               <CardDescription>{answers.length} responses</CardDescription>
