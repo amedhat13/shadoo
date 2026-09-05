@@ -33,8 +33,6 @@ interface Props {
   scopeLabel: string;
 }
 
-type Band = { label: string; min: number };
-
 type Draft = {
   metric_key: string;
   name: string;
@@ -52,18 +50,13 @@ type Draft = {
   naHandling: 'exclude' | 'zero';
   minSample: number;
   weights: Record<string, number>;
-  bands: Band[];
+  bandFair: number;
+  bandGood: number;
+  bandExcellent: number;
   is_active: boolean;
   is_system: boolean;
   sort_order: number;
 };
-
-const DEFAULT_BANDS: Band[] = [
-  { label: 'Excellent', min: 85 },
-  { label: 'Good', min: 70 },
-  { label: 'Needs work', min: 50 },
-  { label: 'Critical', min: 0 },
-];
 
 function toDraft(m?: ReportMetric): Draft {
   return {
@@ -83,7 +76,9 @@ function toDraft(m?: ReportMetric): Draft {
     naHandling: (m?.config?.naHandling as 'exclude' | 'zero') ?? 'exclude',
     minSample: m?.config?.minSample ?? 0,
     weights: (m?.config?.weights as Record<string, number>) ?? {},
-    bands: (m?.config?.bands as Band[])?.length ? (m!.config!.bands as Band[]) : DEFAULT_BANDS,
+    bandFair: m?.config?.bands?.fair ?? 50,
+    bandGood: m?.config?.bands?.good ?? 70,
+    bandExcellent: m?.config?.bands?.excellent ?? 85,
     is_active: m?.is_active ?? true,
     is_system: m?.is_system ?? false,
     sort_order: m?.sort_order ?? 100,
@@ -136,7 +131,7 @@ export function MetricConfigEditor({ ownerId, weightTargets = [], scopeLabel }: 
         naHandling: draft.naHandling,
         minSample: draft.minSample || undefined,
         weights: Object.keys(cleanWeights).length ? cleanWeights : undefined,
-        bands: draft.bands,
+        bands: { fair: draft.bandFair, good: draft.bandGood, excellent: draft.bandExcellent },
         ...(formula === 'nps' ? { promoterMin: draft.promoterMin, detractorMax: draft.detractorMax, min: -100, max: 100 } : {}),
         ...(formula === 'top_2_box' ? { topBoxes: draft.topBoxes } : {}),
         ...(formula === 'expression' ? { expression: draft.expression.trim() } : {}),
@@ -488,49 +483,21 @@ export function MetricConfigEditor({ ownerId, weightTargets = [], scopeLabel }: 
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5">
                     Performance bands
-                    <InfoHint label="Bands colour the gauges and charts. Each band starts at its own value on a 0–100 scale." />
+                    <InfoHint label="Where each colour starts, on the metric's own scale. Below the first value the result shows red." />
                   </Label>
-                  <div className="space-y-2">
-                    {editing.bands.map((b, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <Input
-                          className="h-8 flex-1"
-                          value={b.label}
-                          onChange={(e) => {
-                            const bands = [...editing.bands];
-                            bands[i] = { ...b, label: e.target.value };
-                            setEditing({ ...editing, bands });
-                          }}
-                        />
-                        <span className="text-xs text-muted-foreground">from</span>
-                        <Input
-                          type="number"
-                          className="h-8 w-20"
-                          value={b.min}
-                          onChange={(e) => {
-                            const bands = [...editing.bands];
-                            bands[i] = { ...b, min: Number(e.target.value) };
-                            setEditing({ ...editing, bands });
-                          }}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8"
-                          onClick={() => setEditing({ ...editing, bands: editing.bands.filter((_, j) => j !== i) })}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5"
-                      onClick={() => setEditing({ ...editing, bands: [...editing.bands, { label: 'New band', min: 0 }] })}
-                    >
-                      <Plus className="h-3.5 w-3.5" /> Add band
-                    </Button>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Needs work from</p>
+                      <Input type="number" value={editing.bandFair} onChange={(e) => setEditing({ ...editing, bandFair: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Good from</p>
+                      <Input type="number" value={editing.bandGood} onChange={(e) => setEditing({ ...editing, bandGood: Number(e.target.value) })} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Excellent from</p>
+                      <Input type="number" value={editing.bandExcellent} onChange={(e) => setEditing({ ...editing, bandExcellent: Number(e.target.value) })} />
+                    </div>
                   </div>
                 </div>
               </TabsContent>
