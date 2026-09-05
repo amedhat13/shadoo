@@ -98,7 +98,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
       const missionBranch = new Map<string, string | null>();
       for (const m of missions || []) missionBranch.set(m.id, m.branch_id ?? null);
       const byBranch = (branches || []).map((b: any) => {
-        const bVisits = (visits || []).filter((v: any) => {
+        const bVisits = (visitsScope || []).filter((v: any) => {
           const bid = v.branch_id ?? missionBranch.get(v.mission_id);
           return bid === b.id;
         });
@@ -113,7 +113,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
       // Trend by month
       const monthMap = new Map<string, any[]>();
-      for (const v of visits || []) {
+      for (const v of visitsScope || []) {
         const key = monthKey(v.submitted_at || v.created_at);
         if (!key) continue;
         if (!monthMap.has(key)) monthMap.set(key, []);
@@ -130,7 +130,7 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
 
       return { metric, overall, perQuestion, byBranch, trend, questionCount: questions.length };
     });
-  }, [activeMetrics, missions, visits, branches, language]);
+  }, [activeMetrics, missions, scopedVisits, branches, language]);
 
   if (isLoading) return null;
 
