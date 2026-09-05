@@ -1,7 +1,10 @@
 // Configurable report metrics engine.
+// Weighted answers + custom formulas are configured by the Shadoo team per client.
 // A metric is defined once (Settings → Reports) and applied to any question the
 // client tags with that metric. Everything in the Reports overview is derived
 // from these definitions — no hardcoded methodology rules.
+
+import { evaluateExpression, expressionRefs } from '@/lib/metricExpression';
 
 export type MetricFormula = 'nps' | 'top_2_box' | 'top_box' | 'average' | 'yes_percent' | 'expression';
 
@@ -369,6 +372,13 @@ export function questionsForMetric(missions: any[], metricKey: string): { questi
 
 export function healthColor(metric: ReportMetric, value: number | null): string {
   if (value === null) return 'text-muted-foreground';
+  const bands = metric.config?.bands;
+  if (bands?.good !== undefined) {
+    if (bands.excellent !== undefined && value >= bands.excellent) return 'text-success';
+    if (value >= bands.good) return 'text-success';
+    if (bands.fair !== undefined && value >= bands.fair) return 'text-amber-500';
+    return 'text-destructive';
+  }
   const target = metric.config?.target;
   if (target === undefined) return 'text-foreground';
   if (value >= target) return 'text-success';
