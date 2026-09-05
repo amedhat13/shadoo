@@ -11,11 +11,14 @@ import { ReportMetric } from '@/lib/reportMetrics';
  *
  * Pass `ownerId` to read another account's configuration (admin per-client view).
  */
-export function useReportMetrics(ownerId?: string) {
+export function useReportMetrics(ownerId?: string | null) {
   const { user } = useAuth();
-  const effectiveOwner = ownerId ?? user?.id ?? null;
+  /** `null` explicitly targets the platform defaults; `undefined` falls back to the signed-in user. */
+  const platformScope = ownerId === null;
+  const effectiveOwner = platformScope ? null : (ownerId ?? user?.id ?? null);
   const queryClient = useQueryClient();
-  const isOwnConfig = !ownerId || ownerId === user?.id;
+  const isOwnConfig = ownerId === undefined || ownerId === user?.id;
+
 
   const query = useQuery({
     queryKey: ['report-metrics', effectiveOwner],
