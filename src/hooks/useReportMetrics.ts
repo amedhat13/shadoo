@@ -66,10 +66,20 @@ export function useReportMetrics(ownerId?: string | null) {
         is_system: metric.is_system ?? false,
         sort_order: metric.sort_order ?? 100,
       };
+      if (platformScope) {
+        // The unique index for defaults is partial (user_id IS NULL), so upsert can't target it.
+        const existing = (query.data || []).find(r => r.user_id === null && r.metric_key === metric.metric_key);
+        const { error } = existing
+          ? await supabase.from('report_metrics').update(payload as never).eq('id', existing.id)
+          : await supabase.from('report_metrics').insert(payload as never);
+        if (error) throw error;
+        return;
+      }
       const { error } = await supabase
         .from('report_metrics')
         .upsert(payload as never, { onConflict: 'user_id,metric_key' });
       if (error) throw error;
+
     },
     onSuccess: invalidate,
   });
