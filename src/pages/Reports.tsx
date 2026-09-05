@@ -609,7 +609,7 @@ function MethodologyDashboard({ mission, visits, branches, language }: { mission
   );
 }
 
-function QuestionAnalyticsTab({ mission, missions, visits, language }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string }) {
+function QuestionAnalyticsTab({ mission, missions, visits, language, pinOwnerId }: { mission: ReportMission | null; missions: ReportMission[]; visits: ReportVisit[]; language: string; pinOwnerId?: string }) {
   const { t } = useTranslation('reports');
 
   if (!mission) {
