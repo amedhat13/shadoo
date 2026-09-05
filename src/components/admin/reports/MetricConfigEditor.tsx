@@ -104,7 +104,7 @@ export function MetricConfigEditor({ ownerId, weightTargets = [], scopeLabel }: 
     refs.forEach((r, i) => { sample[r] = 70 + i * 5; });
     const res = evaluateExpression(expr, sample);
     if (res === null) return { ok: false, message: 'That formula could not be read. Use metric keys, numbers, + - * / ( ) and min/max/avg.' };
-    return { ok: true, message: `Valid. With sample values ${refs.map(r => `${r}=${sample[r]}`).join(', ')} this returns ${Math.round(res * 10) / 10}.` };
+    return { ok: true, message: `Valid. With sample values ${refs.map(r => `${r}=${sample[r]}`).join(', ')} this returns ${Math.round(Number(res) * 10) / 10}.` };
   }, [editing, builtinKeys]);
 
   const persist = (draft: Draft) => {
