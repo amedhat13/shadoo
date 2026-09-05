@@ -53,11 +53,30 @@ function monthKey(iso?: string | null) {
 export function MetricsOverview({ missions, visits, branches, language, ownerId, hideSettingsLink }: MetricsOverviewProps) {
   const { activeMetrics, isLoading } = useReportMetrics(ownerId);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [focusBranchId, setFocusBranchId] = useState<string | null>(null);
+  const { isPinned, toggle: togglePin, canEdit: canPin } = useReportPins(ownerId);
+
+  // Branch matrix always uses every visit so the heat map / comparison stay complete.
+  const matrix = useMemo(
+    () => buildBranchMatrix(activeMetrics, missions, visits, branches, language),
+    [activeMetrics, missions, visits, branches, language],
+  );
+
+  // The metric blocks below respect the focused branch (heat-map tile click).
+  const scopedVisits = useMemo(() => {
+    if (!focusBranchId) return visits || [];
+    const missionBranch = new Map<string, string | null>();
+    for (const m of missions || []) missionBranch.set(m.id, m.branch_id ?? null);
+    return (visits || []).filter((v: any) => (v.branch_id ?? missionBranch.get(v.mission_id)) === focusBranchId);
+  }, [visits, missions, focusBranchId]);
+
+  const focusedBranchName = focusBranchId ? matrix.branches.find(b => b.id === focusBranchId)?.name : null;
 
   const results = useMemo(() => {
+    const visitsScope = scopedVisits;
     return activeMetrics.map((metric) => {
       const questions = taggedQuestions(missions, metric.metric_key);
-      const overall = computeMetric(metric, questions, visits);
+      const overall = computeMetric(metric, questions, visitsScope);
 
       // Per question — the same question can exist in several missions, so group by label
       const grouped = new Map<string, { qs: any[]; missionIds: Set<string> }>();
@@ -69,10 +88,11 @@ export function MetricsOverview({ missions, visits, branches, language, ownerId,
         entry.missionIds.add(q.__missionId);
       }
       const perQuestion = Array.from(grouped.entries()).map(([label, entry]) => {
-        const scoped = (visits || []).filter((v: any) => entry.missionIds.has(v.mission_id));
+        const scoped = (visitsScope || []).filter((v: any) => entry.missionIds.has(v.mission_id));
         const r = computeMetric(metric, entry.qs, scoped);
-        return { label, value: r.value, n: r.sampleSize };
+        return { label, value: r.value, n: r.sampleSize, key: questionKey(entry.qs[0]) };
       }).filter(r => r.n > 0).sort((a, b) => (a.value ?? 0) - (b.value ?? 0));
+
 
       // Per branch (visit → mission → branch)
       const missionBranch = new Map<string, string | null>();
