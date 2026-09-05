@@ -51,7 +51,7 @@ export function useReportMetrics(ownerId?: string | null) {
   /** Saves a metric for the current owner (creates a per-client override of a default). */
   const saveMetric = useMutation({
     mutationFn: async (metric: Partial<ReportMetric> & { metric_key: string }) => {
-      if (!effectiveOwner) throw new Error('Not signed in');
+      if (!platformScope && !effectiveOwner) throw new Error('Not signed in');
       const payload = {
         user_id: effectiveOwner,
         metric_key: metric.metric_key,
@@ -77,7 +77,7 @@ export function useReportMetrics(ownerId?: string | null) {
   /** Removes a client's own metric (custom metric deleted, override reverts to default). */
   const removeMetric = useMutation({
     mutationFn: async (metric: ReportMetric) => {
-      if (!effectiveOwner) throw new Error('Not signed in');
+      if (!effectiveOwner) throw new Error('Cannot delete a platform default here.');
       const { error } = await supabase
         .from('report_metrics')
         .delete()
