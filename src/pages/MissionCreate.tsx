@@ -64,6 +64,8 @@ export default function MissionCreatePage() {
 
   const isEditing = Boolean(id);
   const existingMission = id ? getMission(id) : null;
+  const location = useLocation();
+  const aiDraft = (location.state as { aiDraft?: Partial<MissionFormData> } | null)?.aiDraft;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<MissionFormData>(() => {
