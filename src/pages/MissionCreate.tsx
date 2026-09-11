@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getBilingualText } from '@/i18n/utils';
 import { Check } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
