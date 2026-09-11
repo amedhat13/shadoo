@@ -83,6 +83,9 @@ export default function MissionCreatePage() {
         is_geo_tagged: false,
       };
     }
+    if (aiDraft) {
+      return { ...initialFormData, ...aiDraft };
+    }
     return initialFormData;
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
