@@ -25,8 +25,11 @@ export default function MissionsPage() {
   const { missions, branches, updateMissionStatus, duplicateMission } = useMissions();
   const { visitsRemaining, visitsTotal } = usePackage();
 
+  const { wallet } = useWallet();
+
   const [filters, setFilters] = useState<MissionFilters>({ search: '', status: 'all', branch: 'all' });
   const [templateSource, setTemplateSource] = useState<Mission | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
   const canCreateMission = visitsRemaining > 0;
 
   const filteredMissions = missions.filter((mission) => {
