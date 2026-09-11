@@ -182,10 +182,10 @@ function questionSet(brief: string, files: AIAttachment[]) {
     commentMode: 'optional',
     metric_key: metric,
     suggestedComments: [
-      bilingual('Fast and friendly', 'سريع وودود'),
-      bilingual('Long wait', 'انتظار طويل'),
-      bilingual('Staff was busy', 'الموظف كان مشغولاً'),
-      bilingual('Very clean', 'نظيف جداً'),
+      { id: crypto.randomUUID(), ...bilingual('Fast and friendly', 'سريع وودود') },
+      { id: crypto.randomUUID(), ...bilingual('Long wait', 'انتظار طويل') },
+      { id: crypto.randomUUID(), ...bilingual('Staff was busy', 'الموظف كان مشغولاً') },
+      { id: crypto.randomUUID(), ...bilingual('Very clean', 'نظيف جداً') },
     ],
   });
 
@@ -195,9 +195,9 @@ function questionSet(brief: string, files: AIAttachment[]) {
     q('sec-2', 'rating', 'How well did the staff understand your needs?', 'ما مدى فهم الموظف لاحتياجاتك؟', 'asked questions, suggested options, product knowledge, no pressure', 'طرح الأسئلة، اقتراح البدائل، معرفة المنتج، دون إلحاح', 'csat'),
     q('sec-2', 'yes_no', 'Did the staff suggest an add-on or upsell?', 'هل اقترح الموظف إضافة أو منتجاً آخر؟', 'suggested add-on, relevant to order, natural not pushy', 'اقتراح إضافة، ملائم للطلب، بشكل طبيعي', 'compliance_rate'),
     q('sec-3', 'rating', 'Rate the cleanliness of the store.', 'قيّم نظافة الفرع.', 'floors, tables, counters, restrooms, bins', 'الأرضيات، الطاولات، الكاونتر، دورات المياه، سلات المهملات', 'overall_score'),
-    q('sec-3', 'photo', 'Photo of the service counter.', 'صورة لمنطقة الخدمة.', 'wide shot, staff not identifiable, natural light', 'صورة واسعة، دون إظهار الموظفين، إضاءة طبيعية'),
+    q('sec-3', 'attachment', 'Photo of the service counter.', 'صورة لمنطقة الخدمة.', 'wide shot, staff not identifiable, natural light', 'صورة واسعة، دون إظهار الموظفين، إضاءة طبيعية'),
     q('sec-4', 'rating', 'How likely are you to recommend this branch to a friend?', 'ما مدى احتمالية أن ترشح هذا الفرع لصديق؟', 'overall feeling, would return, worth the price, would recommend', 'الإحساس العام، الرجوع مرة أخرى، يستحق السعر، الترشيح', 'nps'),
-    q('sec-4', 'text', 'Describe the visit in your own words.', 'اكتب وصفاً للزيارة بكلماتك.', 'sequence of events, names if given, anything unusual', 'تسلسل الأحداث، الأسماء إن وُجدت، أي شيء غير معتاد'),
+    q('sec-4', 'short_text', 'Describe the visit in your own words.', 'اكتب وصفاً للزيارة بكلماتك.', 'sequence of events, names if given, anything unusual', 'تسلسل الأحداث، الأسماء إن وُجدت، أي شيء غير معتاد'),
   ];
 
   if (files.length) {
