@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ClipboardList } from 'lucide-react';
+import { AIMissionBuilderDialog } from '@/components/missions/ai/AIMissionBuilderDialog';
+import { useWallet } from '@/hooks/useWallet';
+import shadooCap from '@/assets/shadoo-cap.png';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
