@@ -231,7 +231,7 @@ export function AIMissionBuilderDialog({ open, onOpenChange, context }: Props) {
             )}
 
             {/* ---------- Clarify (all questions in one batch) ---------- */}
-            {analysis && (phase === 'clarify' || phase === 'building' || phase === 'ready') && (
+            {analysis && (phase === 'clarify' || phase === 'building') && (
               <div className="space-y-3">
                 <Collapsible open={showReasoning} onOpenChange={setShowReasoning}>
                   <CollapsibleTrigger className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground">
