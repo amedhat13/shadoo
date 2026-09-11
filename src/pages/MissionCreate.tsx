@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getBilingualText } from '@/i18n/utils';
 import { Check } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -64,6 +64,8 @@ export default function MissionCreatePage() {
 
   const isEditing = Boolean(id);
   const existingMission = id ? getMission(id) : null;
+  const location = useLocation();
+  const aiDraft = (location.state as { aiDraft?: Partial<MissionFormData> } | null)?.aiDraft;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<MissionFormData>(() => {
@@ -80,6 +82,9 @@ export default function MissionCreatePage() {
         purchase_budget_per_visit: existingMission.purchase_budget_per_visit,
         is_geo_tagged: false,
       };
+    }
+    if (aiDraft) {
+      return { ...initialFormData, ...aiDraft };
     }
     return initialFormData;
   });
@@ -327,6 +332,15 @@ export default function MissionCreatePage() {
             </p>
           </div>
         </div>
+
+        {aiDraft && (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+            <p className="text-sm font-bold uppercase tracking-tight">Drafted by Shadoo AI</p>
+            <p className="text-xs text-muted-foreground">
+              Every step is pre-filled in English and Arabic. Review each one, adjust anything you want, then publish.
+            </p>
+          </div>
+        )}
 
         {/* Progress Steps */}
         <div className="flex items-center gap-2 md:gap-0 pb-2 overflow-x-auto">
