@@ -333,6 +333,15 @@ export default function MissionCreatePage() {
           </div>
         </div>
 
+        {aiDraft && (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+            <p className="text-sm font-bold uppercase tracking-tight">Drafted by Shadoo AI</p>
+            <p className="text-xs text-muted-foreground">
+              Every step is pre-filled in English and Arabic. Review each one, adjust anything you want, then publish.
+            </p>
+          </div>
+        )}
+
         {/* Progress Steps */}
         <div className="flex items-center gap-2 md:gap-0 pb-2 overflow-x-auto">
           {STEP_KEYS.map((stepKey, index) => (
