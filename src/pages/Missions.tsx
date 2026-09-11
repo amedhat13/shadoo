@@ -77,12 +77,32 @@ export default function MissionsPage() {
           title={t('title')}
           description={t('description')}
           actions={
-            <Button onClick={handleCreateClick} className="gap-2" disabled={!canCreateMission}>
-              <Plus className="h-4 w-4" />
-              {t('create_mission')}
-            </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <Button onClick={handleCreateClick} variant="outline" className="gap-2" disabled={!canCreateMission}>
+                <Plus className="h-4 w-4" />
+                {t('create_mission')}
+              </Button>
+              <Button onClick={() => setAiOpen(true)} className="gap-2" disabled={!canCreateMission}>
+                <img src={shadooCap} alt="" className="h-4 w-auto" />
+                Create with AI
+              </Button>
+            </div>
           }
         />
+
+        <button
+          onClick={() => canCreateMission && setAiOpen(true)}
+          className="w-full rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 text-start transition-colors hover:border-primary"
+        >
+          <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight">
+            <img src={shadooCap} alt="" className="h-5 w-auto" />
+            Skip the 6 steps — describe your mission instead
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Shadoo AI reads your brief or your standards document, asks anything that's missing, then fills the whole
+            wizard in English and Arabic. You review and publish.
+          </p>
+        </button>
 
         <VisitsRemainingWidget visitsRemaining={visitsRemaining} visitsTotal={visitsTotal} variant="card" />
 
