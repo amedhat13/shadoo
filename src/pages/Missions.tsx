@@ -136,6 +136,16 @@ export default function MissionsPage() {
         open={!!templateSource}
         onOpenChange={(o) => !o && setTemplateSource(null)}
       />
+
+      <AIMissionBuilderDialog
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        context={{
+          branches: branches.map((b) => ({ id: b.id, name: b.name, city: b.city })),
+          walletBalance: wallet.available_balance,
+          visitsRemaining,
+        }}
+      />
     </DashboardLayout>
   );
 }
