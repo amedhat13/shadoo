@@ -21,6 +21,7 @@ export const QUESTION_TYPE_LABELS: Record<string, string> = {
   rating: 'Rating',
   short_text: 'Short Text',
   yes_no: 'Yes / No',
+  attachment: 'Attachment',
 };
 
 export const CURRENCY = {

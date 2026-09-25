@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers } from 'lucide-react';
+import { forwardRef, useEffect, useState } from 'react';
+import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers, Paperclip, BarChart3, CircleCheck, CircleX } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -15,16 +16,28 @@ import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import type { CommentMode, PhotoSlot, QuestionPhotoRequirement, SuggestedComment } from '@/types';
 
 export interface CompletedVisitAnswer {
+  question_id?: string;
   question: string;
   question_ar?: string;
   description?: string;
   description_ar?: string;
   section?: string;
+  section_id?: string;
+  section_ar?: string;
   type: string;
+  required?: boolean;
   max_rating?: number;
-  answer: string | number | boolean;
+  allow_na?: boolean;
+  comment_mode?: CommentMode;
+  suggested_comments?: SuggestedComment[];
+  metric_key?: string;
+  options?: { id: string; en?: string; ar?: string }[];
+  photo_requirement?: QuestionPhotoRequirement;
+  attachments?: string[];
+  answer: string | number | boolean | string[];
   not_applicable?: boolean;
   comment?: string;
 }
@@ -34,7 +47,7 @@ export interface CompletedVisit {
   agent_name: string;
   completed_at: string;
   purchase_amount: number;
-  photos: string[];
+  photos: { url: string; slot_id?: string }[];
   receipt_photo?: string;
   answers: CompletedVisitAnswer[];
   rating?: number;
@@ -48,25 +61,25 @@ interface CompletedVisitsDialogProps {
   onOpenChange: (open: boolean) => void;
   visits: CompletedVisit[];
   missionName: string;
-  photoSlots?: { id: string; label: { en?: string; ar?: string }; required?: boolean }[];
+  photoSlots?: PhotoSlot[];
   receiptCap?: number;
   onRateVisit?: (visitId: string, rating: number, feedback?: string) => Promise<void>;
 }
 
 
-function StarRating({ 
+const StarRating = forwardRef<HTMLDivElement, {
+  value: number;
+  onChange?: (v: number) => void;
+  readonly?: boolean;
+}>(function StarRating({
   value, 
   onChange, 
   readonly = false 
-}: { 
-  value: number; 
-  onChange?: (v: number) => void; 
-  readonly?: boolean;
-}) {
+}, ref) {
   const [hover, setHover] = useState(0);
   
   return (
-    <div className="flex gap-1">
+    <div ref={ref} className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -79,6 +92,7 @@ function StarRating({
           onClick={() => onChange?.(star)}
           onMouseEnter={() => !readonly && setHover(star)}
           onMouseLeave={() => !readonly && setHover(0)}
+          aria-label={`${readonly ? 'Rated' : 'Rate'} ${star} stars`}
         >
           <Star
             className={cn(
@@ -92,14 +106,14 @@ function StarRating({
       ))}
     </div>
   );
-}
+});
 
 function groupBySection(answers: CompletedVisitAnswer[]) {
-  const groups: { section?: string; answers: CompletedVisitAnswer[] }[] = [];
+  const groups: { section?: string; section_id?: string; section_ar?: string; answers: CompletedVisitAnswer[] }[] = [];
   answers.forEach((a) => {
     const last = groups[groups.length - 1];
-    if (last && last.section === a.section) last.answers.push(a);
-    else groups.push({ section: a.section, answers: [a] });
+    if (last && (last.section_id || last.section) === (a.section_id || a.section)) last.answers.push(a);
+    else groups.push({ section: a.section, section_id: a.section_id, section_ar: a.section_ar, answers: [a] });
   });
   return groups;
 }
@@ -119,6 +133,11 @@ export function CompletedVisitsDialog({
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const { t } = useTranslation('missions');
   const { t: tc } = useTranslation('common');
+
+  useEffect(() => {
+    if (!open) return;
+    setSelectedVisit((current) => visits.find((visit) => visit.id === current?.id) || visits[0] || null);
+  }, [open, visits]);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-EG', {
@@ -161,11 +180,14 @@ export function CompletedVisitsDialog({
             <CheckCircle2 className="h-5 w-5 text-success" />
             {t('details.completed_visits_title')} - {missionName}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Review every submitted answer, attachment, required photo, and receipt for this mission.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-[60vh]">
+        <div className="flex h-[68vh] min-h-0 flex-col md:flex-row">
           {/* Visit List */}
-          <div className="w-1/3 border-r border-border">
+          <div className="h-32 shrink-0 border-b border-border md:h-full md:w-[18rem] md:border-b-0 md:border-r">
             <ScrollArea className="h-full">
               <div className="p-2">
                 {visits.map((visit, index) => (
@@ -176,8 +198,9 @@ export function CompletedVisitsDialog({
                       setPendingRating(0);
                       setPendingFeedback('');
                     }}
+                    aria-pressed={selectedVisit?.id === visit.id}
                     className={cn(
-                      'w-full text-left p-3 transition-colors hover:bg-muted/50',
+                      'w-full text-start p-3 transition-colors hover:bg-muted/50',
                       selectedVisit?.id === visit.id && 'bg-muted'
                     )}
                   >
@@ -208,12 +231,12 @@ export function CompletedVisitsDialog({
           </div>
 
           {/* Visit Details */}
-          <div className="flex-1">
+          <div className="min-h-0 flex-1">
             {selectedVisit ? (
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
                   {/* Header */}
-                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h3 className="font-bold text-lg">{t('details.mystery_shopper')}</h3>
                       <p className="text-sm text-muted-foreground">
@@ -283,20 +306,27 @@ export function CompletedVisitsDialog({
                       <MessageSquare className="h-4 w-4" />
                       {t('details.answers')} ({selectedVisit.answers.length})
                     </h4>
-                    <div className="space-y-5">
+                    <div className="space-y-6">
                       {groupBySection(selectedVisit.answers).map((group, gi) => (
                         <div key={gi} className="space-y-3">
                           {group.section && (
-                            <div className="flex items-center gap-2">
+                            <div className="border-b border-border pb-2">
+                              <div className="flex items-center gap-2">
                               <Layers className="h-3.5 w-3.5 text-muted-foreground" />
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <span className="text-xs font-bold uppercase tracking-wide">
                                 {group.section}
                               </span>
+                              <span className="text-[10px] text-muted-foreground">{group.answers.length} questions</span>
+                              </div>
+                              {group.section_ar && <p className="mt-1 text-xs font-ar text-muted-foreground" dir="rtl">{group.section_ar}</p>}
                             </div>
                           )}
                           {group.answers.map((answer, idx) => (
-                            <div key={idx} className="border border-border p-3">
-                              <p className="text-sm font-medium">{answer.question}</p>
+                            <div key={answer.question_id || idx} className="border border-border p-4">
+                              <div className="flex items-start gap-3">
+                                <div className="flex h-6 w-6 shrink-0 items-center justify-center bg-muted text-xs font-bold">{idx + 1}</div>
+                                <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold">{answer.question}{answer.required && <span className="text-destructive">*</span>}</p>
                               {answer.question_ar && (
                                 <p className="text-sm font-ar text-muted-foreground" dir="rtl">{answer.question_ar}</p>
                               )}
@@ -310,27 +340,46 @@ export function CompletedVisitsDialog({
                                   )}
                                 </div>
                               )}
-                              <p className="text-xs text-muted-foreground mb-2 mt-1">
+                              <p className="text-xs text-muted-foreground mt-1">
                                 {QUESTION_TYPE_LABELS[answer.type] || answer.type}
-                                {answer.type === 'rating' && answer.max_rating ? ` · 0–${answer.max_rating}` : ''}
+                                {answer.type === 'rating' && answer.max_rating ? ` · ${answer.max_rating > 5 ? `0–${answer.max_rating}` : `1–${answer.max_rating}`}` : ''}
                               </p>
-                              {answer.not_applicable ? (
-                                <Badge variant="outline" className="text-xs">{t('details.not_applicable', 'Not applicable')}</Badge>
-                              ) : (
-                                <div className="bg-muted/50 p-2 text-sm">
-                                  {typeof answer.answer === 'boolean'
-                                    ? answer.answer ? tc('yes') : tc('no')
-                                    : answer.type === 'rating' && answer.max_rating
-                                      ? `${answer.answer} / ${answer.max_rating}`
-                                      : String(answer.answer)}
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {answer.allow_na && <Badge variant="secondary" className="text-[10px]">N/A allowed</Badge>}
+                                {answer.comment_mode && answer.comment_mode !== 'off' && (
+                                  <Badge variant="secondary" className="text-[10px]">Comment {answer.comment_mode === 'required' ? 'required' : 'optional'}</Badge>
+                                )}
+                                {answer.photo_requirement?.enabled && <Badge variant="secondary" className="text-[10px]">Photo enabled</Badge>}
+                                {answer.metric_key && (
+                                  <Badge variant="outline" className="gap-1 text-[10px]"><BarChart3 className="h-3 w-3" />{answer.metric_key.replace(/_/g, ' ')}</Badge>
+                                )}
+                              </div>
+                              {(answer.suggested_comments || []).some((comment) => comment.en || comment.ar) && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {(answer.suggested_comments || []).filter((comment) => comment.en || comment.ar).map((comment) => (
+                                    <span key={comment.id} className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">{comment.en || comment.ar}</span>
+                                  ))}
                                 </div>
                               )}
+                              {answer.not_applicable ? (
+                                <div className="mt-3 border border-border bg-muted/40 p-3 text-sm font-medium">{t('details.not_applicable', 'Not applicable')}</div>
+                              ) : (
+                                <AnswerValue answer={answer} yesLabel={tc('yes')} noLabel={tc('no')} />
+                              )}
                               {answer.comment && (
-                                <div className="mt-2 flex gap-2 text-xs text-muted-foreground">
+                                <div className="mt-3 border-s-2 border-primary bg-primary/5 p-3 text-sm">
+                                  <div className="mb-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                                   <MessageSquare className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                                    Shopper comment
+                                  </div>
                                   <span>{answer.comment}</span>
                                 </div>
                               )}
+                              {(answer.attachments || []).length > 0 && (
+                                <MediaGrid title="Question attachments" urls={answer.attachments || []} icon="attachment" />
+                              )}
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -338,39 +387,43 @@ export function CompletedVisitsDialog({
                     </div>
                   </div>
 
-                  {/* Photos — labelled with the mission's named slots */}
-                  {selectedVisit.photos.length > 0 && (
+                  {/* Photos — labelled with the mission's named slots, including missing required evidence. */}
+                  {(selectedVisit.photos.length > 0 || (photoSlots || []).length > 0) && (
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
-                        {t('details.photos_label')} ({selectedVisit.photos.length})
+                        {t('details.photos_label')} ({selectedVisit.photos.length}/{Math.max(selectedVisit.photos.length, photoSlots?.length || 0)})
                       </h4>
-                      <div className="grid grid-cols-2 gap-3">
-                        {selectedVisit.photos.map((photo, idx) => {
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {Array.from({ length: Math.max(selectedVisit.photos.length, photoSlots?.length || 0) }).map((_, idx) => {
                           const slot = photoSlots?.[idx];
+                          const photo = slot
+                            ? selectedVisit.photos.find((item) => item.slot_id === slot.id) || selectedVisit.photos[idx]
+                            : selectedVisit.photos[idx];
                           return (
-                            <div key={idx} className="space-y-1">
+                            <div key={slot?.id || idx} className="space-y-2 border border-border p-3">
                               {slot && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-semibold">{slot.label?.en || slot.label?.ar}</span>
-                                  {slot.required === false && (
-                                    <span className="text-[10px] uppercase text-muted-foreground">{tc('optional')}</span>
-                                  )}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <span className="text-sm font-semibold">{slot.label?.en || slot.label?.ar}</span>
+                                    {slot.label?.ar && slot.label?.en && <p className="text-xs font-ar text-muted-foreground" dir="rtl">{slot.label.ar}</p>}
+                                  </div>
+                                  <Badge variant={slot.required === false ? 'outline' : 'secondary'} className="shrink-0 text-[10px]">
+                                    {slot.required === false ? tc('optional') : tc('required')}
+                                  </Badge>
                                 </div>
                               )}
-                              <a
-                                href={photo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
-                              >
-                                <img
-                                  src={photo}
-                                  alt={slot?.label?.en || `Visit photo ${idx + 1}`}
-                                  loading="lazy"
-                                  className="w-full h-auto max-h-96 object-contain bg-muted"
-                                />
-                              </a>
+                              {(slot?.hint?.en || slot?.hint?.ar) && <p className="text-xs text-muted-foreground">{slot.hint?.en || slot.hint?.ar}</p>}
+                              {photo?.url ? (
+                                <a href={photo.url} target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity">
+                                  <img src={photo.url} alt={slot?.label?.en || `Visit photo ${idx + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
+                                </a>
+                              ) : (
+                                <div className="flex aspect-[4/3] flex-col items-center justify-center gap-2 border border-dashed border-destructive/40 bg-destructive/5 text-destructive">
+                                  <Camera className="h-6 w-6" />
+                                  <span className="text-xs font-semibold">No photo submitted</span>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -379,7 +432,7 @@ export function CompletedVisitsDialog({
                   )}
 
                   {/* Receipt */}
-                  {selectedVisit.receipt_photo && (
+                  {(selectedVisit.receipt_photo || receiptCap !== undefined) && (
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
@@ -390,19 +443,23 @@ export function CompletedVisitsDialog({
                           </Badge>
                         )}
                       </h4>
-                      <a
-                        href={selectedVisit.receipt_photo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity"
-                      >
-                        <img
-                          src={selectedVisit.receipt_photo}
-                          alt="Receipt"
-                          loading="lazy"
-                          className="w-full h-auto max-h-[32rem] object-contain bg-muted"
-                        />
-                      </a>
+                      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
+                        {selectedVisit.receipt_photo ? (
+                          <a href={selectedVisit.receipt_photo} target="_blank" rel="noopener noreferrer" className="block w-full bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity">
+                            <img src={selectedVisit.receipt_photo} alt="Receipt" loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
+                          </a>
+                        ) : (
+                          <div className="flex aspect-[4/3] flex-col items-center justify-center gap-2 border border-dashed border-destructive/40 bg-destructive/5 text-destructive">
+                            <Paperclip className="h-6 w-6" />
+                            <span className="text-xs font-semibold">Required receipt not submitted</span>
+                          </div>
+                        )}
+                        <div className="border border-border p-3 text-sm">
+                          <div className="text-xs text-muted-foreground">Amount spent</div>
+                          <div className="mt-1 text-xl font-bold">{formatCurrency(selectedVisit.purchase_amount)}</div>
+                          {receiptCap !== undefined && <div className="mt-3 text-xs text-muted-foreground">Reimbursement cap: {formatCurrency(receiptCap)}</div>}
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -420,5 +477,51 @@ export function CompletedVisitsDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function AnswerValue({ answer, yesLabel, noLabel }: { answer: CompletedVisitAnswer; yesLabel: string; noLabel: string }) {
+  const raw = answer.answer;
+  const normalized = typeof raw === 'string' ? raw.toLowerCase() : raw;
+  if (answer.type === 'rating' && typeof raw === 'number') {
+    const max = answer.max_rating || 5;
+    return (
+      <div className="mt-3 border border-border bg-muted/30 p-3">
+        <div className="flex items-end justify-between gap-3">
+          <span className="text-2xl font-black text-primary">{raw}</span>
+          <span className="text-xs text-muted-foreground">out of {max}</span>
+        </div>
+        <div className="mt-2 h-2 overflow-hidden bg-muted"><div className="h-full bg-primary" style={{ width: `${Math.max(0, Math.min(100, (raw / max) * 100))}%` }} /></div>
+      </div>
+    );
+  }
+  if (answer.type === 'yes_no' || typeof raw === 'boolean' || normalized === 'yes' || normalized === 'no') {
+    const positive = raw === true || normalized === 'yes';
+    return (
+      <div className={cn('mt-3 flex items-center gap-2 border p-3 text-sm font-semibold', positive ? 'border-success/30 bg-success/5 text-success' : 'border-destructive/30 bg-destructive/5 text-destructive')}>
+        {positive ? <CircleCheck className="h-5 w-5" /> : <CircleX className="h-5 w-5" />}
+        {positive ? yesLabel : noLabel}
+      </div>
+    );
+  }
+  const selected = answer.options?.find((option) => option.id === String(raw));
+  const display = selected?.en || selected?.ar || (Array.isArray(raw) ? raw.join(', ') : String(raw || '—'));
+  return <div className="mt-3 border border-border bg-muted/40 p-3 text-sm font-medium">{display}</div>;
+}
+
+function MediaGrid({ title, urls, icon }: { title: string; urls: string[]; icon: 'attachment' | 'photo' }) {
+  const Icon = icon === 'attachment' ? Paperclip : Camera;
+  return (
+    <div className="mt-3">
+      <div className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground"><Icon className="h-3.5 w-3.5" />{title}</div>
+      <div className="grid grid-cols-2 gap-2">
+        {urls.map((url, index) => (
+          <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden border border-border bg-muted">
+            <img src={url} alt={`${title} ${index + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain" />
+            <div className="flex items-center gap-1.5 border-t border-border bg-background px-2 py-1.5 text-[10px] font-semibold"><Paperclip className="h-3 w-3" />Open attachment {index + 1}</div>
+          </a>
+        ))}
+      </div>
+    </div>
   );
 }
