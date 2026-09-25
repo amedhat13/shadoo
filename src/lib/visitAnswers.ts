@@ -78,6 +78,8 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
   const qMap = new Map<string, Question>();
   questions.forEach((q) => qMap.set(q.id, q));
 
+  const photoSlots = getMissionPhotoSlots(mission);
+
   return visits.map((v) => {
     const arr = (Array.isArray(v.answers) ? v.answers : []) as RawAnswer[];
     const answers: CompletedVisitAnswer[] = arr.map((a) => {
@@ -114,22 +116,28 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
         options: optionLabels,
         photo_requirement: q?.photoRequirement,
         attachments: [...new Set(answerMedia)],
-        answer: (a.value ?? '') as string | number | boolean,
+        answer: (a.value ?? '') as string | number | boolean | string[],
         not_applicable: Boolean(a.na ?? a.not_applicable),
         comment: a.comment || undefined,
       };
     });
+
+    const rawPhotos = v.photos;
+    const photos = Array.isArray(rawPhotos)
+      ? mediaUrls(rawPhotos).map((url, index) => ({ url, slot_id: photoSlots[index]?.id }))
+      : Object.entries((rawPhotos && typeof rawPhotos === 'object' ? rawPhotos : {}) as Record<string, unknown>)
+          .filter(([key]) => !key.startsWith('q:') && !qMap.has(key))
+          .flatMap(([key, value]) => mediaUrls(value).map((url) => ({
+            url,
+            slot_id: photoSlots.some((slot) => slot.id === key) ? key : undefined,
+          })));
 
     return {
       id: v.id,
       agent_name: 'Mystery Shopper',
       completed_at: v.submitted_at || v.started_at || v.created_at || new Date().toISOString(),
       purchase_amount: Number(v.purchase_amount || 0),
-      photos: Array.isArray(v.photos)
-        ? mediaUrls(v.photos)
-        : Object.entries((v.photos && typeof v.photos === 'object' ? v.photos : {}) as Record<string, unknown>)
-            .filter(([key]) => !key.startsWith('q:') && !qMap.has(key))
-            .flatMap(([, value]) => mediaUrls(value)),
+      photos,
       receipt_photo: v.receipt_photo ?? undefined,
       answers,
       client_rating: v.client_rating ?? undefined,

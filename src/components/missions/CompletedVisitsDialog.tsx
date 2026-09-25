@@ -25,6 +25,7 @@ export interface CompletedVisitAnswer {
   description?: string;
   description_ar?: string;
   section?: string;
+  section_id?: string;
   section_ar?: string;
   type: string;
   required?: boolean;
@@ -36,7 +37,7 @@ export interface CompletedVisitAnswer {
   options?: { id: string; en?: string; ar?: string }[];
   photo_requirement?: QuestionPhotoRequirement;
   attachments?: string[];
-  answer: string | number | boolean;
+  answer: string | number | boolean | string[];
   not_applicable?: boolean;
   comment?: string;
 }
@@ -46,7 +47,7 @@ export interface CompletedVisit {
   agent_name: string;
   completed_at: string;
   purchase_amount: number;
-  photos: string[];
+  photos: { url: string; slot_id?: string }[];
   receipt_photo?: string;
   answers: CompletedVisitAnswer[];
   rating?: number;
@@ -91,6 +92,7 @@ const StarRating = forwardRef<HTMLDivElement, {
           onClick={() => onChange?.(star)}
           onMouseEnter={() => !readonly && setHover(star)}
           onMouseLeave={() => !readonly && setHover(0)}
+          aria-label={`${readonly ? 'Rated' : 'Rate'} ${star} stars`}
         >
           <Star
             className={cn(
@@ -107,11 +109,11 @@ const StarRating = forwardRef<HTMLDivElement, {
 });
 
 function groupBySection(answers: CompletedVisitAnswer[]) {
-  const groups: { section?: string; section_ar?: string; answers: CompletedVisitAnswer[] }[] = [];
+  const groups: { section?: string; section_id?: string; section_ar?: string; answers: CompletedVisitAnswer[] }[] = [];
   answers.forEach((a) => {
     const last = groups[groups.length - 1];
-    if (last && last.section === a.section) last.answers.push(a);
-    else groups.push({ section: a.section, section_ar: a.section_ar, answers: [a] });
+    if (last && (last.section_id || last.section) === (a.section_id || a.section)) last.answers.push(a);
+    else groups.push({ section: a.section, section_id: a.section_id, section_ar: a.section_ar, answers: [a] });
   });
   return groups;
 }
@@ -196,6 +198,7 @@ export function CompletedVisitsDialog({
                       setPendingRating(0);
                       setPendingFeedback('');
                     }}
+                    aria-pressed={selectedVisit?.id === visit.id}
                     className={cn(
                       'w-full text-start p-3 transition-colors hover:bg-muted/50',
                       selectedVisit?.id === visit.id && 'bg-muted'
@@ -393,8 +396,10 @@ export function CompletedVisitsDialog({
                       </h4>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {Array.from({ length: Math.max(selectedVisit.photos.length, photoSlots?.length || 0) }).map((_, idx) => {
-                          const photo = selectedVisit.photos[idx];
                           const slot = photoSlots?.[idx];
+                          const photo = slot
+                            ? selectedVisit.photos.find((item) => item.slot_id === slot.id) || selectedVisit.photos[idx]
+                            : selectedVisit.photos[idx];
                           return (
                             <div key={slot?.id || idx} className="space-y-2 border border-border p-3">
                               {slot && (
@@ -409,9 +414,9 @@ export function CompletedVisitsDialog({
                                 </div>
                               )}
                               {(slot?.hint?.en || slot?.hint?.ar) && <p className="text-xs text-muted-foreground">{slot.hint?.en || slot.hint?.ar}</p>}
-                              {photo ? (
-                                <a href={photo} target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity">
-                                  <img src={photo} alt={slot?.label?.en || `Visit photo ${idx + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
+                              {photo?.url ? (
+                                <a href={photo.url} target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity">
+                                  <img src={photo.url} alt={slot?.label?.en || `Visit photo ${idx + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
                                 </a>
                               ) : (
                                 <div className="flex aspect-[4/3] flex-col items-center justify-center gap-2 border border-dashed border-destructive/40 bg-destructive/5 text-destructive">
