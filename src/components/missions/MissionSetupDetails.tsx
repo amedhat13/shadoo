@@ -1,4 +1,5 @@
-import { Camera, Clock, ListChecks, Receipt, Timer, ShieldCheck, Layers } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Clock, ListChecks, Receipt, Timer, ShieldCheck, Layers, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { QUESTION_TYPE_LABELS } from '@/lib/constants';
@@ -9,6 +10,7 @@ import type {
   QuestionSection,
   ReceiptConfig,
 } from '@/types';
+import { cn } from '@/lib/utils';
 
 type Bilingual = { en?: string; ar?: string };
 
@@ -255,7 +257,7 @@ function questionTags(q: Question): { label: string; className: string }[] {
   return tags;
 }
 
-/** Questions grouped by section, with every enabled behaviour surfaced as a tag. */
+/** Questions grouped by collapsible section, with every enabled behaviour surfaced as a tag. */
 export function MissionQuestionsCard({
   questions,
   sections,
@@ -280,6 +282,13 @@ export function MissionQuestionsCard({
       : [{ section: undefined as QuestionSection | undefined, items: list }];
   const ungrouped =
     sectionList.length > 0 ? list.filter((q) => !q.section_id || !sectionList.some((s) => s.id === q.section_id)) : [];
+
+  // First section open by default; rest collapsed. "Other" always open when present.
+  const hasSections = sectionList.length > 0;
+  const [openKeys, setOpenKeys] = useState<Record<string, boolean>>(() =>
+    hasSections ? { [sectionList[0].id]: true } : {}
+  );
+  const toggle = (key: string) => setOpenKeys((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const renderQuestion = (q: Question, index: number) => {
     const desc = asBilingual(q.description);
@@ -336,6 +345,32 @@ export function MissionQuestionsCard({
 
   let counter = 0;
 
+  const renderGroup = (key: string, label: string, items: Question[], startCounter: number, defaultOpen = false) => {
+    const open = hasSections ? (openKeys[key] ?? false) : defaultOpen;
+    const end = startCounter + items.length;
+    counter = end;
+    const button = (
+      <button
+        type="button"
+        onClick={() => toggle(key)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 border border-border bg-muted/30 px-3 py-2.5 text-start transition-colors hover:bg-muted/60"
+      >
+        <span className="flex items-center gap-2 min-w-0">
+          <span className="text-xs font-bold uppercase tracking-wide truncate">{label}</span>
+          <span className="text-[10px] text-muted-foreground shrink-0">{items.length} Q</span>
+        </span>
+        <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
+      </button>
+    );
+    return (
+      <div key={key} className="space-y-2">
+        {button}
+        {open && <div className="space-y-2">{items.map((q, i) => renderQuestion(q, startCounter + i))}</div>}
+      </div>
+    );
+  };
+
   return (
     <Card className="border border-border">
       <CardHeader>
@@ -343,31 +378,24 @@ export function MissionQuestionsCard({
           {titleLabel || `${list.length} Questions`}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {list.length === 0 ? (
           <p className="text-muted-foreground text-sm">{emptyLabel}</p>
-        ) : (
+        ) : hasSections ? (
           <>
-            {groups.map((g, gi) => (
-              <div key={g.section?.id || gi} className="space-y-3">
-                {g.section && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wide">
-                      {g.section.label?.en || g.section.label?.ar}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">{g.items.length} questions</span>
-                  </div>
-                )}
-                {g.items.map((q) => renderQuestion(q, counter++))}
-              </div>
-            ))}
-            {ungrouped.length > 0 && (
-              <div className="space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Other</span>
-                {ungrouped.map((q) => renderQuestion(q, counter++))}
-              </div>
+            {groups.map((g) =>
+              renderGroup(
+                g.section!.id,
+                g.section?.label?.en || g.section?.label?.ar || 'Section',
+                g.items,
+                counter,
+                false
+              )
             )}
+            {ungrouped.length > 0 && renderGroup('__other', 'Other', ungrouped, counter, false)}
           </>
+        ) : (
+          <div className="space-y-2">{list.map((q, i) => renderQuestion(q, i))}</div>
         )}
       </CardContent>
     </Card>
