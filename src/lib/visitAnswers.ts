@@ -44,13 +44,24 @@ interface RawAnswer {
 
 const mediaUrls = (value: unknown): string[] => {
   if (typeof value === 'string') return value ? [value] : [];
-  if (!Array.isArray(value)) return [];
+  if (!value || typeof value !== 'object') return [];
+  if (!Array.isArray(value)) {
+    const media = value as { url?: string; publicUrl?: string; path?: string };
+    if (media.url || media.publicUrl || media.path) return [media.url || media.publicUrl || media.path || ''].filter(Boolean);
+    return Object.values(value).flatMap(mediaUrls);
+  }
   return value.flatMap((item) => {
     if (typeof item === 'string') return item ? [item] : [];
     if (!item || typeof item !== 'object') return [];
     const media = item as { url?: string; publicUrl?: string; path?: string };
     return media.url || media.publicUrl || media.path ? [media.url || media.publicUrl || media.path || ''] : [];
   }).filter(Boolean);
+};
+
+const keyedMedia = (value: unknown, questionId?: string): string[] => {
+  if (!questionId || !value || Array.isArray(value) || typeof value !== 'object') return [];
+  const record = value as Record<string, unknown>;
+  return [record[questionId], record[`q:${questionId}`]].flatMap(mediaUrls);
 };
 
 /** Builds the enriched completed-visit payload (sections, descriptions, N/A, comments). */
@@ -83,6 +94,7 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
         ...mediaUrls(a.photos),
         ...mediaUrls(a.photo_url),
         ...(q?.type === 'attachment' ? mediaUrls(a.value) : []),
+        ...keyedMedia(v.photos, q?.id || a.question_id),
       ];
       return {
         question_id: q?.id || a.question_id,
@@ -113,7 +125,11 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
       agent_name: 'Mystery Shopper',
       completed_at: v.submitted_at || v.started_at || v.created_at || new Date().toISOString(),
       purchase_amount: Number(v.purchase_amount || 0),
-      photos: mediaUrls(v.photos),
+      photos: Array.isArray(v.photos)
+        ? mediaUrls(v.photos)
+        : Object.entries((v.photos && typeof v.photos === 'object' ? v.photos : {}) as Record<string, unknown>)
+            .filter(([key]) => !key.startsWith('q:') && !qMap.has(key))
+            .flatMap(([, value]) => mediaUrls(value)),
       receipt_photo: v.receipt_photo ?? undefined,
       answers,
       client_rating: v.client_rating ?? undefined,

@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useState } from 'react';
-import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers, Paperclip, Receipt, BarChart3, CircleCheck, CircleX } from 'lucide-react';
+import { CheckCircle2, Camera, MessageSquare, ChevronRight, EyeOff, Star, Loader2, Layers, Paperclip, BarChart3, CircleCheck, CircleX } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -351,6 +351,13 @@ export function CompletedVisitsDialog({
                                   <Badge variant="outline" className="gap-1 text-[10px]"><BarChart3 className="h-3 w-3" />{answer.metric_key.replace(/_/g, ' ')}</Badge>
                                 )}
                               </div>
+                              {(answer.suggested_comments || []).some((comment) => comment.en || comment.ar) && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {(answer.suggested_comments || []).filter((comment) => comment.en || comment.ar).map((comment) => (
+                                    <span key={comment.id} className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">{comment.en || comment.ar}</span>
+                                  ))}
+                                </div>
+                              )}
                               {answer.not_applicable ? (
                                 <div className="mt-3 border border-border bg-muted/40 p-3 text-sm font-medium">{t('details.not_applicable', 'Not applicable')}</div>
                               ) : (
