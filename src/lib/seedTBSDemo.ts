@@ -5,7 +5,19 @@
 // Idempotent: if TBS data already exists, recreates cleanly.
 // ============================================================================
 import { supabase } from '@/integrations/supabase/client';
-import { TBS_QUESTIONS, TBS_VISITS } from './tbsDemoData';
+import { TBS_PHOTO_SLOTS, TBS_QUESTIONS, TBS_SECTIONS, TBS_VISITS } from './tbsDemoData';
+
+/** One-tap comments the shopper leaves when a criterion was missed. */
+const LOW_SCORE_COMMENTS: Record<string, string> = {
+  'tbs-q1': 'Stood at the counter for about a minute before anyone looked up.',
+  'tbs-q2': 'Greeting felt rushed and there was no smile.',
+  'tbs-q3': 'Staff could not explain the difference between two pastries.',
+  'tbs-q4': 'Requested item was finished and no one mentioned it until I asked.',
+  'tbs-q9': 'Order took noticeably longer than promised with no update.',
+  'tbs-q10': 'The extra coffee I paid for was missing from the bag.',
+  'tbs-q12': 'Item was served lukewarm and looked dry.',
+  'tbs-q13': 'Bag had no seal and the lid was loose.',
+};
 
 export interface SeedResult {
   ok: boolean;
