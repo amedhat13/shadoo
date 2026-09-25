@@ -105,6 +105,7 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
         description: desc.en,
         description_ar: desc.ar,
         section: sectionLabel(q?.section_id),
+        section_id: q?.section_id,
         section_ar: bi(section?.label).ar,
         type: q?.type || 'short_text',
         required: q?.required,
