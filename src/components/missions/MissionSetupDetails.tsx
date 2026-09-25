@@ -1,4 +1,5 @@
-import { Camera, Clock, ListChecks, Receipt, Timer, ShieldCheck, Layers } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Clock, ListChecks, Receipt, Timer, ShieldCheck, Layers, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { QUESTION_TYPE_LABELS } from '@/lib/constants';
@@ -9,6 +10,7 @@ import type {
   QuestionSection,
   ReceiptConfig,
 } from '@/types';
+import { cn } from '@/lib/utils';
 
 type Bilingual = { en?: string; ar?: string };
 
