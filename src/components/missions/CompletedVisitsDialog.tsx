@@ -16,7 +16,7 @@ import { CURRENCY, QUESTION_TYPE_LABELS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import type { CommentMode, QuestionPhotoRequirement, SuggestedComment } from '@/types';
+import type { CommentMode, PhotoSlot, QuestionPhotoRequirement, SuggestedComment } from '@/types';
 
 export interface CompletedVisitAnswer {
   question_id?: string;
@@ -60,7 +60,7 @@ interface CompletedVisitsDialogProps {
   onOpenChange: (open: boolean) => void;
   visits: CompletedVisit[];
   missionName: string;
-  photoSlots?: { id: string; label: { en?: string; ar?: string }; required?: boolean }[];
+  photoSlots?: PhotoSlot[];
   receiptCap?: number;
   onRateVisit?: (visitId: string, rating: number, feedback?: string) => Promise<void>;
 }
@@ -384,39 +384,41 @@ export function CompletedVisitsDialog({
                     </div>
                   </div>
 
-                  {/* Photos — labelled with the mission's named slots */}
-                  {selectedVisit.photos.length > 0 && (
+                  {/* Photos — labelled with the mission's named slots, including missing required evidence. */}
+                  {(selectedVisit.photos.length > 0 || (photoSlots || []).length > 0) && (
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
-                        {t('details.photos_label')} ({selectedVisit.photos.length})
+                        {t('details.photos_label')} ({selectedVisit.photos.length}/{Math.max(selectedVisit.photos.length, photoSlots?.length || 0)})
                       </h4>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        {selectedVisit.photos.map((photo, idx) => {
+                        {Array.from({ length: Math.max(selectedVisit.photos.length, photoSlots?.length || 0) }).map((_, idx) => {
+                          const photo = selectedVisit.photos[idx];
                           const slot = photoSlots?.[idx];
                           return (
-                            <div key={idx} className="space-y-1">
+                            <div key={slot?.id || idx} className="space-y-2 border border-border p-3">
                               {slot && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-semibold">{slot.label?.en || slot.label?.ar}</span>
-                                  {slot.required === false && (
-                                    <span className="text-[10px] uppercase text-muted-foreground">{tc('optional')}</span>
-                                  )}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <span className="text-sm font-semibold">{slot.label?.en || slot.label?.ar}</span>
+                                    {slot.label?.ar && slot.label?.en && <p className="text-xs font-ar text-muted-foreground" dir="rtl">{slot.label.ar}</p>}
+                                  </div>
+                                  <Badge variant={slot.required === false ? 'outline' : 'secondary'} className="shrink-0 text-[10px]">
+                                    {slot.required === false ? tc('optional') : tc('required')}
+                                  </Badge>
                                 </div>
                               )}
-                              <a
-                                href={photo}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity"
-                              >
-                                <img
-                                  src={photo}
-                                  alt={slot?.label?.en || `Visit photo ${idx + 1}`}
-                                  loading="lazy"
-                                  className="aspect-[4/3] w-full object-contain bg-muted"
-                                />
-                              </a>
+                              {(slot?.hint?.en || slot?.hint?.ar) && <p className="text-xs text-muted-foreground">{slot.hint?.en || slot.hint?.ar}</p>}
+                              {photo ? (
+                                <a href={photo} target="_blank" rel="noopener noreferrer" className="group bg-muted border border-border overflow-hidden block hover:opacity-90 transition-opacity">
+                                  <img src={photo} alt={slot?.label?.en || `Visit photo ${idx + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
+                                </a>
+                              ) : (
+                                <div className="flex aspect-[4/3] flex-col items-center justify-center gap-2 border border-dashed border-destructive/40 bg-destructive/5 text-destructive">
+                                  <Camera className="h-6 w-6" />
+                                  <span className="text-xs font-semibold">No photo submitted</span>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -425,7 +427,7 @@ export function CompletedVisitsDialog({
                   )}
 
                   {/* Receipt */}
-                  {selectedVisit.receipt_photo && (
+                  {(selectedVisit.receipt_photo || receiptCap !== undefined) && (
                     <div>
                       <h4 className="font-bold text-sm uppercase tracking-wide mb-3 flex items-center gap-2">
                         <Camera className="h-4 w-4" />
@@ -437,19 +439,16 @@ export function CompletedVisitsDialog({
                         )}
                       </h4>
                       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
-                      <a
-                        href={selectedVisit.receipt_photo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity"
-                      >
-                        <img
-                          src={selectedVisit.receipt_photo}
-                          alt="Receipt"
-                          loading="lazy"
-                          className="aspect-[4/3] w-full object-contain bg-muted"
-                        />
-                      </a>
+                        {selectedVisit.receipt_photo ? (
+                          <a href={selectedVisit.receipt_photo} target="_blank" rel="noopener noreferrer" className="block w-full bg-muted border border-border overflow-hidden hover:opacity-90 transition-opacity">
+                            <img src={selectedVisit.receipt_photo} alt="Receipt" loading="lazy" className="aspect-[4/3] w-full object-contain bg-muted" />
+                          </a>
+                        ) : (
+                          <div className="flex aspect-[4/3] flex-col items-center justify-center gap-2 border border-dashed border-destructive/40 bg-destructive/5 text-destructive">
+                            <Paperclip className="h-6 w-6" />
+                            <span className="text-xs font-semibold">Required receipt not submitted</span>
+                          </div>
+                        )}
                         <div className="border border-border p-3 text-sm">
                           <div className="text-xs text-muted-foreground">Amount spent</div>
                           <div className="mt-1 text-xl font-bold">{formatCurrency(selectedVisit.purchase_amount)}</div>
@@ -514,6 +513,7 @@ function MediaGrid({ title, urls, icon }: { title: string; urls: string[]; icon:
         {urls.map((url, index) => (
           <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden border border-border bg-muted">
             <img src={url} alt={`${title} ${index + 1}`} loading="lazy" className="aspect-[4/3] w-full object-contain" />
+            <div className="flex items-center gap-1.5 border-t border-border bg-background px-2 py-1.5 text-[10px] font-semibold"><Paperclip className="h-3 w-3" />Open attachment {index + 1}</div>
           </a>
         ))}
       </div>
