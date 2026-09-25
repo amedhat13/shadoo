@@ -223,7 +223,7 @@ export function CompletedVisitsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] p-0">
+      <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] max-h-[95vh] p-0">
         <DialogHeader className="p-5 pb-3">
           <DialogTitle className="flex items-center gap-2 text-base">
             <CheckCircle2 className="h-5 w-5 text-success" />
@@ -234,7 +234,7 @@ export function CompletedVisitsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-[70vh] min-h-0 flex-col md:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row overflow-hidden">
           {/* Visit list */}
           <div className="h-24 shrink-0 border-b border-border md:h-full md:w-[15rem] md:border-b-0 md:border-e">
             <ScrollArea className="h-full">
