@@ -234,7 +234,7 @@ export function CompletedVisitsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-[70vh] min-h-0 flex-col md:flex-row">
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row overflow-hidden">
           {/* Visit list */}
           <div className="h-24 shrink-0 border-b border-border md:h-full md:w-[15rem] md:border-b-0 md:border-e">
             <ScrollArea className="h-full">
