@@ -81,6 +81,11 @@ export async function seedTBSDemo(): Promise<SeedResult> {
       status: 'completed',
       agent_tier: 'GENERAL',
       questions: JSON.parse(JSON.stringify(TBS_QUESTIONS)),
+      question_sections: JSON.parse(JSON.stringify(TBS_SECTIONS)),
+      photo_requirements: JSON.parse(JSON.stringify({
+        required_count: TBS_PHOTO_SLOTS.filter((s) => s.required).length,
+        slots: TBS_PHOTO_SLOTS,
+      })),
       number_of_visits: 10,
       purchase_budget_per_visit: 250,
       total_purchase_budget: 2500,
