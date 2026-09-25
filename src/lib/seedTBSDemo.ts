@@ -102,7 +102,13 @@ export async function seedTBSDemo(): Promise<SeedResult> {
     mission_id: mission.id,
     agent_id: null,
     status: v.status,
-    answers: JSON.parse(JSON.stringify(v.answers)),
+    answers: JSON.parse(JSON.stringify(v.answers.map((a) => {
+      const low = typeof a.value === 'number' && a.value <= 3;
+      const comment = a.question_id === 'tbs-q14'
+        ? (low ? 'Would think twice before coming back to this branch.' : 'Good experience overall, I would recommend this branch.')
+        : (low ? LOW_SCORE_COMMENTS[a.question_id] : undefined);
+      return comment ? { ...a, comment } : a;
+    }))),
     purchase_amount: v.purchase_amount,
     scheduled_date: v.scheduled_date,
     scheduled_time: v.scheduled_time,
