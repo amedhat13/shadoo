@@ -31,6 +31,13 @@ export interface AdminVisit {
     purchase_budget_per_visit: number;
     user_id: string;
     visit_schedules: any;
+    question_sections?: any;
+    receipt?: any;
+    review_sla_hours?: number | null;
+    cancel_window_min?: number | null;
+    expected_minutes?: number | null;
+    completion_deadline_min?: number | null;
+    methodology?: string | null;
   };
   agent?: {
     id: string;

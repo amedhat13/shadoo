@@ -98,7 +98,7 @@ const StarRating = forwardRef<HTMLDivElement, {
 });
 
 /** Score of a single answer as a 0-100 percentage, or null when it doesn't count. */
-function answerScore(a: CompletedVisitAnswer): number | null {
+export function answerScore(a: CompletedVisitAnswer): number | null {
   if (a.not_applicable) return null;
   if (a.type === 'rating' && typeof a.answer === 'number') {
     const max = a.max_rating || 5;
@@ -113,7 +113,7 @@ function answerScore(a: CompletedVisitAnswer): number | null {
 }
 
 /** An answer needing the client's attention: weak score, or missing required evidence. */
-function isIssue(a: CompletedVisitAnswer): boolean {
+export function isIssue(a: CompletedVisitAnswer): boolean {
   const score = answerScore(a);
   if (score !== null && score <= 60) return true;
   if (a.comment_mode === 'required' && !a.comment && !a.not_applicable) return true;
@@ -121,13 +121,13 @@ function isIssue(a: CompletedVisitAnswer): boolean {
   return false;
 }
 
-function averageScore(answers: CompletedVisitAnswer[]): number | null {
+export function averageScore(answers: CompletedVisitAnswer[]): number | null {
   const scores = answers.map(answerScore).filter((s): s is number => s !== null);
   if (!scores.length) return null;
   return Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
 }
 
-function scoreTone(score: number | null) {
+export function scoreTone(score: number | null) {
   if (score === null) return 'text-muted-foreground';
   if (score >= 80) return 'text-success';
   if (score >= 60) return 'text-amber-500';
@@ -556,7 +556,7 @@ function FilterPill({
 }
 
 /** One question: what was asked, what the shopper answered, and their evidence. */
-function AnswerCard({
+export function AnswerCard({
   index,
   answer,
   yesLabel,
