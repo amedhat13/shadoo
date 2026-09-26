@@ -101,6 +101,13 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
     + (normalizedVisit?.receipt_photo ? 1 : 0);
   const isSubmitted = visit.status === 'submitted';
   const answerIndex = new Map(answers.map((answer, index) => [answer, index]));
+  const matchedPhotoUrls = new Set<string>();
+  const resolvedPhotos = photoSlots.map((slot) => {
+    const matched = photos.find((photo) => photo.slot_id === slot.id && !matchedPhotoUrls.has(photo.url));
+    if (matched) matchedPhotoUrls.add(matched.url);
+    return { slot, photo: matched };
+  });
+  const unmatchedPhotos = photos.filter((photo) => !matchedPhotoUrls.has(photo.url));
 
   const scheduleInfo = visit.scheduled_date
     ? { date: visit.scheduled_date, time: visit.scheduled_time, duration: visit.scheduled_duration }
@@ -305,9 +312,7 @@ export function VisitReviewDialog({ visit, open, onOpenChange }: VisitReviewDial
                     <span className="text-xs font-normal text-muted-foreground">{photos.length}/{Math.max(photos.length, photoSlots.length)}</span>
                   </summary>
                   <div className="grid gap-3 border-t border-border p-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {Array.from({ length: Math.max(photos.length, photoSlots.length) }).map((_, index) => {
-                      const slot = photoSlots[index];
-                      const photo = slot ? photos.find((item) => item.slot_id === slot.id) || photos[index] : photos[index];
+                    {[...resolvedPhotos, ...unmatchedPhotos.map((photo) => ({ slot: undefined, photo }))].map(({ slot, photo }, index) => {
                       const missingRequired = Boolean(slot && slot.required !== false && !photo?.url);
                       return (
                         <div key={slot?.id || index} className="space-y-2">

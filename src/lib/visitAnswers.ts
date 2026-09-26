@@ -125,7 +125,13 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
 
     const rawPhotos = v.photos;
     const photos = Array.isArray(rawPhotos)
-      ? mediaUrls(rawPhotos).map((url, index) => ({ url, slot_id: photoSlots[index]?.id }))
+      ? rawPhotos.flatMap((item, index) => {
+          if (typeof item === 'string') return item ? [{ url: item, slot_id: photoSlots[index]?.id }] : [];
+          if (!item || typeof item !== 'object') return [];
+          const media = item as { url?: string; publicUrl?: string; path?: string; slot_id?: string; slotId?: string };
+          const url = media.url || media.publicUrl || media.path;
+          return url ? [{ url, slot_id: media.slot_id || media.slotId || photoSlots[index]?.id }] : [];
+        })
       : Object.entries((rawPhotos && typeof rawPhotos === 'object' ? rawPhotos : {}) as Record<string, unknown>)
           .filter(([key]) => !key.startsWith('q:') && !qMap.has(key))
           .flatMap(([key, value]) => mediaUrls(value).map((url) => ({
@@ -151,7 +157,7 @@ export function buildCompletedVisits(mission: MissionLike | null | undefined, vi
 /** Named photo slots configured on the mission, if any. */
 export function getMissionPhotoSlots(mission: MissionLike | null | undefined): PhotoSlot[] {
   const pr = mission?.photo_requirements as { slots?: PhotoSlot[] } | undefined;
-  return Array.isArray(pr?.slots) ? pr!.slots! : [];
+  return Array.isArray(pr?.slots) ? pr.slots : [];
 }
 
 /** Reimbursement cap from the mission receipt config. */
