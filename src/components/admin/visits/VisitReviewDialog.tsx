@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Clock,
   Loader2,
-  MapPin,
   Paperclip,
   Receipt,
   Timer,
